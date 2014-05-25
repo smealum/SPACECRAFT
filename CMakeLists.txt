@@ -62,6 +62,11 @@ SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 # find files
 file(GLOB_RECURSE source_files ${SRC}/*)
 
+# Do not compile glew on linux and osx
+if (NOT OS_WINDOWS)
+  list(REMOVE_ITEM source_files ${SRC}/glew/glew.c)
+endif()
+
 # Testing executable
 set(EXEC spacecraft)
 add_executable(
