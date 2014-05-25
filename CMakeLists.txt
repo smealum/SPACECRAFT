@@ -71,6 +71,7 @@ file(GLOB_RECURSE source_files ${SRC}/*)
 # Do not compile glew on linux and osx
 if (NOT OS_WINDOWS)
   list(REMOVE_ITEM source_files ${SRC}/glew/glew.c)
+  find_package(GLEW REQUIRED)
 endif()
 
 # Testing executable

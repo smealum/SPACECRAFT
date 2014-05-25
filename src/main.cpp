@@ -374,6 +374,7 @@ int main()
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        // fill stencil buffer for the reflection and draw a plane
         glEnable(GL_STENCIL_TEST);
         glUniform1i(uniTex, 48); // unset texture
         glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
