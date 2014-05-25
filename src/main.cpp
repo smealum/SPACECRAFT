@@ -15,6 +15,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include "utils/dbg.h"
+
 #define RAD2DEG(X) (float)(360.0*(X)/(2.0*M_PI))
 #define DEG2RAD(X) (float)(2.0*M_PI*(X)/360.0)
 
@@ -49,13 +51,12 @@ in vec3 Color;
 in vec2 Texcoord;
 uniform float time, force, amp;
 out vec4 outColor;
-uniform sampler2D tex, tex2;
+uniform sampler2D tex;
 
 void main()
 {
-    vec4 texC2 = texture(tex2, Texcoord)*vec4(Color, 1.f),
-         texC1 = texture(tex, vec2(Texcoord.x + force*sin((Texcoord.y * 60.0 + time)*amp) / 3.0, Texcoord.y))*vec4(Color, 1.f);
-    outColor = vec4(texC1.rgb, max(1.f, Texcoord.y<0.2f?Texcoord.y/.2f:1.f));
+    vec4 texC = texture(tex, vec2(Texcoord.x + force*sin((Texcoord.y * 60.0 + time)*amp) / 3.0, Texcoord.y))*vec4(Color, 1.f);
+    outColor = vec4(texC.rgb, max(1.f, Texcoord.y<0.2f?Texcoord.y/.2f:1.f));
 
 }
 )";
@@ -98,6 +99,7 @@ inline void TwWindowSizeGLFW3(GLFWwindow* /*window*/, int width, int height)
 
 int main()
 {
+    debug("Debug text");
     if (!glfwInit()) {
         std::cerr<<"Error initializing glfw...\n";
         return 1;
@@ -128,7 +130,9 @@ int main()
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Create a tweak bar
-    bar = TwNewBar("TweakBar");
+    std::string name("TweakBar");
+    bar = TwNewBar(name.c_str());
+    //TwDefine((name+" iconified=true").c_str()); // minimizes
     TwWindowSize(800, 600);
     int wire = 0;
     float force = 0.05, amp = 1.f, size = 1.f;
