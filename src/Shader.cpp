@@ -149,28 +149,24 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
         cerr<<"[Erreur] Impossible de linker les shader";
         exit(EXIT_FAILURE);
     }
-
+    return *p;
 }
 
 GLint ShaderProgram::uniform(const char* name)
 {
     auto it = uniformsMap.find(name);
-    if ( it == uniformsMap.end())
+    if (it == uniformsMap.end())
     {
         // uniforme non référencé
-        GLuint r = glGetUniformLocation(handle,name); 
+        GLuint r = glGetUniformLocation(handle, name); 
         uniformsMap[name] = r;
-        if ( r = GL_INVALID_OPERATION )
-        {
-            log_err("L'identifiant %s  n'existe pas",name);
-        }
+        if ( r == GL_INVALID_OPERATION )
+            log_err("L'identifiant %s  n'existe pas", name);
 
         return r;
     }
     else
-    {
         return it->second; 
-    }
 }
 
 ShaderProgram::ShaderProgram(const ShaderProgram& other)
@@ -181,35 +177,31 @@ ShaderProgram::ShaderProgram(const ShaderProgram& other)
 
 void ShaderProgram::setUniform(const char *name,float x,float y,float z)
 {
-
+    glUniform3f(uniform(name), x, y, z);
 }
 void ShaderProgram::setUniform(const char *name, const glm::vec3 & v)
 {
-
+    glUniform3fv(uniform(name), 1, glm::value_ptr(v));
 }
 void ShaderProgram::setUniform(const char *name, const glm::vec4 & v)
 {
-
+    glUniform4fv(uniform(name), 1, glm::value_ptr(v));
 }
 void ShaderProgram::setUniform(const char *name, const glm::mat4 & m)
 {
-
+    glUniformMatrix4fv(uniform(name), 1, GL_FALSE, glm::value_ptr(m));
 }
 void ShaderProgram::setUniform(const char *name, const glm::mat3 & m)
 {
-
+    glUniformMatrix3fv(uniform(name), 1, GL_FALSE, glm::value_ptr(m));
 }
 void ShaderProgram::setUniform(const char *name, float val )
 {
-
+    glUniform1f(uniform(name), val);
 }
 void ShaderProgram::setUniform(const char *name, int val )
 {
-
-}
-void ShaderProgram::setUniform(const char *name, bool val )
-{
-
+    glUniform1i(uniform(name), val);
 }
 
 ShaderProgram::ShaderProgram()
