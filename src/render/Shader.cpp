@@ -114,6 +114,7 @@ Shader::Shader(const Shader& shader)
 
 ShaderProgram& ShaderProgram::loadFromFile(const char* vertexShader, const char* fragmentShader)
 {
+    debug("Chargement d'un programme : %s , %s ",vertexShader,fragmentShader);
     return ShaderProgram::loadFromShader(
                 Shader::loadFromFile(vertexShader,ShaderType::Vertex),
                 Shader::loadFromFile(fragmentShader,ShaderType::Fragment)
@@ -142,10 +143,13 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
         exit(EXIT_FAILURE);
     }
 
+    debug("creation de programme : attachement");
 
     // attachement.
     glAttachShader(p->handle,vertexShader.getHandle());
     glAttachShader(p->handle,fragmentShader.getHandle());
+
+    debug("creation de programme : linkage ");
 
     // linkage
     glLinkProgram(p->handle);
@@ -156,6 +160,9 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
         log_err("[Erreur] Impossible de linker les shader");
         exit(EXIT_FAILURE);
     }
+
+    debug("creation de programme : succes");
+
     return *p;
 }
 
