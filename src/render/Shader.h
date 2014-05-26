@@ -67,7 +67,7 @@ class Shader
 {
     public:
         // Chargement du shader depuis un fichier
-        static Shader& loadFromFile(const char *filename,ShaderType::T type);
+        static Shader& loadFromFile(const char *filename, ShaderType::T type);
 
 
         // Fournit l'identifiant du shader
