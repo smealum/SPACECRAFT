@@ -91,6 +91,10 @@ include_directories( ${OPENGL_INCLUDE_DIRS} ${GLEW_INCLUDE_PATH} ${GLFW_INCLUDE_
 # libs
 target_link_libraries(${EXEC} ${GLEW_LIBRARY} ${GLFW_LIBRARIES} ${OPENGL_LIBRARIES} ${ANTTWEAKBAR_LIBRARY})
 
+add_custom_target(run
+  COMMAND ${EXECUTABLE_OUTPUT_PATH}/${EXEC}
+  DEPENDS ${EXEC})
+
 # tests
 #enable_testing()
 #add_test(test ${PROJECT_SOURCE_DIR}/tests/test.sh)
