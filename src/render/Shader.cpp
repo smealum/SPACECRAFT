@@ -14,6 +14,7 @@ map< pair<GLuint,GLuint> ,ShaderProgram*> shaderProgramMap;
 // Lecture d'un fichier
 bool getFileContents(const char *filename, vector<char>& buffer)
 {
+    debug("chargement du fichier : %s",filename);
     ifstream file(filename, ios_base::binary);
     if (file)
     {
@@ -37,6 +38,8 @@ bool getFileContents(const char *filename, vector<char>& buffer)
 // chargement d'un shader depuis un fichier
 Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
 {
+    debug("Chargement du shader : %s",filename);
+
     // test si le shader est déja chargé en mémoire.
     auto it = shaderMap.find(string(filename));
     if (it!=shaderMap.end())
@@ -71,6 +74,7 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
         int logsize;
         glGetShaderiv(s->handle, GL_INFO_LOG_LENGTH, &logsize);
          
+        debug("==logsize=%d", filename);
         char* log = new char[logsize+1];
         glGetShaderInfoLog(s->handle, logsize, &logsize, log);
         log[logsize]='\0';
@@ -79,12 +83,15 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
         log_err("============[Erreur log]========================");
         log_err("%s",log);
         log_err("================================================");
+        debug("==logsize=%d", filename);
         
         exit(EXIT_FAILURE);
     }
 
     // ajout du shader dans la map
     shaderMap[string(filename)]=s;
+
+    debug("Shader %s bien chargé", filename);
 
     return *s;
 }
