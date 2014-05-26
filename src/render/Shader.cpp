@@ -213,3 +213,8 @@ GLuint ShaderProgram::getHandle()
 {
     return handle;
 }
+
+void ShaderProgram::use()
+{
+    
+}
