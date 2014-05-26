@@ -2,15 +2,29 @@
 #include <stdlib.h>
 #include <iostream>
 
-void producerMain(Producer& p)
+void fakeProducerMain(Producer& p)
 {
-	// while(1)std::cout << "hello \n";
+	p.producerMain();
 }
 
 Producer::Producer(ContentInputQueue& iq, ContentOutputQueue& oq):
 	inputQueue(iq),
 	outputQueue(oq),
-	thread(new std::thread(producerMain, std::ref(*this)))
+	thread(new std::thread(fakeProducerMain, std::ref(*this)))
 {
 	
+}
+
+void Producer::producerMain()
+{
+	//TODO : attente passive avec signaux
+	while(1)
+	{
+		ContentRequest* cr=inputQueue.pop();
+		if(cr)
+		{
+			cr->process();
+			outputQueue.push(cr);
+		}
+	}
 }

@@ -9,6 +9,7 @@ class Producer
 {
 	public:
 		Producer(ContentInputQueue& inputQueue, ContentOutputQueue& outputQueue);
+		void producerMain();
 	private:
 		std::thread* thread;
 		//FIFO synallagmatique
