@@ -50,7 +50,7 @@ class Shader
 
     private:
         Shader();   // constructeur privé, passer par Shader::fromFile(filename)
-        GLuint glHandle;
+        GLuint handle;
         std::map<std::string,GLuint> uniformsMap;
 };
 
