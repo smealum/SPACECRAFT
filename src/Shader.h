@@ -52,6 +52,9 @@ class Shader
         Shader();   // constructeur privé, passer par Shader::fromFile(filename)
         GLuint handle;
         std::map<std::string,GLuint> uniformsMap;
+
+        // constructeur par copie (private)
+        Shader(const Shader& shader);
 };
 
 #endif /* end of include guard: SHADER_F8X43H2W */

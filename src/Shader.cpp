@@ -35,6 +35,12 @@ bool getFileContents(const char *filename, vector<char>& buffer)
 // chargement d'un shader depuis un fichier
 Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
 {
+    // test si le shader est déja chargé en mémoire.
+    auto it = shaderMap.find(string(filename));
+    if (it!=shaderMap.end())
+        return it->second;
+
+    // Sinon, on le charge
     Shader* s = new Shader();
 
     // chargement du fichier
@@ -75,10 +81,19 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
         exit(0);
     }
 
+    // ajout du shader dans la map
+    //shaderMap[string(filename)]=s;
+
     return *s;
 }
 
 Shader::Shader()
 {
 
+}
+
+Shader::Shader(const Shader& shader)
+{
+    handle = shader.handle;
+    uniformsMap = shader.uniformsMap;
 }
