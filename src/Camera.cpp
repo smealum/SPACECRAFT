@@ -10,3 +10,8 @@ Camera::Camera() :
                 , 0.1f, 1000.f))
 {}
 
+void Camera::updateCamera(ShaderProgram &prog)
+{
+    prog.setUniform("view", view);
+    prog.setUniform("proj", proj);
+}

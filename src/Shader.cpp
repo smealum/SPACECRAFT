@@ -144,42 +144,45 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
 
 }
 
-GLuint ShaderProgram::uniform(const char* name)
+GLint ShaderProgram::uniform(const char* name)
 {
+    auto uni(uniformsMap.find(name));
+    GLint uniId;
+    if (uni != uniformsMap.end())
+        uniId = uni->second;
+    else
+        uniId = uniformsMap[name] = glGetUniformLocation(handle, name);
 
+    return uniId;
 }
 
 void ShaderProgram::setUniform(const char *name,float x,float y,float z)
 {
-
+    glUniform3f(uniform(name), x, y, z);
 }
 void ShaderProgram::setUniform(const char *name, const glm::vec3 & v)
 {
-
+    glUniform3fv(uniform(name), 1, glm::value_ptr(v));
 }
 void ShaderProgram::setUniform(const char *name, const glm::vec4 & v)
 {
-
+    glUniform4fv(uniform(name), 1, glm::value_ptr(v));
 }
 void ShaderProgram::setUniform(const char *name, const glm::mat4 & m)
 {
-
+    glUniformMatrix4fv(uniform(name), 1, GL_FALSE, glm::value_ptr(m));
 }
 void ShaderProgram::setUniform(const char *name, const glm::mat3 & m)
 {
-
+    glUniformMatrix3fv(uniform(name), 1, GL_FALSE, glm::value_ptr(m));
 }
 void ShaderProgram::setUniform(const char *name, float val )
 {
-
+    glUniform1f(uniform(name), val);
 }
 void ShaderProgram::setUniform(const char *name, int val )
 {
-
-}
-void ShaderProgram::setUniform(const char *name, bool val )
-{
-
+    glUniform1i(uniform(name), val);
 }
 
 ShaderProgram::ShaderProgram()
