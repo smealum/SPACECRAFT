@@ -1,6 +1,7 @@
 #include "tests/testShaders.h"
 #include "Application.h"
 #include "render/Camera.h"
+#include "utils/dbg.h"
 
 static GLfloat vertices[] = {
     // POSITION           | COLOR       | NORMAL
@@ -46,8 +47,6 @@ static GLuint elements[12*3] = {
     20,21,22,   20,22,23, // face 6
 };
 
-
-
 testShaders::testShaders() :
     program(ShaderProgram::loadFromFile("shader/basic/basic.vert", "shader/basic/basic.frag")),
     model(1.f),
@@ -55,16 +54,21 @@ testShaders::testShaders() :
     vbo(0)
 {
     glGenVertexArrays(1, &vao);
+    log_info("Created VAO(%d)", vao);
     glBindVertexArray(vao);
 
     glGenBuffers(1, &vbo);
+    log_info("Created VBO(%d)", vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glGenBuffers(1, &ebo);
+    log_info("Created EBO(%d)", ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
+    glBindFragDataLocation(program.getHandle(), 0, "outColor");
+    program.use();
     GLint posAttrib = program.attribLocation("position");
     glEnableVertexAttribArray(posAttrib);
     glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), 0);
@@ -72,10 +76,10 @@ testShaders::testShaders() :
     glEnableVertexAttribArray(colAttrib);
     glVertexAttribPointer(colAttrib, 4, GL_FLOAT, GL_FALSE,
                           10*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
-    //GLint texAttrib = program.attribLocation("texcoord");
-    //glEnableVertexAttribArray(texAttrib);
-    //glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE,
-                           //8*sizeof(float), (void*)(6*sizeof(float)));
+    GLint texAttrib = program.attribLocation("texcoord");
+    glEnableVertexAttribArray(texAttrib);
+    glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE,
+                           10*sizeof(float), (void*)(0*sizeof(float))); // TODO change texcoord
     
     program.setUniform("overrideColor", glm::vec4(1.f));
     program.setUniform("model", model);
@@ -83,18 +87,18 @@ testShaders::testShaders() :
 
 void testShaders::draw()
 {
+    program.use();
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    program.use();
     Camera &cam(Application::getInstance().getCamera());
     cam.updateCamera(program);
 
     glDrawElements(
             GL_TRIANGLES,
-            12,
+            36,
             GL_UNSIGNED_INT,
-            NULL
+            0
             );
 
 }

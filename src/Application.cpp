@@ -80,7 +80,6 @@ Application::Application() :
         glfwTerminate();
         std::exit(1);
     }
-    tt = new testShaders;
 }
 
 void Application::glfwWindowHints()
@@ -125,6 +124,9 @@ void Application::run()
             glm::vec3(0.f),
             glm::vec3(0, 1.f, 0.f)
             );
+
+    tt = new testShaders;
+
     while (state != appExiting)
     {
         loop();

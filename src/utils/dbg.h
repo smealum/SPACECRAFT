@@ -5,21 +5,23 @@
 #include <cerrno>
 #include <cstring>
 
-#ifdef NDEBUG
-#define debug(M, ...)
-#else
-#define debug(M, ...) fprintf(stderr, "DEBUG %s:%d: " M "\n", __FILE__, __LINE__, ##__VA_ARGS__)
-#endif
-
 // colored printing for unixes
 #ifdef __WIN32__
 	#define ERROR_TEXT "[ERROR]"
 	#define WARN_TEXT "[WARN]"
 	#define INFO_TEXT "[INFO]"
+	#define DEBUG_TEXT "[DEBUG]"
 #else
 	#define ERROR_TEXT "[31m[ERROR][0m"
 	#define WARN_TEXT "[33m[WARN][0m"
 	#define INFO_TEXT "[34m[INFO][0m"
+	#define DEBUG_TEXT "[36m[DEBUG][0m"
+#endif
+
+#ifdef NDEBUG
+#define debug(M, ...)
+#else
+#define debug(M, ...) fprintf(stderr, DEBUG_TEXT " %s:%d: " M "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 #endif
 
 // used in the macros
