@@ -31,15 +31,18 @@ class Application : public Singleton<Application> {
         TwBar *bar;
 #endif
         unsigned int width, height;
+        float viewWidth, viewHeight;
         GLFWwindow* window;
 
         friend Singleton<Application>;
+
+        void glfwWindowHints();
 
     public:
         ~Application();
         void run();
         void loop();
-        //void switchFullscreen(bool fs);
+        void createWindowInFullscreen(bool fs);
         //void resetVSync();
         inline void exit() { state = appExiting; }
 
