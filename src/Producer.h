@@ -11,6 +11,7 @@ class Producer
 		Producer(ContentInputQueue& inputQueue, ContentOutputQueue& outputQueue);
 	private:
 		std::thread* thread;
+		//FIFO synallagmatique
 		ContentInputQueue& inputQueue;
 		ContentOutputQueue& outputQueue;
 };
