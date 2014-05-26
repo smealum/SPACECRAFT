@@ -66,9 +66,8 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
     
     
     // assignation du code source
-    log_info("%s", &fileContent[0]);
     const char* shaderText(&fileContent[0]);
-    glShaderSource(s->handle,1, (const GLchar**)&shaderText, NULL);
+    glShaderSource(s->handle, 1, (const GLchar**)&shaderText, NULL);
 
     // compilation
     glCompileShader(s->handle);
