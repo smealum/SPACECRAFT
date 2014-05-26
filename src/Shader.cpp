@@ -1,6 +1,8 @@
 #include "Shader.h"
 #include <vector>
 #include <fstream>
+#include <iostream>
+#include "utils/dbg.h"
 
 using namespace std;
 
@@ -30,18 +32,68 @@ bool getFileContents(const char *filename, vector<char>& buffer)
     }
 }
 
+// chargement d'un shader depuis un fichier
 Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
 {
-    Shader s;
+    // test si le shader est déja chargé en mémoire.
+    auto it = shaderMap.find(string(filename));
+    if (it!=shaderMap.end())
+        return it->second;
+
+    // Sinon, on le charge
+    Shader* s = new Shader();
+
+    // chargement du fichier
     vector<char> fileContent;
     if (not getFileContents(filename,fileContent))
     {
-    
+        cerr << "[Erreur] Fichier " << filename << " introuvable"<<endl;
+        exit(0);
     }
-    return s;
+
+    // creation
+    s->handle = glCreateShader(type);
+    
+    // assignation du code source
+    glShaderSource(s->handle,1, (const GLchar**)&(fileContent[0]), NULL);
+
+    // compilation
+    glCompileShader(s->handle);
+
+    // vérification de la compilation
+    GLint compile_status;
+    glGetShaderiv(s->handle, GL_COMPILE_STATUS, &compile_status);
+    if(compile_status != GL_TRUE)
+    {
+        /* error text retreiving*/
+        int logsize;
+        glGetShaderiv(s->handle, GL_INFO_LOG_LENGTH, &logsize);
+         
+        char* log = new char[logsize+1];
+        glGetShaderInfoLog(s->handle, logsize, &logsize, log);
+        log[logsize]='\0';
+         
+        cerr<<"[erreur] Impossible de compiler le shader : "<<filename<<endl;
+        cerr<<"============[Erreur]================="<<endl;
+        cerr<<log<<endl;
+        cerr<<"============[Erreur]================="<<endl;
+        
+        exit(0);
+    }
+
+    // ajout du shader dans la map
+    //shaderMap[string(filename)]=s;
+
+    return *s;
 }
 
 Shader::Shader()
 {
 
+}
+
+Shader::Shader(const Shader& shader)
+{
+    handle = shader.handle;
+    uniformsMap = shader.uniformsMap;
 }
