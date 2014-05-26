@@ -57,7 +57,10 @@ class ShaderProgram
         GLuint handle;
 
         // identifiants des attributs.
-        std::map<std::string,GLuint> uniformsMap;
+        std::map<std::string,GLint> uniformsMap;
+
+        // constructeur par copie (private, interdit)
+        ShaderProgram(const ShaderProgram& other);
 };
 
 class Shader
@@ -78,7 +81,7 @@ class Shader
         // identifiant du shader OpenGL
         GLuint handle;
 
-        // constructeur par copie (private)
+        // constructeur par copie (private, interdit)
         Shader(const Shader& shader);
 };
 
