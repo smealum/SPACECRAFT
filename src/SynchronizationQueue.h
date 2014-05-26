@@ -9,6 +9,7 @@ class SynchronizationQueue
 {
 	public:
 		SynchronizationQueue(void);
+		void popAll(std::queue<T>& ret);
 		void push(T t);
 		T pop(void);
 	private:
@@ -34,9 +35,18 @@ template<class T>
 T SynchronizationQueue<T>::pop(void)
 {
 	mutex.lock();
-		T t=queue.pop();
+		T t=queue.front();
+		queue.pop();
 	mutex.unlock();
 	return t;
+}
+
+template<class T>
+void SynchronizationQueue<T>::popAll(std::queue<T>& ret)
+{
+	mutex.lock();
+		queue.swap(ret);
+	mutex.unlock();
 }
 
 #endif
