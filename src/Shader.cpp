@@ -9,7 +9,7 @@ using namespace std;
 // collection des shader déja créés.
 map<string,Shader*> shaderMap;
 // collection des programmes déjà créés.
-map<string,ShaderProgram*> shaderProgramMap;
+map< pair<GLuint,GLuint> ,ShaderProgram*> shaderProgramMap;
 
 // Lecture d'un fichier
 bool getFileContents(const char *filename, vector<char>& buffer)
@@ -49,7 +49,7 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
     vector<char> fileContent;
     if (not getFileContents(filename,fileContent))
     {
-        cerr << "[Erreur] Fichier " << filename << " introuvable"<<endl;
+        log_err("[Erreur] Fichier %s  introuvable.", filename);
         exit(EXIT_FAILURE);
     }
 
@@ -116,7 +116,15 @@ ShaderProgram& ShaderProgram::loadFromFile(const char* vertexShader, const char*
 ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragmentShader)
 {
     // Si le program existe déjà on le renvoie
-    //auto it = shaderProgramMap.find
+    auto it = shaderProgramMap.find(
+                make_pair<GLuint,GLuint>(
+                    vertexShader.getHandle(),
+                    fragmentShader.getHandle())
+            );
+    if (it != shaderProgramMap.end())
+    {
+        return *(it->second);
+    }
 
     // programme creation
     ShaderProgram* p = new ShaderProgram();
@@ -144,9 +152,25 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
 
 }
 
-GLuint ShaderProgram::uniform(const char* name)
+GLint ShaderProgram::uniform(const char* name)
 {
+    auto it = uniformsMap.find(name);
+    if ( it == uniformsMap.end())
+    {
+        // uniforme non référencé
+        GLuint r = glGetUniformLocation(handle,name); 
+        uniformsMap[name] = r;
+        if ( r = GL_INVALID_OPERATION )
+        {
+            log_err("L'identifiant %s  n'existe pas",name);
+        }
 
+        return r;
+    }
+    else
+    {
+        return it->second; 
+    }
 }
 
 void ShaderProgram::setUniform(const char *name,float x,float y,float z)

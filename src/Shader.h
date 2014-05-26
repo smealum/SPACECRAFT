@@ -34,7 +34,7 @@ class ShaderProgram
         GLuint getHandle();
 
         // Fournit localisation d'un uniform.
-        GLuint uniform(const char* name);
+        GLint uniform(const char* name);
 
         // parametrer le ShaderProgram
         void setUniform(const char *name,float x,float y,float z);
