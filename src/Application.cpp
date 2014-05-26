@@ -27,7 +27,10 @@ Application::Application() :
 #endif
     width(800),
     height(600),
-    window(NULL)
+    viewWidth(width),
+    viewHeight(height),
+    window(NULL),
+    camera(NULL)
 {
     if (!glfwInit())
     {
@@ -35,19 +38,10 @@ Application::Application() :
         std::exit(1);
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHints();
 
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    createWindowInFullscreen(fullscreen);
 
-    window = glfwCreateWindow(width, height, "SPACECRAFT", NULL, NULL); // Windowed
-    if (!window) {
-        log_err("Cannot create window...");
-        glfwTerminate();
-        std::exit(2);
-    }
     glfwMakeContextCurrent(window);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // can be GLFW_CURSOR_HIDDEN
 
@@ -87,10 +81,43 @@ Application::Application() :
 
 }
 
+void Application::glfwWindowHints()
+{
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
+}
+
+void Application::createWindowInFullscreen(bool fs)
+{
+    if (window)
+    {
+        log_err("createWindowInFullscreen called but windows is alreayd created.");
+    } else {
+        const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        width = mode->width;
+        height = mode->height;
+        viewWidth = width;
+        viewHeight = height;
+        if (!fs)
+            width *= 2.f/3.f, height *= 2.f/3.f;
+        window = glfwCreateWindow(width, height, "SPACECRAFT", fs?glfwGetPrimaryMonitor():NULL, NULL); // Windowed
+        if (!window) {
+            log_err("Cannot create window...");
+            glfwTerminate();
+            std::exit(2);
+        }
+    }
+}
+
 
 void Application::run()
 {
     state = appInLoop;
+    camera = new Camera();
     while (state != appExiting)
     {
         loop();

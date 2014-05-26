@@ -14,6 +14,7 @@
 #ifndef NTWBAR
 #include <AntTweakBar.h>
 #endif
+#include "Camera.h"
 
 enum appState {
     appReady,
@@ -31,17 +32,22 @@ class Application : public Singleton<Application> {
         TwBar *bar;
 #endif
         unsigned int width, height;
+        float viewWidth, viewHeight;
         GLFWwindow* window;
+        Camera *camera;
 
         friend class Singleton<Application>;
+
+        void glfwWindowHints();
 
     public:
         ~Application();
         void run();
         void loop();
-        //void switchFullscreen(bool fs);
+        void createWindowInFullscreen(bool fs);
         //void resetVSync();
         inline void exit() { state = appExiting; }
+        inline float getWindowRatio() const { return static_cast<float>(width)/static_cast<float>(height); }
 
 };
 
