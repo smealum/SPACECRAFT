@@ -30,6 +30,9 @@ class ShaderProgram
         static ShaderProgram& loadFromFile(const char* vertexShader, const char* fragmentShader);
         static ShaderProgram& loadFromShader(Shader& vertexShader, Shader& fragmentShader);
 
+        // active le shader
+        void use();
+
         // Fournit l'identifiant du program
         GLuint getHandle();
 
@@ -38,7 +41,7 @@ class ShaderProgram
         inline GLint operator[](const char* name) {return uniform(name);}
 
         // parametrer le ShaderProgram
-        void setUniform(const char *name,float x,float y,float z);
+        void setUniform(const char *name, float x,float y,float z);
         void setUniform(const char *name, const glm::vec3 & v);
         void setUniform(const char *name, const glm::vec4 & v);
         void setUniform(const char *name, const glm::mat4 & m);
