@@ -1,7 +1,7 @@
 #ifndef CONTENTREQ_H
 #define CONTENTREQ_H
 
-#include "SynchronizationQueue.h"
+#include "data/SynchronizationQueue.h"
 
 class ContentRequest
 {

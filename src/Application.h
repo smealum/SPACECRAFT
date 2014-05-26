@@ -14,7 +14,7 @@
 #ifndef NTWBAR
 #include <AntTweakBar.h>
 #endif
-#include "Camera.h"
+#include "render/Camera.h"
 
 enum appState {
     appReady,

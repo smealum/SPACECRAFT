@@ -1,7 +1,7 @@
 #ifndef CONTENTREP_H
 #define CONTENTREP_H
 
-#include "SynchronizationQueue.h"
+#include "data/SynchronizationQueue.h"
 
 class ContentReply
 {

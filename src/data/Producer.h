@@ -2,8 +2,8 @@
 #define PRODUCER_H
 
 #include <thread>
-#include "ContentRequest.h"
-#include "ContentReply.h"
+#include "data/ContentRequest.h"
+#include "data/ContentReply.h"
 
 class Producer
 {

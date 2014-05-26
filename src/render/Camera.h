@@ -3,7 +3,7 @@
 
 #define GLM_FORCE_RADIANS
 #include <glm/mat4x4.hpp>
-#include "Shader.h"
+#include "render/Shader.h"
 
 class Camera {
     public:
