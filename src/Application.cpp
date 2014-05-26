@@ -80,7 +80,7 @@ Application::Application() :
         glfwTerminate();
         std::exit(1);
     }
-
+    tt = new testShaders;
 }
 
 void Application::glfwWindowHints()
@@ -139,6 +139,8 @@ void Application::loop()
 
         glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        tt->draw();
 
 #ifndef NTWBAR
         // Draw tweak bars

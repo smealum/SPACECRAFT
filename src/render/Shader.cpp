@@ -158,15 +158,24 @@ GLint ShaderProgram::uniform(const char* name)
     if (it == uniformsMap.end())
     {
         // uniforme non référencé
-        GLuint r = glGetUniformLocation(handle, name); 
+        GLint r = glGetUniformLocation(handle, name); 
         uniformsMap[name] = r;
         if ( r == GL_INVALID_OPERATION )
-            log_err("L'identifiant %s  n'existe pas", name);
+            log_err("Uniform %s doesn't exist.", name);
 
         return r;
     }
     else
         return it->second; 
+}
+
+GLint ShaderProgram::attribLocation(const char *name)
+{
+    GLint attrib = glGetAttribLocation(handle, name);
+    if (attrib == GL_INVALID_OPERATION)
+        log_err("Attibute %s doesn't exist.", name);
+
+    return attrib;
 }
 
 ShaderProgram::ShaderProgram(const ShaderProgram& other)

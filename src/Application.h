@@ -1,12 +1,5 @@
 #ifndef __APPLICATION_H__
 #define __APPLICATION_H__
-/*******************************************************************************
- *  Application                                                                *
- *  Mon May 26 CEST 2014                                                       *
- *  Copyright Eduardo San Martin Morote                                        *
- *  eduardo.san-martin-morote@ensimag.fr                                       *
- *  http://posva.net                                                           *
- ******************************************************************************/
 
 #include "utils/Singleton.h"
 #include <GL/glew.h>
@@ -15,6 +8,7 @@
 #include <AntTweakBar.h>
 #endif
 #include "render/Camera.h"
+#include "tests/testShaders.h"
 
 enum appState {
     appReady,
@@ -36,6 +30,7 @@ class Application : public Singleton<Application> {
         GLFWwindow* window;
         Camera *camera;
         float bgColor[3];
+        testShaders *tt;
 
         friend class Singleton<Application>;
 
