@@ -29,7 +29,8 @@ Application::Application() :
     height(600),
     viewWidth(width),
     viewHeight(height),
-    window(NULL)
+    window(NULL),
+    camera(NULL)
 {
     if (!glfwInit())
     {
@@ -116,6 +117,7 @@ void Application::createWindowInFullscreen(bool fs)
 void Application::run()
 {
     state = appInLoop;
+    camera = new Camera();
     while (state != appExiting)
     {
         loop();
