@@ -2,15 +2,8 @@
 #define CONTENTREP_H
 
 #include "data/SynchronizationQueue.h"
+#include "data/ContentRequest.h"
 
-class ContentReply
-{
-	public:
-
-	private:
-
-};
-
-typedef SynchronizationQueue<ContentReply> ContentOutputQueue;
+typedef SynchronizationQueue<ContentRequest*> ContentOutputQueue;
 
 #endif
