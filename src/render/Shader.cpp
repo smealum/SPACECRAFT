@@ -82,16 +82,12 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
         GLsizei logsize = 0;
         glGetShaderiv(s->handle, GL_INFO_LOG_LENGTH, &logsize);
          
-        debug("==logsize=%d", logsize);
         char* log = new char[logsize+1];
         glGetShaderInfoLog(s->handle, logsize, &logsize, log);
         //log[logsize]='\0';
          
         log_err("Impossible de compiler le shader : %s",filename);
-        log_err("============[Erreur log]========================");
-        log_err("%s",log);
-        log_err("================================================");
-        debug("==logsize=%d", logsize);
+        log_err("============[Erreur log]========================\n%s\n================================================", log);
         
         //exit(EXIT_FAILURE);
     }
@@ -99,7 +95,6 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
     // ajout du shader dans la map
     shaderMap[string(filename)]=s;
 
-    debug("Shader %s bien chargé", filename);
 
     return *s;
 }
@@ -151,13 +146,11 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
         //exit(EXIT_FAILURE);
     }
 
-    debug("creation de programme : attachement");
 
     // attachement.
     glAttachShader(p->handle,vertexShader.getHandle());
     glAttachShader(p->handle,fragmentShader.getHandle());
 
-    debug("creation de programme : linkage ");
 
     // linkage
     glLinkProgram(p->handle);
@@ -169,7 +162,6 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
         //exit(EXIT_FAILURE);
     }
 
-    debug("creation de programme : succes");
 
     return *p;
 }
