@@ -98,15 +98,15 @@ inline void TwWindowSizeGLFW3(GLFWwindow* /*window*/, int width, int height)
 
 
 #include <thread>
-
-void hello(){
-    std::cout << "Hello from thread " << std::endl;
-}
+#include "Producer.h"
 
 int main()
 {
-    std::thread t1(hello);
-    t1.join();
+    ContentInputQueue testInputQueue;
+    ContentOutputQueue testOutputQueue;
+
+    Producer p1(testInputQueue, testOutputQueue);
+
     debug("Debug text");
     if (!glfwInit()) {
         std::cerr<<"Error initializing glfw...\n";
