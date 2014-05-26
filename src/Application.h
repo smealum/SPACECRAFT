@@ -49,6 +49,7 @@ class Application : public Singleton<Application> {
         inline void exit() { state = appExiting; }
         inline float getWindowRatio() const { return static_cast<float>(width)/static_cast<float>(height); }
 
+        inline Camera& getCamera() { return *camera; }
 };
 
 #endif
