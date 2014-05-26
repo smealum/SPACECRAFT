@@ -6,6 +6,10 @@ smooth in vec4 fposition;
 flat in vec3 lightPosition;
 out vec3 color;
 
+uniform float ambient = 0.3;
+uniform float diffuse = 0.3;
+uniform float specular = 0.3;
+
 void main() {
     vec3 lightObjDirection = normalize(lightPosition-fposition.xyz);
     vec3 normal = normalize(fnormal);
@@ -19,7 +23,7 @@ void main() {
 	coefSpecu=coefSpecu*coefSpecu;
 	coefSpecu*=7.0;
 
-	color=	(0.3+
-		  	0.3*coefDiffu+
-		  	0.3*coefSpecu)*fcolor;
+	color=( ambient+
+		  	diffuse*coefDiffu+
+		  	specular*coefSpecu)*fcolor;
 };
