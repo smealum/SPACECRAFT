@@ -60,7 +60,9 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
     s->handle = glCreateShader(type);
     
     // assignation du code source
-    glShaderSource(s->handle,1, (const GLchar**)&(fileContent[0]), NULL);
+    log_info("%s", &fileContent[0]);
+    const char* shaderText(&fileContent[0]);
+    glShaderSource(s->handle,1, (const GLchar**)&shaderText, NULL);
 
     // compilation
     glCompileShader(s->handle);
@@ -74,7 +76,7 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
         int logsize;
         glGetShaderiv(s->handle, GL_INFO_LOG_LENGTH, &logsize);
          
-        debug("==logsize=%d", filename);
+        debug("==logsize=%d", logsize);
         char* log = new char[logsize+1];
         glGetShaderInfoLog(s->handle, logsize, &logsize, log);
         log[logsize]='\0';
@@ -83,7 +85,7 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
         log_err("============[Erreur log]========================");
         log_err("%s",log);
         log_err("================================================");
-        debug("==logsize=%d", filename);
+        debug("==logsize=%d", logsize);
         
         exit(EXIT_FAILURE);
     }
