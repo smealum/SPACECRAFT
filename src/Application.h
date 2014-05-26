@@ -34,7 +34,7 @@ class Application : public Singleton<Application> {
         float viewWidth, viewHeight;
         GLFWwindow* window;
 
-        friend Singleton<Application>;
+        friend class Singleton<Application>;
 
         void glfwWindowHints();
 
