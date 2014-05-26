@@ -75,10 +75,10 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
         glGetShaderInfoLog(s->handle, logsize, &logsize, log);
         log[logsize]='\0';
          
-        cerr<<"[erreur] Impossible de compiler le shader : "<<filename<<endl;
-        cerr<<"============[Erreur]================="<<endl;
-        cerr<<log<<endl;
-        cerr<<"============[Erreur]================="<<endl;
+        log_err("Impossible de compiler le shader : %s",filename);
+        log_err("============[Erreur log]========================");
+        log_err("%s",log);
+        log_err("================================================");
         
         exit(EXIT_FAILURE);
     }
@@ -131,7 +131,7 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
 	p->handle = glCreateProgram();
     if (not p->handle)
     {
-        cerr<<"[Erreur] Impossible de créer un ShaderProgramme vierge"<<endl;
+        log_err("Impossible de créer un ShaderProgramme vierge");
         exit(EXIT_FAILURE);
     }
 
@@ -146,7 +146,7 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
     glGetProgramiv(p->handle,GL_LINK_STATUS, &result);
     if (result!=GL_TRUE)
     {
-        cerr<<"[Erreur] Impossible de linker les shader";
+        log_err("[Erreur] Impossible de linker les shader");
         exit(EXIT_FAILURE);
     }
     return *p;
