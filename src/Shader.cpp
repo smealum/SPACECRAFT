@@ -173,6 +173,12 @@ GLint ShaderProgram::uniform(const char* name)
     }
 }
 
+ShaderProgram::ShaderProgram(const ShaderProgram& other)
+{
+    handle = other.handle;
+    uniformsMap = other.uniformsMap;
+}
+
 void ShaderProgram::setUniform(const char *name,float x,float y,float z)
 {
 
