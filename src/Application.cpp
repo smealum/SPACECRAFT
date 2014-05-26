@@ -120,6 +120,11 @@ void Application::run()
 {
     state = appInLoop;
     camera = new Camera();
+    camera->view = glm::lookAt(
+            glm::vec3(1.5, 1.5f, 1.5f),
+            glm::vec3(0.f),
+            glm::vec3(0, 1.f, 0.f)
+            );
     while (state != appExiting)
     {
         loop();

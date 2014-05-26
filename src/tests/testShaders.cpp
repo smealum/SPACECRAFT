@@ -83,6 +83,10 @@ testShaders::testShaders() :
 
 void testShaders::draw()
 {
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    program.use();
     Camera &cam(Application::getInstance().getCamera());
     cam.updateCamera(program);
 
