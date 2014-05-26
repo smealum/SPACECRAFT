@@ -34,6 +34,7 @@ class ShaderProgram
 
         // Fournit localisation d'un uniform.
         GLint uniform(const char* name);
+        GLint attribLocation(const char* name);
         inline GLint operator[](const char* name) {return uniform(name);}
 
         // parametrer le ShaderProgram

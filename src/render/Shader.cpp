@@ -60,7 +60,9 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
     s->handle = glCreateShader(type);
     
     // assignation du code source
-    glShaderSource(s->handle,1, (const GLchar**)&(fileContent[0]), NULL);
+    log_info("%s", &fileContent[0]);
+    const char* shaderText(&fileContent[0]);
+    glShaderSource(s->handle,1, (const GLchar**)&shaderText, NULL);
 
     // compilation
     glCompileShader(s->handle);
@@ -74,7 +76,7 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
         int logsize;
         glGetShaderiv(s->handle, GL_INFO_LOG_LENGTH, &logsize);
          
-        debug("==logsize=%d", filename);
+        debug("==logsize=%d", logsize);
         char* log = new char[logsize+1];
         glGetShaderInfoLog(s->handle, logsize, &logsize, log);
         //log[logsize]='\0';
@@ -83,7 +85,7 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
         log_err("============[Erreur log]========================");
         log_err("%s",log);
         log_err("================================================");
-        debug("==logsize=%d", filename);
+        debug("==logsize=%d", logsize);
         
         exit(EXIT_FAILURE);
     }
@@ -172,15 +174,24 @@ GLint ShaderProgram::uniform(const char* name)
     if (it == uniformsMap.end())
     {
         // uniforme non référencé
-        GLuint r = glGetUniformLocation(handle, name); 
+        GLint r = glGetUniformLocation(handle, name); 
         uniformsMap[name] = r;
         if ( r == GL_INVALID_OPERATION )
-            log_err("L'identifiant %s  n'existe pas", name);
+            log_err("Uniform %s doesn't exist.", name);
 
         return r;
     }
     else
         return it->second; 
+}
+
+GLint ShaderProgram::attribLocation(const char *name)
+{
+    GLint attrib = glGetAttribLocation(handle, name);
+    if (attrib == GL_INVALID_OPERATION)
+        log_err("Attibute %s doesn't exist.", name);
+
+    return attrib;
 }
 
 ShaderProgram::ShaderProgram(const ShaderProgram& other)
