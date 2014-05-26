@@ -77,7 +77,7 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
         debug("==logsize=%d", filename);
         char* log = new char[logsize+1];
         glGetShaderInfoLog(s->handle, logsize, &logsize, log);
-        log[logsize]='\0';
+        //log[logsize]='\0';
          
         log_err("Impossible de compiler le shader : %s",filename);
         log_err("============[Erreur log]========================");
