@@ -53,11 +53,17 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
     if (not getFileContents(filename,fileContent))
     {
         log_err("[Erreur] Fichier %s  introuvable.", filename);
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 
     // creation
     s->handle = glCreateShader(type);
+    if(s->handle == 0)
+    {
+        debug("Impossible de créer un shader vierge");
+    }
+
+    
     
     // assignation du code source
     log_info("%s", &fileContent[0]);
@@ -73,7 +79,7 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
     if(compile_status != GL_TRUE)
     {
         /* error text retreiving*/
-        int logsize;
+        GLsizei logsize = 0;
         glGetShaderiv(s->handle, GL_INFO_LOG_LENGTH, &logsize);
          
         debug("==logsize=%d", logsize);
@@ -87,7 +93,7 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
         log_err("================================================");
         debug("==logsize=%d", logsize);
         
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 
     // ajout du shader dans la map
@@ -142,7 +148,7 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
     if (not p->handle)
     {
         log_err("Impossible de créer un ShaderProgramme vierge");
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 
     debug("creation de programme : attachement");
@@ -160,7 +166,7 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
     if (result!=GL_TRUE)
     {
         log_err("[Erreur] Impossible de linker les shader");
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 
     debug("creation de programme : succes");

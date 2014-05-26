@@ -13,9 +13,9 @@ class ShaderProgram;
 namespace ShaderType
 {
     enum T {
-        Vertex,
-        Fragment,
-        Geometry
+        Vertex = GL_VERTEX_SHADER,
+        Fragment = GL_FRAGMENT_SHADER,
+        Geometry = GL_GEOMETRY_SHADER
     };
 };
 
