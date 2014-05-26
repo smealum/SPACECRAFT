@@ -51,7 +51,7 @@ class ShaderProgram
         //void bindAttribLocation( GLuint location,const char * name);
         //void bindFragDataLocation( GLuint location,const char * name );
     private:
-        // constructeur (privé) . Utiliser loadFrom*
+        // constructeur (privé) . Utiliser loadFrom[File|Shader]
         ShaderProgram();
 
         // identifiant OpenGL
