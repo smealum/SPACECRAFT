@@ -1,7 +1,7 @@
 #ifndef CONTENTHANDLER_H
 #define CONTENTHANDLER_H
 
-#include "Producer.h"
+#include "data/Producer.h"
 #include <vector>
 
 class ContentHandler
