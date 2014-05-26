@@ -2,11 +2,17 @@ cmake_minimum_required(VERSION 2.6)
 
 # define a macro that helps defining an option
 macro(set_option var default type docstring)
-  set(${var} ${default})
+  if(NOT DEFINED ${var})
+    set(${var} ${default})
+  endif()
   set(${var} ${${var}} CACHE ${type} ${docstring} FORCE)
 endmacro()
 
 set_option(CMAKE_BUILD_TYPE DEBUG STRING "DEBUG: -g -O0, RELEASE: -O2")
+
+if (CMAKE_BUILD_TYPE MATCHES "RELEASE")
+  add_definitions(-DNDEBUG)
+endif()
 
 project(spacecraft)
 
