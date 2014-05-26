@@ -30,7 +30,8 @@ Application::Application() :
     viewWidth(width),
     viewHeight(height),
     window(NULL),
-    camera(NULL)
+    camera(NULL),
+    bgColor{0.1f, 0.2f, 0.4f}
 {
     if (!glfwInit())
     {
@@ -59,6 +60,7 @@ Application::Application() :
     //TwDefine((name+" iconified=true").c_str()); // minimizes
     TwWindowSize(width, height);
     TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
+    TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
 
     // Set GLFW event callbacks
     // - Redirect window size changes to the callback function WindowSizeCB
@@ -135,7 +137,7 @@ void Application::loop()
             state = appExiting;
         }
 
-        glClearColor(0, 0, 0, 1.f);
+        glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 #ifndef NTWBAR

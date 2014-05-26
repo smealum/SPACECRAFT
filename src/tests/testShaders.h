@@ -6,6 +6,7 @@ class testShaders {
     glm::mat4 model;
     GLuint vao;
     GLuint vbo;
+    GLuint ebo;
 
     testShaders();
 

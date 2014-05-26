@@ -35,6 +35,7 @@ class Application : public Singleton<Application> {
         float viewWidth, viewHeight;
         GLFWwindow* window;
         Camera *camera;
+        float bgColor[3];
 
         friend class Singleton<Application>;
 
