@@ -3,7 +3,7 @@
 smooth in vec3 fcolor;
 smooth in vec3 fnormal;
 smooth in vec4 fposition;
-flat in vec3 lightPosition;
+flat in vec3 flightPosition;
 out vec3 color;
 
 uniform float ambient = 0.3;

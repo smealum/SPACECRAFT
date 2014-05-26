@@ -10,7 +10,9 @@ smooth out vec4 fcolor;
 smooth out vec3 fnormal;
 
 smooth out vec4 fposition;
-flat out vec3 lightPosition;
+flat out vec3 flightPosition;
+
+uniform vec4 lightPosition = vec4(1.0,1.0,1.0,0.0);
 
 void main ()
 {
@@ -18,5 +20,5 @@ void main ()
 	fcolor=color;
 	fposition=modelview*vec4(position,1.0);
     fnormal=(modelview*vec4(normal,0.0)).xyz;
-	lightPosition=(modelview*vec4(1.0,1.0,1.0,0.0)).xyz;
+	flightPosition=(modelview*lightPosition).xyz;
 }
