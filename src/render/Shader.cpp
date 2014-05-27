@@ -158,7 +158,16 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
     if (result!=GL_TRUE)
     {
         log_err("[Erreur] Impossible de linker les shader");
-        //exit(EXIT_FAILURE);
+
+        /* error text retreiving*/
+        GLsizei logsize = 0;
+        glGetProgramiv(p->handle, GL_INFO_LOG_LENGTH, &logsize);
+         
+        char* log = new char[logsize];
+        glGetProgramInfoLog(p->handle, logsize, &logsize, log);
+        //log[logsize]='\0';
+         
+        log_err("============[Erreur log]========================\n%s\n================================================", log);
     }
 
 

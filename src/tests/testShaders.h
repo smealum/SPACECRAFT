@@ -5,9 +5,10 @@
 #include <render/Shader.h>
 
 class testShaders {
-    ShaderProgram &program;
+    ShaderProgram &programBasic, &programPhong;
     glm::mat4 model;
-    GLuint vao;
+    GLuint vaoBasic;
+    GLuint vaoPhong;
     GLuint vbo;
     GLuint ebo;
 
