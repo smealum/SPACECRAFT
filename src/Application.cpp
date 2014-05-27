@@ -31,7 +31,7 @@ Application::Application() :
     viewHeight(height),
     window(NULL),
     camera(NULL),
-    bgColor{0.1f, 0.2f, 0.4f}
+    bgColor{0.0f, 0.0f, 0.0f}
 {
     if (!glfwInit())
     {

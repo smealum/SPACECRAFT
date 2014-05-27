@@ -4,7 +4,7 @@
 #include "utils/dbg.h"
 
 static GLfloat vertices[] = {
-    // POSITION           | COLOR       | NORMAL
+    //     POSITION    |      COLOR           |     NORMAL
     // x positif
     +0.5 , -0.5 , -0.5 , 1.0 , 0.0 , 0.0 , 1.f, +1.0 , 0.0 , 0.0 ,
     +0.5 , +0.5 , -0.5 , 1.0 , 0.0 , 0.0 , 1.f, +1.0 , 0.0 , 0.0 ,
@@ -48,14 +48,13 @@ static GLuint elements[12*3] = {
 };
 
 testShaders::testShaders() :
-    program(ShaderProgram::loadFromFile("shader/basic/basic.vert", "shader/basic/basic.frag")),
+    programBasic(ShaderProgram::loadFromFile("shader/basic/basic.vert", "shader/basic/basic.frag")),
+    programPhong(ShaderProgram::loadFromFile("shader/phong/phong.vert", "shader/phong/phong.frag")),
     model(1.f),
-    vao(0),
+    vaoBasic(0),
+    vaoPhong(0),
     vbo(0)
 {
-    glGenVertexArrays(1, &vao);
-    log_info("Created VAO(%d)", vao);
-    glBindVertexArray(vao);
 
     glGenBuffers(1, &vbo);
     log_info("Created VBO(%d)", vbo);
@@ -67,38 +66,121 @@ testShaders::testShaders() :
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
-    glBindFragDataLocation(program.getHandle(), 0, "outColor");
-    program.use();
-    GLint posAttrib = program.attribLocation("position");
-    glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), 0);
-    GLint colAttrib = program.attribLocation("color");
-    glEnableVertexAttribArray(colAttrib);
-    glVertexAttribPointer(colAttrib, 4, GL_FLOAT, GL_FALSE,
-                          10*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
-    GLint texAttrib = program.attribLocation("texcoord");
-    glEnableVertexAttribArray(texAttrib);
-    glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE,
-                           10*sizeof(float), (void*)(0*sizeof(float))); // TODO change texcoord
-    
-    program.setUniform("overrideColor", glm::vec4(1.f));
-    program.setUniform("model", model);
+    // basic programme configuration
+    {
+        glGenVertexArrays(1, &vaoBasic);
+        log_info("Created vaoBasic(%d)", vaoBasic);
+        glBindVertexArray(vaoBasic);
+
+        programBasic.use();
+        glBindFragDataLocation(programBasic.getHandle(), 0, "outColor");
+        GLint posAttrib = programBasic.attribLocation("position");
+        glEnableVertexAttribArray(posAttrib);
+        glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), 0);
+        GLint colAttrib = programBasic.attribLocation("color");
+        glEnableVertexAttribArray(colAttrib);
+        glVertexAttribPointer(colAttrib, 4, GL_FLOAT, GL_FALSE,
+                              10*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
+        GLint texAttrib = programBasic.attribLocation("texcoord");
+        glEnableVertexAttribArray(texAttrib);
+        glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE,
+                               10*sizeof(GLfloat), (void*)(0*sizeof(GLfloat))); // TODO change texcoord
+        
+        programBasic.setUniform("overrideColor", glm::vec4(1.f));
+
+        programBasic.setUniform("model", model);
+    }
+    // phong programme configuration
+    {
+        glGenVertexArrays(1, &vaoPhong);
+        log_info("Created vaoPhong(%d)", vaoPhong);
+        glBindVertexArray(vaoPhong);
+
+        programPhong.use();
+        glBindFragDataLocation(programPhong.getHandle(), 0, "outColor");
+        GLint posAttrib = programPhong.attribLocation("position");
+        glEnableVertexAttribArray(posAttrib);
+        glVertexAttribPointer(
+                posAttrib,
+                3,
+                GL_FLOAT,
+                GL_FALSE,
+                10*sizeof(GLfloat),
+                (void*)0
+        );
+        GLint colAttrib = programPhong.attribLocation("color");
+        glEnableVertexAttribArray(colAttrib);
+        glVertexAttribPointer(
+                colAttrib,
+                4,
+                GL_FLOAT,
+                GL_FALSE,
+                10*sizeof(GLfloat),
+                (void*)(3*sizeof(GLfloat))
+        );
+        GLint normalAttrib = programPhong.attribLocation("normal");
+        glEnableVertexAttribArray(normalAttrib);
+        glVertexAttribPointer(
+                normalAttrib,
+                3,
+                GL_FLOAT,
+                GL_TRUE,
+                10*sizeof(GLfloat),
+                (void*)(7*sizeof(GLfloat))
+        );
+        
+    }
 }
 
 void testShaders::draw()
 {
-    program.use();
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     Camera &cam(Application::getInstance().getCamera());
-    cam.updateCamera(program);
-
-    glDrawElements(
-            GL_TRIANGLES,
-            36,
-            GL_UNSIGNED_INT,
-            0
+    cam.view = glm::lookAt(
+            glm::vec3(0, 0, -5.f),
+            glm::vec3(0.f,0.f,0.f),
+            glm::vec3(0, 1.f, 0.f)
             );
+    // basic program
+    {
+        programBasic.use();
+        glBindVertexArray(vaoBasic);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        cam.updateCamera(programBasic);
 
+        static float modelAngle=0.0;
+        modelAngle+=0.04;
+        model = glm::translate(glm::mat4(1.0),glm::vec3(-1.0,0.0,0.0));
+        model = glm::rotate(model,modelAngle,glm::vec3(sin(modelAngle),0.0,1.0));
+        programBasic.setUniform("model", model);
+
+        glDrawElements(
+                GL_TRIANGLES,
+                36,
+                GL_UNSIGNED_INT,
+                0
+                );
+    }
+    // phong program
+    {
+        static float modelAngle=0.0;
+        modelAngle+=0.04;
+        model = glm::translate(glm::mat4(1.0),glm::vec3(1.0,0.0,0.0));
+        model = glm::rotate(model,modelAngle,glm::vec3(sin(modelAngle),0.0,1.0));
+
+        programPhong.use();
+        glBindVertexArray(vaoPhong);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        programPhong.setUniform("projection",cam.proj);
+        programPhong.setUniform("model",model);
+        programPhong.setUniform("view",cam.view);
+
+        glDrawElements(
+                GL_TRIANGLES,
+                36,
+                GL_UNSIGNED_INT,
+                0
+                );
+    }
 }
