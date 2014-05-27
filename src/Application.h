@@ -23,7 +23,7 @@ class Application : public Singleton<Application> {
     private:
         Application();
         appState state;
-        bool fullscreen, vsync, active;
+        bool fullscreen, vsync, active, wireframe;
 #ifndef NTWBAR
         TwBar *bar;
 #endif

@@ -23,6 +23,7 @@ Application::Application() :
     fullscreen(false),
     vsync(false),
     active(true),
+    wireframe(false),
 #ifndef NTWBAR
     bar(NULL),
 #endif
@@ -63,6 +64,7 @@ Application::Application() :
     TwWindowSize(width, height);
     TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
     TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
+    TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
 
     // vsync on
     glfwSwapInterval(1);
@@ -156,6 +158,8 @@ void Application::loop()
 
         glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
 
         tt->draw();
 
