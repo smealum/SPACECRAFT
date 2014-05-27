@@ -27,6 +27,10 @@ void CameraKeyboard::update(Camera& camera)
         camera.view = translate(mat4(1.0),vec3(0,0.0,+tS))*camera.view;
     if (Input::isKeyHold(GLFW_KEY_S))
         camera.view = translate(mat4(1.0),vec3(0,0,-tS))*camera.view;
+    if (Input::isKeyHold(GLFW_KEY_Q))
+        camera.view = translate(mat4(1.0),vec3(0.0,-tS, 0.0))*camera.view;
+    if (Input::isKeyHold(GLFW_KEY_E))
+        camera.view = translate(mat4(1.0),vec3(0.0,+tS, 0.0))*camera.view;
     // rotation
     if (Input::isKeyHold(GLFW_KEY_K))
         camera.view = rotate(mat4(1.0),rS,vec3(1.0,0.0,0.0))*camera.view;
