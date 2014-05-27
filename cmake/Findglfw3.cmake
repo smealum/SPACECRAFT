@@ -42,7 +42,6 @@ FIND_LIBRARY(GLFW_LIBRARIES DOC "Absolute path to GLFW library."
   $ENV{GLFW_ROOT}
   PATH_SUFFIXES lib/win32 #For finding the library file under the root of the glfw expanded archive, typically on Windows.
   PATHS
-  ${LIB_DIR}
   /usr/local/lib
   /usr/lib
   ${GLFW_ROOT_DIR}/lib-msvc100/release # added by ptr
