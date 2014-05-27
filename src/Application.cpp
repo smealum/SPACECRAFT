@@ -53,6 +53,7 @@ Application::Application() :
 
     // transparency
     glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_CULL_FACE);
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -125,7 +126,7 @@ void Application::run()
             glm::vec3(0.f),
             glm::vec3(0, 1.f, 0.f)
             );
-    camera->setCameraManager(new CameraKeyboard());
+    camera->setCameraManager(new CameraKeyboard(width, height));
 
     tt = new testShaders;
 

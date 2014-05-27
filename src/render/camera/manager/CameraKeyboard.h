@@ -6,7 +6,7 @@
 class CameraKeyboard : public CameraManager
 {
     public:
-        CameraKeyboard();
+        CameraKeyboard(int width, int height);
         virtual void update(Camera& camera);
 };
 
