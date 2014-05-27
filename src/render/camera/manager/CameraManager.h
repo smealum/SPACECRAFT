@@ -10,10 +10,8 @@ class Camera;
 class CameraManager
 {
     public:
-        CameraManager(int w, int h);
-        virtual void update(Camera& camera);
-    private:
-	int width, height;
+        CameraManager();
+        virtual void update(Camera& camera) = 0;
 };
 
 

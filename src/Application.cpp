@@ -64,6 +64,9 @@ Application::Application() :
     TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
     TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
 
+    // vsync on
+    glfwSwapInterval(1);
+
     // Set GLFW event callbacks
     // - Redirect window size changes to the callback function WindowSizeCB
     glfwSetWindowSizeCallback(window, (GLFWwindowposfun)TwWindowSizeGLFW3);
@@ -127,7 +130,7 @@ void Application::run()
             glm::vec3(0.f),
             glm::vec3(0, 1.f, 0.f)
             );
-    camera->setCameraManager(new CameraKeyboard(width, height));
+    camera->setCameraManager(new CameraKeyboard());
 
     tt = new testShaders;
 

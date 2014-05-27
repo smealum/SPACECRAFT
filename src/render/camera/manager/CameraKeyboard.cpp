@@ -7,7 +7,7 @@
 using namespace std;
 using namespace glm;
 
-CameraKeyboard::CameraKeyboard(int width, int height) : CameraManager(width, height)
+CameraKeyboard::CameraKeyboard()
 {
 
 }
