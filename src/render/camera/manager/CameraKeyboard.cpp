@@ -19,11 +19,11 @@ void CameraKeyboard::update(Camera& camera)
     const float rS = 0.03;
 
     // translation
-    if (Input::isKeyHold(GLFW_KEY_Q))
+    if (Input::isKeyHold(GLFW_KEY_A))
         camera.view = translate(mat4(1.0),vec3(+tS,0.0,0.0))*camera.view;
     if (Input::isKeyHold(GLFW_KEY_D))
         camera.view = translate(mat4(1.0),vec3(-tS,0.0,0.0))*camera.view;
-    if (Input::isKeyHold(GLFW_KEY_Z))
+    if (Input::isKeyHold(GLFW_KEY_W))
         camera.view = translate(mat4(1.0),vec3(0,0.0,+tS))*camera.view;
     if (Input::isKeyHold(GLFW_KEY_S))
         camera.view = translate(mat4(1.0),vec3(0,0,-tS))*camera.view;
