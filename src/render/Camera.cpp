@@ -61,3 +61,13 @@ void Camera::updateFrustum(void)
 				-final[1][2]+final[3][2],
 				final[1][3]+final[3][3]);	
 }
+
+//a verifier (pour le signe et tout ça)
+bool Camera::isPointInFrustum(glm::vec3 p)
+{
+	for(int i=0;i<6;i++)
+	{
+		if(glm::dot(glm::vec4(p,1.0f),frustumPlane[i])>0.0f)return false;
+	}
+	return true;
+}

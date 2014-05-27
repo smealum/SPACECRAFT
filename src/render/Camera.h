@@ -9,9 +9,10 @@ class Camera {
 		glm::mat4 view, proj, final;
 
 		Camera();
-		// the shader needs to have 2 uniforms: view and proj
-		void updateCamera(ShaderProgram &prog);
+		void updateCamera(ShaderProgram &prog); // the shader needs to have 2 uniforms: view and proj
 		void updateFrustum(void);
+		bool isPointInFrustum(glm::vec3 p);
+
 	private:
 		glm::vec4 frustumPlane[6]; 
 };
