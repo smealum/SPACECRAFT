@@ -119,7 +119,7 @@ void Application::createWindowInFullscreen(bool fs)
 void Application::run()
 {
     state = appInLoop;
-    camera = new Camera();
+    camera = new Camera;
     camera->view = glm::lookAt(
             glm::vec3(1.5, 1.5f, 1.5f),
             glm::vec3(0.f),
