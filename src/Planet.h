@@ -10,14 +10,16 @@ typedef struct
 
 class Planet;
 
-//0-5-1
-//|\ /|
-//8-4-6
-//|/ \|
-//3-7-2
+// Vertex position
+//      0-5-1
+//      |\ /|
+//      8-4-6
+//      |/ \|
+//      3-7-2
 
-//[0][1]
-//[2][3]
+// Sons position
+//      [0][1]
+//      [2][3]
 class PlanetFace
 {
 	public:
