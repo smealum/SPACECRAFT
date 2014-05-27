@@ -13,7 +13,7 @@ class ContentHandler
 		void handleNewContent();
 	private:
 
-		std::vector<Producer>* producers;
+		std::vector<Producer*>* producers;
         ContentInputQueue inputQueue;
         ContentOutputQueue outputQueue;
 };

@@ -4,18 +4,18 @@
 #include "utils/Input.h"
 
 #ifndef NTWBAR
-inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
-{TwEventMouseButtonGLFW(button, action);}
-inline void TwEventMousePosGLFW3(GLFWwindow* /*window*/, double xpos, double ypos)
-{TwMouseMotion(int(xpos), int(ypos));}
-inline void TwEventMouseWheelGLFW3(GLFWwindow* /*window*/, double /*xoffset*/, double yoffset)
-{TwEventMouseWheelGLFW(yoffset);}
-inline void TwEventKeyGLFW3(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
-{TwEventKeyGLFW(key, action);}
-inline void TwEventCharGLFW3(GLFWwindow* /*window*/, int codepoint)
-{TwEventCharGLFW(codepoint, GLFW_PRESS);}
-inline void TwWindowSizeGLFW3(GLFWwindow* /*window*/, int width, int height)
-{TwWindowSize(width, height);}
+    inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
+    {TwEventMouseButtonGLFW(button, action);}
+    inline void TwEventMousePosGLFW3(GLFWwindow* /*window*/, double xpos, double ypos)
+    {TwMouseMotion(int(xpos), int(ypos));}
+    inline void TwEventMouseWheelGLFW3(GLFWwindow* /*window*/, double /*xoffset*/, double yoffset)
+    {TwEventMouseWheelGLFW(yoffset);}
+    inline void TwEventKeyGLFW3(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
+    {TwEventKeyGLFW(key, action);}
+    inline void TwEventCharGLFW3(GLFWwindow* /*window*/, int codepoint)
+    {TwEventCharGLFW(codepoint, GLFW_PRESS);}
+    inline void TwWindowSizeGLFW3(GLFWwindow* /*window*/, int width, int height)
+    {TwWindowSize(width, height);}
 #endif
 
 Application::Application() : 
@@ -32,6 +32,7 @@ Application::Application() :
     viewHeight(height),
     window(NULL),
     camera(NULL),
+    contentHandler(NUMPRODUCERS),
     bgColor{0.0f, 0.0f, 0.0f}
 {
     if (!glfwInit())
@@ -47,9 +48,9 @@ Application::Application() :
     glfwMakeContextCurrent(window);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // can be GLFW_CURSOR_HIDDEN
 
-#ifndef NTWBAR
-    TwInit(TW_OPENGL_CORE, NULL);
-#endif
+    #ifndef NTWBAR
+        TwInit(TW_OPENGL_CORE, NULL);
+    #endif
 
     // transparency
     glEnable(GL_DEPTH_TEST);
@@ -154,15 +155,15 @@ void Application::loop()
 
         tt->draw();
 
-#ifndef NTWBAR
-        // Draw tweak bars
-        glUseProgram(0);
-        glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-        TwDraw();
-#endif
+        #ifndef NTWBAR
+            // Draw tweak bars
+            glUseProgram(0);
+            glBindVertexArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+            TwDraw();
+        #endif
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -171,9 +172,9 @@ void Application::loop()
 
 Application::~Application()
 {
-#ifndef NTWBAR
-    TwTerminate();
-#endif
+    #ifndef NTWBAR
+        TwTerminate();
+    #endif
     glfwTerminate();
 }
 
