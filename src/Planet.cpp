@@ -1,4 +1,5 @@
 #include "Planet.h"
+#include "data/ContentHandler.h"
 
 //0-5-1
 //|\ /|
@@ -14,6 +15,7 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 {
 	vertex[0]=v[0]; vertex[1]=v[1];
 	vertex[2]=v[2];	vertex[3]=v[3];
+	depth=0;
 	finalize();
 }
 
@@ -54,6 +56,7 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 			break;
 	}
 	
+	depth=father->depth+1;
 	finalize();
 }
 
@@ -66,6 +69,13 @@ void PlanetFace::finalize(void)
 	vertex[8]=(vertex[3]+vertex[0])*0.5f;
 
 	for(int i=0;i<9;i++)vertex[i]=glm::normalize(vertex[i]);
+
+	planet->handler.requestContent(new PlanetElevationRequest(*planet, *this, vertex[4]));
+}
+
+void PlanetFace::updateElevation(float e)
+{
+	elevation=e;
 }
 
 glm::vec3 cubeArray[6][4]=
@@ -76,8 +86,9 @@ glm::vec3 cubeArray[6][4]=
 		{glm::vec3(1.0,1.0,-1.0),glm::vec3(-1.0,1.0,-1.0),glm::vec3(-1.0,-1.0,-1.0),glm::vec3(1.0,-1.0,-1.0)}, //near
 		{glm::vec3(-1.0,-1.0,1.0),glm::vec3(-1.0,1.0,1.0),glm::vec3(1.0,1.0,1.0),glm::vec3(1.0,-1.0,1.0)}}; //far
 
-Planet::Planet(planetInfo_s pi):
-	planetInfo(pi)
+Planet::Planet(planetInfo_s pi, ContentHandler& ch):
+	planetInfo(pi),
+	handler(ch)
 {
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
 }
