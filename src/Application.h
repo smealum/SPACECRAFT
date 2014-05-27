@@ -7,7 +7,7 @@
 #ifndef NTWBAR
 #include <AntTweakBar.h>
 #endif
-#include "render/Camera.h"
+#include "render/camera/Camera.h"
 #include "tests/testShaders.h"
 
 enum appState {
