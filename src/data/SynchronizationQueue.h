@@ -1,8 +1,8 @@
 #ifndef SYNCQUEUE_H
 #define SYNCQUEUE_H
 
-#include <thread>
 #include <queue>
+#include <SFML/System/Mutex.hpp>
 
 template<class T>
 class SynchronizationQueue
@@ -13,7 +13,7 @@ class SynchronizationQueue
 		void push(T t);
 		T pop(void);
 	private:
-		std::mutex mutex;
+                sf::Mutex mutex;
 		std::queue<T> queue;
 };
 

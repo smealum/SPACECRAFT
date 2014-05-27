@@ -27,4 +27,4 @@ void main() {
                 diffuse*coefDiffu+
                 specular*coefSpecu)*fcolor.xyz;
     outColor.a=fcolor.a;
-};
+}

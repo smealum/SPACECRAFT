@@ -1,17 +1,20 @@
 #ifndef __CAMERA_H__
 #define __CAMERA_H__
 
-#define GLM_FORCE_RADIANS
-#include <glm/mat4x4.hpp>
+#include "utils/glm.h"
 #include "render/Shader.h"
 
 class Camera {
-    public:
-        glm::mat4 view, proj;
+	public:
+		glm::mat4 view, proj, final;
 
-        Camera();
-        // the shader needs to have 2 uniforms: view and proj
-        void updateCamera(ShaderProgram &prog);
+		Camera();
+		void updateCamera(ShaderProgram &prog); // the shader needs to have 2 uniforms: view and proj
+		void updateFrustum(void);
+		bool isPointInFrustum(glm::vec3 p);
+
+	private:
+		glm::vec4 frustumPlane[6]; 
 };
 
 #endif
