@@ -1,6 +1,7 @@
 #ifndef SYNCQUEUE_H
 #define SYNCQUEUE_H
 
+#include <cstdlib>
 #include <queue>
 #include <SFML/System/Mutex.hpp>
 
@@ -13,7 +14,7 @@ class SynchronizationQueue
 		void push(T t);
 		T pop(void);
 	private:
-                sf::Mutex mutex;
+		sf::Mutex mutex;
 		std::queue<T> queue;
 };
 
@@ -34,9 +35,13 @@ void SynchronizationQueue<T>::push(T t)
 template<class T>
 T SynchronizationQueue<T>::pop(void)
 {
+	T t=NULL;
 	mutex.lock();
-		T t=queue.front();
-		queue.pop();
+		if(queue.size()>0)
+		{
+			t=queue.front();
+			queue.pop();
+		}
 	mutex.unlock();
 	return t;
 }

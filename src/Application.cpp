@@ -2,6 +2,7 @@
 #include "utils/dbg.h"
 #include <cstdlib>
 #include "utils/Input.h"
+#include "Planet.h"
 
 #ifndef NTWBAR
 inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
@@ -41,6 +42,7 @@ Application::Application() :
     viewHeight(height),
     window(NULL),
     camera(NULL),
+    contentHandler(NUMPRODUCERS),
     bgColor{0.0f, 0.0f, 0.0f}
 {
     if (!glfwInit())
@@ -56,9 +58,9 @@ Application::Application() :
     glfwMakeContextCurrent(window);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // can be GLFW_CURSOR_HIDDEN
 
-#ifndef NTWBAR
-    TwInit(TW_OPENGL_CORE, NULL);
-#endif
+    #ifndef NTWBAR
+        TwInit(TW_OPENGL_CORE, NULL);
+    #endif
 
     // transparency
     glEnable(GL_DEPTH_TEST);
@@ -132,6 +134,8 @@ void Application::createWindowInFullscreen(bool fs)
 }
 
 
+Planet* testPlanet;
+
 void Application::run()
 {
     state = appInLoop;
@@ -141,9 +145,11 @@ void Application::run()
             glm::vec3(0.f),
             glm::vec3(0, 1.f, 0.f)
             );
-    camera->setCameraManager(new CameraKeyboard());
+    camera->setCameraManager(new CameraKeyboardMouse());
 
     tt = new testShaders;
+    testPlanet=new Planet((planetInfo_s){0}, contentHandler);
+    testPlanet->testFullGeneration(4);
 
     while (state != appExiting)
     {
@@ -169,18 +175,20 @@ void Application::loop()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
+        // tt->draw();
+        testPlanet->drawDirect();
 
-        tt->draw();
+        contentHandler.handleNewContent();
 
-#ifndef NTWBAR
-        // Draw tweak bars
-        glUseProgram(0);
-        glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-        TwDraw();
-#endif
+        #ifndef NTWBAR
+            // Draw tweak bars
+            glUseProgram(0);
+            glBindVertexArray(0);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+            TwDraw();
+        #endif
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -189,9 +197,9 @@ void Application::loop()
 
 Application::~Application()
 {
-#ifndef NTWBAR
-    TwTerminate();
-#endif
+    #ifndef NTWBAR
+        TwTerminate();
+    #endif
     glfwTerminate();
 }
 

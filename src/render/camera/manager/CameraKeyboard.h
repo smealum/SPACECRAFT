@@ -1,5 +1,5 @@
-#ifndef CAMERAKEYBOARD_95EYY2BL
-#define CAMERAKEYBOARD_95EYY2BL
+#ifndef CAMERAKEYBOARD_FEF6DBSV
+#define CAMERAKEYBOARD_FEF6DBSV
 
 #include "CameraManager.h"
 
@@ -10,4 +10,5 @@ class CameraKeyboard : public CameraManager
         virtual void update(Camera& camera);
 };
 
-#endif /* end of include guard: CAMERAKEYBOARD_95EYY2BL */
+
+#endif /* end of include guard: CAMERAKEYBOARD_FEF6DBSV */

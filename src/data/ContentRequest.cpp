@@ -14,7 +14,7 @@ PlanetElevationRequest::~PlanetElevationRequest()
 
 void PlanetElevationRequest::process(void)
 {
-	elevation=glm::simplex(glm::normalize(coord));
+	elevation=1.0+glm::simplex(glm::normalize(coord))*0.1f;
 }
 
 void PlanetElevationRequest::update(void)

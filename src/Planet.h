@@ -2,6 +2,7 @@
 #define PLANET_H
 
 #include "utils/glm.h"
+#include <render/Shader.h>
 
 typedef struct
 {
@@ -28,6 +29,10 @@ class PlanetFace
 
 		void updateElevation(float e);
 
+		//TEMP
+		void drawDirect(void);
+		void testFullGeneration(int depth);
+
 	private:
 		void finalize(void);
 
@@ -46,9 +51,19 @@ class Planet
 
 		const planetInfo_s planetInfo; //read only
 		class ContentHandler& handler;
+		
+		//TEMP
+		void drawDirect(void);
+		void testFullGeneration(int depth);
+		ShaderProgram &programBasic;
 
 	private:
 		PlanetFace* faces[6];
+
+		//TEMP
+			GLuint vaoBasic;
+			GLuint vbo;
+			GLuint ebo;
 };
 
 #endif

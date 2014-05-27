@@ -5,12 +5,14 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #ifndef NTWBAR
-#include <AntTweakBar.h>
+    #include <AntTweakBar.h>
 #endif
 #include "render/camera/Camera.h"
-#include "render/camera/manager/CameraManager.h"
-#include "render/camera/manager/CameraKeyboard.h"
+#include "render/camera/manager/CameraKeyboardMouse.h"
 #include "tests/testShaders.h"
+#include "data/ContentHandler.h"
+
+#define NUMPRODUCERS (1)
 
 enum appState {
     appReady,
@@ -24,15 +26,16 @@ class Application : public Singleton<Application> {
         Application();
         appState state;
         bool fullscreen, vsync, active, wireframe;
-#ifndef NTWBAR
-        TwBar *bar;
-#endif
+        #ifndef NTWBAR
+            TwBar *bar;
+        #endif
         unsigned int width, height;
         float viewWidth, viewHeight;
         GLFWwindow* window;
         Camera *camera;
         float bgColor[3];
         testShaders *tt;
+        ContentHandler contentHandler;
 
         friend class Singleton<Application>;
 

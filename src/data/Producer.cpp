@@ -8,7 +8,7 @@ void fakeProducerMain(Producer* p)
 }
 
 Producer::Producer(ContentInputQueue& iq, ContentOutputQueue& oq):
-	thread(new sf::Thread(&Producer::producerMain, this)),
+	thread(new sf::Thread(fakeProducerMain, this)),
 	inputQueue(iq),
 	outputQueue(oq)
 {
