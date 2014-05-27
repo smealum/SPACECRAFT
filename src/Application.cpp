@@ -136,7 +136,7 @@ void Application::run()
             glm::vec3(0.f),
             glm::vec3(0, 1.f, 0.f)
             );
-    camera->setCameraManager(new CameraKeyboard());
+    camera->setCameraManager(new CameraKeyboardMouse());
 
     tt = new testShaders;
     testPlanet=new Planet((planetInfo_s){0}, contentHandler);

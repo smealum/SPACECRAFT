@@ -6,43 +6,52 @@
 #include "dbg.h"
 using namespace std;
 
-static map<int,pair<int,int> > keyState;
-static map<int,pair<int,int> > mouseState;
-static double m_mouseX;
-static double m_mouseY;
-bool Input::fixMouse(false);
-float Input::horAngle(INFINITY), Input::verAngle(INFINITY);
-glm::vec3 Input::position(0.f, 0.f, 0.f);
+map<int,pair<int,int> > keyState;
+map<int,pair<int,int> > mouseState;
+double m_mouseX;
+double m_mouseY;
+float horAngle = 0;
+float verAngle = 0;
+bool mouseIsFixed = false;
+bool mouseIsFixing = false;
 
 void Input::update(GLFWwindow* window)
 {
+    // get screen dimension
+    int width, height;
+    glfwGetWindowSize(window, &width, &height);
+
+    // update key
     for(auto it = keyState.begin(); it!=keyState.end(); ++it )
     {
         it->second.second = it->second.first;
         it->second.first  = glfwGetKey(window,it->first);
     }
+
+    // update mouse
     for(auto it = mouseState.begin(); it!=mouseState.end(); ++it )
     {
         it->second.second = it->second.first;
         it->second.first  = glfwGetMouseButton(window,it->first);
     }
+
+
+    // petit fix
+    if (mouseIsFixing)
+    {
+        glfwSetCursorPos(window, width/2, height/2);
+        mouseIsFixing=false;
+    }
+
+    // get mouse position
     glfwGetCursorPos(window, &m_mouseX, &m_mouseY);
 
-    if (fixMouse)
-    {
-	float mSpeed = 0.05f;
-	int width, height;
-	glfwGetWindowSize(window, &width, &height);
-	glfwSetCursorPos(window, width/2, height/2);
-	if (horAngle == INFINITY)
-	    horAngle = verAngle = 0.f;
-	else 
-	{
-	    horAngle = mSpeed * 1.f * (float)(width/2 - m_mouseX);
-	    verAngle = mSpeed * 1.f * (float)(height/2 - m_mouseY);
-	}
-	debug("mouse is %f, %f moves at speed %f, %f", m_mouseX, m_mouseY, horAngle, verAngle);
-    }
+    // get mouse position (bis)
+    horAngle = (float)(width/2 - m_mouseX);
+    verAngle = (float)(height/2 - m_mouseY);
+
+    // fix mousePosition
+    if (mouseIsFixed) glfwSetCursorPos(window, width/2, height/2);
 }
 
 bool Input::isKeyPressed(int key)
@@ -94,4 +103,28 @@ double Input::mouseY()
 void Input::setMousePos(double x, double y)
 {
     glfwSetCursorPos(Application::getInstance().getWindow(), x, y);
+}
+
+float Input::getHorAngle()
+{
+    return horAngle;
+}
+float Input::getVerAngle() 
+{
+    return verAngle;
+}
+
+void Input::fixMouse()
+{
+    mouseIsFixed =true;
+    mouseIsFixing=true;
+}
+
+void Input::unfixMouse()
+{
+    mouseIsFixed=false;
+}
+bool Input::isMouseFixed()
+{
+    return mouseIsFixed;
 }
