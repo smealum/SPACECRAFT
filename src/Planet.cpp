@@ -106,9 +106,9 @@ static GLuint elements[2*3] = {
 };
 
 Planet::Planet(planetInfo_s pi, ContentHandler& ch):
-	programBasic(ShaderProgram::loadFromFile("shader/basic/basic.vert", "shader/basic/basic.frag", "planet")),
 	planetInfo(pi),
-	handler(ch)
+	handler(ch),
+	programBasic(ShaderProgram::loadFromFile("shader/basic/basic.vert", "shader/basic/basic.frag", "planet"))
 {
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
 

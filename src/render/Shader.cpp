@@ -26,7 +26,7 @@ struct ShaderProgram::uniform_t {
     uniformType::T type;
     ShaderProgram::uniform_u val;
     uniform_t() {}
-    uniform_t(const ShaderProgram::uniform_t& u) {}
+    uniform_t(const ShaderProgram::uniform_t& u) :  type(u.type), val(u.val){}
 };
 
 struct ShaderProgram::attribute_t {
