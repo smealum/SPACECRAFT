@@ -1,7 +1,8 @@
 #include "tests/testShaders.h"
 #include "Application.h"
-#include "render/Camera.h"
+#include "render/camera/Camera.h"
 #include "utils/dbg.h"
+#include "utils/Input.h"
 
 static GLfloat vertices[] = {
     //     POSITION    |      COLOR           |     NORMAL
@@ -130,6 +131,13 @@ testShaders::testShaders() :
         );
         
     }
+
+    Camera &cam(Application::getInstance().getCamera());
+    cam.view = glm::lookAt(
+            glm::vec3(0, 0, -5.f),
+            glm::vec3(0.f,0.f,0.f),
+            glm::vec3(0, 1.f, 0.f)
+            );
 }
 
 void testShaders::draw()
@@ -138,11 +146,6 @@ void testShaders::draw()
     modelAngle+=0.04;
 
     Camera &cam(Application::getInstance().getCamera());
-    cam.view = glm::lookAt(
-            glm::vec3(0, 0, -5.f),
-            glm::vec3(0.f,0.f,0.f),
-            glm::vec3(0, 1.f, 0.f)
-            );
     // basic program
     {
         programBasic.use();
