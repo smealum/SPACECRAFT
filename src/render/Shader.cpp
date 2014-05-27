@@ -20,11 +20,13 @@ union ShaderProgram::uniform_u {
     float f;
     int i;
     uniform_u() {}
+    uniform_u(const uniform_u &u) : i(u.i) {}
 };
 struct ShaderProgram::uniform_t {
     uniformType::T type;
     ShaderProgram::uniform_u val;
     uniform_t() {}
+    uniform_t(const ShaderProgram::uniform_t& u) {}
 };
 
 struct ShaderProgram::attribute_t {
