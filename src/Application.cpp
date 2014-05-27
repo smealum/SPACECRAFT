@@ -63,6 +63,9 @@ Application::Application() :
     TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
     TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
 
+    // vsync on
+    glfwSwapInterval(1);
+
     // Set GLFW event callbacks
     // - Redirect window size changes to the callback function WindowSizeCB
     glfwSetWindowSizeCallback(window, (GLFWwindowposfun)TwWindowSizeGLFW3);

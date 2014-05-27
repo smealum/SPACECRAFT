@@ -11,7 +11,7 @@ class CameraManager
 {
     public:
         CameraManager();
-        virtual void update(Camera& camera);
+        virtual void update(Camera& camera) = 0;
 };
 
 

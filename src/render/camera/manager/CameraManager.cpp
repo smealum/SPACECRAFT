@@ -8,7 +8,3 @@ CameraManager::CameraManager()
 {
     
 }
-
-void CameraManager::update(Camera& camera)
-{
-}
