@@ -2,6 +2,7 @@
 #define INPUT_QHZPGW1N
 
 #include <map>
+#include "utils/glm.h"
 
 struct GLFWwindow;
 
@@ -18,6 +19,13 @@ class Input
         static double mouseX();
         static double mouseY();
 	static void setMousePos(double x, double y); // relative
+
+	static bool fixMouse;
+	static float horAngle, verAngle;
+	static glm::vec3 position;
+
+	static inline float getHorAngle() { return horAngle; }
+	static inline float getVerAngle() { return verAngle; }
 };
 
 #endif /* end of include guard: INPUT_QHZPGW1N */

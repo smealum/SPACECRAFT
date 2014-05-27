@@ -113,6 +113,7 @@ void Application::createWindowInFullscreen(bool fs)
             glfwTerminate();
             std::exit(2);
         }
+	glfwSetCursorPos(window, width/2, height/2);
     }
 }
 
