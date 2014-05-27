@@ -16,12 +16,13 @@ void ContentHandler::handleNewContent(void)
 {
 	std::queue<ContentRequest*> q;
 	outputQueue.popAll(q);
-	ContentRequest* r=NULL;
 
-	while((r=q.front()))
+	while(q.size()>0)
 	{
+		ContentRequest* r=q.front();
 		r->update();
-		delete r;
+		printf("UPDATE\n");
 		q.pop();
+		delete r;
 	}
 }

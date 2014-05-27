@@ -2,6 +2,7 @@
 #include "utils/dbg.h"
 #include <cstdlib>
 #include "utils/Input.h"
+#include "Planet.h"
 
 #ifndef NTWBAR
     inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
@@ -117,6 +118,8 @@ void Application::createWindowInFullscreen(bool fs)
 }
 
 
+Planet* testPlanet;
+
 void Application::run()
 {
     state = appInLoop;
@@ -129,6 +132,8 @@ void Application::run()
     camera->setCameraManager(new CameraKeyboard());
 
     tt = new testShaders;
+    testPlanet=new Planet((planetInfo_s){0}, contentHandler);
+    testPlanet->testFullGeneration(4);
 
     while (state != appExiting)
     {
@@ -153,7 +158,10 @@ void Application::loop()
         glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        tt->draw();
+        // tt->draw();
+        testPlanet->drawDirect();
+
+        contentHandler.handleNewContent();
 
         #ifndef NTWBAR
             // Draw tweak bars

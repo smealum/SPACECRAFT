@@ -28,22 +28,22 @@ template<class T>
 void SynchronizationQueue<T>::push(T t)
 {
 	mutex.lock();
-		// queue.push(t);
+		queue.push(t);
 	mutex.unlock();
 }
 
 template<class T>
 T SynchronizationQueue<T>::pop(void)
 {
+	T t=NULL;
 	mutex.lock();
 		if(queue.size()>0)
 		{
-			T t=queue.front();
+			t=queue.front();
 			queue.pop();
-			return t;
 		}
 	mutex.unlock();
-	return NULL;
+	return t;
 }
 
 template<class T>
