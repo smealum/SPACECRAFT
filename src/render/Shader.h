@@ -6,6 +6,7 @@
 #include "utils/glm.h"
 #include <string>
 #include <map>
+#include <list>
 
 class Shader;
 class ShaderProgram;
@@ -19,6 +20,28 @@ namespace ShaderType
     };
 };
 
+class Shader
+{
+    public:
+        // Chargement du shader depuis un fichier
+        static Shader& loadFromFile(const char *filename, ShaderType::T type);
+
+
+        // Fournit l'identifiant du shader
+        inline GLuint getHandle() { return handle; }
+        
+
+    private:
+        // constructeur privé, passer par Shader::fromFile(filename)
+        Shader();
+
+        // identifiant du shader OpenGL
+        GLuint handle;
+
+        // constructeur par copie (private, interdit)
+        Shader(const Shader& shader);
+};
+
 class ShaderProgram
 {
     public:
@@ -30,7 +53,7 @@ class ShaderProgram
         void use();
 
         // Fournit l'identifiant du program
-        GLuint getHandle();
+        inline GLuint getHandle() { return handle; }
 
         // Fournit localisation d'un uniform.
         GLint uniform(const char* name);
@@ -47,43 +70,28 @@ class ShaderProgram
         void setUniform(const char *name, int val );
         void setUniform(const char *name, bool val );
 
+        // invalid program, need some shaders
+        ShaderProgram();
+        ~ShaderProgram();
+
+        // attach a compiled shader
+        void attachShader(Shader &s);
+        void detachShader(Shader &s);
         // parametrer les attributs
+        void setAttribute(const char *name, GLint size, GLboolean normalized, GLsizei stride, GLuint offset);
         //void bindAttribLocation( GLuint location,const char * name);
         //void bindFragDataLocation( GLuint location,const char * name );
     private:
-        // constructeur (privé) . Utiliser loadFrom[File|Shader]
-        ShaderProgram();
-
         // identifiant OpenGL
         GLuint handle;
+        bool valid; // does it need to be linked when there some shaders have been attached
 
         // identifiants des attributs.
+        std::list<Shader*> attachedShaders;
         std::map<std::string,GLint> uniformsMap;
 
         // constructeur par copie (private, interdit)
         ShaderProgram(const ShaderProgram& other);
-};
-
-class Shader
-{
-    public:
-        // Chargement du shader depuis un fichier
-        static Shader& loadFromFile(const char *filename, ShaderType::T type);
-
-
-        // Fournit l'identifiant du shader
-        GLuint getHandle();
-        
-
-    private:
-        // constructeur privé, passer par Shader::fromFile(filename)
-        Shader();
-
-        // identifiant du shader OpenGL
-        GLuint handle;
-
-        // constructeur par copie (private, interdit)
-        Shader(const Shader& shader);
 };
 
 #endif /* end of include guard: SHADER_F8X43H2W */

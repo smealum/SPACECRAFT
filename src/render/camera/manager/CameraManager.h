@@ -1,18 +1,17 @@
 #ifndef CAMERAMANAGER_ASD83Q76
 #define CAMERAMANAGER_ASD83Q76
 
-#include "../Camera.h"
-#include <GLFW/glfw3.h>
 #include "utils/glm.h"
+#include <GLFW/glfw3.h>
 
+
+class Camera;
 // class patron
 class CameraManager
 {
     public:
-        CameraManager(Camera& camera);
-        void update();
-    private:
-        Camera& m_camera;
+        CameraManager();
+        virtual void update(Camera& camera);
 };
 
 

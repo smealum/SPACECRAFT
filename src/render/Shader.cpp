@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include "utils/dbg.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -46,7 +47,7 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
         return *(it->second);
 
     // Sinon, on le charge
-    Shader* s = new Shader();
+    Shader* s = new Shader;
 
     // chargement du fichier
     vector<char> fileContent;
@@ -103,11 +104,6 @@ Shader::Shader()
 
 }
 
-GLuint Shader::getHandle()
-{
-    return handle;
-}
-
 Shader::Shader(const Shader& shader)
 {
     handle = shader.handle;
@@ -137,7 +133,7 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
     }
 
     // programme creation
-    ShaderProgram* p = new ShaderProgram();
+    ShaderProgram* p = new ShaderProgram;
 	p->handle = glCreateProgram();
     if (not p->handle)
     {
@@ -153,6 +149,7 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
 
     // linkage
     glLinkProgram(p->handle);
+    p->valid = true;
     GLint result;
     glGetProgramiv(p->handle,GL_LINK_STATUS, &result);
     if (result!=GL_TRUE)
@@ -236,17 +233,69 @@ void ShaderProgram::setUniform(const char *name, int val )
     glUniform1i(uniform(name), val);
 }
 
-ShaderProgram::ShaderProgram()
+ShaderProgram::ShaderProgram() :
+    handle(0),
+    valid(false)
 {
-    
 }
 
-GLuint ShaderProgram::getHandle()
+ShaderProgram::~ShaderProgram()
 {
-    return handle;
+    // detach shaders and set delete flag
+    for (auto it(attachedShaders.begin()); it != attachedShaders.end(); ++it)
+    {
+        glDetachShader(handle, (*it)->getHandle());
+        glDeleteShader((*it)->getHandle());
+    }
+    glDeleteProgram(handle);
+}
+
+void ShaderProgram::attachShader(Shader &s)
+{
+    if (find(attachedShaders.begin(), attachedShaders.end(), &s) == attachedShaders.end())
+    {
+        glAttachShader(handle, s.getHandle());
+        attachedShaders.push_back(&s);
+        valid = false;
+    } else
+        log_err("Shader %u is already attached to program %u.", s.getHandle(), handle);
+}
+
+void ShaderProgram::detachShader(Shader &s)
+{
+    auto it(find(attachedShaders.begin(), attachedShaders.end(), &s));
+    if (it == attachedShaders.end())
+    {
+        log_err("Cannot detach shader %u...", s.getHandle());
+    } else {
+        attachedShaders.erase(it);
+        glDetachShader(handle, s.getHandle());
+        glDeleteShader(s.getHandle()); // flags for deletion
+        valid = false;
+    }
 }
 
 void ShaderProgram::use()
 {
+    if (!valid)
+    {
+        valid = true;
+        glLinkProgram(handle);
+    }
     glUseProgram(handle);
 }
+
+void ShaderProgram::setAttribute(const char *name, GLint size, GLboolean normalized, GLsizei stride, GLuint offset)
+{
+    GLint loc = attribLocation(name);
+    glEnableVertexAttribArray(loc);
+    glVertexAttribPointer(
+            loc,
+            size,
+            GL_FLOAT,
+            normalized,
+            stride*sizeof(GLfloat),
+            (void*)(offset*sizeof(GLfloat))
+            );
+}
+

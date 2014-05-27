@@ -119,12 +119,13 @@ void Application::createWindowInFullscreen(bool fs)
 void Application::run()
 {
     state = appInLoop;
-    camera = new Camera();
+    camera = new Camera;
     camera->view = glm::lookAt(
             glm::vec3(1.5, 1.5f, 1.5f),
             glm::vec3(0.f),
             glm::vec3(0, 1.f, 0.f)
             );
+    camera->setCameraManager(new CameraKeyboard());
 
     tt = new testShaders;
 
@@ -146,6 +147,7 @@ void Application::loop()
         }
 
         Input::update(window);
+        camera->update();
 
         glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

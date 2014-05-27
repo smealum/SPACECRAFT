@@ -8,6 +8,8 @@
 #include <AntTweakBar.h>
 #endif
 #include "render/camera/Camera.h"
+#include "render/camera/manager/CameraManager.h"
+#include "render/camera/manager/CameraKeyboard.h"
 #include "tests/testShaders.h"
 
 enum appState {

@@ -75,17 +75,9 @@ testShaders::testShaders() :
 
         programBasic.use();
         glBindFragDataLocation(programBasic.getHandle(), 0, "outColor");
-        GLint posAttrib = programBasic.attribLocation("position");
-        glEnableVertexAttribArray(posAttrib);
-        glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 10*sizeof(GLfloat), 0);
-        GLint colAttrib = programBasic.attribLocation("color");
-        glEnableVertexAttribArray(colAttrib);
-        glVertexAttribPointer(colAttrib, 4, GL_FLOAT, GL_FALSE,
-                              10*sizeof(GLfloat), (void*)(3*sizeof(GLfloat)));
-        GLint texAttrib = programBasic.attribLocation("texcoord");
-        glEnableVertexAttribArray(texAttrib);
-        glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE,
-                               10*sizeof(GLfloat), (void*)(0*sizeof(GLfloat))); // TODO change texcoord
+        programBasic.setAttribute("position", 3, GL_FALSE, 10, 0);
+        programBasic.setAttribute("color", 4, GL_FALSE, 10, 3);
+        programBasic.setAttribute("texcoord", 2, GL_FALSE, 10, 0); // XXX pas de texcoord
         
         programBasic.setUniform("overrideColor", glm::vec4(1.f));
 
@@ -99,38 +91,18 @@ testShaders::testShaders() :
 
         programPhong.use();
         glBindFragDataLocation(programPhong.getHandle(), 0, "outColor");
-        GLint posAttrib = programPhong.attribLocation("position");
-        glEnableVertexAttribArray(posAttrib);
-        glVertexAttribPointer(
-                posAttrib,
-                3,
-                GL_FLOAT,
-                GL_FALSE,
-                10*sizeof(GLfloat),
-                (void*)0
-        );
-        GLint colAttrib = programPhong.attribLocation("color");
-        glEnableVertexAttribArray(colAttrib);
-        glVertexAttribPointer(
-                colAttrib,
-                4,
-                GL_FLOAT,
-                GL_FALSE,
-                10*sizeof(GLfloat),
-                (void*)(3*sizeof(GLfloat))
-        );
-        GLint normalAttrib = programPhong.attribLocation("normal");
-        glEnableVertexAttribArray(normalAttrib);
-        glVertexAttribPointer(
-                normalAttrib,
-                3,
-                GL_FLOAT,
-                GL_TRUE,
-                10*sizeof(GLfloat),
-                (void*)(7*sizeof(GLfloat))
-        );
+        programPhong.setAttribute("position", 3, GL_FALSE, 10, 0);
+        programPhong.setAttribute("color", 4, GL_FALSE, 10, 3);
+        programPhong.setAttribute("normal", 3, GL_FALSE, 10, 7);
         
     }
+
+    Camera &cam(Application::getInstance().getCamera());
+    cam.view = glm::lookAt(
+            glm::vec3(0, 0, -5.f),
+            glm::vec3(0.f,0.f,0.f),
+            glm::vec3(0, 1.f, 0.f)
+            );
 }
 
 void testShaders::draw()
@@ -139,11 +111,6 @@ void testShaders::draw()
     modelAngle+=0.04;
 
     Camera &cam(Application::getInstance().getCamera());
-    cam.view = glm::lookAt(
-            glm::vec3(0, 0, -5.f),
-            glm::vec3(0.f,0.f,0.f),
-            glm::vec3(0, 1.f, 0.f)
-            );
     // basic program
     {
         programBasic.use();
@@ -165,7 +132,7 @@ void testShaders::draw()
     }
     // phong program
     {
-        model = glm::translate(glm::mat4(1.0),-glm::vec3(Input::mouseX()*0.01-3.0,Input::mouseY()*0.01-3.0,0.0));
+        model = glm::translate(glm::mat4(1.0),-glm::vec3(1.0,0.0,0.0));
         model = glm::rotate(model,modelAngle,glm::vec3(sin(modelAngle),0.0,1.0));
 
         programPhong.use();

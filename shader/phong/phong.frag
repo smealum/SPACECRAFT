@@ -21,7 +21,9 @@ void main() {
 	coefSpecu=coefSpecu*coefSpecu;
 	coefSpecu=coefSpecu*coefSpecu;
 	coefSpecu=coefSpecu*coefSpecu;
-	coefSpecu*=7.0;
+	coefSpecu=coefSpecu*coefSpecu;
+	coefSpecu=coefSpecu*coefSpecu;
+	coefSpecu*=1.0;
 
 	outColor.xyz=(  ambient+
                 diffuse*coefDiffu+
