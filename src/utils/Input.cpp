@@ -1,4 +1,5 @@
 #include "Input.h"
+#include "Application.h"
 
 #include <vector>
 using namespace std;
@@ -67,4 +68,9 @@ double Input::mouseX()
 double Input::mouseY()
 {
     return m_mouseY;
+}
+
+void Input::setMousePos(double x, double y)
+{
+    glfwSetCursorPos(Application::getInstance().getWindow(), x, y);
 }

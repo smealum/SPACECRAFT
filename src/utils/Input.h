@@ -1,8 +1,9 @@
 #ifndef INPUT_QHZPGW1N
 #define INPUT_QHZPGW1N
 
-#include <GLFW/glfw3.h>
 #include <map>
+
+struct GLFWwindow;
 
 class Input
 {
@@ -16,6 +17,7 @@ class Input
         static bool isMouseHold(int key);
         static double mouseX();
         static double mouseY();
+	static void setMousePos(double x, double y); // relative
 };
 
 #endif /* end of include guard: INPUT_QHZPGW1N */

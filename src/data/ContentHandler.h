@@ -8,8 +8,11 @@ class ContentHandler
 {
 	public:
 		ContentHandler(int numProducers);
+
+		void requestContent(ContentRequest* req);
 		void handleNewContent();
 	private:
+
 		std::vector<Producer>* producers;
         ContentInputQueue inputQueue;
         ContentOutputQueue outputQueue;

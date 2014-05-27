@@ -7,6 +7,8 @@ class ContentRequest
 {
 	public:
 		virtual void process()=0;
+		virtual void update()=0;
+		virtual ~ContentRequest() {}
 	private:		
 };
 
@@ -16,12 +18,16 @@ class ContentRequest
 class PlanetElevationRequest : public ContentRequest
 {
 	public:
-		PlanetElevationRequest(Planet& p, uint8_t f, glm::vec2 c);
+		PlanetElevationRequest(Planet& p, PlanetFace& pf, glm::vec3 c);
 		void process(void);
+		void update(void);
+		virtual ~PlanetElevationRequest();
+		
 	private:
-		uint8_t face;
-		glm::vec2 coord;
+		float elevation;
+		glm::vec3 coord;
 		Planet& planet;
+		PlanetFace& face;
 };
 
 typedef SynchronizationQueue<ContentRequest*> ContentInputQueue;

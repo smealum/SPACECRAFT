@@ -25,6 +25,9 @@ class PlanetFace
 	public:
 		PlanetFace(Planet* planet, glm::vec3 v[4]);
 		PlanetFace(Planet* planet, PlanetFace* father, uint8_t id);
+
+		void updateElevation(float e);
+
 	private:
 		void finalize(void);
 
@@ -32,13 +35,18 @@ class PlanetFace
 		PlanetFace* father; //father == NULL <=> toplevel face
 		PlanetFace* sons[4];
 		glm::vec3 vertex[9];
+		float elevation;
+		int depth;
 };
 
 class Planet
 {
 	public:
-		Planet(planetInfo_s pi);
+		Planet(planetInfo_s pi, class ContentHandler& ch);
+
 		const planetInfo_s planetInfo; //read only
+		class ContentHandler& handler;
+
 	private:
 		PlanetFace* faces[6];
 };
