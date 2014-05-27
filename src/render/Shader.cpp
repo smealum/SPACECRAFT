@@ -149,6 +149,7 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
 
     // linkage
     glLinkProgram(p->handle);
+    p->valid = true;
     GLint result;
     glGetProgramiv(p->handle,GL_LINK_STATUS, &result);
     if (result!=GL_TRUE)
@@ -251,8 +252,13 @@ ShaderProgram::~ShaderProgram()
 
 void ShaderProgram::attachShader(Shader &s)
 {
-    glAttachShader(handle, s.getHandle());
-    attachedShaders.push_back(&s);
+    if (find(attachedShaders.begin(), attachedShaders.end(), &s) == attachedShaders.end())
+    {
+        glAttachShader(handle, s.getHandle());
+        attachedShaders.push_back(&s);
+        valid = false;
+    } else
+        log_err("Shader %u is already attached to program %u.", s.getHandle(), handle);
 }
 
 void ShaderProgram::detachShader(Shader &s)
@@ -265,6 +271,7 @@ void ShaderProgram::detachShader(Shader &s)
         attachedShaders.erase(it);
         glDetachShader(handle, s.getHandle());
         glDeleteShader(s.getHandle()); // flags for deletion
+        valid = false;
     }
 }
 
@@ -277,3 +284,18 @@ void ShaderProgram::use()
     }
     glUseProgram(handle);
 }
+
+void ShaderProgram::setAttribute(const char *name, GLint size, GLboolean normalized, GLsizei stride, GLuint offset)
+{
+    GLint loc = attribLocation(name);
+    glEnableVertexAttribArray(loc);
+    glVertexAttribPointer(
+            loc,
+            size,
+            GL_FLOAT,
+            normalized,
+            stride*sizeof(GLfloat),
+            (void*)(offset*sizeof(GLfloat))
+            );
+}
+

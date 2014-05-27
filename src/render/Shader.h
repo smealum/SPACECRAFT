@@ -78,6 +78,7 @@ class ShaderProgram
         void attachShader(Shader &s);
         void detachShader(Shader &s);
         // parametrer les attributs
+        void setAttribute(const char *name, GLint size, GLboolean normalized, GLsizei stride, GLuint offset);
         //void bindAttribLocation( GLuint location,const char * name);
         //void bindFragDataLocation( GLuint location,const char * name );
     private:
