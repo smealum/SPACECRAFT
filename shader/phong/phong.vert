@@ -7,7 +7,7 @@ layout(location = 2) in vec3 normal;
 uniform mat4 projection = mat4(1.0);
 uniform mat4 model = mat4(1.0);
 uniform mat4 view = mat4(1.0);
-uniform vec4 lightPosition = vec4(0.0,1.0,0.0,0.0);
+uniform vec4 lightPosition = vec4(0.0,0.0,0.0,1.0);
 
 smooth out vec4 fcolor;
 smooth out vec3 fnormal;
@@ -19,8 +19,7 @@ void main ()
 {
     gl_Position = projection*view*model*vec4(position,1.0);
 	fcolor=color;
-    fcolor.a=1.0;
 	fposition=view*model*vec4(position,1.0);
     fnormal=(view*model*vec4(normal,0.0)).xyz;
-	flightPosition=(model*lightPosition).xyz;
+	flightPosition=(view*lightPosition).xyz;
 }

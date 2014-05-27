@@ -134,6 +134,9 @@ testShaders::testShaders() :
 
 void testShaders::draw()
 {
+    static float modelAngle=0.0;
+    modelAngle+=0.04;
+
     Camera &cam(Application::getInstance().getCamera());
     cam.view = glm::lookAt(
             glm::vec3(0, 0, -5.f),
@@ -148,9 +151,7 @@ void testShaders::draw()
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         cam.updateCamera(programBasic);
 
-        static float modelAngle=0.0;
-        modelAngle+=0.04;
-        model = glm::translate(glm::mat4(1.0),glm::vec3(-1.0,0.0,0.0));
+        model = glm::translate(glm::mat4(1.0),-glm::vec3(-1.0,0.0,0.0));
         model = glm::rotate(model,modelAngle,glm::vec3(sin(modelAngle),0.0,1.0));
         programBasic.setUniform("model", model);
 
@@ -163,9 +164,7 @@ void testShaders::draw()
     }
     // phong program
     {
-        static float modelAngle=0.0;
-        modelAngle+=0.04;
-        model = glm::translate(glm::mat4(1.0),glm::vec3(1.0,0.0,0.0));
+        model = glm::translate(glm::mat4(1.0),-glm::vec3(1.0,0.0,0.0));
         model = glm::rotate(model,modelAngle,glm::vec3(sin(modelAngle),0.0,1.0));
 
         programPhong.use();
