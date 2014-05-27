@@ -61,7 +61,7 @@ set(SRC ${PROJECT_SOURCE_DIR}/src)
 
 # durectories
 include_directories(${SRC})
-set(EXECUTABLE_OUTPUT_PATH bin)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 # modules
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
