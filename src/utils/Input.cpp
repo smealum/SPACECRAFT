@@ -10,7 +10,7 @@ static map<int,pair<int,int> > keyState;
 static map<int,pair<int,int> > mouseState;
 static double m_mouseX;
 static double m_mouseY;
-bool Input::fixMouse(true);
+bool Input::fixMouse(false);
 float Input::horAngle(INFINITY), Input::verAngle(INFINITY);
 glm::vec3 Input::position(0.f, 0.f, 0.f);
 
