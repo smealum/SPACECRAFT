@@ -47,8 +47,8 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 		case 2:
 			vertex[0]=father->vertex[8];
 			vertex[1]=father->vertex[4];
-			vertex[2]=father->vertex[3];
-			vertex[3]=father->vertex[7];
+			vertex[2]=father->vertex[7];
+			vertex[3]=father->vertex[3];
 			break;
 		case 3:
 			vertex[0]=father->vertex[4];
@@ -163,9 +163,8 @@ void PlanetFace::drawDirect(void)
 			if(sons[i])sons[i]->drawDirect();
 		}
 	}else{
-		float v=2.0f/depth;
-	    planet->programBasic.setUniform("model", glm::translate(glm::mat4(1.0f),vertex[4]*elevation)*glm::scale(glm::mat4_cast(q),glm::vec3(0.1f)));
-	    // printf("%f\n",elevation);
+		float v=2.0f/(1<<depth);
+	    planet->programBasic.setUniform("model", glm::translate(glm::mat4(1.0f),vertex[4]*elevation)*glm::scale(glm::mat4_cast(q),glm::vec3(v)));
 	    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 }
