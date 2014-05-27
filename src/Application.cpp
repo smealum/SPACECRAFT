@@ -1,6 +1,7 @@
 #include "Application.h"
 #include "utils/dbg.h"
 #include <cstdlib>
+#include "utils/Input.h"
 
 #ifndef NTWBAR
 inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
@@ -143,6 +144,8 @@ void Application::loop()
             glfwSetWindowShouldClose(window, GL_TRUE);
             state = appExiting;
         }
+
+        Input::update(window);
 
         glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

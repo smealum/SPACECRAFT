@@ -25,7 +25,6 @@ FIND_LIBRARY(ANTTWEAKBAR_LIBRARY DOC "Absolute path to AntTweakBar library."
   $ENV{ANTTWEAKBAR_ROOT}
   PATH_SUFFIXES lib/win32 #For finding the library file under the root of the glfw expanded archive, typically on Windows.
   PATHS
-  ${LIB_DIR}
   /usr/local/lib
   /usr/lib
   ${ANTTWEAKBAR_ROOT_DIR}/lib-msvc100/release # added by ptr

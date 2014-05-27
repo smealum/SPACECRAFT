@@ -1,7 +1,8 @@
 #include "tests/testShaders.h"
 #include "Application.h"
-#include "render/Camera.h"
+#include "render/camera/Camera.h"
 #include "utils/dbg.h"
+#include "utils/Input.h"
 
 static GLfloat vertices[] = {
     //     POSITION    |      COLOR           |     NORMAL
@@ -164,7 +165,7 @@ void testShaders::draw()
     }
     // phong program
     {
-        model = glm::translate(glm::mat4(1.0),-glm::vec3(1.0,0.0,0.0));
+        model = glm::translate(glm::mat4(1.0),-glm::vec3(Input::mouseX()*0.01-3.0,Input::mouseY()*0.01-3.0,0.0));
         model = glm::rotate(model,modelAngle,glm::vec3(sin(modelAngle),0.0,1.0));
 
         programPhong.use();
