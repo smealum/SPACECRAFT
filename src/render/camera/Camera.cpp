@@ -1,12 +1,14 @@
 #include "render/camera/Camera.h"
 #include "Application.h"
 #include "utils/maths.h"
+#include "manager/CameraManager.h"
 
 Camera::Camera() :
     view(1.f),
     proj(glm::perspective(DEG2RAD(45.f),
                 Application::getInstance().getWindowRatio()
-                , 0.1f, 1000.f))
+                , 0.1f, 1000.f)),
+    cameraManager(NULL)
 {}
 
 void Camera::updateCamera(ShaderProgram &prog)
@@ -70,4 +72,17 @@ bool Camera::isPointInFrustum(glm::vec3 p)
 		if(glm::dot(glm::vec4(p,1.0f),frustumPlane[i])>0.0f)return false;
 	}
 	return true;
+}
+
+void Camera::setCameraManager(CameraManager* c)
+{
+    cameraManager=c;
+}
+    
+void Camera::update()
+{
+    if (cameraManager)
+    {
+        cameraManager->update(*this);
+    }
 }
