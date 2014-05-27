@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "render/Camera.h"
 #include "utils/dbg.h"
+#include "utils/Input.h"
 
 static GLfloat vertices[] = {
     //     POSITION    |      COLOR           |     NORMAL
@@ -164,7 +165,9 @@ void testShaders::draw()
     }
     // phong program
     {
-        model = glm::translate(glm::mat4(1.0),-glm::vec3(1.0,0.0,0.0));
+        static int keyHoldCounter=0;
+        if (Input::isKeyHold(GLFW_KEY_V)) keyHoldCounter++;
+        model = glm::translate(glm::mat4(1.0),-glm::vec3(1.0+keyHoldCounter*0.1,0.0,0.0));
         model = glm::rotate(model,modelAngle,glm::vec3(sin(modelAngle),0.0,1.0));
 
         programPhong.use();
