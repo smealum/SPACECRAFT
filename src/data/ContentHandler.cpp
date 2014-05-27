@@ -21,7 +21,6 @@ void ContentHandler::handleNewContent(void)
 	{
 		ContentRequest* r=q.front();
 		r->update();
-		printf("UPDATE\n");
 		q.pop();
 		delete r;
 	}

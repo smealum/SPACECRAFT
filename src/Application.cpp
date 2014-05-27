@@ -24,6 +24,7 @@ Application::Application() :
     fullscreen(false),
     vsync(false),
     active(true),
+    wireframe(false),
 #ifndef NTWBAR
     bar(NULL),
 #endif
@@ -55,6 +56,7 @@ Application::Application() :
 
     // transparency
     glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_CULL_FACE);
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -64,6 +66,10 @@ Application::Application() :
     TwWindowSize(width, height);
     TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
     TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
+    TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
+
+    // vsync on
+    glfwSwapInterval(1);
 
     // Set GLFW event callbacks
     // - Redirect window size changes to the callback function WindowSizeCB
@@ -114,6 +120,7 @@ void Application::createWindowInFullscreen(bool fs)
             glfwTerminate();
             std::exit(2);
         }
+	glfwSetCursorPos(window, width/2, height/2);
     }
 }
 
@@ -158,6 +165,7 @@ void Application::loop()
         glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
         // tt->draw();
         testPlanet->drawDirect();
 

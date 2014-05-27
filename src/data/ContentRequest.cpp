@@ -9,6 +9,9 @@ PlanetElevationRequest::PlanetElevationRequest(Planet& p, PlanetFace& pf, glm::v
 
 }
 
+PlanetElevationRequest::~PlanetElevationRequest()
+{}
+
 void PlanetElevationRequest::process(void)
 {
 	elevation=1.0+glm::simplex(glm::normalize(coord))*0.1f;

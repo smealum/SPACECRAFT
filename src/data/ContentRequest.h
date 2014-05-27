@@ -8,6 +8,7 @@ class ContentRequest
 	public:
 		virtual void process()=0;
 		virtual void update()=0;
+		virtual ~ContentRequest() {}
 	private:		
 };
 
@@ -20,6 +21,7 @@ class PlanetElevationRequest : public ContentRequest
 		PlanetElevationRequest(Planet& p, PlanetFace& pf, glm::vec3 c);
 		void process(void);
 		void update(void);
+		virtual ~PlanetElevationRequest();
 		
 	private:
 		float elevation;

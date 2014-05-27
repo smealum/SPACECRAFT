@@ -26,7 +26,7 @@ class Application : public Singleton<Application> {
     private:
         Application();
         appState state;
-        bool fullscreen, vsync, active;
+        bool fullscreen, vsync, active, wireframe;
         #ifndef NTWBAR
             TwBar *bar;
         #endif
@@ -50,6 +50,7 @@ class Application : public Singleton<Application> {
         //void resetVSync();
         inline void exit() { state = appExiting; }
         inline float getWindowRatio() const { return static_cast<float>(width)/static_cast<float>(height); }
+        inline GLFWwindow* getWindow() { return window; }
 
         inline Camera& getCamera() { return *camera; }
 };

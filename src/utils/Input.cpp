@@ -1,12 +1,18 @@
 #include "Input.h"
+#include "Application.h"
 
 #include <vector>
+#include <cmath>
+#include "dbg.h"
 using namespace std;
 
-map<int,pair<int,int> > keyState;
-map<int,pair<int,int> > mouseState;
-double m_mouseX;
-double m_mouseY;
+static map<int,pair<int,int> > keyState;
+static map<int,pair<int,int> > mouseState;
+static double m_mouseX;
+static double m_mouseY;
+bool Input::fixMouse(false);
+float Input::horAngle(INFINITY), Input::verAngle(INFINITY);
+glm::vec3 Input::position(0.f, 0.f, 0.f);
 
 void Input::update(GLFWwindow* window)
 {
@@ -20,7 +26,23 @@ void Input::update(GLFWwindow* window)
         it->second.second = it->second.first;
         it->second.first  = glfwGetMouseButton(window,it->first);
     }
-    glfwGetCursorPos(window,&m_mouseX,&m_mouseY);
+    glfwGetCursorPos(window, &m_mouseX, &m_mouseY);
+
+    if (fixMouse)
+    {
+	float mSpeed = 0.05f;
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+	glfwSetCursorPos(window, width/2, height/2);
+	if (horAngle == INFINITY)
+	    horAngle = verAngle = 0.f;
+	else 
+	{
+	    horAngle = mSpeed * 1.f * (float)(width/2 - m_mouseX);
+	    verAngle = mSpeed * 1.f * (float)(height/2 - m_mouseY);
+	}
+	debug("mouse is %f, %f moves at speed %f, %f", m_mouseX, m_mouseY, horAngle, verAngle);
+    }
 }
 
 bool Input::isKeyPressed(int key)
@@ -67,4 +89,9 @@ double Input::mouseX()
 double Input::mouseY()
 {
     return m_mouseY;
+}
+
+void Input::setMousePos(double x, double y)
+{
+    glfwSetCursorPos(Application::getInstance().getWindow(), x, y);
 }
