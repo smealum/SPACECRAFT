@@ -158,14 +158,14 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
     return *s;
 }
 
-Shader::Shader()
+Shader::Shader() :
+handle(0)
 {
-
 }
 
-Shader::Shader(const Shader& shader)
+Shader::Shader(const Shader& shader) :
+handle(shader.handle)
 {
-    handle = shader.handle;
 }
 
 
