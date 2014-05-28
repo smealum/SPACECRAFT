@@ -107,7 +107,16 @@ void PlanetFace::updateElevation(float e)
 
 bool PlanetFace::isDetailedEnough(Camera& c)
 {
-	glm::vec3 p=c.getPosition();
+	if(depth>9)return true;
+	glm::vec3 p1=c.getPosition();
+	glm::vec3 p2=vertex[4]*elevation;
+	glm::vec3 v=p2-p1;
+	// if(glm::dot(v,vertex[4])>0.0f)return true; //backface culling
+	// if(!c.isPointInFrustum(p2))return true; //frustum culling
+	if(depth<4)return false;
+	float d=2.0f/(1<<(depth-3));
+	if(glm::length(v)/d<1.f)return false;
+	return true;
 }
 
 glm::vec3 cubeArray[6][4]=
@@ -179,7 +188,7 @@ void PlanetFace::testFullGeneration(int depth)
 void Planet::testFullGeneration(int depth)
 {
 	for(int i=0;i<6;i++)faces[i]->testFullGeneration(depth);
-	faces[0]->deletePlanetFace();
+	// faces[0]->deletePlanetFace();
 }
 
 void PlanetFace::drawDirect(void)
@@ -194,7 +203,7 @@ void PlanetFace::drawDirect(void)
 	}else{
 		float v=2.0f/(1<<depth);
 	    planet->programBasic.setUniform("model", glm::translate(glm::mat4(1.0f),vertex[4]*elevation)*glm::scale(glm::mat4_cast(q),glm::vec3(v)));
-        planet->programBasic.setUniform("overrideColor", glm::vec4(glm::vec3((elevation-0.7f)*2),1.0f));
+        planet->programBasic.setUniform("overrideColor", glm::vec4(glm::vec3((elevation-1.0f)*10),1.0f));
 	    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 }
@@ -217,5 +226,23 @@ void Planet::drawDirect(void)
         // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     	for(int i=0;i<6;i++)faces[i]->drawDirect();
     }
+}
 
+void PlanetFace::processLevelOfDetail(Camera& c)
+{
+	if(isDetailedEnough(c))
+	{
+		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace();
+	}else{
+		for(int i=0;i<4;i++)
+		{
+			if(sons[i])sons[i]->processLevelOfDetail(c);
+			else sons[i]=new PlanetFace(planet,this,i);
+		}
+	}
+}
+
+void Planet::processLevelOfDetail(Camera& c)
+{
+	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c);
 }

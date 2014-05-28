@@ -36,6 +36,8 @@ class Application : public Singleton<Application> {
         float bgColor[3];
         testShaders *tt;
         ContentHandler contentHandler;
+        float deltaTime, time, fps;
+        int fpsCounter;
 
         friend class Singleton<Application>;
 
