@@ -20,7 +20,7 @@ union ShaderProgram::uniform_u {
     float f;
     int i;
     uniform_u() {}
-    uniform_u(const uniform_u &u) : i(u.i) {}
+    uniform_u(const uniform_u &u) : m4(u.m4) {}
 };
 struct ShaderProgram::uniform_t {
     uniformType::T type;
