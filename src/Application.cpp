@@ -178,6 +178,10 @@ void Application::loop()
         // tt->draw();
         testPlanet->drawDirect();
 
+        camera->updateFrustum();
+        if(camera->isPointInFrustum(glm::vec3(0.0f)))printf("INSIDE YES\n");
+        else printf("NOOOOO\n");
+
         contentHandler.handleNewContent();
 
         #ifndef NTWBAR
