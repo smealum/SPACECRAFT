@@ -159,35 +159,36 @@ Planet::Planet(planetInfo_s pi, ContentHandler& ch):
 
 	    // basic programme configuration
 	    {
-	        glGenVertexArrays(1, &vaoBasic);
-	        glBindVertexArray(vaoBasic);
+			glGenVertexArrays(1, &vaoBasic);
+			glBindVertexArray(vaoBasic);
 
-		programBasic.setBuffers(vaoBasic, vbo, ebo);
-	        programBasic.use();
-	        glBindFragDataLocation(programBasic.getHandle(), 0, "outColor");
-	        programBasic.setAttribute("position", 3, GL_FALSE, 10, 0);
-	        programBasic.setAttribute("color", 4, GL_FALSE, 10, 3);
-	        // programBasic.setAttribute("texcoord", 2, GL_FALSE, 10, 0); // XXX pas de texcoord
-	        
-	        programBasic.setUniform("overrideColor", glm::vec4(1.f));
+			programBasic.setBuffers(vaoBasic, vbo, ebo);
+				programBasic.use();
+				glBindFragDataLocation(programBasic.getHandle(), 0, "outColor");
+				programBasic.setAttribute("position", 3, GL_FALSE, 10, 0);
+				programBasic.setAttribute("color", 4, GL_FALSE, 10, 3);
+				// programBasic.setAttribute("texcoord", 2, GL_FALSE, 10, 0); // XXX pas de texcoord
 
-	        programBasic.setUniform("model", glm::mat4(1.0f));
+				programBasic.setUniform("overrideColor", glm::vec4(1.f));
+
+				programBasic.setUniform("model", glm::mat4(1.0f));
 	    }
 }
 
-void PlanetFace::testFullGeneration(int depth)
+void PlanetFace::testFullGeneration(int depth, PlanetFaceBufferHandler* b)
 {
 	if(depth<=0)return;
 	for(int i=0;i<4;i++)
 	{
 		if(!sons[i])sons[i]=new PlanetFace(planet,this,i);
-		sons[i]->testFullGeneration(depth-1);
+		if(depth==1)b->addFace(sons[i]);
+		sons[i]->testFullGeneration(depth-1, b);
 	}
 }
 
-void Planet::testFullGeneration(int depth)
+void Planet::testFullGeneration(int depth, PlanetFaceBufferHandler* b)
 {
-	for(int i=0;i<6;i++)faces[i]->testFullGeneration(depth);
+	for(int i=0;i<6;i++)faces[i]->testFullGeneration(depth, b);
 	// faces[0]->deletePlanetFace();
 }
 
@@ -245,4 +246,57 @@ void PlanetFace::processLevelOfDetail(Camera& c)
 void Planet::processLevelOfDetail(Camera& c)
 {
 	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c);
+}
+
+PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms):
+	planetFace(pf),
+	maxSize(ms),
+	shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "planetface"))
+{
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, ms*sizeof(faceBufferEntry_s), NULL, GL_STATIC_DRAW);
+
+    buffer=(faceBufferEntry_s*)malloc(ms*sizeof(faceBufferEntry_s));
+
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	shader.setBuffers(vao, vbo, 0);
+	shader.use();
+	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
+	shader.setAttribute("position", 3, GL_FALSE, 6, 0);
+	shader.setAttribute("color", 3, GL_FALSE, 6, 3);
+	shader.setUniform("overrideColor", glm::vec4(1.f));
+	shader.setUniform("model", glm::mat4(1.0f));
+}
+
+PlanetFaceBufferHandler::~PlanetFaceBufferHandler()
+{
+	free(buffer);
+}
+
+void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
+{
+	if(curSize<maxSize)
+	{
+		faces.push_back(pf);
+		const glm::vec3 v=pf->vertex[4]*pf->elevation;
+		const glm::vec3 n=pf->vertex[4];
+		buffer[curSize]=(faceBufferEntry_s){{v.x,v.y,v.z},{n.x,n.y,n.z}};
+
+    	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	    glBufferSubData(GL_ARRAY_BUFFER, curSize*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[curSize]);
+		
+		curSize++;
+	}
+}
+
+void PlanetFaceBufferHandler::draw(Camera& c)
+{
+    shader.use();
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    c.updateCamera(shader);
+	glDrawArrays(GL_POINTS, 0, curSize);
 }

@@ -72,29 +72,29 @@ Application::Application() :
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-#ifndef NTWBAR
-    bar = TwNewBar("SPACECRAFT");
-    //TwDefine((name+" iconified=true").c_str()); // minimizes
-    TwWindowSize(width, height);
-    TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
-    TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
-    TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
-    TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
-    TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
+    #ifndef NTWBAR
+        bar = TwNewBar("SPACECRAFT");
+        //TwDefine((name+" iconified=true").c_str()); // minimizes
+        TwWindowSize(width, height);
+        TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
+        TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
+        TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
+        TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
+        TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
 
-    // vsync on
-    glfwSwapInterval(1);
+        // vsync on
+        glfwSwapInterval(1);
 
-    // Set GLFW event callbacks
-    // - Redirect window size changes to the callback function WindowSizeCB
-    glfwSetWindowSizeCallback(window, (GLFWwindowposfun)TwWindowSizeGLFW3);
+        // Set GLFW event callbacks
+        // - Redirect window size changes to the callback function WindowSizeCB
+        glfwSetWindowSizeCallback(window, (GLFWwindowposfun)TwWindowSizeGLFW3);
 
-    glfwSetMouseButtonCallback(window, (GLFWmousebuttonfun)TwEventMouseButtonGLFW3);
-    glfwSetCursorPosCallback(window, (GLFWcursorposfun)TwEventMousePosGLFW3);
-    glfwSetScrollCallback(window, (GLFWscrollfun)TwEventMouseWheelGLFW3);
-    glfwSetKeyCallback(window, (GLFWkeyfun)TwEventKeyGLFW3);
-    glfwSetCharCallback(window, (GLFWcharfun)TwEventCharGLFW3);
-#endif
+        glfwSetMouseButtonCallback(window, (GLFWmousebuttonfun)TwEventMouseButtonGLFW3);
+        glfwSetCursorPosCallback(window, (GLFWcursorposfun)TwEventMousePosGLFW3);
+        glfwSetScrollCallback(window, (GLFWscrollfun)TwEventMouseWheelGLFW3);
+        glfwSetKeyCallback(window, (GLFWkeyfun)TwEventKeyGLFW3);
+        glfwSetCharCallback(window, (GLFWcharfun)TwEventCharGLFW3);
+    #endif
 
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_NO_ERROR)
@@ -138,8 +138,8 @@ void Application::createWindowInFullscreen(bool fs)
     }
 }
 
-
 Planet* testPlanet;
+PlanetFaceBufferHandler* testBuffer;
 
 void Application::run()
 {
@@ -154,7 +154,11 @@ void Application::run()
 
     tt = new testShaders;
     testPlanet=new Planet((planetInfo_s){0}, contentHandler);
-    // testPlanet->testFullGeneration(6);
+
+    testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
+    testBuffer->addFace(testPlanet->faces[0]);
+    
+    // testPlanet->testFullGeneration(4, testBuffer);
 
     float timeA;
     while (state != appExiting)
@@ -197,18 +201,19 @@ void Application::loop()
     glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
     tt->draw();
     testPlanet->drawDirect();
+    // testBuffer->draw(*camera);
 
     contentHandler.handleNewContent();
 
-#ifndef NTWBAR
-    // Draw tweak bars
-    glUseProgram(0);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-    TwDraw();
-#endif
+    #ifndef NTWBAR
+        // Draw tweak bars
+        glUseProgram(0);
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+        TwDraw();
+    #endif
 
     glfwSwapBuffers(window);
     glfwPollEvents();
