@@ -276,20 +276,41 @@ PlanetFaceBufferHandler::~PlanetFaceBufferHandler()
 	free(buffer);
 }
 
+void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
+{
+	if(i>=maxSize)return;
+	faces.push_back(pf);
+	const glm::vec3 v=pf->vertex[4]*pf->elevation;
+	const glm::vec3 n=pf->vertex[4];
+	buffer[i]=(faceBufferEntry_s){{v.x,v.y,v.z},{n.x,n.y,n.z}};
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferSubData(GL_ARRAY_BUFFER, i*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[i]);
+}
+
 void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 {
-	if(curSize<maxSize)
+	changeFace(pf, curSize);
+	curSize++;
+}
+
+void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf, int i)
+{
+	if(i>=curSize || i<0)return;
+
+	if(faces.size()>1)
 	{
-		faces.push_back(pf);
 		const glm::vec3 v=pf->vertex[4]*pf->elevation;
 		const glm::vec3 n=pf->vertex[4];
-		buffer[curSize]=(faceBufferEntry_s){{v.x,v.y,v.z},{n.x,n.y,n.z}};
+		faces[i]=faces[curSize-1];
+		buffer[i]=buffer[curSize-1];
 
-    	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	    glBufferSubData(GL_ARRAY_BUFFER, curSize*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[curSize]);
-		
-		curSize++;
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferSubData(GL_ARRAY_BUFFER, i*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[i]);
 	}
+
+	faces.pop_back();
+	curSize--;
 }
 
 void PlanetFaceBufferHandler::draw(Camera& c)

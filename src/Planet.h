@@ -39,6 +39,8 @@ class PlanetFaceBufferHandler
 		~PlanetFaceBufferHandler();
 	
 		void addFace(PlanetFace* pf);
+		void deleteFace(PlanetFace* pf, int i);
+		void changeFace(PlanetFace* pf, int i);
 		void draw(Camera& c);
 
 	private:

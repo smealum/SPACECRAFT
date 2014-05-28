@@ -68,7 +68,7 @@ Application::Application() :
 
     // transparency
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -158,7 +158,7 @@ void Application::run()
     testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
     testBuffer->addFace(testPlanet->faces[0]);
     
-    // testPlanet->testFullGeneration(4, testBuffer);
+    testPlanet->testFullGeneration(4, testBuffer);
 
     float timeA;
     while (state != appExiting)
@@ -199,9 +199,9 @@ void Application::loop()
     testPlanet->processLevelOfDetail(*camera);
 
     glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
-    tt->draw();
-    testPlanet->drawDirect();
-    // testBuffer->draw(*camera);
+    // tt->draw();
+    // testPlanet->drawDirect();
+    testBuffer->draw(*camera);
 
     contentHandler.handleNewContent();
 
