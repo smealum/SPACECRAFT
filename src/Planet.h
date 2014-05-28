@@ -39,7 +39,7 @@ class PlanetFaceBufferHandler
 		~PlanetFaceBufferHandler();
 	
 		void addFace(PlanetFace* pf);
-		void deleteFace(PlanetFace* pf, int i);
+		void deleteFace(PlanetFace* pf);
 		void changeFace(PlanetFace* pf, int i);
 		void draw(Camera& c);
 
@@ -59,10 +59,10 @@ class PlanetFace
 		PlanetFace(Planet* planet, glm::vec3 v[4]);
 		PlanetFace(Planet* planet, PlanetFace* father, uint8_t id);
 		
-		void deletePlanetFace(void);
+		void deletePlanetFace(PlanetFaceBufferHandler* b);
 		void updateElevation(float e);
 		bool isDetailedEnough(Camera& c);
-		void processLevelOfDetail(Camera& c);	
+		void processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b);	
 
 		TrackerPointer<PlanetFace>* getTptr(void);
 
@@ -80,6 +80,7 @@ class PlanetFace
 
 		TrackerPointer<PlanetFace>* tptr;
 
+		int bufferID;
 		float elevation;
 		uint8_t id;
 		int depth;
@@ -91,6 +92,7 @@ class Planet
 		Planet(planetInfo_s pi, class ContentHandler& ch);
 		
 		void processLevelOfDetail(Camera& c);
+		void draw(Camera& c);
 
 		const planetInfo_s planetInfo; //read only
 		class ContentHandler& handler;
@@ -101,6 +103,7 @@ class Planet
 		ShaderProgram &programBasic;
 
 		PlanetFace* faces[6];
+		PlanetFaceBufferHandler* faceBuffers[6];
 	private:
 
 		//TEMP

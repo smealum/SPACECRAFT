@@ -17,7 +17,8 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
-	id(5)
+	id(5),
+	bufferID(-1)
 {
 	vertex[0]=v[0]; vertex[1]=v[1];
 	vertex[2]=v[2];	vertex[3]=v[3];
@@ -31,7 +32,8 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
-	id(id)
+	id(id),
+	bufferID(-1)
 {
 	//TODO : exception ?
 	// if(!father);
@@ -70,13 +72,14 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	finalize();
 }
 
-void PlanetFace::deletePlanetFace(void)
+void PlanetFace::deletePlanetFace(PlanetFaceBufferHandler* b)
 {
+	b->deleteFace(this);
 	if(!father)
 	{
-		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace();
+		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
 	}else{
-		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace();
+		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
 		father->sons[id]=NULL;
 		tptr->release();
 	}
@@ -107,7 +110,7 @@ void PlanetFace::updateElevation(float e)
 
 bool PlanetFace::isDetailedEnough(Camera& c)
 {
-	if(depth>9)return true;
+	if(depth>13)return true;
 	glm::vec3 p1=c.getPosition();
 	glm::vec3 p2=vertex[4]*elevation;
 	glm::vec3 v=p2-p1;
@@ -147,6 +150,7 @@ Planet::Planet(planetInfo_s pi, ContentHandler& ch):
 	programBasic(ShaderProgram::loadFromFile("shader/planet/planet.vert", "shader/planet/planet.frag", "planet"))
 {
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
+	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], 1024*16);
 
 	//TEMP pour drawDirect
 	    glGenBuffers(1, &vbo);
@@ -229,29 +233,35 @@ void Planet::drawDirect(void)
     }
 }
 
-void PlanetFace::processLevelOfDetail(Camera& c)
+void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 {
 	if(isDetailedEnough(c))
 	{
-		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace();
+		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
+		if(bufferID<0)b->addFace(this);
 	}else{
+		b->deleteFace(this);
 		for(int i=0;i<4;i++)
 		{
-			if(sons[i])sons[i]->processLevelOfDetail(c);
-			else sons[i]=new PlanetFace(planet,this,i);
+			if(sons[i])sons[i]->processLevelOfDetail(c, b);
+			else{
+				sons[i]=new PlanetFace(planet,this,i);
+				b->addFace(sons[i]);
+			}
 		}
 	}
 }
 
 void Planet::processLevelOfDetail(Camera& c)
 {
-	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c);
+	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, faceBuffers[i]);
 }
 
 PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms):
 	planetFace(pf),
 	maxSize(ms),
-	shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "planetface"))
+	shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "planetface")),
+	curSize(0)
 {
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -290,34 +300,44 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 
 void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 {
+	if(curSize>=maxSize)return;
 	changeFace(pf, curSize);
+	pf->bufferID=curSize;
 	curSize++;
 }
 
-void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf, int i)
+void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 {
+	const int i=pf->bufferID;
 	if(i>=curSize || i<0)return;
 
 	if(faces.size()>1)
 	{
-		const glm::vec3 v=pf->vertex[4]*pf->elevation;
-		const glm::vec3 n=pf->vertex[4];
 		faces[i]=faces[curSize-1];
 		buffer[i]=buffer[curSize-1];
+
+		faces[i]->bufferID=i;
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferSubData(GL_ARRAY_BUFFER, i*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[i]);
 	}
 
+	pf->bufferID=-1;
 	faces.pop_back();
 	curSize--;
 }
 
 void PlanetFaceBufferHandler::draw(Camera& c)
 {
-    shader.use();
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    c.updateCamera(shader);
+	shader.use();
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	c.updateCamera(shader);
 	glDrawArrays(GL_POINTS, 0, curSize);
+	// printf("%d, %d\n",curSize,faces.size());
+}
+
+void Planet::draw(Camera& c)
+{
+	for(int i=0;i<6;i++)faceBuffers[i]->draw(c);
 }

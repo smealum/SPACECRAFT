@@ -155,10 +155,10 @@ void Application::run()
     tt = new testShaders;
     testPlanet=new Planet((planetInfo_s){0}, contentHandler);
 
-    testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
-    testBuffer->addFace(testPlanet->faces[0]);
-    
-    testPlanet->testFullGeneration(4, testBuffer);
+    // testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
+    // testBuffer->addFace(testPlanet->faces[0]);
+
+    // testPlanet->testFullGeneration(4, testBuffer);
 
     float timeA;
     while (state != appExiting)
@@ -201,7 +201,8 @@ void Application::loop()
     glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
     // tt->draw();
     // testPlanet->drawDirect();
-    testBuffer->draw(*camera);
+    testPlanet->draw(*camera);
+    // testBuffer->draw(*camera);
 
     contentHandler.handleNewContent();
 

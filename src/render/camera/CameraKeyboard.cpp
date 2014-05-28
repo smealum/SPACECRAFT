@@ -40,6 +40,7 @@ void CameraKeyboard::update(Camera& camera)
     //float delta = 1.f;
 
     if (Input::isKeyHold(GLFW_KEY_LEFT_SHIFT))tS=0.01f;
+    if (Input::isKeyHold(GLFW_KEY_LEFT_CONTROL))tS=0.0001f;
     // translation
     if (Input::isKeyHold(GLFW_KEY_A))
 	   camera.view = translate(mat4(1.f), vec3(+tS,0.0,0.0))*camera.view; //Input::position -= right * delta * tS;
