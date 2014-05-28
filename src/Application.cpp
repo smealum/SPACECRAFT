@@ -74,7 +74,7 @@ Application::Application() :
     TwWindowSize(width, height);
     TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
     TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
-    TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' key='z' help='Toggle wireframe display mode.' ");
+    TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
     TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
 
     // vsync on
@@ -149,7 +149,7 @@ void Application::run()
 
     tt = new testShaders;
     testPlanet=new Planet((planetInfo_s){0}, contentHandler);
-    testPlanet->testFullGeneration(4);
+    testPlanet->testFullGeneration(5);
 
     while (state != appExiting)
     {
@@ -177,6 +177,10 @@ void Application::loop()
         glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
         // tt->draw();
         testPlanet->drawDirect();
+
+        camera->updateFrustum();
+        if(camera->isPointInFrustum(glm::vec3(0.0f)))printf("INSIDE YES\n");
+        else printf("NOOOOO\n");
 
         contentHandler.handleNewContent();
 

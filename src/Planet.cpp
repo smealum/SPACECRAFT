@@ -13,8 +13,11 @@
 
 PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	planet(planet),
-	sons{NULL, NULL, NULL, NULL},
-	elevation(1.0f)
+	sons({NULL, NULL, NULL, NULL}),
+	father(NULL),
+	elevation(1.0f),
+	id(5),
+	tptr(new TrackerPointer<PlanetFace>(this, true))
 {
 	vertex[0]=v[0]; vertex[1]=v[1];
 	vertex[2]=v[2];	vertex[3]=v[3];
@@ -25,8 +28,10 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	planet(planet),
 	father(father),
-	sons{NULL, NULL, NULL, NULL},
-	elevation(1.0f)
+	sons({NULL, NULL, NULL, NULL}),
+	elevation(1.0f),
+	id(id),
+	tptr(new TrackerPointer<PlanetFace>(this, true))
 {
 	//TODO : exception ?
 	// if(!father);
@@ -63,6 +68,23 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	
 	depth=father->depth+1;
 	finalize();
+}
+
+void PlanetFace::deletePlanetFace(void)
+{
+	if(!father)
+	{
+		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace();
+	}else{
+		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace();
+		father->sons[id]=NULL;
+		tptr->release();
+	}
+}
+
+TrackerPointer<PlanetFace>* PlanetFace::getTptr(void)
+{
+	return tptr;
 }
 
 void PlanetFace::finalize(void)
@@ -108,7 +130,7 @@ static GLuint elements[2*3] = {
 Planet::Planet(planetInfo_s pi, ContentHandler& ch):
 	planetInfo(pi),
 	handler(ch),
-	programBasic(ShaderProgram::loadFromFile("shader/basic/basic.vert", "shader/basic/basic.frag", "planet"))
+	programBasic(ShaderProgram::loadFromFile("shader/planet/planet.vert", "shader/planet/planet.frag", "planet"))
 {
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
 
@@ -152,6 +174,7 @@ void PlanetFace::testFullGeneration(int depth)
 void Planet::testFullGeneration(int depth)
 {
 	for(int i=0;i<6;i++)faces[i]->testFullGeneration(depth);
+	faces[0]->deletePlanetFace();
 }
 
 void PlanetFace::drawDirect(void)
@@ -166,6 +189,7 @@ void PlanetFace::drawDirect(void)
 	}else{
 		float v=2.0f/(1<<depth);
 	    planet->programBasic.setUniform("model", glm::translate(glm::mat4(1.0f),vertex[4]*elevation)*glm::scale(glm::mat4_cast(q),glm::vec3(v)));
+        planet->programBasic.setUniform("overrideColor", glm::vec4(glm::vec3((elevation-0.7f)*2),1.0f));
 	    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	}
 }
