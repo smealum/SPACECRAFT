@@ -1,7 +1,7 @@
 #include "render/Camera.h"
+#include "render/CameraManager.h"
 #include "Application.h"
 #include "utils/maths.h"
-#include "CameraManager.h"
 
 Camera::Camera():
 	view(1.f),
