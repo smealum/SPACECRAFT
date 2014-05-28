@@ -105,6 +105,11 @@ void PlanetFace::updateElevation(float e)
 	elevation=e;
 }
 
+bool PlanetFace::isDetailedEnough(Camera& c)
+{
+	glm::vec3 p=c.getPosition();
+}
+
 glm::vec3 cubeArray[6][4]=
 		{{glm::vec3(-1.0,-1.0,-1.0),glm::vec3(-1.0,-1.0,1.0),glm::vec3(1.0,-1.0,1.0),glm::vec3(1.0,-1.0,-1.0)}, //bottom
 		{glm::vec3(1.0,1.0,1.0),glm::vec3(-1.0,1.0,1.0),glm::vec3(-1.0,1.0,-1.0),glm::vec3(1.0,1.0,-1.0)}, //top

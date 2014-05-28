@@ -3,7 +3,8 @@
 
 #include "utils/glm.h"
 #include "utils/TrackerPointer.h"
-#include <render/Shader.h>
+#include "render/Shader.h"
+#include "render/Camera.h"
 
 typedef struct
 {
@@ -30,6 +31,8 @@ class PlanetFace
 		
 		void deletePlanetFace(void);
 		void updateElevation(float e);
+		bool isDetailedEnough(Camera& c);
+
 		TrackerPointer<PlanetFace>* getTptr(void);
 
 		//TEMP

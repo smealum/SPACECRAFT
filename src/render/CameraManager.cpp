@@ -1,5 +1,5 @@
-#include "../Camera.h"
-#include "CameraManager.h"
+#include "render/Camera.h"
+#include "render/CameraManager.h"
 
 using namespace std;
 using namespace glm;
