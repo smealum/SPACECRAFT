@@ -1,6 +1,7 @@
 #ifndef PLANET_H
 #define PLANET_H
 
+#include <vector>
 #include "utils/glm.h"
 #include "utils/TrackerPointer.h"
 #include "render/Shader.h"
@@ -11,7 +12,14 @@ typedef struct
 	int seed;
 }planetInfo_s;
 
+typedef struct
+{
+	float pos[3];
+	float normal[3];
+}faceBufferEntry_s;
+
 class Planet;
+class PlanetFace;
 
 // Vertex position
 //      0-5-1
@@ -23,8 +31,28 @@ class Planet;
 // Sons position
 //      [0][1]
 //      [2][3]
+
+class PlanetFaceBufferHandler
+{
+	public:
+		PlanetFaceBufferHandler(PlanetFace& pf, int ms);
+		~PlanetFaceBufferHandler();
+	
+		void addFace(PlanetFace* pf);
+		void draw(Camera& c);
+
+	private:
+		ShaderProgram &shader;
+		PlanetFace& planetFace;
+		std::vector<PlanetFace*> faces;
+		faceBufferEntry_s* buffer;
+		int maxSize, curSize;
+		GLuint vbo, vao;
+};
+
 class PlanetFace
 {
+	friend class PlanetFaceBufferHandler;
 	public:
 		PlanetFace(Planet* planet, glm::vec3 v[4]);
 		PlanetFace(Planet* planet, PlanetFace* father, uint8_t id);
@@ -38,7 +66,7 @@ class PlanetFace
 
 		//TEMP
 		void drawDirect(void);
-		void testFullGeneration(int depth);
+		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
 
 	private:
 		void finalize(void);
@@ -67,11 +95,11 @@ class Planet
 		
 		//TEMP
 		void drawDirect(void);
-		void testFullGeneration(int depth);
+		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
 		ShaderProgram &programBasic;
 
-	private:
 		PlanetFace* faces[6];
+	private:
 
 		//TEMP
 			GLuint vaoBasic;
