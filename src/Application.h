@@ -7,8 +7,8 @@
 #ifndef NTWBAR
     #include <AntTweakBar.h>
 #endif
-#include "render/camera/Camera.h"
-#include "render/camera/manager/CameraKeyboardMouse.h"
+#include "render/Camera.h"
+#include "render/camera/CameraKeyboardMouse.h"
 #include "tests/testShaders.h"
 #include "data/ContentHandler.h"
 

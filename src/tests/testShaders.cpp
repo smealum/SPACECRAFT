@@ -1,6 +1,6 @@
 #include "tests/testShaders.h"
 #include "Application.h"
-#include "render/camera/Camera.h"
+#include "render/Camera.h"
 #include "utils/dbg.h"
 #include "utils/Input.h"
 

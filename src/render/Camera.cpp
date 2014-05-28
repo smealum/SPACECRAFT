@@ -1,7 +1,7 @@
-#include "render/camera/Camera.h"
+#include "render/Camera.h"
 #include "Application.h"
 #include "utils/maths.h"
-#include "manager/CameraManager.h"
+#include "render/CameraManager.h"
 
 using namespace glm;
 
@@ -17,6 +17,11 @@ void Camera::updateCamera(ShaderProgram &prog)
 {
 	prog.setUniform("view", view);
 	prog.setUniform("proj", proj);
+}
+
+glm::vec3 Camera::getPosition(void)
+{
+	return glm::vec3(glm::inverse(view)[3]);
 }
 
 void Camera::updateFrustum(void)

@@ -18,6 +18,7 @@ class Camera {
 		void updateCamera(ShaderProgram &prog); // the shader needs to have 2 uniforms: view and proj
 		void updateFrustum(void);
 		bool isPointInFrustum(glm::vec3 p);
+		glm::vec3 getPosition(void);
 
 	private:
 		glm::vec4 frustumPlane[6]; 

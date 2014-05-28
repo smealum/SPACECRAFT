@@ -1,7 +1,7 @@
 #ifndef CAMERAKEYBOARD_FEF6DBSV
 #define CAMERAKEYBOARD_FEF6DBSV
 
-#include "CameraManager.h"
+#include "render/CameraManager.h"
 
 class CameraKeyboard : public CameraManager
 {
