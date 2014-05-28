@@ -13,7 +13,7 @@
 
 PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	planet(planet),
-	sons({NULL, NULL, NULL, NULL}),
+	sons{NULL, NULL, NULL, NULL},
 	elevation(1.0f)
 {
 	vertex[0]=v[0]; vertex[1]=v[1];
@@ -25,7 +25,7 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	planet(planet),
 	father(father),
-	sons({NULL, NULL, NULL, NULL}),
+	sons{NULL, NULL, NULL, NULL},
 	elevation(1.0f)
 {
 	//TODO : exception ?
@@ -106,9 +106,9 @@ static GLuint elements[2*3] = {
 };
 
 Planet::Planet(planetInfo_s pi, ContentHandler& ch):
-	programBasic(ShaderProgram::loadFromFile("shader/basic/basic.vert", "shader/basic/basic.frag")),
 	planetInfo(pi),
-	handler(ch)
+	handler(ch),
+	programBasic(ShaderProgram::loadFromFile("shader/basic/basic.vert", "shader/basic/basic.frag", "planet"))
 {
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
 
@@ -126,6 +126,7 @@ Planet::Planet(planetInfo_s pi, ContentHandler& ch):
 	        glGenVertexArrays(1, &vaoBasic);
 	        glBindVertexArray(vaoBasic);
 
+		programBasic.setBuffers(vaoBasic, vbo, ebo);
 	        programBasic.use();
 	        glBindFragDataLocation(programBasic.getHandle(), 0, "outColor");
 	        programBasic.setAttribute("position", 3, GL_FALSE, 10, 0);

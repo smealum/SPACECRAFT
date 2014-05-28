@@ -5,18 +5,26 @@
 #include "Planet.h"
 
 #ifndef NTWBAR
-    inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
-    {TwEventMouseButtonGLFW(button, action);}
-    inline void TwEventMousePosGLFW3(GLFWwindow* /*window*/, double xpos, double ypos)
-    {TwMouseMotion(int(xpos), int(ypos));}
-    inline void TwEventMouseWheelGLFW3(GLFWwindow* /*window*/, double /*xoffset*/, double yoffset)
-    {TwEventMouseWheelGLFW(yoffset);}
-    inline void TwEventKeyGLFW3(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
-    {TwEventKeyGLFW(key, action);}
-    inline void TwEventCharGLFW3(GLFWwindow* /*window*/, int codepoint)
-    {TwEventCharGLFW(codepoint, GLFW_PRESS);}
-    inline void TwWindowSizeGLFW3(GLFWwindow* /*window*/, int width, int height)
-    {TwWindowSize(width, height);}
+inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
+{TwEventMouseButtonGLFW(button, action);}
+inline void TwEventMousePosGLFW3(GLFWwindow* /*window*/, double xpos, double ypos)
+{TwMouseMotion(int(xpos), int(ypos));}
+inline void TwEventMouseWheelGLFW3(GLFWwindow* /*window*/, double /*xoffset*/, double yoffset)
+{TwEventMouseWheelGLFW(yoffset);}
+inline void TwEventKeyGLFW3(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
+{TwEventKeyGLFW(key, action);}
+inline void TwEventCharGLFW3(GLFWwindow* /*window*/, int codepoint)
+{TwEventCharGLFW(codepoint, GLFW_PRESS);}
+inline void TwWindowSizeGLFW3(GLFWwindow* /*window*/, int width, int height)
+{TwWindowSize(width, height);}
+
+void TW_CALL reloadAllShaders(void * /*clientData*/)
+{
+    for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
+    {
+        it->second->load();
+    }
+}
 #endif
 
 Application::Application() : 
@@ -66,7 +74,8 @@ Application::Application() :
     TwWindowSize(width, height);
     TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
     TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
-    TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
+    TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' key='z' help='Toggle wireframe display mode.' ");
+    TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
 
     // vsync on
     glfwSwapInterval(1);

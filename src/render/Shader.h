@@ -7,6 +7,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <set>
 
 class Shader;
 class ShaderProgram;
@@ -28,32 +29,62 @@ class Shader
 
 
         // Fournit l'identifiant du shader
-        inline GLuint getHandle() { return handle; }
-        
+        inline GLuint getHandle() const { return handle; }
+        inline std::string getFilename() const { return file; }
 
+        void load();
+        
     private:
         // constructeur privé, passer par Shader::fromFile(filename)
         Shader();
 
         // identifiant du shader OpenGL
         GLuint handle;
+        ShaderType::T type;
+        std::string file;
+        std::set<ShaderProgram*> programs;
 
         // constructeur par copie (private, interdit)
         Shader(const Shader& shader);
+
+        // when a program uses a shader, the shader must save a ref to  it 
+        // in order to notify him if it is reloaded
+        void addProgram(ShaderProgram* p);
+        void removeProgram(ShaderProgram *p);
+
+        void notifyPrograms();
+
+        friend class ShaderProgram;
+
 };
+
+namespace uniformType
+{
+    enum T {
+        v3,
+        v4,
+        m3,
+        m4,
+        f,
+        i
+    };
+}
 
 class ShaderProgram
 {
     public:
         // constructeur
-        static ShaderProgram& loadFromFile(const char* vertexShader, const char* fragmentShader);
-        static ShaderProgram& loadFromShader(Shader& vertexShader, Shader& fragmentShader);
+        static ShaderProgram& loadFromFile(const char* vertexShader, const char* fragmentShader, const std::string &name);
+        static ShaderProgram& loadFromShader(Shader& vertexShader, Shader& fragmentShader, const std::string &name);
+
+        void setBuffers(GLint vao, GLint vbo, GLint ebo);
 
         // active le shader
         void use();
 
         // Fournit l'identifiant du program
-        inline GLuint getHandle() { return handle; }
+        inline GLuint getHandle() const { return handle; }
+        inline std::string getName() const { return name; }
 
         // Fournit localisation d'un uniform.
         GLint uniform(const char* name);
@@ -68,11 +99,12 @@ class ShaderProgram
         void setUniform(const char *name, const glm::mat3 & m);
         void setUniform(const char *name, float val );
         void setUniform(const char *name, int val );
-        void setUniform(const char *name, bool val );
 
         // invalid program, need some shaders
         ShaderProgram();
         ~ShaderProgram();
+
+        inline void setInvalid() { valid = false; }
 
         // attach a compiled shader
         void attachShader(Shader &s);
@@ -82,16 +114,27 @@ class ShaderProgram
         //void bindAttribLocation( GLuint location,const char * name);
         //void bindFragDataLocation( GLuint location,const char * name );
     private:
+        union uniform_u;
+        struct uniform_t;
+        struct attribute_t;
+        std::map<std::string, uniform_t> uniforms;
+        std::map<std::string, attribute_t> attributes;
         // identifiant OpenGL
         GLuint handle;
         bool valid; // does it need to be linked when there some shaders have been attached
+        std::string name;
+        GLint vao, vbo, ebo;
 
         // identifiants des attributs.
-        std::list<Shader*> attachedShaders;
+        std::set<Shader*> attachedShaders;
         std::map<std::string,GLint> uniformsMap;
 
         // constructeur par copie (private, interdit)
         ShaderProgram(const ShaderProgram& other);
+
 };
+
+extern Shader* getShader(const std::string& file);
+extern std::map<std::string,Shader*> shaderMap;
 
 #endif /* end of include guard: SHADER_F8X43H2W */
