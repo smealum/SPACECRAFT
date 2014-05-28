@@ -6,16 +6,61 @@
 #include <algorithm>
 
 using namespace std;
+using namespace glm;
 
 // collection des shader déja créés.
 map<string,Shader*> shaderMap;
 // collection des programmes déjà créés.
-map< pair<GLuint,GLuint> ,ShaderProgram*> shaderProgramMap;
+map<string, ShaderProgram*> shaderProgramMap;
+
+struct UniformValue {
+    vec3 v3;
+    vec4 v4;
+    mat3 m3;
+    mat4 m4;
+    float f;
+    int i;
+    UniformValue() {}
+    UniformValue(const UniformValue &u) : i(u.i) {}
+};
+
+namespace UniformType
+{
+    enum T {
+        v3,
+        v4,
+        m3,
+        m4,
+        f,
+        i
+    };
+}
+
+struct UniformTypeValue {
+    UniformType::T type;
+    UniformValue val;
+    UniformTypeValue() {}
+    UniformTypeValue(const UniformTypeValue& u) :  type(u.type), val(u.val){}
+};
+
+
+struct ShaderProgram::attribute_t {
+    GLint size;
+    GLboolean normalized;
+    GLsizei stride;
+    GLuint offset;
+};
+
+Shader* getShader(const std::string& file)
+{
+    auto it(shaderMap.find(file));
+    return it != shaderMap.end() ? it->second : NULL;
+}
 
 // Lecture d'un fichier
 bool getFileContents(const char *filename, vector<char>& buffer)
 {
-    debug("chargement du fichier : %s",filename);
+    //debug("chargement du fichier : %s",filename);
     ifstream file(filename, ios_base::binary);
     if (file)
     {
@@ -36,10 +81,79 @@ bool getFileContents(const char *filename, vector<char>& buffer)
     }
 }
 
+void Shader::addProgram(ShaderProgram *p)
+{
+    programs.insert(p);
+}
+
+void Shader::removeProgram(ShaderProgram *p)
+{
+    programs.erase(p);
+}
+
+void Shader::notifyPrograms()
+{
+    for (auto it(programs.begin()); it != programs.end(); ++it)
+    {
+        (*it)->setInvalid();
+    }
+}
+
+void Shader::load()
+{
+    // chargement du fichier
+    vector<char> fileContent;
+    if (!getFileContents(file.c_str(),fileContent))
+    {
+        log_err("[Erreur] Fichier %s  introuvable.", file.c_str());
+        //exit(EXIT_FAILURE);
+    }
+
+    // creation
+    if (handle == 0)
+        handle = glCreateShader(type);
+    if(handle == 0)
+    {
+        debug("Impossible de créer un shader vierge");
+    }
+
+    // assignation du code source
+    const char* shaderText(&fileContent[0]);
+    glShaderSource(handle, 1, (const GLchar**)&shaderText, NULL);
+
+    // compilation
+    glCompileShader(handle);
+
+    // vérification de la compilation
+    GLint compile_status;
+    glGetShaderiv(handle, GL_COMPILE_STATUS, &compile_status);
+    if(compile_status != GL_TRUE)
+    {
+        /* error text retreiving*/
+        GLsizei logsize = 0;
+        glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &logsize);
+         
+        char* log = new char[logsize+1];
+        glGetShaderInfoLog(handle, logsize, &logsize, log);
+        //log[logsize]='\0';
+         
+        log_err("Impossible de compiler le shader : %s",file.c_str());
+        log_err("\n[Erreur log]\n%s\n_________", log);
+        
+        //exit(EXIT_FAILURE);
+    }
+    else
+    {
+        log_info("Shader %s compiled successfully.", file.c_str());
+    }
+
+    notifyPrograms();
+}
+
 // chargement d'un shader depuis un fichier
 Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
 {
-    debug("Chargement du shader : %s",filename);
+    //debug("Chargement du shader : %s",filename);
 
     // test si le shader est déja chargé en mémoire.
     auto it = shaderMap.find(string(filename));
@@ -48,89 +162,44 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
 
     // Sinon, on le charge
     Shader* s = new Shader;
+    s->file = filename;
+    s->type = type;
 
-    // chargement du fichier
-    vector<char> fileContent;
-    if (not getFileContents(filename,fileContent))
-    {
-        log_err("[Erreur] Fichier %s  introuvable.", filename);
-        //exit(EXIT_FAILURE);
-    }
-
-    // creation
-    s->handle = glCreateShader(type);
-    if(s->handle == 0)
-    {
-        debug("Impossible de créer un shader vierge");
-    }
-
-    
-    
-    // assignation du code source
-    const char* shaderText(&fileContent[0]);
-    glShaderSource(s->handle, 1, (const GLchar**)&shaderText, NULL);
-
-    // compilation
-    glCompileShader(s->handle);
-
-    // vérification de la compilation
-    GLint compile_status;
-    glGetShaderiv(s->handle, GL_COMPILE_STATUS, &compile_status);
-    if(compile_status != GL_TRUE)
-    {
-        /* error text retreiving*/
-        GLsizei logsize = 0;
-        glGetShaderiv(s->handle, GL_INFO_LOG_LENGTH, &logsize);
-         
-        char* log = new char[logsize+1];
-        glGetShaderInfoLog(s->handle, logsize, &logsize, log);
-        //log[logsize]='\0';
-         
-        log_err("Impossible de compiler le shader : %s",filename);
-        log_err("============[Erreur log]========================\n%s\n================================================", log);
-        
-        //exit(EXIT_FAILURE);
-    }
+    s->load();
 
     // ajout du shader dans la map
     shaderMap[string(filename)]=s;
 
-
     return *s;
 }
 
-Shader::Shader()
+Shader::Shader() :
+handle(0)
 {
-
 }
 
-Shader::Shader(const Shader& shader)
+Shader::Shader(const Shader& shader) :
+handle(shader.handle)
 {
-    handle = shader.handle;
 }
 
 
-ShaderProgram& ShaderProgram::loadFromFile(const char* vertexShader, const char* fragmentShader)
+ShaderProgram& ShaderProgram::loadFromFile(const char* vertexShader, const char* fragmentShader, const std::string &name)
 {
     debug("Chargement d'un programme : %s , %s ",vertexShader,fragmentShader);
     return ShaderProgram::loadFromShader(
                 Shader::loadFromFile(vertexShader,ShaderType::Vertex),
-                Shader::loadFromFile(fragmentShader,ShaderType::Fragment)
+                Shader::loadFromFile(fragmentShader,ShaderType::Fragment),
+                name
             );
 }
 
-ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragmentShader)
+ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragmentShader, const std::string &name)
 {
-    // Si le program existe déjà on le renvoie
-    auto it = shaderProgramMap.find(
-                make_pair<GLuint,GLuint>(
-                    vertexShader.getHandle(),
-                    fragmentShader.getHandle())
-            );
+    // Check if shaderprogram exists
+    auto it(shaderProgramMap.find(name));
     if (it != shaderProgramMap.end())
-    {
         return *(it->second);
-    }
 
     // programme creation
     ShaderProgram* p = new ShaderProgram;
@@ -140,12 +209,12 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
         log_err("Impossible de créer un ShaderProgramme vierge");
         //exit(EXIT_FAILURE);
     }
-
+    p->name = name;
+    shaderProgramMap[p->name] = p;
 
     // attachement.
-    glAttachShader(p->handle,vertexShader.getHandle());
-    glAttachShader(p->handle,fragmentShader.getHandle());
-
+    p->attachShader(vertexShader);
+    p->attachShader(fragmentShader);
 
     // linkage
     glLinkProgram(p->handle);
@@ -164,7 +233,7 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
         glGetProgramInfoLog(p->handle, logsize, &logsize, log);
         //log[logsize]='\0';
          
-        log_err("============[Erreur log]========================\n%s\n================================================", log);
+        log_err("\n[Erreur log]\n%s\n_________", log);
     }
 
 
@@ -207,30 +276,44 @@ ShaderProgram::ShaderProgram(const ShaderProgram& other)
 void ShaderProgram::setUniform(const char *name,float x,float y,float z)
 {
     glUniform3f(uniform(name), x, y, z);
+    uniforms[name].type = UniformType::v3;
+    uniforms[name].val.v3 = vec3(x, y, z);
 }
-void ShaderProgram::setUniform(const char *name, const glm::vec3 & v)
+void ShaderProgram::setUniform(const char *name, const vec3 & v)
 {
-    glUniform3fv(uniform(name), 1, glm::value_ptr(v));
+    glUniform3fv(uniform(name), 1, value_ptr(v));
+    uniforms[name].type = UniformType::v3;
+    uniforms[name].val.v3 = v;
 }
-void ShaderProgram::setUniform(const char *name, const glm::vec4 & v)
+void ShaderProgram::setUniform(const char *name, const vec4 & v)
 {
-    glUniform4fv(uniform(name), 1, glm::value_ptr(v));
+    glUniform4fv(uniform(name), 1, value_ptr(v));
+    uniforms[name].type = UniformType::v4;
+    uniforms[name].val.v4 = v;
 }
-void ShaderProgram::setUniform(const char *name, const glm::mat4 & m)
+void ShaderProgram::setUniform(const char *name, const mat4 & m)
 {
-    glUniformMatrix4fv(uniform(name), 1, GL_FALSE, glm::value_ptr(m));
+    glUniformMatrix4fv(uniform(name), 1, GL_FALSE, value_ptr(m));
+    uniforms[name].type = UniformType::m4;
+    uniforms[name].val.m4 = m;
 }
-void ShaderProgram::setUniform(const char *name, const glm::mat3 & m)
+void ShaderProgram::setUniform(const char *name, const mat3 & m)
 {
-    glUniformMatrix3fv(uniform(name), 1, GL_FALSE, glm::value_ptr(m));
+    glUniformMatrix3fv(uniform(name), 1, GL_FALSE, value_ptr(m));
+    uniforms[name].type = UniformType::m3;
+    uniforms[name].val.m3 = m;
 }
 void ShaderProgram::setUniform(const char *name, float val )
 {
     glUniform1f(uniform(name), val);
+    uniforms[name].type = UniformType::i;
+    uniforms[name].val.f = val;
 }
 void ShaderProgram::setUniform(const char *name, int val )
 {
     glUniform1i(uniform(name), val);
+    uniforms[name].type = UniformType::i;
+    uniforms[name].val.f = val;
 }
 
 ShaderProgram::ShaderProgram() :
@@ -252,35 +335,106 @@ ShaderProgram::~ShaderProgram()
 
 void ShaderProgram::attachShader(Shader &s)
 {
-    if (find(attachedShaders.begin(), attachedShaders.end(), &s) == attachedShaders.end())
+    auto it(attachedShaders.find(&s));
+    if (it == attachedShaders.end())
     {
+        s.addProgram(this);
+        attachedShaders.insert(&s);
         glAttachShader(handle, s.getHandle());
-        attachedShaders.push_back(&s);
         valid = false;
     } else
-        log_err("Shader %u is already attached to program %u.", s.getHandle(), handle);
+        log_err("Cannot attach shader %s to program %s because it is alreayd attached...",
+                s.getFilename().c_str(),
+                name.c_str());
 }
 
 void ShaderProgram::detachShader(Shader &s)
 {
-    auto it(find(attachedShaders.begin(), attachedShaders.end(), &s));
-    if (it == attachedShaders.end())
+    if (attachedShaders.erase(&s) > 0)
     {
-        log_err("Cannot detach shader %u...", s.getHandle());
-    } else {
-        attachedShaders.erase(it);
+        s.removeProgram(this);
         glDetachShader(handle, s.getHandle());
         glDeleteShader(s.getHandle()); // flags for deletion
         valid = false;
-    }
+    } else
+        log_err("Cannot detach shader %s from program %s...",
+                s.getFilename().c_str(),
+                name.c_str());
 }
+
+extern GLfloat elements[], vertices[];
 
 void ShaderProgram::use()
 {
     if (!valid)
     {
         valid = true;
+        // recheck uniforms
         glLinkProgram(handle);
+        glUseProgram(handle);
+        GLint result;
+        glGetProgramiv(handle, GL_LINK_STATUS, &result);
+        if (result!=GL_TRUE)
+        {
+            log_err("[Erreur] Impossible de linker les shader");
+
+            /* error text retreiving*/
+            GLsizei logsize = 0;
+            glGetProgramiv(handle, GL_INFO_LOG_LENGTH, &logsize);
+
+            char* log = new char[logsize];
+            glGetProgramInfoLog(handle, logsize, &logsize, log);
+            //log[logsize]='\0';
+
+            log_err("\n[Erreur log]\n%s\n_________", log);
+        }
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        loadAllUniforms();
+        for (auto it(attributes.begin()); it != attributes.end(); ++it)
+        {
+            GLint loc = attribLocation(it->first.c_str());
+            glEnableVertexAttribArray(loc);
+            glVertexAttribPointer(
+                    loc,
+                    it->second.size,
+                    GL_FLOAT,
+                    it->second.normalized,
+                    it->second.stride*sizeof(GLfloat),
+                    (void*)(it->second.offset*sizeof(GLfloat))
+                    );
+            //log_info("Attrib %s at loc %d.", it->first.c_str(), loc);
+
+        }
+        log_info("Program %s is loaded again.", name.c_str());
+        for (auto it(uniforms.begin()); it != uniforms.end(); ++it)
+        {
+            //debug("uniform of type %u.", it->second.type);
+            switch (it->second.type) {
+                case UniformType::v3:
+                    glUniform3fv(uniform(it->first.c_str()), 1, value_ptr(it->second.val.v3));
+                    break;
+                case UniformType::v4:
+                    glUniform4fv(uniform(it->first.c_str()), 1, value_ptr(it->second.val.v4));
+                    break;
+                case UniformType::m3:
+                    glUniformMatrix3fv(uniform(it->first.c_str()), 1, GL_FALSE, value_ptr(it->second.val.m3));
+                    break;
+                case UniformType::m4:
+                    glUniformMatrix4fv(uniform(it->first.c_str()), 1, GL_FALSE, value_ptr(it->second.val.m4));
+                    break;
+                case UniformType::f:
+                    glUniform1f(uniform(it->first.c_str()), it->second.val.f);
+                    break;
+                case UniformType::i:
+                    glUniform1i(uniform(it->first.c_str()), it->second.val.i);
+                    break;
+                default:
+                    log_err("Unknow uniform type");
+                    break;
+            }
+        }
     }
     glUseProgram(handle);
 }
@@ -297,5 +451,52 @@ void ShaderProgram::setAttribute(const char *name, GLint size, GLboolean normali
             stride*sizeof(GLfloat),
             (void*)(offset*sizeof(GLfloat))
             );
+    attributes[name].size = size;
+    attributes[name].normalized = normalized;
+    attributes[name].stride = stride;
+    attributes[name].offset = offset;
 }
 
+void ShaderProgram::setBuffers(GLint vao, GLint vbo, GLint ebo)
+{
+    this->vao = vao;
+    this->vbo = vbo;
+    this->ebo = ebo;
+}
+
+void ShaderProgram::loadAllUniforms()
+{
+
+    GLint numBlocks = 0;
+    glGetProgramInterfaceiv(handle, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, &numBlocks );
+    const GLenum blockProperties[1] = {GL_NUM_ACTIVE_VARIABLES};
+    const GLenum activeUnifProp[1] = {GL_ACTIVE_VARIABLES};
+    const GLenum unifProperties[3] = {GL_NAME_LENGTH, GL_TYPE, GL_LOCATION};
+    log_info("nombre de blocks:%d",numBlocks);
+
+    for(int blockIx = 0; blockIx < numBlocks; ++numBlocks)
+    {
+        GLint numActiveUnifs = 0;
+        glGetProgramResourceiv(handle, GL_UNIFORM_BLOCK, blockIx, 1, blockProperties[0], 1, NULL, numActiveUnifs);
+
+        if(!numActiveUnifs)
+            continue;
+
+        std::vector<GLint> blockUnifs(numActiveUnifs);
+        glGetProgramramResourceiv(handle, GL_UNIFORM_BLOCK, blockIx, 1, activeUnifProp, numActiveUnifs, NULL, &blockUnifs[0]);
+        log_info("nombre active uniforms:%d",numActiveUnifs);
+
+        for(int unifIx = 0; unifIx < numActiveUnifs; ++unifIx)
+        {
+            GLint values[3];
+            glGetProgramResourceiv(handle, GL_UNIFORM, unifIx, 3, unifProperties, 4, NULL, values);
+
+            //Get the name. Must use a std::vector rather than a std::string for C++03 standards issues.
+            //C++11 would let you use a std::string directly.
+            std::vector<char> nameData(values[0]);
+            glGetProgramResourceName(handle, GL_UNIFORM, blockUnifs[unifIx], nameData.size(), NULL, &nameData[0]);
+            std::string name(nameData.begin(), nameData.end() - 1);
+            log_info("%s",name.c_str());
+        }
+    }
+}

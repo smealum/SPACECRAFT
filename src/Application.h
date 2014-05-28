@@ -8,8 +8,7 @@
     #include <AntTweakBar.h>
 #endif
 #include "render/camera/Camera.h"
-#include "render/camera/manager/CameraManager.h"
-#include "render/camera/manager/CameraKeyboard.h"
+#include "render/camera/manager/CameraKeyboardMouse.h"
 #include "tests/testShaders.h"
 #include "data/ContentHandler.h"
 

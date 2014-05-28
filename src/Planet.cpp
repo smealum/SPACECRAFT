@@ -128,9 +128,9 @@ static GLuint elements[2*3] = {
 };
 
 Planet::Planet(planetInfo_s pi, ContentHandler& ch):
-	programBasic(ShaderProgram::loadFromFile("shader/planet/planet.vert", "shader/planet/planet.frag")),
 	planetInfo(pi),
-	handler(ch)
+	handler(ch),
+	programBasic(ShaderProgram::loadFromFile("shader/planet/planet.vert", "shader/planet/planet.frag", "planet"))
 {
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
 
@@ -148,6 +148,7 @@ Planet::Planet(planetInfo_s pi, ContentHandler& ch):
 	        glGenVertexArrays(1, &vaoBasic);
 	        glBindVertexArray(vaoBasic);
 
+		programBasic.setBuffers(vaoBasic, vbo, ebo);
 	        programBasic.use();
 	        glBindFragDataLocation(programBasic.getHandle(), 0, "outColor");
 	        programBasic.setAttribute("position", 3, GL_FALSE, 10, 0);

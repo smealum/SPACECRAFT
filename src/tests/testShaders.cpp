@@ -49,8 +49,8 @@ static GLuint elements[12*3] = {
 };
 
 testShaders::testShaders() :
-    programBasic(ShaderProgram::loadFromFile("shader/basic/basic.vert", "shader/basic/basic.frag")),
-    programPhong(ShaderProgram::loadFromFile("shader/phong/phong.vert", "shader/phong/phong.frag")),
+    programBasic(ShaderProgram::loadFromFile("shader/basic/basic.vert", "shader/basic/basic.frag", "basic")),
+    programPhong(ShaderProgram::loadFromFile("shader/phong/phong.vert", "shader/phong/phong.frag", "phong")),
     model(1.f),
     vaoBasic(0),
     vaoPhong(0),
@@ -73,6 +73,7 @@ testShaders::testShaders() :
         log_info("Created vaoBasic(%d)", vaoBasic);
         glBindVertexArray(vaoBasic);
 
+        programBasic.setBuffers(vaoBasic, vbo, ebo);
         programBasic.use();
         glBindFragDataLocation(programBasic.getHandle(), 0, "outColor");
         programBasic.setAttribute("position", 3, GL_FALSE, 10, 0);
@@ -89,6 +90,7 @@ testShaders::testShaders() :
         log_info("Created vaoPhong(%d)", vaoPhong);
         glBindVertexArray(vaoPhong);
 
+        programPhong.setBuffers(vaoPhong, vbo, ebo);
         programPhong.use();
         glBindFragDataLocation(programPhong.getHandle(), 0, "outColor");
         programPhong.setAttribute("position", 3, GL_FALSE, 10, 0);
@@ -122,6 +124,10 @@ void testShaders::draw()
         model = glm::translate(glm::mat4(1.0),-glm::vec3(-1.0,0.0,0.0));
         model = glm::rotate(model,modelAngle,glm::vec3(sin(modelAngle),0.0,1.0));
         programBasic.setUniform("model", model);
+        programBasic.setUniform("overrideColor", glm::vec4(1.f));
+        //programBasic.setAttribute("position", 3, GL_FALSE, 10, 0);
+        //programBasic.setAttribute("color", 4, GL_FALSE, 10, 3);
+        //programBasic.setAttribute("texcoord", 2, GL_FALSE, 10, 0); // XXX pas de texcoord
 
         glDrawElements(
                 GL_TRIANGLES,
