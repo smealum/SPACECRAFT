@@ -3,9 +3,11 @@
 #include "utils/maths.h"
 #include "CameraManager.h"
 
+using namespace glm;
+
 Camera::Camera():
 	view(1.f),
-	proj(glm::perspective(DEG2RAD(45.f), Application::getInstance().getWindowRatio(), 0.1f, 1000.f)),
+	proj(perspective(DEG2RAD(45.f), Application::getInstance().getWindowRatio(), 0.1f, 1000.f)),
     cameraManager(NULL)
 {
 
@@ -26,52 +28,22 @@ void Camera::updateFrustum(void)
 {
 	final=proj*view;
 
-	//near
-	frustumPlane[0]=
-		glm::normalize(glm::vec4(final[0][2]+final[0][3],
-								final[1][2]+final[1][3],
-								final[2][2]+final[2][3],
-								final[3][2]+final[3][3]));
+    vec4 rowX = row(final, 0);
+    vec4 rowY = row(final, 1);
+    vec4 rowZ = row(final, 2);
+    vec4 rowW = row(final, 3);
 
-	//far
-	frustumPlane[1]=
-		glm::normalize(glm::vec4(-final[0][2]+final[0][3],
-								-final[1][2]+final[1][3],
-								-final[2][2]+final[2][3],
-								-final[3][2]+final[3][3]));
-
-	//left
-	frustumPlane[2]=
-		glm::normalize(glm::vec4(final[0][0]+final[0][3],
-								final[1][0]+final[1][3],
-								final[2][0]+final[2][3],
-								final[3][0]+final[3][3]));
-
-	//right
-	frustumPlane[3]=
-		glm::normalize(glm::vec4(-final[0][0]+final[0][3],
-								-final[1][0]+final[1][3],
-								-final[2][0]+final[2][3],
-								-final[3][0]+final[3][3]));
-
-	//bottom
-	frustumPlane[4]=
-		glm::normalize(glm::vec4(final[0][1]+final[0][3],
-								final[1][1]+final[1][3],
-								final[2][1]+final[2][3],
-								final[3][1]+final[3][3]));
-
-	//top
-	frustumPlane[5]=
-		glm::normalize(glm::vec4(-final[0][1]+final[0][3],
-								-final[1][1]+final[1][3],
-								-final[2][1]+final[2][3],
-								-final[3][1]+final[3][3]));
+    frustumPlane[0] = normalize(rowW + rowX);
+    frustumPlane[1] = normalize(rowW - rowX);
+    frustumPlane[2] = normalize(rowW + rowY);
+    frustumPlane[3] = normalize(rowW - rowY);
+    frustumPlane[4] = normalize(rowW + rowZ);
+    frustumPlane[5] = normalize(rowW - rowZ);
 }
 
-bool Camera::isPointInFrustum(glm::vec3 p)
+bool Camera::isPointInFrustum(vec3 p)
 {
-	for(int i=0;i<6;i++)if(glm::dot(glm::vec4(p,1.0f),frustumPlane[i])<0.0f)return false;
+	for(int i=0;i<6;i++)if(dot(vec4(p,1.0f),frustumPlane[i])<0.0f)return false;
 	return true;
 }
 
