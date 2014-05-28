@@ -11,6 +11,7 @@
 
 class Shader;
 class ShaderProgram;
+struct UniformTypeValue;
 
 namespace ShaderType
 {
@@ -35,7 +36,7 @@ class Shader
         void load();
         
     private:
-        // constructeur privé, passer par Shader::fromFile(filename)
+        // constructeur privé, passez par Shader::fromFile(filename)
         Shader();
 
         // identifiant du shader OpenGL
@@ -58,17 +59,6 @@ class Shader
 
 };
 
-namespace uniformType
-{
-    enum T {
-        v3,
-        v4,
-        m3,
-        m4,
-        f,
-        i
-    };
-}
 
 class ShaderProgram
 {
@@ -114,10 +104,8 @@ class ShaderProgram
         //void bindAttribLocation( GLuint location,const char * name);
         //void bindFragDataLocation( GLuint location,const char * name );
     private:
-        union uniform_u;
-        struct uniform_t;
         struct attribute_t;
-        std::map<std::string, uniform_t> uniforms;
+        std::map<std::string, UniformTypeValue> uniforms;
         std::map<std::string, attribute_t> attributes;
         // identifiant OpenGL
         GLuint handle;
@@ -132,9 +120,12 @@ class ShaderProgram
         // constructeur par copie (private, interdit)
         ShaderProgram(const ShaderProgram& other);
 
+        void loadAllUniforms();
+
 };
 
 extern Shader* getShader(const std::string& file);
 extern std::map<std::string,Shader*> shaderMap;
+
 
 #endif /* end of include guard: SHADER_F8X43H2W */

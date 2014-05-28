@@ -6,28 +6,43 @@
 #include <algorithm>
 
 using namespace std;
+using namespace glm;
 
 // collection des shader déja créés.
 map<string,Shader*> shaderMap;
 // collection des programmes déjà créés.
 map<string, ShaderProgram*> shaderProgramMap;
 
-union ShaderProgram::uniform_u {
-    glm::vec3 v3;
-    glm::vec4 v4;
-    glm::mat3 m3;
-    glm::mat4 m4;
+struct UniformValue {
+    vec3 v3;
+    vec4 v4;
+    mat3 m3;
+    mat4 m4;
     float f;
     int i;
-    uniform_u() {}
-    uniform_u(const uniform_u &u) : i(u.i) {}
+    UniformValue() {}
+    UniformValue(const UniformValue &u) : i(u.i) {}
 };
-struct ShaderProgram::uniform_t {
-    uniformType::T type;
-    ShaderProgram::uniform_u val;
-    uniform_t() {}
-    uniform_t(const ShaderProgram::uniform_t& u) :  type(u.type), val(u.val){}
+
+namespace UniformType
+{
+    enum T {
+        v3,
+        v4,
+        m3,
+        m4,
+        f,
+        i
+    };
+}
+
+struct UniformTypeValue {
+    UniformType::T type;
+    UniformValue val;
+    UniformTypeValue() {}
+    UniformTypeValue(const UniformTypeValue& u) :  type(u.type), val(u.val){}
 };
+
 
 struct ShaderProgram::attribute_t {
     GLint size;
@@ -123,7 +138,7 @@ void Shader::load()
         //log[logsize]='\0';
          
         log_err("Impossible de compiler le shader : %s",file.c_str());
-        log_err("============[Erreur log]========================\n%s\n================================================", log);
+        log_err("\n[Erreur log]\n%s\n_________", log);
         
         //exit(EXIT_FAILURE);
     }
@@ -218,7 +233,7 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
         glGetProgramInfoLog(p->handle, logsize, &logsize, log);
         //log[logsize]='\0';
          
-        log_err("============[Erreur log]========================\n%s\n================================================", log);
+        log_err("\n[Erreur log]\n%s\n_________", log);
     }
 
 
@@ -261,43 +276,43 @@ ShaderProgram::ShaderProgram(const ShaderProgram& other)
 void ShaderProgram::setUniform(const char *name,float x,float y,float z)
 {
     glUniform3f(uniform(name), x, y, z);
-    uniforms[name].type = uniformType::v3;
-    uniforms[name].val.v3 = glm::vec3(x, y, z);
+    uniforms[name].type = UniformType::v3;
+    uniforms[name].val.v3 = vec3(x, y, z);
 }
-void ShaderProgram::setUniform(const char *name, const glm::vec3 & v)
+void ShaderProgram::setUniform(const char *name, const vec3 & v)
 {
-    glUniform3fv(uniform(name), 1, glm::value_ptr(v));
-    uniforms[name].type = uniformType::v3;
+    glUniform3fv(uniform(name), 1, value_ptr(v));
+    uniforms[name].type = UniformType::v3;
     uniforms[name].val.v3 = v;
 }
-void ShaderProgram::setUniform(const char *name, const glm::vec4 & v)
+void ShaderProgram::setUniform(const char *name, const vec4 & v)
 {
-    glUniform4fv(uniform(name), 1, glm::value_ptr(v));
-    uniforms[name].type = uniformType::v4;
+    glUniform4fv(uniform(name), 1, value_ptr(v));
+    uniforms[name].type = UniformType::v4;
     uniforms[name].val.v4 = v;
 }
-void ShaderProgram::setUniform(const char *name, const glm::mat4 & m)
+void ShaderProgram::setUniform(const char *name, const mat4 & m)
 {
-    glUniformMatrix4fv(uniform(name), 1, GL_FALSE, glm::value_ptr(m));
-    uniforms[name].type = uniformType::m4;
+    glUniformMatrix4fv(uniform(name), 1, GL_FALSE, value_ptr(m));
+    uniforms[name].type = UniformType::m4;
     uniforms[name].val.m4 = m;
 }
-void ShaderProgram::setUniform(const char *name, const glm::mat3 & m)
+void ShaderProgram::setUniform(const char *name, const mat3 & m)
 {
-    glUniformMatrix3fv(uniform(name), 1, GL_FALSE, glm::value_ptr(m));
-    uniforms[name].type = uniformType::m3;
+    glUniformMatrix3fv(uniform(name), 1, GL_FALSE, value_ptr(m));
+    uniforms[name].type = UniformType::m3;
     uniforms[name].val.m3 = m;
 }
 void ShaderProgram::setUniform(const char *name, float val )
 {
     glUniform1f(uniform(name), val);
-    uniforms[name].type = uniformType::i;
+    uniforms[name].type = UniformType::i;
     uniforms[name].val.f = val;
 }
 void ShaderProgram::setUniform(const char *name, int val )
 {
     glUniform1i(uniform(name), val);
-    uniforms[name].type = uniformType::i;
+    uniforms[name].type = UniformType::i;
     uniforms[name].val.f = val;
 }
 
@@ -371,11 +386,12 @@ void ShaderProgram::use()
             glGetProgramInfoLog(handle, logsize, &logsize, log);
             //log[logsize]='\0';
 
-            log_err("============[Erreur log]========================\n%s\n================================================", log);
+            log_err("\n[Erreur log]\n%s\n_________", log);
         }
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        loadAllUniforms();
         for (auto it(attributes.begin()); it != attributes.end(); ++it)
         {
             GLint loc = attribLocation(it->first.c_str());
@@ -396,22 +412,22 @@ void ShaderProgram::use()
         {
             //debug("uniform of type %u.", it->second.type);
             switch (it->second.type) {
-                case uniformType::v3:
-                    glUniform3fv(uniform(it->first.c_str()), 1, glm::value_ptr(it->second.val.v3));
+                case UniformType::v3:
+                    glUniform3fv(uniform(it->first.c_str()), 1, value_ptr(it->second.val.v3));
                     break;
-                case uniformType::v4:
-                    glUniform4fv(uniform(it->first.c_str()), 1, glm::value_ptr(it->second.val.v4));
+                case UniformType::v4:
+                    glUniform4fv(uniform(it->first.c_str()), 1, value_ptr(it->second.val.v4));
                     break;
-                case uniformType::m3:
-                    glUniformMatrix3fv(uniform(it->first.c_str()), 1, GL_FALSE, glm::value_ptr(it->second.val.m3));
+                case UniformType::m3:
+                    glUniformMatrix3fv(uniform(it->first.c_str()), 1, GL_FALSE, value_ptr(it->second.val.m3));
                     break;
-                case uniformType::m4:
-                    glUniformMatrix4fv(uniform(it->first.c_str()), 1, GL_FALSE, glm::value_ptr(it->second.val.m4));
+                case UniformType::m4:
+                    glUniformMatrix4fv(uniform(it->first.c_str()), 1, GL_FALSE, value_ptr(it->second.val.m4));
                     break;
-                case uniformType::f:
+                case UniformType::f:
                     glUniform1f(uniform(it->first.c_str()), it->second.val.f);
                     break;
-                case uniformType::i:
+                case UniformType::i:
                     glUniform1i(uniform(it->first.c_str()), it->second.val.i);
                     break;
                 default:
@@ -446,4 +462,41 @@ void ShaderProgram::setBuffers(GLint vao, GLint vbo, GLint ebo)
     this->vao = vao;
     this->vbo = vbo;
     this->ebo = ebo;
+}
+
+void ShaderProgram::loadAllUniforms()
+{
+
+    GLint numBlocks = 0;
+    glGetProgramInterfaceiv(handle, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, &numBlocks );
+    const GLenum blockProperties[1] = {GL_NUM_ACTIVE_VARIABLES};
+    const GLenum activeUnifProp[1] = {GL_ACTIVE_VARIABLES};
+    const GLenum unifProperties[3] = {GL_NAME_LENGTH, GL_TYPE, GL_LOCATION};
+    log_info("nombre de blocks:%d",numBlocks);
+
+    for(int blockIx = 0; blockIx < numBlocks; ++numBlocks)
+    {
+        GLint numActiveUnifs = 0;
+        glGetProgramResourceiv(handle, GL_UNIFORM_BLOCK, blockIx, 1, blockProperties[0], 1, NULL, numActiveUnifs);
+
+        if(!numActiveUnifs)
+            continue;
+
+        std::vector<GLint> blockUnifs(numActiveUnifs);
+        glGetProgramramResourceiv(handle, GL_UNIFORM_BLOCK, blockIx, 1, activeUnifProp, numActiveUnifs, NULL, &blockUnifs[0]);
+        log_info("nombre active uniforms:%d",numActiveUnifs);
+
+        for(int unifIx = 0; unifIx < numActiveUnifs; ++unifIx)
+        {
+            GLint values[3];
+            glGetProgramResourceiv(handle, GL_UNIFORM, unifIx, 3, unifProperties, 4, NULL, values);
+
+            //Get the name. Must use a std::vector rather than a std::string for C++03 standards issues.
+            //C++11 would let you use a std::string directly.
+            std::vector<char> nameData(values[0]);
+            glGetProgramResourceName(handle, GL_UNIFORM, blockUnifs[unifIx], nameData.size(), NULL, &nameData[0]);
+            std::string name(nameData.begin(), nameData.end() - 1);
+            log_info("%s",name.c_str());
+        }
+    }
 }
