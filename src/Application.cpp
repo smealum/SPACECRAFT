@@ -42,8 +42,12 @@ Application::Application() :
     viewHeight(height),
     window(NULL),
     camera(NULL),
+    bgColor{0.0f, 0.0f, 0.0f},
     contentHandler(NUMPRODUCERS),
-    bgColor{0.0f, 0.0f, 0.0f}
+    deltaTime(0.f),
+    time(0.f),
+    fps(0.f),
+    fpsCounter(0)
 {
     if (!glfwInit())
     {
@@ -76,6 +80,7 @@ Application::Application() :
     TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
     TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
     TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
+    TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
 
     // vsync on
     glfwSwapInterval(1);
@@ -151,50 +156,62 @@ void Application::run()
     testPlanet=new Planet((planetInfo_s){0}, contentHandler);
     testPlanet->testFullGeneration(5);
 
+    float timeA;
     while (state != appExiting)
     {
-        loop();
+        while(!glfwWindowShouldClose(window))
+        {
+            timeA = (float)glfwGetTime();
+            debug("time: %f", timeA);
+            loop();
+            fpsCounter++;
+            deltaTime = (float)glfwGetTime() - timeA;
+            time += deltaTime;
+            if (time > 0.f)
+            {
+                fps = (float)fpsCounter/time;
+                fpsCounter = 0;
+                time = 0.f;
+            }
+        }
     }
 
 }
 
 void Application::loop()
 {
-    while(!glfwWindowShouldClose(window))
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        {
-            glfwSetWindowShouldClose(window, GL_TRUE);
-            state = appExiting;
-        }
-
-        Input::update(window);
-        camera->update();
-
-        glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
-        tt->draw();
-        testPlanet->drawDirect();
-
-        camera->updateFrustum();
-
-        contentHandler.handleNewContent();
-
-        #ifndef NTWBAR
-            // Draw tweak bars
-            glUseProgram(0);
-            glBindVertexArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-            TwDraw();
-        #endif
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        glfwSetWindowShouldClose(window, GL_TRUE);
+        state = appExiting;
     }
+
+    Input::update(window);
+    camera->update();
+
+    glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
+    tt->draw();
+    testPlanet->drawDirect();
+
+    camera->updateFrustum();
+
+    contentHandler.handleNewContent();
+
+#ifndef NTWBAR
+    // Draw tweak bars
+    glUseProgram(0);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    TwDraw();
+#endif
+
+    glfwSwapBuffers(window);
+    glfwPollEvents();
 }
 
 Application::~Application()
