@@ -149,7 +149,7 @@ void Application::run()
 
     tt = new testShaders;
     testPlanet=new Planet((planetInfo_s){0}, contentHandler);
-    testPlanet->testFullGeneration(5);
+    // testPlanet->testFullGeneration(6);
 
     while (state != appExiting)
     {
@@ -171,16 +171,15 @@ void Application::loop()
         Input::update(window);
         camera->update();
 
+        camera->updateFrustum();
+        testPlanet->processLevelOfDetail(*camera);
+
         glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
         // tt->draw();
         testPlanet->drawDirect();
-
-        camera->updateFrustum();
-        // if(camera->isPointInFrustum(glm::vec3(0.0f)))
-        printf("%f %f %f\n",camera->getPosition().x,camera->getPosition().y,camera->getPosition().z);
 
         contentHandler.handleNewContent();
 

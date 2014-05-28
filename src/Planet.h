@@ -32,6 +32,7 @@ class PlanetFace
 		void deletePlanetFace(void);
 		void updateElevation(float e);
 		bool isDetailedEnough(Camera& c);
+		void processLevelOfDetail(Camera& c);	
 
 		TrackerPointer<PlanetFace>* getTptr(void);
 
@@ -58,6 +59,8 @@ class Planet
 {
 	public:
 		Planet(planetInfo_s pi, class ContentHandler& ch);
+		
+		void processLevelOfDetail(Camera& c);
 
 		const planetInfo_s planetInfo; //read only
 		class ContentHandler& handler;
