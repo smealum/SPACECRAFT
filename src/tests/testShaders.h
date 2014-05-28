@@ -3,6 +3,7 @@
 
 #include "utils/glm.h"
 #include <render/Shader.h>
+#include "Chunk.h"
 
 class testShaders {
     ShaderProgram &programBasic, &programPhong;
@@ -11,6 +12,8 @@ class testShaders {
     GLuint vaoPhong;
     GLuint vbo;
     GLuint ebo;
+    Chunk chunk;
+
 
     public:
     testShaders();
