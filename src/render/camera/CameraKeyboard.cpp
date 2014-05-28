@@ -68,9 +68,4 @@ void CameraKeyboard::update(Camera& camera)
         camera.view = rotate(mat4(1.0),rS,vec3(0.0,0.0,-1.0))*camera.view;
     if (Input::isKeyHold(GLFW_KEY_O))
         camera.view = rotate(mat4(1.0),rS,vec3(0.0,0.0,+1.0))*camera.view;
-    
-    //camera.view = glm::lookAt(Input::position,
-	    //Input::position+dir,
-	    //up);
-
 }
