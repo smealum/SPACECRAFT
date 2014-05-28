@@ -2,6 +2,7 @@
 #define PLANET_H
 
 #include "utils/glm.h"
+#include "utils/TrackerPointer.h"
 #include <render/Shader.h>
 
 typedef struct
@@ -26,8 +27,10 @@ class PlanetFace
 	public:
 		PlanetFace(Planet* planet, glm::vec3 v[4]);
 		PlanetFace(Planet* planet, PlanetFace* father, uint8_t id);
-
+		
+		void deletePlanetFace(void);
 		void updateElevation(float e);
+		TrackerPointer<PlanetFace>* getTptr(void);
 
 		//TEMP
 		void drawDirect(void);
@@ -40,7 +43,11 @@ class PlanetFace
 		PlanetFace* father; //father == NULL <=> toplevel face
 		PlanetFace* sons[4];
 		glm::vec3 vertex[9];
+
+		TrackerPointer<PlanetFace>* tptr;
+
 		float elevation;
+		uint8_t id;
 		int depth;
 };
 

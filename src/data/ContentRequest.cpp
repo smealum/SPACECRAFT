@@ -3,10 +3,10 @@
 //PlanetElevationRequest stuff
 PlanetElevationRequest::PlanetElevationRequest(Planet& p, PlanetFace& pf, glm::vec3 c):
 	planet(p),
-	face(pf),
 	coord(c)
 {
-
+	face=pf.getTptr();
+	face->grab();
 }
 
 PlanetElevationRequest::~PlanetElevationRequest()
@@ -19,5 +19,6 @@ void PlanetElevationRequest::process(void)
 
 void PlanetElevationRequest::update(void)
 {
-	face.updateElevation(elevation);
+	face->getPointer()->updateElevation(elevation);
+	face->release();
 }

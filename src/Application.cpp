@@ -140,7 +140,7 @@ void Application::run()
 
     tt = new testShaders;
     testPlanet=new Planet((planetInfo_s){0}, contentHandler);
-    testPlanet->testFullGeneration(4);
+    testPlanet->testFullGeneration(5);
 
     while (state != appExiting)
     {

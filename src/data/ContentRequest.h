@@ -2,6 +2,7 @@
 #define CONTENTREQ_H
 
 #include "data/SynchronizationQueue.h"
+#include "utils/TrackerPointer.h"
 
 class ContentRequest
 {
@@ -27,7 +28,7 @@ class PlanetElevationRequest : public ContentRequest
 		float elevation;
 		glm::vec3 coord;
 		Planet& planet;
-		PlanetFace& face;
+		TrackerPointer<PlanetFace>* face;
 };
 
 typedef SynchronizationQueue<ContentRequest*> ContentInputQueue;
