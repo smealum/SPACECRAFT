@@ -154,7 +154,7 @@ void Application::run()
 
     tt = new testShaders;
     testPlanet=new Planet((planetInfo_s){0}, contentHandler);
-    testPlanet->testFullGeneration(5);
+    // testPlanet->testFullGeneration(6);
 
     float timeA;
     while (state != appExiting)
@@ -162,7 +162,6 @@ void Application::run()
         while(!glfwWindowShouldClose(window))
         {
             timeA = (float)glfwGetTime();
-            debug("time: %f", timeA);
             loop();
             fpsCounter++;
             deltaTime = (float)glfwGetTime() - timeA;
@@ -192,11 +191,12 @@ void Application::loop()
     glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    camera->updateFrustum();
+    testPlanet->processLevelOfDetail(*camera);
+
     glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
     tt->draw();
     testPlanet->drawDirect();
-
-    camera->updateFrustum();
 
     contentHandler.handleNewContent();
 

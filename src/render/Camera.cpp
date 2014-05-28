@@ -7,7 +7,7 @@ using namespace glm;
 
 Camera::Camera():
 	view(1.f),
-	proj(perspective(DEG2RAD(45.f), Application::getInstance().getWindowRatio(), 0.1f, 1000.f)),
+	proj(perspective(DEG2RAD(90.f), Application::getInstance().getWindowRatio(), 0.001f, 100.f)),
     cameraManager(NULL)
 {
 

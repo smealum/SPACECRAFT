@@ -15,7 +15,7 @@ CameraKeyboard::CameraKeyboard()
 void CameraKeyboard::update(Camera& camera)
 {
     // vitesse en translation
-    const float tS = 0.1;
+    float tS = 0.1;
     // vitesse en rotation
     const float rS = 0.03;
 
@@ -39,23 +39,20 @@ void CameraKeyboard::update(Camera& camera)
     }
     //float delta = 1.f;
 
+    if (Input::isKeyHold(GLFW_KEY_LEFT_SHIFT))tS=0.01f;
     // translation
     if (Input::isKeyHold(GLFW_KEY_A))
-	//Input::position -= right * delta * tS;
-	camera.view = translate(mat4(1.f), vec3(+tS,0.0,0.0))*camera.view;
+	   camera.view = translate(mat4(1.f), vec3(+tS,0.0,0.0))*camera.view; //Input::position -= right * delta * tS;
     if (Input::isKeyHold(GLFW_KEY_D))
-	//Input::position += right * delta * tS;
-	camera.view = translate(mat4(1.0),vec3(-tS,0.0,0.0))*camera.view;
+    	camera.view = translate(mat4(1.0),vec3(-tS,0.0,0.0))*camera.view; //Input::position += right * delta * tS;
     if (Input::isKeyHold(GLFW_KEY_W))
-	//Input::position += dir * delta * tS;
-	camera.view = translate(mat4(1.0),vec3(0,0.0,+tS))*camera.view;
+    	camera.view = translate(mat4(1.0),vec3(0,0.0,+tS))*camera.view; //Input::position += dir * delta * tS;
     if (Input::isKeyHold(GLFW_KEY_S))
-	//Input::position -= dir * delta * tS;
-	camera.view = translate(mat4(1.0),vec3(0,0,-tS))*camera.view;
-    if (Input::isKeyHold(GLFW_KEY_Q))
-	camera.view = translate(mat4(1.0),vec3(0.0,-tS, 0.0))*camera.view;
+    	camera.view = translate(mat4(1.0),vec3(0,0,-tS))*camera.view; //Input::position -= dir * delta * tS;
     if (Input::isKeyHold(GLFW_KEY_E))
-	camera.view = translate(mat4(1.0),vec3(0.0,+tS, 0.0))*camera.view;
+	   camera.view = translate(mat4(1.0),vec3(0.0,-tS, 0.0))*camera.view;
+    if (Input::isKeyHold(GLFW_KEY_Q))
+	   camera.view = translate(mat4(1.0),vec3(0.0,+tS, 0.0))*camera.view;
 
     // rotation
     if (Input::isKeyHold(GLFW_KEY_K))
