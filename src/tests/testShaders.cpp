@@ -165,4 +165,5 @@ void testShaders::draw()
                 0
                 );
     }
+    chunk.draw(Application::getInstance().getCamera());
 }

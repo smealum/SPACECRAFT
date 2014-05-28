@@ -1,10 +1,11 @@
 #include "Chunk.h"
+#include "utils/dbg.h"
 
 using namespace std;
 using namespace glm;
 
 Chunk::Chunk():
-    program(ShaderProgram::loadFromFile("shader/basic/basic.vert", "shader/basic/basic.frag", "basic"))
+    program(ShaderProgram::loadFromFile("shader/phong/phong.vert", "shader/phong/phong.frag", "phong"))
 {
     for(int x=0;x<CHUNK_N;x++)
     {
@@ -12,7 +13,22 @@ Chunk::Chunk():
         {
             for(int z=0;z<CHUNK_N;z++)
             {
-                value[x][y][z]=x+y*x+z*x*z;
+                if (
+                        (x-CHUNK_N/2)*(x-CHUNK_N/2)+
+                        (y-CHUNK_N/2)*(y-CHUNK_N/2)+
+                        (z-CHUNK_N/2)*(z-CHUNK_N/2)
+
+                        < CHUNK_N*CHUNK_N/4
+                    )
+                {
+                    value[x][y][z]=x+y*x+z*x*z;
+                    if (value[x][y][z]==0)
+                        value[x][y][z]=1;
+                }
+                else
+                {
+                    value[x][y][z]=0;
+                }
             }
         }
     }
@@ -24,107 +40,147 @@ void Chunk::computeChunk()
 {
     vArray.clear();
     // X
-    for(int y=1;y<CHUNK_N;++y)
-    for(int z=1;z<CHUNK_N;++z)
+    for(int y=0;y<CHUNK_N;++y)
+    for(int z=0;z<CHUNK_N;++z)
     for(int x=1;x<CHUNK_N;++x)
+    {
+        if (value[x][y][z])
+        {
+            if (!value[x-1][y][z])
+            {
+                GL_Vertex v;
+                v.color=vec4(
+                        double(x)/double(CHUNK_N),
+                        double(y)/double(CHUNK_N),
+                        double(z)/double(CHUNK_N),
+                        1.0
+                );
+                v.normal=vec3(-1,0,0);
+                v.position=vec3(x,y,z)     *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y,z+1)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y+1,z)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y,z+1)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y+1,z+1) *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y+1,z)  *CHUNK_SIZE; vArray.push_back(v);
+            }
+        }
+        else
+        {
+            if (value[x-1][y][z])
+            {
+                GL_Vertex v;
+                v.color=vec4(
+                        double(x-1)/double(CHUNK_N),
+                        double(y)/double(CHUNK_N),
+                        double(z)/double(CHUNK_N),
+                        1.0
+                );
+                v.normal=vec3(1,0,0);
+                v.position=vec3(x,y,z)     *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y+1,z)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y,z+1)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y,z+1)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y+1,z)  *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y+1,z+1) *CHUNK_SIZE; vArray.push_back(v);
+            }
+        }
+    }
+    // Y
+    for(int x=0;x<CHUNK_N;++x)
+    for(int z=0;z<CHUNK_N;++z)
+    for(int y=1;y<CHUNK_N;++y)
+    {
+        if (value[x][y][z])
+        {
+            if (!value[x][y-1][z])
+            {
+                GL_Vertex v;
+                v.color=vec4(
+                        double(x)/double(CHUNK_N),
+                        double(y)/double(CHUNK_N),
+                        double(z)/double(CHUNK_N),
+                        1.0
+                );
+                v.normal=vec3(0,-1,0);
+                v.position=vec3(x,y,z)     *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y,z+1)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x+1,y,z+1) *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y,z+1)  *CHUNK_SIZE; vArray.push_back(v);
+            }
+        }
+        else
+        {
+            if (value[x][y-1][z])
+            {
+                GL_Vertex v;
+                v.color=vec4(
+                        double(x)/double(CHUNK_N),
+                        double(y-1)/double(CHUNK_N),
+                        double(z)/double(CHUNK_N),
+                        1.0
+                );
+                v.normal=vec3(1,1,0);
+                v.position=vec3(x,y,z)     *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y,z+1)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y,z+1)  *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x+1,y,z+1) *CHUNK_SIZE; vArray.push_back(v);
+            }
+        }
+    }
+
+    // Y
+    for(int x=0;x<CHUNK_N;++x)
+    for(int y=0;y<CHUNK_N;++y)
+    for(int z=1;z<CHUNK_N;++z)
     {
         if (value[x][y][z])
         {
             if (!value[x][y][z-1])
             {
-                GL_Vertex v1=
-                {
-                   vec3(x,y,z),
-                   vec4(value[x][y][z]),
-                   vec3(-1,0,0)
-                };
-                vArray.push_back(v1);
-                GL_Vertex v2=
-                {
-                   vec3(x,y,z+1),
-                   vec4(value[x][y][z]),
-                   vec3(-1,0,0)
-                };
-                vArray.push_back(v2);
-                GL_Vertex v3=
-                {
-                   vec3(x,y+1,z),
-                   vec4(value[x][y][z]),
-                   vec3(-1,0,0)
-                };
-                vArray.push_back(v3);
-                GL_Vertex v4=
-                {
-                   vec3(x,y,z),
-                   vec4(value[x][y][z+1]),
-                   vec3(-1,0,0)
-                };
-                vArray.push_back(v4);
-                GL_Vertex v5=
-                {
-                   vec3(x,y,z+1),
-                   vec4(value[x][y+1][z+1]),
-                   vec3(-1,0,0)
-                };
-                vArray.push_back(v5);
-                GL_Vertex v6=
-                {
-                   vec3(x,y+1,z+1),
-                   vec4(value[x][y+1][z]),
-                   vec3(-1,0,0)
-                };
-                vArray.push_back(v6);
+                GL_Vertex v;
+                v.color=vec4(
+                        double(x)/double(CHUNK_N),
+                        double(y)/double(CHUNK_N),
+                        double(z)/double(CHUNK_N),
+                        1.0
+                );
+                v.normal=vec3(0,0,-1);
+                v.position=vec3(x,y,z)     *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y+1,z)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y+1,z)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x+1,y+1,z) *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
             }
         }
         else
         {
             if (value[x][y][z-1])
             {
-                GL_Vertex v1=
-                {
-                   vec3(x,y,z),
-                   vec4(value[x-1][y][z]),
-                   vec3(1,0,0)
-                };
-                vArray.push_back(v1);
-                GL_Vertex v2=
-                {
-                   vec3(x,y+1,z),
-                   vec4(value[x-1][y][z]),
-                   vec3(1,0,0)
-                };
-                vArray.push_back(v2);
-                GL_Vertex v3=
-                {
-                   vec3(x,y,z+1),
-                   vec4(value[x-1][y][z]),
-                   vec3(1,0,0)
-                };
-                vArray.push_back(v3);
-                GL_Vertex v4=
-                {
-                   vec3(x,y,z),
-                   vec4(value[x-1][y][z+1]),
-                   vec3(1,0,0)
-                };
-                vArray.push_back(v4);
-                GL_Vertex v5=
-                {
-                   vec3(x,y+1,z+1),
-                   vec4(value[x-1][y+1][z+1]),
-                   vec3(1,0,0)
-                };
-                vArray.push_back(v5);
-                GL_Vertex v6=
-                {
-                   vec3(x,y,z+1),
-                   vec4(value[x-1][y+1][z]),
-                   vec3(1,0,0)
-                };
-                vArray.push_back(v6);
+                GL_Vertex v;
+                v.color=vec4(
+                        double(x)/double(CHUNK_N),
+                        double(y)/double(CHUNK_N),
+                        double(z-1)/double(CHUNK_N),
+                        1.0
+                );
+                v.normal=vec3(1,1,0);
+                v.position=vec3(x,y,z)     *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y+1,z)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y+1,z)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x+1,y+1,z) *CHUNK_SIZE; vArray.push_back(v);
             }
         }
     }
+
+
+
 }
 
 void Chunk::draw(Camera& cam)
@@ -146,12 +202,19 @@ void Chunk::initGLObjects()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GL_Vertex)*vArray.size(), &(vArray[0]), GL_STATIC_DRAW);
 
+    log_info("%d octet",sizeof(GL_Vertex) * vArray.size());
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
     program.setBuffers(vao, vbo, 0);
     program.use();
     glBindFragDataLocation(program.getHandle(), 0, "outColor");
+    program.setAttribute("position", 3, GL_FALSE, 10, 0);
+    program.setAttribute("color", 4, GL_FALSE, 10, 3);
+    program.setAttribute("normal", 3, GL_FALSE, 10, 7);
+
+
+        
 }
 void Chunk::destroyGLObjects()
 {

@@ -1,7 +1,7 @@
 #ifndef CHUNK_4TYUGC3N
 #define CHUNK_4TYUGC3N
 
-#define CHUNK_SIZE 1.0
+#define CHUNK_SIZE 0.1f
 #define CHUNK_N 32
 
 #include "utils/glm.h"
