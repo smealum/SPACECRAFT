@@ -175,12 +175,10 @@ void Application::loop()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
-        // tt->draw();
+        tt->draw();
         testPlanet->drawDirect();
 
         camera->updateFrustum();
-        // if(camera->isPointInFrustum(glm::vec3(0.0f)))
-        printf("%f %f %f\n",camera->getPosition().x,camera->getPosition().y,camera->getPosition().z);
 
         contentHandler.handleNewContent();
 
