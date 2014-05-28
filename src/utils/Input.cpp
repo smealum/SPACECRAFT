@@ -51,7 +51,16 @@ void Input::update(GLFWwindow* window)
     verAngle = (float)(height/2 - m_mouseY);
 
     // fix mousePosition
-    if (mouseIsFixed) glfwSetCursorPos(window, width/2, height/2);
+    if (mouseIsFixed)
+    {
+        glfwSetCursorPos(window, width/2, height/2);
+        //glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_NORMAL);
+        //glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_HIDDEN);
+    }
+    else
+    {
+        //glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_NORMAL);
+    }
 }
 
 bool Input::isKeyPressed(int key)
