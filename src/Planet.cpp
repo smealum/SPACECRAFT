@@ -13,11 +13,11 @@
 
 PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	planet(planet),
-	sons({NULL, NULL, NULL, NULL}),
 	father(NULL),
+	sons{NULL, NULL, NULL, NULL},
+	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
-	id(5),
-	tptr(new TrackerPointer<PlanetFace>(this, true))
+	id(5)
 {
 	vertex[0]=v[0]; vertex[1]=v[1];
 	vertex[2]=v[2];	vertex[3]=v[3];
@@ -28,10 +28,10 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	planet(planet),
 	father(father),
-	sons({NULL, NULL, NULL, NULL}),
+	sons{NULL, NULL, NULL, NULL},
+	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
-	id(id),
-	tptr(new TrackerPointer<PlanetFace>(this, true))
+	id(id)
 {
 	//TODO : exception ?
 	// if(!father);
