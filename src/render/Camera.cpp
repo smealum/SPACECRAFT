@@ -21,7 +21,7 @@ void Camera::updateCamera(ShaderProgram &prog)
 
 glm::vec3 Camera::getPosition(void)
 {
-	return glm::vec3(view[3][0],view[3][1],view[3][2]);
+	return glm::vec3(glm::inverse(view)[3]);
 }
 
 void Camera::updateFrustum(void)

@@ -179,8 +179,8 @@ void Application::loop()
         testPlanet->drawDirect();
 
         camera->updateFrustum();
-        if(camera->isPointInFrustum(glm::vec3(0.0f)))printf("INSIDE YES\n");
-        else printf("NOOOOO\n");
+        // if(camera->isPointInFrustum(glm::vec3(0.0f)))
+        printf("%f %f %f\n",camera->getPosition().x,camera->getPosition().y,camera->getPosition().z);
 
         contentHandler.handleNewContent();
 
