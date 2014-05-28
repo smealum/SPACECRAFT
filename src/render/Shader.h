@@ -11,7 +11,6 @@
 
 class Shader;
 class ShaderProgram;
-struct UniformTypeValue;
 
 namespace ShaderType
 {
@@ -104,8 +103,9 @@ class ShaderProgram
         //void bindAttribLocation( GLuint location,const char * name);
         //void bindFragDataLocation( GLuint location,const char * name );
     private:
+        struct uniform_t;
         struct attribute_t;
-        std::map<std::string, UniformTypeValue> uniforms;
+        std::map<std::string, uniform_t> uniforms;
         std::map<std::string, attribute_t> attributes;
         // identifiant OpenGL
         GLuint handle;
@@ -120,7 +120,11 @@ class ShaderProgram
         // constructeur par copie (private, interdit)
         ShaderProgram(const ShaderProgram& other);
 
-        void loadAllUniforms();
+        // used to save uniforms before reloading shader
+        void saveUniforms();
+
+        // load uniforms saved, used after linking new shaders
+        void loadUniforms();
 
 };
 

@@ -4,6 +4,7 @@
 #include <iostream>
 #include "utils/dbg.h"
 #include <algorithm>
+#include <glm/gtx/string_cast.hpp>
 
 using namespace std;
 using namespace glm;
@@ -13,15 +14,15 @@ map<string,Shader*> shaderMap;
 // collection des programmes déjà créés.
 map<string, ShaderProgram*> shaderProgramMap;
 
-struct UniformValue {
+struct uniform_u { // XXX should be an union
     vec3 v3;
     vec4 v4;
     mat3 m3;
     mat4 m4;
     float f;
     int i;
-    UniformValue() {}
-    UniformValue(const UniformValue &u) : i(u.i) {}
+    uniform_u () {}
+    //uniform_u(const uniform_u &u) : m4(u.m4) {}
 };
 
 namespace UniformType
@@ -36,11 +37,11 @@ namespace UniformType
     };
 }
 
-struct UniformTypeValue {
+struct ShaderProgram::uniform_t {
     UniformType::T type;
-    UniformValue val;
-    UniformTypeValue() {}
-    UniformTypeValue(const UniformTypeValue& u) :  type(u.type), val(u.val){}
+    std::vector<uniform_u> val;
+    uniform_t() {}
+    //uniform_t(const uniform_t& u) :  type(u.type), val(u.val){}
 };
 
 
@@ -276,44 +277,30 @@ ShaderProgram::ShaderProgram(const ShaderProgram& other)
 void ShaderProgram::setUniform(const char *name,float x,float y,float z)
 {
     glUniform3f(uniform(name), x, y, z);
-    uniforms[name].type = UniformType::v3;
-    uniforms[name].val.v3 = vec3(x, y, z);
 }
 void ShaderProgram::setUniform(const char *name, const vec3 & v)
 {
     glUniform3fv(uniform(name), 1, value_ptr(v));
-    uniforms[name].type = UniformType::v3;
-    uniforms[name].val.v3 = v;
 }
 void ShaderProgram::setUniform(const char *name, const vec4 & v)
 {
     glUniform4fv(uniform(name), 1, value_ptr(v));
-    uniforms[name].type = UniformType::v4;
-    uniforms[name].val.v4 = v;
 }
 void ShaderProgram::setUniform(const char *name, const mat4 & m)
 {
     glUniformMatrix4fv(uniform(name), 1, GL_FALSE, value_ptr(m));
-    uniforms[name].type = UniformType::m4;
-    uniforms[name].val.m4 = m;
 }
 void ShaderProgram::setUniform(const char *name, const mat3 & m)
 {
     glUniformMatrix3fv(uniform(name), 1, GL_FALSE, value_ptr(m));
-    uniforms[name].type = UniformType::m3;
-    uniforms[name].val.m3 = m;
 }
 void ShaderProgram::setUniform(const char *name, float val )
 {
     glUniform1f(uniform(name), val);
-    uniforms[name].type = UniformType::i;
-    uniforms[name].val.f = val;
 }
 void ShaderProgram::setUniform(const char *name, int val )
 {
     glUniform1i(uniform(name), val);
-    uniforms[name].type = UniformType::i;
-    uniforms[name].val.f = val;
 }
 
 ShaderProgram::ShaderProgram() :
@@ -369,6 +356,8 @@ void ShaderProgram::use()
     if (!valid)
     {
         valid = true;
+        glUseProgram(handle); // TODO is it really necessary?
+        saveUniforms();
         // recheck uniforms
         glLinkProgram(handle);
         glUseProgram(handle);
@@ -391,7 +380,6 @@ void ShaderProgram::use()
         glBindVertexArray(vao);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        loadAllUniforms();
         for (auto it(attributes.begin()); it != attributes.end(); ++it)
         {
             GLint loc = attribLocation(it->first.c_str());
@@ -408,33 +396,7 @@ void ShaderProgram::use()
 
         }
         log_info("Program %s is loaded again.", name.c_str());
-        for (auto it(uniforms.begin()); it != uniforms.end(); ++it)
-        {
-            //debug("uniform of type %u.", it->second.type);
-            switch (it->second.type) {
-                case UniformType::v3:
-                    glUniform3fv(uniform(it->first.c_str()), 1, value_ptr(it->second.val.v3));
-                    break;
-                case UniformType::v4:
-                    glUniform4fv(uniform(it->first.c_str()), 1, value_ptr(it->second.val.v4));
-                    break;
-                case UniformType::m3:
-                    glUniformMatrix3fv(uniform(it->first.c_str()), 1, GL_FALSE, value_ptr(it->second.val.m3));
-                    break;
-                case UniformType::m4:
-                    glUniformMatrix4fv(uniform(it->first.c_str()), 1, GL_FALSE, value_ptr(it->second.val.m4));
-                    break;
-                case UniformType::f:
-                    glUniform1f(uniform(it->first.c_str()), it->second.val.f);
-                    break;
-                case UniformType::i:
-                    glUniform1i(uniform(it->first.c_str()), it->second.val.i);
-                    break;
-                default:
-                    log_err("Unknow uniform type");
-                    break;
-            }
-        }
+        loadUniforms();
     }
     glUseProgram(handle);
 }
@@ -464,39 +426,92 @@ void ShaderProgram::setBuffers(GLint vao, GLint vbo, GLint ebo)
     this->ebo = ebo;
 }
 
-void ShaderProgram::loadAllUniforms()
+void ShaderProgram::saveUniforms()
 {
+    GLint numUniforms = 0;
+    glGetProgramiv(handle, GL_ACTIVE_UNIFORMS, &numUniforms);
+    log_info("There is %d uniforms in shader %s", numUniforms, name.c_str());
+    //glGetProgramInterfaceiv(handle, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms);
+    //const GLenum properties[4] = {GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_LOCATION};
 
-    GLint numBlocks = 0;
-    glGetProgramInterfaceiv(handle, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, &numBlocks );
-    const GLenum blockProperties[1] = {GL_NUM_ACTIVE_VARIABLES};
-    const GLenum activeUnifProp[1] = {GL_ACTIVE_VARIABLES};
-    const GLenum unifProperties[3] = {GL_NAME_LENGTH, GL_TYPE, GL_LOCATION};
-    log_info("nombre de blocks:%d",numBlocks);
-
-    for(int blockIx = 0; blockIx < numBlocks; ++numBlocks)
+    for(int unif = 0; unif < numUniforms; ++unif)
     {
-        GLint numActiveUnifs = 0;
-        glGetProgramResourceiv(handle, GL_UNIFORM_BLOCK, blockIx, 1, blockProperties[0], 1, NULL, numActiveUnifs);
-
-        if(!numActiveUnifs)
-            continue;
-
-        std::vector<GLint> blockUnifs(numActiveUnifs);
-        glGetProgramramResourceiv(handle, GL_UNIFORM_BLOCK, blockIx, 1, activeUnifProp, numActiveUnifs, NULL, &blockUnifs[0]);
-        log_info("nombre active uniforms:%d",numActiveUnifs);
-
-        for(int unifIx = 0; unifIx < numActiveUnifs; ++unifIx)
-        {
-            GLint values[3];
-            glGetProgramResourceiv(handle, GL_UNIFORM, unifIx, 3, unifProperties, 4, NULL, values);
-
-            //Get the name. Must use a std::vector rather than a std::string for C++03 standards issues.
-            //C++11 would let you use a std::string directly.
-            std::vector<char> nameData(values[0]);
-            glGetProgramResourceName(handle, GL_UNIFORM, blockUnifs[unifIx], nameData.size(), NULL, &nameData[0]);
-            std::string name(nameData.begin(), nameData.end() - 1);
-            log_info("%s",name.c_str());
+        //GLint values[4];
+        GLchar name[124];
+        GLsizei length;
+        GLint size, loc;
+        GLenum type;
+        glGetActiveUniform(handle,
+                    unif,
+                    124,
+                    &length,
+                    &size,
+                    &type,
+                    name
+                );
+        loc = glGetUniformLocation(handle, name);
+        log_info("uniform %d(loc: %d) of size %d, type %d and name %s", unif, loc, size, type, name);
+        glm::mat4 m4;
+        glm::vec4 v4;
+        uniforms[name].val.resize(size);
+        switch (type) {
+            case GL_FLOAT_MAT4:
+                glGetUniformfv(handle, loc, glm::value_ptr(m4));
+                uniforms[name].type = UniformType::m4;
+                for (GLint i = 0; i < size; ++i)
+                    uniforms[name].val[i].m4 = m4;
+                break;
+            case GL_FLOAT_VEC4:
+                glGetUniformfv(handle, loc, glm::value_ptr(v4));
+                uniforms[name].type = UniformType::v4;
+                for (GLint i = 0; i < size; ++i)
+                    uniforms[name].val[i].v4 = v4;
+                break;
+            default:
+                log_err("Uniform %s of type %d is not supported!", name, type);
+                break;
         }
+        //glGetProgramiv(
+        //glGetProgramResourceiv(handle, GL_UNIFORM, unif, 4, properties, 4, NULL, values);
+
+        //Skip any uniforms that are in a block
+        //log_info("prop: %d", properties[0]);
+        //if(properties[0] != -1)
+            //continue;
+
+        //Get the name. Must use a std::vector rather than a std::string for C++03 standards issues.
+        //C++11 would let you use a std::string directly.
+        //std::vector<char> nameData(values[2]);
+        //glGetProgramResourceName(handle, GL_UNIFORM, unif, nameData.size(), NULL, &nameData[0]);
+        //std::string name(nameData.begin(), nameData.end() - 1);
     }
 }
+
+void ShaderProgram::loadUniforms()
+{
+    for (auto it(uniforms.begin()); it != uniforms.end(); ++it)
+    {
+        //debug("uniform of type %u.", it->second.type);
+        auto &v(it->second.val);
+        switch (it->second.type) {
+            case UniformType::v4:
+                //glUniform4fv(uniform(it->first.c_str()), 1, value_ptr(it->second.val.v4));
+                if (v.size() == 1)
+                    glUniform4fv(uniform(it->first.c_str()),
+                            1,
+                            glm::value_ptr(v[0].v4));
+                break;
+            case UniformType::m4:
+                if (v.size() == 1)
+                    glUniformMatrix4fv(uniform(it->first.c_str()),
+                            1, GL_FALSE,
+                            glm::value_ptr(v[0].m4));
+                break;
+            default:
+                log_err("Uniform %s have a unsupported type!", it->first.c_str());
+                break;
+        }
+    }
+
+}
+
