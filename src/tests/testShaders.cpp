@@ -78,9 +78,18 @@ testShaders::testShaders() :
         glBindFragDataLocation(programBasic.getHandle(), 0, "outColor");
         programBasic.setAttribute("position", 3, GL_FALSE, 10, 0);
         programBasic.setAttribute("color", 4, GL_FALSE, 10, 3);
-        programBasic.setAttribute("texcoord", 2, GL_FALSE, 10, 0); // XXX pas de texcoord
+        //programBasic.setAttribute("texcoord", 2, GL_FALSE, 10, 0); // XXX pas de texcoord
         
         programBasic.setUniform("overrideColor", glm::vec4(1.f));
+
+        GLfloat tmp[] = {
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        };
+        GLint l = glGetUniformLocation(programBasic.getHandle(), "tmp");
+        glUniform4fv(l, 4, tmp);
 
         programBasic.setUniform("model", model);
     }

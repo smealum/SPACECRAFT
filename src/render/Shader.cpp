@@ -15,31 +15,16 @@ map<string,Shader*> shaderMap;
 map<string, ShaderProgram*> shaderProgramMap;
 
 struct uniform_u { // XXX should be an union
-    vec3 v3;
-    vec4 v4;
-    mat3 m3;
-    mat4 m4;
-    float f;
-    int i;
-    uniform_u () {}
+    GLfloat *v;
+    GLint i; // for int types;
+    GLint size;
+    uniform_u () : v(NULL) {}
     //uniform_u(const uniform_u &u) : m4(u.m4) {}
 };
 
-namespace UniformType
-{
-    enum T {
-        v3,
-        v4,
-        m3,
-        m4,
-        f,
-        i
-    };
-}
-
 struct ShaderProgram::uniform_t {
-    UniformType::T type;
-    std::vector<uniform_u> val;
+    GLenum type;
+    uniform_u val;
     uniform_t() {}
     //uniform_t(const uniform_t& u) :  type(u.type), val(u.val){}
 };
@@ -451,39 +436,47 @@ void ShaderProgram::saveUniforms()
                 );
         loc = glGetUniformLocation(handle, name);
         log_info("uniform %d(loc: %d) of size %d, type %d and name %s", unif, loc, size, type, name);
-        glm::mat4 m4;
-        glm::vec4 v4;
-        uniforms[name].val.resize(size);
-        switch (type) {
-            case GL_FLOAT_MAT4:
-                glGetUniformfv(handle, loc, glm::value_ptr(m4));
-                uniforms[name].type = UniformType::m4;
-                for (GLint i = 0; i < size; ++i)
-                    uniforms[name].val[i].m4 = m4;
-                break;
-            case GL_FLOAT_VEC4:
-                glGetUniformfv(handle, loc, glm::value_ptr(v4));
-                uniforms[name].type = UniformType::v4;
-                for (GLint i = 0; i < size; ++i)
-                    uniforms[name].val[i].v4 = v4;
-                break;
-            default:
-                log_err("Uniform %s of type %d is not supported!", name, type);
-                break;
+        uniforms[name].type = type;
+        auto &val = uniforms[name].val;
+        debug("val: %p", val.v);
+        if (val.v)
+        {
+            delete[] val.v;
+            val.v = NULL;
         }
-        //glGetProgramiv(
-        //glGetProgramResourceiv(handle, GL_UNIFORM, unif, 4, properties, 4, NULL, values);
+        val.size = size;
+        debug("val: %p", val.v);
+        for (int i = 0; i <size; i++)
+        {
+            switch (type) {
+                case GL_FLOAT_MAT4:
+                    if (!val.v)
+                        val.v = new GLfloat[size*16];
+                    glGetUniformfv(handle, loc, val.v+i*16);
+                    break;
+                case GL_FLOAT_VEC4:
+                    if (!val.v)
+                        val.v = new GLfloat[size*4];
+                    glGetUniformfv(handle, loc+i, val.v+i*4);
+                    debug("v[%d]=(%f,%f,%f,%f)", i,
+                            val.v[0+i*4], val.v[1+i*4], val.v[2+i*4], val.v[3+i*4]);
+                    break;
+                case GL_FLOAT_VEC3:
+                    if (!val.v)
+                        val.v = new GLfloat[size*3];
+                    glGetUniformfv(handle, loc+i, val.v+i*3);
+                    break;
+                case GL_FLOAT:
+                    if (!val.v)
+                        val.v = new GLfloat[size];
+                    glGetUniformfv(handle, loc+i, val.v+i);
+                    break;
 
-        //Skip any uniforms that are in a block
-        //log_info("prop: %d", properties[0]);
-        //if(properties[0] != -1)
-            //continue;
-
-        //Get the name. Must use a std::vector rather than a std::string for C++03 standards issues.
-        //C++11 would let you use a std::string directly.
-        //std::vector<char> nameData(values[2]);
-        //glGetProgramResourceName(handle, GL_UNIFORM, unif, nameData.size(), NULL, &nameData[0]);
-        //std::string name(nameData.begin(), nameData.end() - 1);
+                default:
+                    log_err("Uniform %s of type %d is not supported!", name, type);
+                    break;
+            }
+        }
     }
 }
 
@@ -492,20 +485,24 @@ void ShaderProgram::loadUniforms()
     for (auto it(uniforms.begin()); it != uniforms.end(); ++it)
     {
         //debug("uniform of type %u.", it->second.type);
-        auto &v(it->second.val);
+        auto &val(it->second.val);
         switch (it->second.type) {
-            case UniformType::v4:
+            case GL_FLOAT_VEC4:
                 //glUniform4fv(uniform(it->first.c_str()), 1, value_ptr(it->second.val.v4));
-                if (v.size() == 1)
-                    glUniform4fv(uniform(it->first.c_str()),
-                            1,
-                            glm::value_ptr(v[0].v4));
+                glUniform4fv(uniform(it->first.c_str()),
+                        val.size,
+                        val.v);
                 break;
-            case UniformType::m4:
-                if (v.size() == 1)
-                    glUniformMatrix4fv(uniform(it->first.c_str()),
-                            1, GL_FALSE,
-                            glm::value_ptr(v[0].m4));
+            case GL_FLOAT:
+                glUniform1fv(uniform(it->first.c_str()),
+                        val.size,
+                        val.v);
+                break;
+            case GL_FLOAT_MAT4:
+                glUniformMatrix4fv(uniform(it->first.c_str()),
+                        val.size,
+                        GL_FALSE,
+                        val.v);
                 break;
             default:
                 log_err("Uniform %s have a unsupported type!", it->first.c_str());

@@ -178,7 +178,7 @@ void Application::loop()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
-        // tt->draw();
+        tt->draw();
         testPlanet->drawDirect();
 
         contentHandler.handleNewContent();
