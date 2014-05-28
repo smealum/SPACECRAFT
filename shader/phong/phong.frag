@@ -2,31 +2,34 @@
 
 smooth in vec4 fcolor;
 smooth in vec3 fnormal;
-smooth in vec4 fposition;
-flat in vec3 flightPosition;
+smooth in vec3 flightDir;
+smooth in vec3 feyeDir;
 out vec4 outColor;
 
-uniform float ambient = 0.1;
+uniform float ambient = 0.0;
 uniform float diffuse = 0.7;
-uniform float specular = 0.3;
+uniform float specular = 1.0;
+uniform float specPow = 6.0;
+
 
 void main() {
-    vec3 lightObjDirection = normalize(flightPosition-fposition.xyz);
-    vec3 normal = normalize(fnormal);
-    float coefDiffu=dot(normal,lightObjDirection);
-    float coefSpecu=dot(reflect(lightObjDirection,normal),normalize(fposition.xyz));
-    if (coefDiffu<0.0) coefDiffu=0.0;
-    if (coefSpecu<0.0) coefSpecu=0.0;
-	coefSpecu=coefSpecu*coefSpecu;
-	coefSpecu=coefSpecu*coefSpecu;
-	coefSpecu=coefSpecu*coefSpecu;
-	coefSpecu=coefSpecu*coefSpecu;
-	coefSpecu=coefSpecu*coefSpecu;
-	coefSpecu=coefSpecu*coefSpecu;
-	coefSpecu*=1.0;
+    outColor = ambient * fcolor;
 
-	outColor.xyz=(  ambient+
-                diffuse*coefDiffu+
-                specular*coefSpecu)*fcolor.xyz;
-    outColor.a=fcolor.a;
+
+    vec3 N = normalize(fnormal);
+    vec3 L = normalize(flightDir);
+
+    float lambertTerm = dot(N,L);
+    if (lambertTerm > 0.0)
+    {
+        outColor += diffuse * lambertTerm * fcolor;
+        
+        vec3 E = normalize(feyeDir);
+        vec3 R = reflect(-L,N);
+
+        outColor += specular * pow( max(dot(E,R),0.0), specPow) * fcolor;
+    }
+
+    outColor.a = fcolor.a;
+
 }
