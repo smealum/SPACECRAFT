@@ -13,13 +13,16 @@ Chunk::Chunk():
         {
             for(int z=0;z<CHUNK_N;z++)
             {
-                if (
-                        (x-CHUNK_N/2)*(x-CHUNK_N/2)+
-                        (y-CHUNK_N/2)*(y-CHUNK_N/2)+
-                        (z-CHUNK_N/2)*(z-CHUNK_N/2)
+				//if (
+						//(x-CHUNK_N/2)*(x-CHUNK_N/2)+
+						//(y-CHUNK_N/2)*(y-CHUNK_N/2)+
+						//(z-CHUNK_N/2)*(z-CHUNK_N/2)
 
-                        < CHUNK_N*CHUNK_N/4
-                    )
+						//< CHUNK_N*CHUNK_N/4
+
+						//and y<CHUNK_N/2
+					//)
+				if ( (x+y+z +x*y*z) % 20 == 0)
                 {
                     value[x][y][z]=x+y*x+z*x*z;
                     if (value[x][y][z]==0)

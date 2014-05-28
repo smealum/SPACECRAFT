@@ -13,7 +13,7 @@ smooth out vec3 fnormal;
 smooth out vec3 flightDir;
 smooth out vec3 feyeDir;
 
-uniform vec4 lightPosition = vec4(1.0,0.0,0.0,1.0);
+uniform vec4 lightPosition = vec4(0.0,10000.0,0.0,1.0);
 
 void main ()
 {
@@ -25,5 +25,5 @@ void main ()
     gl_Position = projection*vVertex;
     feyeDir = -vVertex.xyz;
 
-    flightDir = lightPosition.xyz - vVertex.xyz;
+    flightDir = (view*lightPosition).xyz - vVertex.xyz;
 }

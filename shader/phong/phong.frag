@@ -6,15 +6,14 @@ smooth in vec3 flightDir;
 smooth in vec3 feyeDir;
 out vec4 outColor;
 
-uniform float ambient = 0.0;
+uniform float ambient = 0.3;
 uniform float diffuse = 0.7;
 uniform float specular = 1.0;
-uniform float specPow = 6.0;
+uniform float specPow = 1.0;
 
 
 void main() {
     outColor = ambient * fcolor;
-
 
     vec3 N = normalize(fnormal);
     vec3 L = normalize(flightDir);
