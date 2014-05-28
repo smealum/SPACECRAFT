@@ -466,37 +466,43 @@ void ShaderProgram::setBuffers(GLint vao, GLint vbo, GLint ebo)
 
 void ShaderProgram::loadAllUniforms()
 {
+    GLint numUniforms = 0;
+    glGetProgramInterfaceiv(handle, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms);
+    const GLenum properties[4] = {GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_LOCATION};
 
-    GLint numBlocks = 0;
-    glGetProgramInterfaceiv(handle, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, &numBlocks );
-    const GLenum blockProperties[1] = {GL_NUM_ACTIVE_VARIABLES};
-    const GLenum activeUnifProp[1] = {GL_ACTIVE_VARIABLES};
-    const GLenum unifProperties[3] = {GL_NAME_LENGTH, GL_TYPE, GL_LOCATION};
-    log_info("nombre de blocks:%d",numBlocks);
-
-    for(int blockIx = 0; blockIx < numBlocks; ++numBlocks)
+    for(int unif = 0; unif < numUniforms; ++unif)
     {
-        GLint numActiveUnifs = 0;
-        glGetProgramResourceiv(handle, GL_UNIFORM_BLOCK, blockIx, 1, blockProperties[0], 1, NULL, numActiveUnifs);
+        GLint values[4];
+        glGetProgramResourceiv(handle, GL_UNIFORM, unif, 4, properties, 4, NULL, values);
 
-        if(!numActiveUnifs)
-            continue;
+        //Skip any uniforms that are in a block.
+        //if(properties[0] != -1)
+            //continue;
 
-        std::vector<GLint> blockUnifs(numActiveUnifs);
-        glGetProgramramResourceiv(handle, GL_UNIFORM_BLOCK, blockIx, 1, activeUnifProp, numActiveUnifs, NULL, &blockUnifs[0]);
-        log_info("nombre active uniforms:%d",numActiveUnifs);
+        //Get the name. Must use a std::vector rather than a std::string for C++03 standards issues.
+        //C++11 would let you use a std::string directly.
+        std::vector<char> nameData(values[2]+1);
+        glGetProgramResourceName(handle, GL_UNIFORM, unif, nameData.size(), NULL, &nameData[0]);
+        std::string name(nameData.begin(), nameData.end() - 1);
+        log_info("uniform:%s",name.c_str());
 
-        for(int unifIx = 0; unifIx < numActiveUnifs; ++unifIx)
+        
         {
-            GLint values[3];
-            glGetProgramResourceiv(handle, GL_UNIFORM, unifIx, 3, unifProperties, 4, NULL, values);
-
-            //Get the name. Must use a std::vector rather than a std::string for C++03 standards issues.
-            //C++11 would let you use a std::string directly.
-            std::vector<char> nameData(values[0]);
-            glGetProgramResourceName(handle, GL_UNIFORM, blockUnifs[unifIx], nameData.size(), NULL, &nameData[0]);
-            std::string name(nameData.begin(), nameData.end() - 1);
-            log_info("%s",name.c_str());
+            GLfloat value[16];
+            GLint location = uniform(name.c_str());
+            log_info("location =%d",location);
+            glGetUniformfv(handle,location,value);
+            
+            for(int i=0;i<16;++i)
+            log_info("value:%f",value[i]);
         }
+        //{
+            //GLint 
+            //glGetUniformdv(handle,uniform(name.c_str()),value);
+            
+            //for(int i=0;i<16;++i)
+            //log_info("value:%f",value[i]);
+        //}
+        
     }
 }
