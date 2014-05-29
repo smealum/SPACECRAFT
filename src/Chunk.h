@@ -18,6 +18,8 @@ struct GL_Vertex
     glm::vec3 normal;
 };
 
+//do NOT instanciate directly
+//use new
 //do NOT destroy directly
 //use destroyChunk
 class Chunk
