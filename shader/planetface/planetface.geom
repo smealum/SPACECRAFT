@@ -20,19 +20,19 @@ void main() {
 	vec3 v2=gv2[0]*gsize[0];
 	
 	fcolor = gcolor[0];
-	gl_Position = proj * view * model * vec4(gelevation[0]*normalize(pos[0]-v1-v2),1.0);
-	EmitVertex();
-	
-    fcolor = gcolor[0];
 	gl_Position = proj * view * model * vec4(gelevation[0]*normalize(pos[0]+v1-v2),1.0);
 	EmitVertex();
 	
     fcolor = gcolor[0];
-	gl_Position = proj * view * model * vec4(gelevation[0]*normalize(pos[0]-v1+v2),1.0);
+	gl_Position = proj * view * model * vec4(gelevation[0]*normalize(pos[0]-v1-v2),1.0);
+	EmitVertex();
+	
+    fcolor = gcolor[0];
+	gl_Position = proj * view * model * vec4(gelevation[0]*normalize(pos[0]+v1+v2),1.0);
 	EmitVertex();
 
     fcolor = gcolor[0];
-	gl_Position = proj * view * model * vec4(gelevation[0]*normalize(pos[0]+v1+v2),1.0);
+	gl_Position = proj * view * model * vec4(gelevation[0]*normalize(pos[0]-v1+v2),1.0);
 	EmitVertex();
 	EndPrimitive();
 }
