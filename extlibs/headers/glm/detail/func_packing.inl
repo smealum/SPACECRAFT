@@ -32,23 +32,25 @@
 
 namespace glm
 {
-	GLM_FUNC_QUALIFIER uint packUnorm2x16(vec2 const & v)
-	{
-		u16vec2 Topack(round(clamp(v, 0.0f, 1.0f) * 65535.0f));
-		return reinterpret_cast<uint&>(Topack);
-	}
+	#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+		GLM_FUNC_QUALIFIER uint packUnorm2x16(vec2 const & v)
+		{
+			u16vec2 Topack(round(clamp(v, 0.0f, 1.0f) * 65535.0f));
+			return reinterpret_cast<uint&>(Topack);
+		}
 
-	GLM_FUNC_QUALIFIER vec2 unpackUnorm2x16(uint const & p)
-	{
-		vec2 Unpack(reinterpret_cast<u16vec2 const &>(p));
-		return Unpack * float(1.5259021896696421759365224689097e-5); // 1.0 / 65535.0
-	}
-
-	GLM_FUNC_QUALIFIER uint packSnorm2x16(vec2 const & v)
-	{
-		i16vec2 Topack(round(clamp(v ,-1.0f, 1.0f) * 32767.0f));
-		return reinterpret_cast<uint32&>(Topack);
-	}
+		GLM_FUNC_QUALIFIER vec2 unpackUnorm2x16(uint const & p)
+		{
+			vec2 Unpack(reinterpret_cast<u16vec2 const &>(p));
+			return Unpack * float(1.5259021896696421759365224689097e-5); // 1.0 / 65535.0
+		}
+		
+		GLM_FUNC_QUALIFIER uint packSnorm2x16(vec2 const & v)
+		{
+			i16vec2 Topack(round(clamp(v ,-1.0f, 1.0f) * 32767.0f));
+			return reinterpret_cast<uint32&>(Topack);
+		}
+	#pragma GCC diagnostic pop
 
 	GLM_FUNC_QUALIFIER vec2 unpackSnorm2x16(uint const & p)
 	{
