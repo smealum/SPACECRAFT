@@ -1,8 +1,9 @@
 #ifndef CHUNK_4TYUGC3N
 #define CHUNK_4TYUGC3N
 
-#define CHUNK_SIZE 0.1f
+#define BLOCK_SIZE 0.1f
 #define CHUNK_N 32
+#define CHUNK_SIZE (BLOCK_SIZE*CHUNK_N)
 
 #include "utils/glm.h"
 #include "render/Camera.h"
@@ -25,9 +26,9 @@ struct GL_Vertex
 class Chunk
 {
     public:
-        Chunk(Planet* p);
+        Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z);
 
-        void draw(Camera& camera);
+        void draw(Camera& camera, glm::mat4 model);
         void updateData(char data[CHUNK_N][CHUNK_N][CHUNK_N]);
         void destroyChunk(void);
         
@@ -42,8 +43,11 @@ class Chunk
         
         void computeChunk();
 
+        int px, py, pz;
+
         TrackerPointer<Chunk>* tptr;
         Planet* planet;
+        class MiniWorld* miniWorld;
 
         GLuint vbo;
         GLuint vao;

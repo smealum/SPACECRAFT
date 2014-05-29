@@ -2,9 +2,9 @@
 #define MINIWORLD_QZJL4BIM
 
 //in terms of chunks
-#define MINIWORLD_W 16
-#define MINIWORLD_H 16
-#define MINIWORLD_D 16
+#define MINIWORLD_W 2
+#define MINIWORLD_H 2
+#define MINIWORLD_D 2
 
 #include "utils/glm.h"
 #include "render/Camera.h"

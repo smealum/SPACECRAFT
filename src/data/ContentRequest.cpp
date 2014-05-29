@@ -25,10 +25,13 @@ void PlanetElevationRequest::update(void)
 }
 
 //WorldChunkRequest stuff
-WorldChunkRequest::WorldChunkRequest(Planet& p, Chunk& c, glm::vec3 o, glm::vec3 e):
+WorldChunkRequest::WorldChunkRequest(Planet& p, Chunk& c, glm::vec3 o, glm::vec3 e, int x, int y, int z):
 	planet(p),
 	origin(o),
-	end(e)
+	end(e),
+	px(x),
+	py(y),
+	pz(z)
 {
 	chunk=c.getTptr();
 	chunk->grab();
@@ -42,11 +45,12 @@ void WorldChunkRequest::process(void)
 	//TEMP
 	for(int i=0;i<CHUNK_N;i++)
 	{
-		for(int j=0;j<CHUNK_N;j++)
+		for(int k=0;k<CHUNK_N;k++)
 		{
-			for(int k=0;k<CHUNK_N;k++)
+			int h=(int)((glm::simplex(glm::vec2(px*CHUNK_N+i,pz*CHUNK_N+k)*0.01f)+1.0f)*32);
+			for(int j=0;j<CHUNK_N;j++)
 			{
-				if(j<CHUNK_N/2)data[i][j][k]=1;
+				if(py*CHUNK_N+j<=h)data[i][j][k]=1;
 				else data[i][j][k]=0;
 			}
 		}

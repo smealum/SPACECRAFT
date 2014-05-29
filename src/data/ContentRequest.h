@@ -36,13 +36,14 @@ class PlanetElevationRequest : public ContentRequest
 class WorldChunkRequest : public ContentRequest
 {
 	public:
-		WorldChunkRequest(Planet& p, Chunk& c, glm::vec3 o, glm::vec3 e);
+		WorldChunkRequest(Planet& p, Chunk& c, glm::vec3 o, glm::vec3 e, int x, int y, int z);
 		void process(void);
 		void update(void);
 		virtual ~WorldChunkRequest();
 		
 	private:
         char data[CHUNK_N][CHUNK_N][CHUNK_N];
+        int px, py, pz;
 		glm::vec3 origin, end;
 		Planet& planet;
 		TrackerPointer<Chunk>* chunk;

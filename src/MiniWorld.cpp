@@ -9,7 +9,7 @@ MiniWorld::MiniWorld(Planet* p):
 		{
 			for(int k=0;k<MINIWORLD_W;k++)
 			{
-				chunks[i][j][k]=new Chunk(p);
+				chunks[i][j][k]=new Chunk(p,this,i,j,k);
 			}
 		}
 	}
@@ -25,7 +25,7 @@ void MiniWorld::draw(Camera& c)
 		{
 			for(int k=0;k<MINIWORLD_W;k++)
 			{
-				chunks[i][j][k]->draw(c);
+				chunks[i][j][k]->draw(c, glm::mat4(1.0f));
 			}
 		}
 	}

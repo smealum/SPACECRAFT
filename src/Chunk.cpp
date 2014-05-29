@@ -5,41 +5,16 @@
 using namespace std;
 using namespace glm;
 
-Chunk::Chunk(Planet* p):
+Chunk::Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z):
     program(ShaderProgram::loadFromFile("shader/phong/phong.vert", "shader/phong/phong.frag", "phong")),
     tptr(new TrackerPointer<Chunk>(this, true)),
-    planet(p)
+    planet(p),
+    miniWorld(mw),
+    px(x),
+    py(y),
+    pz(z)
 {
-    // for(int x=0;x<CHUNK_N;x++)
-    // {
-    //     for(int y=0;y<CHUNK_N;y++)
-    //     {
-    //         for(int z=0;z<CHUNK_N;z++)
-    //         {
-				// //if (
-				// 		//(x-CHUNK_N/2)*(x-CHUNK_N/2)+
-				// 		//(y-CHUNK_N/2)*(y-CHUNK_N/2)+
-				// 		//(z-CHUNK_N/2)*(z-CHUNK_N/2)
-
-				// 		//< CHUNK_N*CHUNK_N/4
-
-				// 		//and y<CHUNK_N/2
-				// 	//)
-				// if ( (x+y+z +x*y*z) % 20 == 0)
-    //             {
-    //                 value[x][y][z]=x+y*x+z*x*z;
-    //                 if (value[x][y][z]==0)
-    //                     value[x][y][z]=1;
-    //             }
-    //             else
-    //             {
-    //                 value[x][y][z]=0;
-    //             }
-    //         }
-    //     }
-    // }
-
-    planet->handler.requestContent(new WorldChunkRequest(*planet, *this, glm::vec3(0.f,0.f,0.f), glm::vec3(1.f,1.f,1.f)));
+    planet->handler.requestContent(new WorldChunkRequest(*planet, *this, glm::vec3(0.f,0.f,0.f), glm::vec3(1.f,1.f,1.f), x, y, z));
 
     memset(value,0,sizeof(char)*CHUNK_N*CHUNK_N*CHUNK_N);
 
@@ -78,12 +53,12 @@ void Chunk::computeChunk()
                         1.0
                 );
                 v.normal=vec3(-1,0,0);
-                v.position=vec3(x,y,z)     *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y,z+1)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y+1,z)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y,z+1)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y+1,z+1) *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y+1,z)  *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y,z)*BLOCK_SIZE;     vArray.push_back(v);
+                v.position=vec3(x,y,z+1)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x,y+1,z)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x,y,z+1)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x,y+1,z+1)*BLOCK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y+1,z)*BLOCK_SIZE;   vArray.push_back(v);
             }
         }
         else
@@ -98,12 +73,12 @@ void Chunk::computeChunk()
                         1.0
                 );
                 v.normal=vec3(1,0,0);
-                v.position=vec3(x,y,z)     *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y+1,z)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y,z+1)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y,z+1)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y+1,z)  *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y+1,z+1) *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y,z)*BLOCK_SIZE;     vArray.push_back(v);
+                v.position=vec3(x,y+1,z)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x,y,z+1)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x,y,z+1)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x,y+1,z)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x,y+1,z+1)*BLOCK_SIZE; vArray.push_back(v);
             }
         }
     }
@@ -124,12 +99,12 @@ void Chunk::computeChunk()
                         1.0
                 );
                 v.normal=vec3(0,-1,0);
-                v.position=vec3(x,y,z)     *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y,z+1)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x+1,y,z+1) *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y,z+1)  *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y,z)*BLOCK_SIZE;     vArray.push_back(v);
+                v.position=vec3(x+1,y,z)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x,y,z+1)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x+1,y,z)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x+1,y,z+1)*BLOCK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y,z+1)*BLOCK_SIZE;   vArray.push_back(v);
             }
         }
         else
@@ -143,13 +118,13 @@ void Chunk::computeChunk()
                         double(z)/double(CHUNK_N),
                         1.0
                 );
-                v.normal=vec3(1,1,0);
-                v.position=vec3(x,y,z)     *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y,z+1)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y,z+1)  *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x+1,y,z+1) *CHUNK_SIZE; vArray.push_back(v);
+                v.normal=vec3(0,1,0);
+                v.position=vec3(x,y,z)*BLOCK_SIZE;     vArray.push_back(v);
+                v.position=vec3(x,y,z+1)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x+1,y,z)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x+1,y,z)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x,y,z+1)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x+1,y,z+1)*BLOCK_SIZE; vArray.push_back(v);
             }
         }
     }
@@ -171,12 +146,12 @@ void Chunk::computeChunk()
                         1.0
                 );
                 v.normal=vec3(0,0,-1);
-                v.position=vec3(x,y,z)     *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y+1,z)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y+1,z)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x+1,y+1,z) *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
+                v.position=vec3(x,y,z)*BLOCK_SIZE;     vArray.push_back(v);
+                v.position=vec3(x,y+1,z)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x+1,y,z)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x,y+1,z)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x+1,y+1,z)*BLOCK_SIZE; vArray.push_back(v);
+                v.position=vec3(x+1,y,z)*BLOCK_SIZE;   vArray.push_back(v);
             }
         }
         else
@@ -190,25 +165,25 @@ void Chunk::computeChunk()
                         double(z-1)/double(CHUNK_N),
                         1.0
                 );
-                v.normal=vec3(1,1,0);
-                v.position=vec3(x,y,z)     *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y+1,z)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x,y+1,z)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x+1,y,z)   *CHUNK_SIZE; vArray.push_back(v);
-                v.position=vec3(x+1,y+1,z) *CHUNK_SIZE; vArray.push_back(v);
+                v.normal=vec3(0,0,1);
+                v.position=vec3(x,y,z)*BLOCK_SIZE;     vArray.push_back(v);
+                v.position=vec3(x+1,y,z)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x,y+1,z)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x,y+1,z)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x+1,y,z)*BLOCK_SIZE;   vArray.push_back(v);
+                v.position=vec3(x+1,y+1,z)*BLOCK_SIZE; vArray.push_back(v);
             }
         }
     }
 }
 
-void Chunk::draw(Camera& cam)
+void Chunk::draw(Camera& cam, glm::mat4 model)
 {
     program.use();
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     program.setUniform("projection",cam.proj);
-    program.setUniform("model",mat4(1.0));
+    program.setUniform("model",glm::translate(model, glm::vec3(px,py,pz)*CHUNK_SIZE));
     program.setUniform("view",cam.view);
     glDrawArrays(GL_TRIANGLES, 0 ,  vArray.size()); 
 }
