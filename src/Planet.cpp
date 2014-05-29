@@ -260,7 +260,7 @@ void Planet::processLevelOfDetail(Camera& c)
 PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms):
 	planetFace(pf),
 	maxSize(ms),
-	shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "planetface")),
+	shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface")),
 	curSize(0)
 {
     glGenBuffers(1, &vbo);

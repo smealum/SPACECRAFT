@@ -64,7 +64,9 @@ class ShaderProgram
     public:
         // constructeur
         static ShaderProgram& loadFromFile(const char* vertexShader, const char* fragmentShader, const std::string &name);
+        static ShaderProgram& loadFromFile(const char* vertexShader, const char* fragmentShader, const char* geometryShader, const std::string &name);
         static ShaderProgram& loadFromShader(Shader& vertexShader, Shader& fragmentShader, const std::string &name);
+        static ShaderProgram& loadFromShader(Shader& vertexShader, Shader& fragmentShader, Shader& geometryShader, const std::string &name);
 
         void setBuffers(GLint vao, GLint vbo, GLint ebo);
 

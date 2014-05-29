@@ -180,7 +180,64 @@ ShaderProgram& ShaderProgram::loadFromFile(const char* vertexShader, const char*
             );
 }
 
+ShaderProgram& ShaderProgram::loadFromFile(const char* vertexShader, const char* fragmentShader, const char* geometryShader, const std::string &name)
+{
+    debug("Chargement d'un programme : %s , %s, %s ",vertexShader,fragmentShader,geometryShader);
+    return ShaderProgram::loadFromShader(
+                Shader::loadFromFile(vertexShader,ShaderType::Vertex),
+                Shader::loadFromFile(fragmentShader,ShaderType::Fragment),
+                Shader::loadFromFile(geometryShader,ShaderType::Geometry),
+                name
+            );
+}
+
 ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragmentShader, const std::string &name)
+{
+    // Check if shaderprogram exists
+    auto it(shaderProgramMap.find(name));
+    if (it != shaderProgramMap.end())
+        return *(it->second);
+
+    // programme creation
+    ShaderProgram* p = new ShaderProgram;
+    p->handle = glCreateProgram();
+    if (not p->handle)
+    {
+        log_err("Impossible de créer un ShaderProgramme vierge");
+        //exit(EXIT_FAILURE);
+    }
+    p->name = name;
+    shaderProgramMap[p->name] = p;
+
+    // attachement.
+    p->attachShader(vertexShader);
+    p->attachShader(fragmentShader);
+
+    // linkage
+    glLinkProgram(p->handle);
+    p->valid = true;
+    GLint result;
+    glGetProgramiv(p->handle,GL_LINK_STATUS, &result);
+    if (result!=GL_TRUE)
+    {
+        log_err("[Erreur] Impossible de linker les shader");
+
+        /* error text retreiving*/
+        GLsizei logsize = 0;
+        glGetProgramiv(p->handle, GL_INFO_LOG_LENGTH, &logsize);
+         
+        char* log = new char[logsize];
+        glGetProgramInfoLog(p->handle, logsize, &logsize, log);
+        //log[logsize]='\0';
+         
+        log_err("\n[Erreur log]\n%s\n_________", log);
+    }
+
+
+    return *p;
+}
+
+ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragmentShader, Shader& geometryShader, const std::string &name)
 {
     // Check if shaderprogram exists
     auto it(shaderProgramMap.find(name));
@@ -200,6 +257,7 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
 
     // attachement.
     p->attachShader(vertexShader);
+    p->attachShader(geometryShader);
     p->attachShader(fragmentShader);
 
     // linkage
@@ -315,7 +373,7 @@ void ShaderProgram::attachShader(Shader &s)
         glAttachShader(handle, s.getHandle());
         valid = false;
     } else
-        log_err("Cannot attach shader %s to program %s because it is alreayd attached...",
+        log_err("Cannot attach shader %s to program %s because it is already attached...",
                 s.getFilename().c_str(),
                 name.c_str());
 }
