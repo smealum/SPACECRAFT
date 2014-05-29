@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include "utils/Input.h"
 #include "Planet.h"
+#include "Chunk.h"
 
 #ifndef NTWBAR
 inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
@@ -139,6 +140,7 @@ void Application::createWindowInFullscreen(bool fs)
 }
 
 Planet* testPlanet;
+Chunk* testChunk;
 PlanetFaceBufferHandler* testBuffer;
 
 void Application::run()
@@ -154,6 +156,7 @@ void Application::run()
 
     tt = new testShaders;
     testPlanet=new Planet((planetInfo_s){0}, contentHandler);
+    testChunk=new Chunk(testPlanet);
 
     // testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
     // testBuffer->addFace(testPlanet->faces[0]);
@@ -198,10 +201,11 @@ void Application::loop()
     camera->updateFrustum();
     testPlanet->processLevelOfDetail(*camera);
 
-    glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
-    // tt->draw();
+    glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
+    tt->draw();
     // testPlanet->drawDirect();
     testPlanet->draw(*camera);
+    testChunk->draw(*camera);
     // testBuffer->draw(*camera);
 
     contentHandler.handleNewContent();

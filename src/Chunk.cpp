@@ -1,42 +1,61 @@
 #include "Chunk.h"
+#include "data/ContentHandler.h"
 #include "utils/dbg.h"
 
 using namespace std;
 using namespace glm;
 
-Chunk::Chunk():
-    program(ShaderProgram::loadFromFile("shader/phong/phong.vert", "shader/phong/phong.frag", "phong"))
+Chunk::Chunk(Planet* p):
+    program(ShaderProgram::loadFromFile("shader/phong/phong.vert", "shader/phong/phong.frag", "phong")),
+    tptr(new TrackerPointer<Chunk>(this, true)),
+    planet(p)
 {
-    for(int x=0;x<CHUNK_N;x++)
-    {
-        for(int y=0;y<CHUNK_N;y++)
-        {
-            for(int z=0;z<CHUNK_N;z++)
-            {
-				//if (
-						//(x-CHUNK_N/2)*(x-CHUNK_N/2)+
-						//(y-CHUNK_N/2)*(y-CHUNK_N/2)+
-						//(z-CHUNK_N/2)*(z-CHUNK_N/2)
+    // for(int x=0;x<CHUNK_N;x++)
+    // {
+    //     for(int y=0;y<CHUNK_N;y++)
+    //     {
+    //         for(int z=0;z<CHUNK_N;z++)
+    //         {
+				// //if (
+				// 		//(x-CHUNK_N/2)*(x-CHUNK_N/2)+
+				// 		//(y-CHUNK_N/2)*(y-CHUNK_N/2)+
+				// 		//(z-CHUNK_N/2)*(z-CHUNK_N/2)
 
-						//< CHUNK_N*CHUNK_N/4
+				// 		//< CHUNK_N*CHUNK_N/4
 
-						//and y<CHUNK_N/2
-					//)
-				if ( (x+y+z +x*y*z) % 20 == 0)
-                {
-                    value[x][y][z]=x+y*x+z*x*z;
-                    if (value[x][y][z]==0)
-                        value[x][y][z]=1;
-                }
-                else
-                {
-                    value[x][y][z]=0;
-                }
-            }
-        }
-    }
+				// 		//and y<CHUNK_N/2
+				// 	//)
+				// if ( (x+y+z +x*y*z) % 20 == 0)
+    //             {
+    //                 value[x][y][z]=x+y*x+z*x*z;
+    //                 if (value[x][y][z]==0)
+    //                     value[x][y][z]=1;
+    //             }
+    //             else
+    //             {
+    //                 value[x][y][z]=0;
+    //             }
+    //         }
+    //     }
+    // }
+
+    planet->handler.requestContent(new WorldChunkRequest(*planet, *this, glm::vec3(0.f,0.f,0.f), glm::vec3(1.f,1.f,1.f)));
+
+    memset(value,0,sizeof(char)*CHUNK_N*CHUNK_N*CHUNK_N);
 
     initGLObjects();
+}
+
+void Chunk::updateData(char data[CHUNK_N][CHUNK_N][CHUNK_N])
+{
+    memcpy(value,data,sizeof(char)*CHUNK_N*CHUNK_N*CHUNK_N);
+    destroyGLObjects();
+    initGLObjects();
+}
+
+void Chunk::destroyChunk(void)
+{
+    tptr->release();
 }
 
 void Chunk::computeChunk()
@@ -181,9 +200,6 @@ void Chunk::computeChunk()
             }
         }
     }
-
-
-
 }
 
 void Chunk::draw(Camera& cam)
@@ -195,6 +211,11 @@ void Chunk::draw(Camera& cam)
     program.setUniform("model",mat4(1.0));
     program.setUniform("view",cam.view);
     glDrawArrays(GL_TRIANGLES, 0 ,  vArray.size()); 
+}
+
+TrackerPointer<Chunk>* Chunk::getTptr(void)
+{
+    return tptr;
 }
 
 void Chunk::initGLObjects()
@@ -215,11 +236,9 @@ void Chunk::initGLObjects()
     program.setAttribute("position", 3, GL_FALSE, 10, 0);
     program.setAttribute("color", 4, GL_FALSE, 10, 3);
     program.setAttribute("normal", 3, GL_FALSE, 10, 7);
-
-
-        
 }
+
 void Chunk::destroyGLObjects()
 {
-
+    //TODO !
 }

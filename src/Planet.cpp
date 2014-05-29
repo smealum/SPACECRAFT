@@ -295,8 +295,6 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 {
 	if(i>=maxSize)return;
 	faces.push_back(pf);
-	const glm::vec3 v=pf->vertex[4]*pf->elevation;
-	// const glm::vec3 n=pf->vertex[4];
 	const glm::vec3 n=pf->uvertex[4];
 	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,1.0f/(1<<pf->depth)};
 

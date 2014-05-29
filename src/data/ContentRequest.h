@@ -31,6 +31,23 @@ class PlanetElevationRequest : public ContentRequest
 		TrackerPointer<PlanetFace>* face;
 };
 
+#include "Chunk.h"
+
+class WorldChunkRequest : public ContentRequest
+{
+	public:
+		WorldChunkRequest(Planet& p, Chunk& c, glm::vec3 o, glm::vec3 e);
+		void process(void);
+		void update(void);
+		virtual ~WorldChunkRequest();
+		
+	private:
+        char data[CHUNK_N][CHUNK_N][CHUNK_N];
+		glm::vec3 origin, end;
+		Planet& planet;
+		TrackerPointer<Chunk>* chunk;
+};
+
 typedef SynchronizationQueue<ContentRequest*> ContentInputQueue;
 
 #endif

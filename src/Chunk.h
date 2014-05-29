@@ -5,8 +5,10 @@
 #define CHUNK_N 32
 
 #include "utils/glm.h"
-#include <vector>
 #include "render/Camera.h"
+#include "utils/TrackerPointer.h"
+#include "Planet.h"
+
 #include <vector>
 
 struct GL_Vertex
@@ -16,21 +18,33 @@ struct GL_Vertex
     glm::vec3 normal;
 };
 
+//do NOT destroy directly
+//use destroyChunk
 class Chunk
 {
     public:
+        Chunk(Planet* p);
+
+        void draw(Camera& camera);
+        void updateData(char data[CHUNK_N][CHUNK_N][CHUNK_N]);
+        void destroyChunk(void);
+        
+        TrackerPointer<Chunk>* getTptr(void);
+
         Chunk* neighbour[4] ; // NULL <=> nothing
         char value[CHUNK_N][CHUNK_N][CHUNK_N];
-        void draw(Camera& camera);
 
-        Chunk();
     private:
         void initGLObjects();
         void destroyGLObjects();
+        
+        void computeChunk();
+
+        TrackerPointer<Chunk>* tptr;
+        Planet* planet;
+
         GLuint vbo;
         GLuint vao;
-
-        void computeChunk();
 
         std::vector<GL_Vertex> vArray;
         ShaderProgram &program;
