@@ -21,8 +21,8 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	id(5),
 	bufferID(-1)
 {
-	vertex[0]=v[0]; vertex[1]=v[1];
-	vertex[2]=v[2];	vertex[3]=v[3];
+	uvertex[0]=v[0]; uvertex[1]=v[1];
+	uvertex[2]=v[2]; uvertex[3]=v[3];
 	depth=0;
 	finalize();
 }
@@ -42,28 +42,28 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	switch(id)
 	{
 		case 0:
-			vertex[0]=father->vertex[0];
-			vertex[1]=father->vertex[5];
-			vertex[2]=father->vertex[4];
-			vertex[3]=father->vertex[8];
+			uvertex[0]=father->uvertex[0];
+			uvertex[1]=father->uvertex[5];
+			uvertex[2]=father->uvertex[4];
+			uvertex[3]=father->uvertex[8];
 			break;
 		case 1:
-			vertex[0]=father->vertex[5];
-			vertex[1]=father->vertex[1];
-			vertex[2]=father->vertex[6];
-			vertex[3]=father->vertex[4];
+			uvertex[0]=father->uvertex[5];
+			uvertex[1]=father->uvertex[1];
+			uvertex[2]=father->uvertex[6];
+			uvertex[3]=father->uvertex[4];
 			break;
 		case 2:
-			vertex[0]=father->vertex[8];
-			vertex[1]=father->vertex[4];
-			vertex[2]=father->vertex[7];
-			vertex[3]=father->vertex[3];
+			uvertex[0]=father->uvertex[8];
+			uvertex[1]=father->uvertex[4];
+			uvertex[2]=father->uvertex[7];
+			uvertex[3]=father->uvertex[3];
 			break;
 		case 3:
-			vertex[0]=father->vertex[4];
-			vertex[1]=father->vertex[6];
-			vertex[2]=father->vertex[2];
-			vertex[3]=father->vertex[7];
+			uvertex[0]=father->uvertex[4];
+			uvertex[1]=father->uvertex[6];
+			uvertex[2]=father->uvertex[2];
+			uvertex[3]=father->uvertex[7];
 			break;
 		default:
 			//TODO : exception ?
@@ -94,13 +94,13 @@ TrackerPointer<PlanetFace>* PlanetFace::getTptr(void)
 
 void PlanetFace::finalize(void)
 {
-	vertex[4]=(vertex[0]+vertex[1]+vertex[2]+vertex[3])*0.25f;
-	vertex[5]=(vertex[0]+vertex[1])*0.5f;
-	vertex[6]=(vertex[1]+vertex[2])*0.5f;
-	vertex[7]=(vertex[2]+vertex[3])*0.5f;
-	vertex[8]=(vertex[3]+vertex[0])*0.5f;
+	uvertex[4]=(uvertex[0]+uvertex[1]+uvertex[2]+uvertex[3])*0.25f;
+	uvertex[5]=(uvertex[0]+uvertex[1])*0.5f;
+	uvertex[6]=(uvertex[1]+uvertex[2])*0.5f;
+	uvertex[7]=(uvertex[2]+uvertex[3])*0.5f;
+	uvertex[8]=(uvertex[3]+uvertex[0])*0.5f;
 
-	for(int i=0;i<9;i++)vertex[i]=glm::normalize(vertex[i]);
+	for(int i=0;i<9;i++)vertex[i]=glm::normalize(uvertex[i]);
 
 	planet->handler.requestContent(new PlanetElevationRequest(*planet, *this, vertex[4]));
 }
@@ -133,7 +133,6 @@ glm::vec3 cubeArray[6][4]=
 		{glm::vec3(1.0,1.0,-1.0),glm::vec3(-1.0,1.0,-1.0),glm::vec3(-1.0,-1.0,-1.0),glm::vec3(1.0,-1.0,-1.0)}, //near
 		{glm::vec3(-1.0,-1.0,1.0),glm::vec3(-1.0,1.0,1.0),glm::vec3(1.0,1.0,1.0),glm::vec3(1.0,-1.0,1.0)}}; //far
 
-
 static GLfloat vertices[] = {
     //     POSITION    |      COLOR           |     NORMAL
     // x positif
@@ -153,7 +152,7 @@ Planet::Planet(planetInfo_s pi, ContentHandler& ch):
 	programBasic(ShaderProgram::loadFromFile("shader/planet/planet.vert", "shader/planet/planet.frag", "planet"))
 {
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
-	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], 1024*16);
+	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], 1024*16, cubeArray[i][1]-cubeArray[i][0], cubeArray[i][3]-cubeArray[i][0]);
 
 	//TEMP pour drawDirect
 	    glGenBuffers(1, &vbo);
@@ -257,11 +256,13 @@ void Planet::processLevelOfDetail(Camera& c)
 	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, faceBuffers[i]);
 }
 
-PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms):
+PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::vec3 v1, glm::vec3 v2):
 	planetFace(pf),
 	maxSize(ms),
 	shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface")),
-	curSize(0)
+	curSize(0),
+	v1(v1),
+	v2(v2)
 {
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -275,8 +276,10 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms):
 	shader.setBuffers(vao, vbo, 0);
 	shader.use();
 	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
-	shader.setAttribute("position", 3, GL_FALSE, 6, 0);
-	shader.setAttribute("color", 3, GL_FALSE, 6, 3);
+
+	shader.setAttribute("position", 3, GL_FALSE, 4, 0);
+	shader.setAttribute("elevation", 1, GL_FALSE, 4, 3);
+
 	shader.setUniform("overrideColor", glm::vec4(1.f));
 	shader.setUniform("model", glm::mat4(1.0f));
 }
@@ -291,8 +294,9 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	if(i>=maxSize)return;
 	faces.push_back(pf);
 	const glm::vec3 v=pf->vertex[4]*pf->elevation;
-	const glm::vec3 n=pf->vertex[4];
-	buffer[i]=(faceBufferEntry_s){{v.x,v.y,v.z},{n.x,n.y,n.z}};
+	// const glm::vec3 n=pf->vertex[4];
+	const glm::vec3 n=pf->uvertex[4];
+	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation};
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, i*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[i]);
@@ -330,9 +334,14 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 void PlanetFaceBufferHandler::draw(Camera& c)
 {
 	shader.use();
+	c.updateCamera(shader);
+
+	shader.setUniform("v1", v1);
+	shader.setUniform("v2", v2);
+
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	c.updateCamera(shader);
+	
 	glDrawArrays(GL_POINTS, 0, curSize);
 	// printf("%d, %d\n",curSize,faces.size());
 }

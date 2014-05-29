@@ -7,7 +7,8 @@
 using namespace std;
 using namespace glm;
 
-CameraKeyboard::CameraKeyboard()
+CameraKeyboard::CameraKeyboard():
+    speed(0.1)
 {
 
 }
@@ -15,7 +16,7 @@ CameraKeyboard::CameraKeyboard()
 void CameraKeyboard::update(Camera& camera)
 {
     // vitesse en translation
-    float tS = 0.1;
+    float tS = speed;
     // vitesse en rotation
     float rS = 0.03;
 
@@ -39,8 +40,8 @@ void CameraKeyboard::update(Camera& camera)
     }
     //float delta = 1.f;
 
-    if (Input::isKeyHold(GLFW_KEY_LEFT_SHIFT)){tS=0.01f;rS=0.0003f;}
-    if (Input::isKeyHold(GLFW_KEY_LEFT_CONTROL)){tS=0.0001f;rS=0.0003f;}
+    if (Input::isKeyHold(GLFW_KEY_LEFT_SHIFT)){tS/=10.0f;rS=0.0003f;}
+    if (Input::isKeyHold(GLFW_KEY_LEFT_CONTROL)){tS/=100.0f;rS=0.0003f;}
     // translation
     if (Input::isKeyHold(GLFW_KEY_A))
 	   camera.view = translate(mat4(1.f), vec3(+tS,0.0,0.0))*camera.view; //Input::position -= right * delta * tS;
@@ -69,4 +70,8 @@ void CameraKeyboard::update(Camera& camera)
         camera.view = rotate(mat4(1.0),rS,vec3(0.0,0.0,-1.0))*camera.view;
     if (Input::isKeyHold(GLFW_KEY_O))
         camera.view = rotate(mat4(1.0),rS,vec3(0.0,0.0,+1.0))*camera.view;
+    
+    // speed
+    if (Input::isKeyPressed(GLFW_KEY_Y))speed*=10.0f;
+    else if (Input::isKeyPressed(GLFW_KEY_H))speed/=10.0f;
 }

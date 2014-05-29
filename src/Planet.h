@@ -15,7 +15,7 @@ typedef struct
 typedef struct
 {
 	float pos[3];
-	float normal[3];
+	float elevation;
 }faceBufferEntry_s;
 
 class Planet;
@@ -35,7 +35,7 @@ class PlanetFace;
 class PlanetFaceBufferHandler
 {
 	public:
-		PlanetFaceBufferHandler(PlanetFace& pf, int ms);
+		PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::vec3 v1, glm::vec3 v2);
 		~PlanetFaceBufferHandler();
 	
 		void addFace(PlanetFace* pf);
@@ -50,6 +50,7 @@ class PlanetFaceBufferHandler
 		faceBufferEntry_s* buffer;
 		int maxSize, curSize;
 		GLuint vbo, vao;
+		glm::vec3 v1, v2;
 };
 
 class PlanetFace
@@ -77,6 +78,7 @@ class PlanetFace
 		PlanetFace* father; //father == NULL <=> toplevel face
 		PlanetFace* sons[4];
 		glm::vec3 vertex[9];
+		glm::vec3 uvertex[9];
 
 		TrackerPointer<PlanetFace>* tptr;
 
