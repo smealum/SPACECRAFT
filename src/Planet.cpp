@@ -17,6 +17,7 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
+	elevated(false),
 	id(5),
 	bufferID(-1)
 {
@@ -32,6 +33,7 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
+	elevated(false),
 	id(id),
 	bufferID(-1)
 {
@@ -106,6 +108,7 @@ void PlanetFace::finalize(void)
 void PlanetFace::updateElevation(float e)
 {
 	elevation=e;
+	elevated=true;
 }
 
 bool PlanetFace::isDetailedEnough(Camera& c)
@@ -238,16 +241,13 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 	if(isDetailedEnough(c))
 	{
 		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
-		if(bufferID<0)b->addFace(this);
+		if(elevated)b->addFace(this);
 	}else{
 		b->deleteFace(this);
 		for(int i=0;i<4;i++)
 		{
 			if(sons[i])sons[i]->processLevelOfDetail(c, b);
-			else{
-				sons[i]=new PlanetFace(planet,this,i);
-				b->addFace(sons[i]);
-			}
+			else sons[i]=new PlanetFace(planet,this,i);
 		}
 	}
 }
@@ -300,7 +300,7 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 
 void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 {
-	if(curSize>=maxSize)return;
+	if(curSize>=maxSize || pf->bufferID>=0)return;
 	changeFace(pf, curSize);
 	pf->bufferID=curSize;
 	curSize++;

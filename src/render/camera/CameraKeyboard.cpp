@@ -17,7 +17,7 @@ void CameraKeyboard::update(Camera& camera)
     // vitesse en translation
     float tS = 0.1;
     // vitesse en rotation
-    const float rS = 0.03;
+    float rS = 0.03;
 
     // input from mouse
     vec3 dir, up, right;
@@ -39,8 +39,8 @@ void CameraKeyboard::update(Camera& camera)
     }
     //float delta = 1.f;
 
-    if (Input::isKeyHold(GLFW_KEY_LEFT_SHIFT))tS=0.01f;
-    if (Input::isKeyHold(GLFW_KEY_LEFT_CONTROL))tS=0.0001f;
+    if (Input::isKeyHold(GLFW_KEY_LEFT_SHIFT)){tS=0.01f;rS=0.0003f;}
+    if (Input::isKeyHold(GLFW_KEY_LEFT_CONTROL)){tS=0.0001f;rS=0.0003f;}
     // translation
     if (Input::isKeyHold(GLFW_KEY_A))
 	   camera.view = translate(mat4(1.f), vec3(+tS,0.0,0.0))*camera.view; //Input::position -= right * delta * tS;

@@ -80,6 +80,7 @@ class PlanetFace
 
 		TrackerPointer<PlanetFace>* tptr;
 
+		bool elevated;
 		int bufferID;
 		float elevation;
 		uint8_t id;
