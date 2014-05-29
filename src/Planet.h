@@ -16,6 +16,7 @@ typedef struct
 {
 	float pos[3];
 	float elevation;
+	float size;
 }faceBufferEntry_s;
 
 class Planet;
