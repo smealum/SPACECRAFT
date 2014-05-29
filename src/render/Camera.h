@@ -12,7 +12,7 @@ class Camera {
         void update();
 		glm::mat4 view, proj, final;
 
-		Camera();
+		Camera(float znear, float zfar);
         void setCameraManager(CameraManager* c);
 
 		void updateCamera(ShaderProgram &prog); // the shader needs to have 2 uniforms: view and proj
@@ -22,6 +22,7 @@ class Camera {
 
 	private:
 		glm::vec4 frustumPlane[6]; 
+		float znear, zfar;
 
         CameraManager* cameraManager;
 };

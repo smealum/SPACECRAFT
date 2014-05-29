@@ -113,7 +113,7 @@ void PlanetFace::updateElevation(float e)
 
 bool PlanetFace::isDetailedEnough(Camera& c)
 {
-	if(depth>13)return true;
+	if(depth>15)return true;
 	glm::vec3 p1=c.getPosition();
 	glm::vec3 p2=vertex[4]*elevation;
 	glm::vec3 v=p2-p1;
@@ -288,6 +288,8 @@ PlanetFaceBufferHandler::~PlanetFaceBufferHandler()
 {
 	free(buffer);
 }
+
+//TODO : grouper les glBufferSubData de façon intelligente à chaque frame (glBufferSubData individuels pour les delete, mais groupé pour les add en queue ?)
 
 void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 {

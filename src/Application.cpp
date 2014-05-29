@@ -144,7 +144,7 @@ PlanetFaceBufferHandler* testBuffer;
 void Application::run()
 {
     state = appInLoop;
-    camera = new Camera;
+    camera = new Camera(0.000001f, 100.f);
     camera->view = glm::lookAt(
             glm::vec3(1.5, 1.5f, 1.5f),
             glm::vec3(0.f),
