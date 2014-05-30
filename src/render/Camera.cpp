@@ -5,10 +5,12 @@
 
 using namespace glm;
 
-Camera::Camera():
+Camera::Camera(float znear, float zfar):
 	view(1.f),
-	proj(perspective(DEG2RAD(90.f), Application::getInstance().getWindowRatio(), 0.001f, 100.f)),
-    cameraManager(NULL)
+    proj(perspective(DEG2RAD(90.f), Application::getInstance().getWindowRatio(), znear, zfar)),
+    cameraManager(NULL),
+    znear(znear),
+    zfar(zfar)
 {
 
 }
@@ -16,7 +18,9 @@ Camera::Camera():
 void Camera::updateCamera(ShaderProgram &prog)
 {
 	prog.setUniform("view", view);
-	prog.setUniform("proj", proj);
+    prog.setUniform("proj", proj);
+    prog.setUniform("znear", znear);
+	prog.setUniform("zfar", zfar);
 }
 
 glm::vec3 Camera::getPosition(void)

@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include "utils/Input.h"
 #include "Planet.h"
+#include "MiniWorld.h"
 
 #ifndef NTWBAR
 inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
@@ -68,7 +69,7 @@ Application::Application() :
 
     // transparency
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
+    // glEnable(GL_CULL_FACE);
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -139,12 +140,13 @@ void Application::createWindowInFullscreen(bool fs)
 }
 
 Planet* testPlanet;
+MiniWorld* testMiniWorld;
 PlanetFaceBufferHandler* testBuffer;
 
 void Application::run()
 {
     state = appInLoop;
-    camera = new Camera;
+    camera = new Camera(0.000001f, 100.f);
     camera->view = glm::lookAt(
             glm::vec3(1.5, 1.5f, 1.5f),
             glm::vec3(0.f),
@@ -154,10 +156,10 @@ void Application::run()
 
     tt = new testShaders;
     testPlanet=new Planet((planetInfo_s){0}, contentHandler);
-
+    // testChunk=new Chunk(testPlanet);
+    // testMiniWorld=new MiniWorld(testPlanet, testPlanet->faces[2]);
     // testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
     // testBuffer->addFace(testPlanet->faces[0]);
-
     // testPlanet->testFullGeneration(4, testBuffer);
 
     float timeA;
@@ -198,10 +200,12 @@ void Application::loop()
     camera->updateFrustum();
     testPlanet->processLevelOfDetail(*camera);
 
-    glPolygonMode( GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL );
+    glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
     // tt->draw();
     // testPlanet->drawDirect();
     testPlanet->draw(*camera);
+    // testChunk->draw(*camera);
+    // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);
 
     contentHandler.handleNewContent();

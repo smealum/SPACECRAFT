@@ -1,4 +1,5 @@
 #include "Planet.h"
+#include "MiniWorld.h"
 #include "data/ContentHandler.h"
 #include "Application.h"
 
@@ -19,7 +20,8 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	elevation(1.0f),
 	elevated(false),
 	id(5),
-	bufferID(-1)
+	bufferID(-1),
+	miniworld(NULL)
 {
 	uvertex[0]=v[0]; uvertex[1]=v[1];
 	uvertex[2]=v[2]; uvertex[3]=v[3];
@@ -35,7 +37,8 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	elevation(1.0f),
 	elevated(false),
 	id(id),
-	bufferID(-1)
+	bufferID(-1),
+	miniworld(NULL)
 {
 	//TODO : exception ?
 	// if(!father);
@@ -72,6 +75,11 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	
 	depth=father->depth+1;
 	finalize();
+}
+
+PlanetFace::~PlanetFace()
+{
+	removeMiniWorld();
 }
 
 void PlanetFace::deletePlanetFace(PlanetFaceBufferHandler* b)
@@ -111,9 +119,19 @@ void PlanetFace::updateElevation(float e)
 	elevated=true;
 }
 
+#include <cstdio>
+
+bool PlanetFace::shouldHaveMiniworld(Camera& c)
+{
+	// if(depth>15)printf("%f %f %f\n",vertex[4].x,vertex[4].y,vertex[4].z);
+	return depth>15;// && glm::length(c.getPosition()-vertex[4])<glm::length(vertex[1]-vertex[0])*5;
+}
+
 bool PlanetFace::isDetailedEnough(Camera& c)
 {
-	if(depth>13)return true;
+	if(shouldHaveMiniworld(c))return true;
+	if(depth>15)return true;
+	// if(depth>8)return true;
 	glm::vec3 p1=c.getPosition();
 	glm::vec3 p2=vertex[4]*elevation;
 	glm::vec3 v=p2-p1;
@@ -123,6 +141,44 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	float d=2.0f/(1<<(depth-3));
 	if(glm::length(v)/d<1.f)return false;
 	return true;
+}
+
+void PlanetFace::createMiniWorld(void)
+{
+	if(miniworld || planet->numMiniWorlds()>=16)return;
+
+	miniworld=new MiniWorld(planet, this);
+	planet->addMiniWorld(miniworld);
+}
+
+void PlanetFace::removeMiniWorld(void)
+{
+	if(!miniworld)return;
+
+	planet->removeMiniWorld(miniworld);
+	delete miniworld;
+	miniworld=NULL;
+}
+
+void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
+{
+	if(isDetailedEnough(c))
+	{
+		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
+		if(elevated)
+		{
+			b->addFace(this);
+			if(shouldHaveMiniworld(c))createMiniWorld();
+			else removeMiniWorld();
+		}
+	}else{
+		b->deleteFace(this);
+		for(int i=0;i<4;i++)
+		{
+			if(sons[i])sons[i]->processLevelOfDetail(c, b);
+			else sons[i]=new PlanetFace(planet,this,i);
+		}
+	}
 }
 
 glm::vec3 cubeArray[6][4]=
@@ -235,22 +291,6 @@ void Planet::drawDirect(void)
     }
 }
 
-void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
-{
-	if(isDetailedEnough(c))
-	{
-		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
-		if(elevated)b->addFace(this);
-	}else{
-		b->deleteFace(this);
-		for(int i=0;i<4;i++)
-		{
-			if(sons[i])sons[i]->processLevelOfDetail(c, b);
-			else sons[i]=new PlanetFace(planet,this,i);
-		}
-	}
-}
-
 void Planet::processLevelOfDetail(Camera& c)
 {
 	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, faceBuffers[i]);
@@ -289,12 +329,12 @@ PlanetFaceBufferHandler::~PlanetFaceBufferHandler()
 	free(buffer);
 }
 
+//TODO : grouper les glBufferSubData de façon intelligente à chaque frame (glBufferSubData individuels pour les delete, mais groupé pour les add en queue ?)
+
 void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 {
 	if(i>=maxSize)return;
 	faces.push_back(pf);
-	const glm::vec3 v=pf->vertex[4]*pf->elevation;
-	// const glm::vec3 n=pf->vertex[4];
 	const glm::vec3 n=pf->uvertex[4];
 	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,1.0f/(1<<pf->depth)};
 
@@ -349,4 +389,23 @@ void PlanetFaceBufferHandler::draw(Camera& c)
 void Planet::draw(Camera& c)
 {
 	for(int i=0;i<6;i++)faceBuffers[i]->draw(c);
+
+	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
+
+	printf("%d\n",miniWorldList.size());
+}
+
+void Planet::addMiniWorld(MiniWorld* mw)
+{
+	miniWorldList.push_back(mw);
+}
+
+void Planet::removeMiniWorld(MiniWorld* mw)
+{
+	miniWorldList.remove(mw);
+}
+
+int Planet::numMiniWorlds(void)
+{
+	return miniWorldList.size();
 }

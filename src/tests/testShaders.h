@@ -12,7 +12,6 @@ class testShaders {
     GLuint vaoPhong;
     GLuint vbo;
     GLuint ebo;
-    Chunk chunk;
 
 
     public:
