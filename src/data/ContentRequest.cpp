@@ -15,10 +15,16 @@ PlanetElevationRequest::PlanetElevationRequest(Planet& p, PlanetFace& pf, glm::v
 PlanetElevationRequest::~PlanetElevationRequest()
 {}
 
+//temp
+float getElevation(glm::vec3 v)
+{
+	return 1.0+fabs(glm::simplex(glm::normalize(v*1000.0f)))*0.1f+fabs(glm::simplex(glm::normalize(v*100.0f)))*0.01f+glm::simplex(glm::normalize(v*10.0f))*0.001;
+}
+
 void PlanetElevationRequest::process(void)
 {
 	// elevation=1.0+glm::simplex(glm::normalize(coord))*0.1f;
-	elevation=1.0+fabs(glm::simplex(glm::normalize(coord*1000.0f)))*0.1f+fabs(glm::simplex(glm::normalize(coord*100.0f)))*0.01f+glm::simplex(glm::normalize(coord*10.0f))*0.001;
+	elevation=getElevation(coord);
 }
 
 void PlanetElevationRequest::update(void)
@@ -28,9 +34,10 @@ void PlanetElevationRequest::update(void)
 }
 
 //WorldChunkRequest stuff
-WorldChunkRequest::WorldChunkRequest(Planet& p, Chunk& c, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z):
+WorldChunkRequest::WorldChunkRequest(Planet& p, Chunk& c, float elevation, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z):
 	planet(p),
 	origin(o),
+	elevation(elevation),
 	v1(v1),
 	v2(v2),
 	px(x),
@@ -191,7 +198,8 @@ void WorldChunkRequest::process(void)
 			// const int h=(int)((glm::simplex(glm::vec2(px*CHUNK_N+i,pz*CHUNK_N+k)*0.01f)+1.0f)*32);
 			const glm::vec3 v=(origin+(float(px*CHUNK_N+i)/MINIWORLD_N)*(v1)+(float(pz*CHUNK_N+k)/MINIWORLD_N)*(v2))*10000.0f;
 			const int h=(int)((glm::simplex(v)+1.0f)*32);
-			// printf("h %f %f %f %d\n",v.x,v.y,v.z,h);
+			// const int h=(int)((getElevation(v)-elevation)*320);
+			// printf("h %f\n",f);
 			// const int h=CHUNK_N/2;
 			// const int h=2;
 			for(int j=0;j<CHUNK_N;j++)

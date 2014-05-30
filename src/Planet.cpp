@@ -123,14 +123,14 @@ void PlanetFace::updateElevation(float e)
 
 bool PlanetFace::shouldHaveMiniworld(Camera& c)
 {
-	// if(depth>15)printf("%f %f %f\n",vertex[4].x,vertex[4].y,vertex[4].z);
-	return depth>15;// && glm::length(c.getPosition()-vertex[4])<glm::length(vertex[1]-vertex[0])*5;
+	// if(depth>13)printf("%f %f %f\n",vertex[4].x,vertex[4].y,vertex[4].z);
+	return depth>13;// && glm::length(c.getPosition()-vertex[4])<glm::length(vertex[1]-vertex[0])*5;
 }
 
 bool PlanetFace::isDetailedEnough(Camera& c)
 {
 	if(shouldHaveMiniworld(c))return true;
-	if(depth>15)return true;
+	if(depth>13)return true;
 	// if(depth>8)return true;
 	glm::vec3 p1=c.getPosition();
 	glm::vec3 p2=vertex[4]*elevation;
@@ -172,12 +172,14 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 			else removeMiniWorld();
 		}
 	}else{
-		b->deleteFace(this);
+		bool done=true;
 		for(int i=0;i<4;i++)
 		{
 			if(sons[i])sons[i]->processLevelOfDetail(c, b);
 			else sons[i]=new PlanetFace(planet,this,i);
+			if(!sons[i]->elevated)done=false;
 		}
+		if(done)b->deleteFace(this);
 	}
 }
 
@@ -392,7 +394,7 @@ void Planet::draw(Camera& c)
 
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
 
-	printf("%d\n",miniWorldList.size());
+	// printf("%d\n",miniWorldList.size());
 }
 
 void Planet::addMiniWorld(MiniWorld* mw)

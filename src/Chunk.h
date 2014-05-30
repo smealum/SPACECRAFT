@@ -20,9 +20,9 @@ struct GL_Vertex
 };
 
 //do NOT instanciate directly
-//use new
+//	use new
 //do NOT destroy directly
-//use destroyChunk
+//	use destroyChunk
 class Chunk
 {
 	public:
