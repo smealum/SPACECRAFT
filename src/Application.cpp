@@ -4,6 +4,7 @@
 #include "utils/Input.h"
 #include "Planet.h"
 #include "MiniWorld.h"
+#define WIN_TITLE "SPACECRAFT"
 
 #ifndef NTWBAR
 inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
@@ -84,7 +85,7 @@ Application::Application() :
         TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
 
         // vsync on
-        glfwSwapInterval(1);
+        glfwSwapInterval(vsync);
 
         // Set GLFW event callbacks
         // - Redirect window size changes to the callback function WindowSizeCB
@@ -129,7 +130,7 @@ void Application::createWindowInFullscreen(bool fs)
         viewHeight = height;
         if (!fs)
             width *= 2.f/3.f, height *= 2.f/3.f;
-        window = glfwCreateWindow(width, height, "SPACECRAFT", fs?glfwGetPrimaryMonitor():NULL, NULL); // Windowed
+        window = glfwCreateWindow(width, height, WIN_TITLE, fs?glfwGetPrimaryMonitor():NULL, NULL); // Windowed
         if (!window) {
             log_err("Cannot create window...");
             glfwTerminate();
@@ -163,6 +164,7 @@ void Application::run()
     // testPlanet->testFullGeneration(4, testBuffer);
 
     float timeA;
+    char titleBuff[512];
     while (state != appExiting)
     {
         while(!glfwWindowShouldClose(window))
@@ -172,11 +174,14 @@ void Application::run()
             fpsCounter++;
             deltaTime = (float)glfwGetTime() - timeA;
             time += deltaTime;
-            if (time > 0.f)
+            if (time > 1.f)
             {
                 fps = (float)fpsCounter/time;
                 fpsCounter = 0;
                 time = 0.f;
+                // updating title to have FPS
+                sprintf(titleBuff, "%s FPS: %.1f", WIN_TITLE, fps);
+                glfwSetWindowTitle(window, titleBuff);
             }
         }
     }
