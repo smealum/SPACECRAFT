@@ -54,6 +54,9 @@ class Application : public Singleton<Application> {
         inline GLFWwindow* getWindow() { return window; }
 
         inline Camera& getCamera() { return *camera; }
-};
+
+        // elapsed time in seconds
+        inline float getFrameDeltaTime() const { return deltaTime; }
+    };
 
 #endif

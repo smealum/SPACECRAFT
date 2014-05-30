@@ -25,16 +25,16 @@ FIND_PATH(GLFW_INCLUDE_DIRS GLFW/glfw3.h DOC "Path to GLFW include directory."
   $ENV{GLFW_ROOT}
   PATH_SUFFIX include #For finding the include file under the root of the glfw expanded archive, typically on Windows.
   PATHS
-  ${CMAKE_SOURCE_DIR}/extlibs/headers
   /usr/include/
   /usr/local/include/
   # By default headers are under GLFW subfolder
   /usr/include/GLFW
   /usr/local/include/GLFW
   ${GLFW_ROOT_DIR}/include/ # added by ptr
+  ${CMAKE_SOURCE_DIR}/extlibs/headers
 )
 
-SET(GLFW_LIB_NAMES libglfw3.a glfw3 glfw GLFW3.lib)
+SET(GLFW_LIB_NAMES libglfw3.a glfw3 glfw glfw3.dll glfw.dll GLFW3.lib)
 
 FIND_LIBRARY(GLFW_LIBRARIES DOC "Absolute path to GLFW library."
   NAMES ${GLFW_LIB_NAMES}

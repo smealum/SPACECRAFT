@@ -11,13 +11,13 @@ FIND_PATH(ANTTWEAKBAR_INCLUDE_DIRS AntTweakBar.h DOC "Path to AntTweakBar includ
   $ENV{ANTTWEAKBAR_ROOT}
   PATH_SUFFIX include #For finding the include file under the root of the glfw expanded archive, typically on Windows.
   PATHS
-  ${CMAKE_SOURCE_DIR}/extlibs/headers
   /usr/include/
   /usr/local/include/
   ${ANTTWEAKBAR_ROOT_DIR}/include/ # added by ptr
+  ${CMAKE_SOURCE_DIR}/extlibs/headers
 )
 
-SET(ANTTWEAKBAR_LIB_NAMES libAntTweakBar.dylib libAntTweakBar.a AntTweakBar AntTweakBar.lib)
+SET(ANTTWEAKBAR_LIB_NAMES libAntTweakBar.dylib libAntTweakBar.a AntTweakBar AntTweakBar.dll AntTweakBar.lib)
 
 FIND_LIBRARY(ANTTWEAKBAR_LIBRARY DOC "Absolute path to AntTweakBar library."
   NAMES ${ANTTWEAKBAR_LIB_NAMES}

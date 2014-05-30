@@ -3,12 +3,13 @@
 #include "CameraKeyboard.h"
 #include <GLFW/glfw3.h>
 #include "utils/maths.h"
+#include "Application.h"
 
 using namespace std;
 using namespace glm;
 
 CameraKeyboard::CameraKeyboard():
-    speed(0.1)
+    speed(5)
 {
 
 }
@@ -16,9 +17,10 @@ CameraKeyboard::CameraKeyboard():
 void CameraKeyboard::update(Camera& camera)
 {
     // vitesse en translation
-    float tS = speed;
+    float delta = Application::getInstance().getFrameDeltaTime();
+    float tS = speed * delta;
     // vitesse en rotation
-    float rS = 0.03;
+    float rS = 1.5 * delta;
 
     // input from mouse
     vec3 dir, up, right;

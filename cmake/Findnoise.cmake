@@ -11,13 +11,13 @@ FIND_PATH(NOISE_INCLUDE_DIRS AntTweakBar.h DOC "Path to libnoise include directo
   $ENV{NOISE_ROOT}
   PATH_SUFFIX include #For finding the include file under the root of the glfw expanded archive, typically on Windows.
   PATHS
-  ${CMAKE_SOURCE_DIR}/extlibs/headers
   /usr/include/
   /usr/local/include/
   ${NOISE_ROOT_DIR}/include/ # added by ptr
+  ${CMAKE_SOURCE_DIR}/extlibs/headers
 )
 
-SET(NOISE_LIB_NAMES libnoise.dylib libnoise.a libnoise libnoise.lib)
+SET(NOISE_LIB_NAMES libnoise.dylib libnoise.a libnoise libnoise.dll libnoise.lib)
 
 FIND_LIBRARY(NOISE_LIBRARY DOC "Absolute path to libnoise library."
   NAMES ${NOISE_LIB_NAMES}
