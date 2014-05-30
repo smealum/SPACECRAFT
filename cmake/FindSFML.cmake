@@ -61,8 +61,6 @@ if(SFML_STATIC_LIBRARIES)
     set(FIND_SFML_LIB_SUFFIX "${FIND_SFML_LIB_SUFFIX}-s")
 endif()
 
-message("${CMAKE_SOURCE_DIR} , ${CMAKE_LIBRARY_PATH}")
-
 # find the SFML include directory
 find_path(SFML_INCLUDE_DIR SFML/Config.hpp
           PATH_SUFFIXES include

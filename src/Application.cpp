@@ -206,15 +206,15 @@ void Application::loop()
 
     contentHandler.handleNewContent();
 
-    // #ifndef NTWBAR
-    //     // Draw tweak bars
-    //     glUseProgram(0);
-    //     glBindVertexArray(0);
-    //     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    //     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    //     glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-    //     TwDraw();
-    // #endif
+    #ifndef NTWBAR
+         // Draw tweak bars
+        glUseProgram(0);
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+        TwDraw();
+    #endif
 
     glfwSwapBuffers(window);
     glfwPollEvents();
