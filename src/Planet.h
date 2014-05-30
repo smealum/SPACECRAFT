@@ -2,6 +2,7 @@
 #define PLANET_H
 
 #include <vector>
+#include <list>
 #include "utils/glm.h"
 #include "utils/TrackerPointer.h"
 #include "render/Shader.h"
@@ -57,14 +58,19 @@ class PlanetFaceBufferHandler
 class PlanetFace
 {
 	friend class PlanetFaceBufferHandler;
+	friend class MiniWorld;
 	public:
 		PlanetFace(Planet* planet, glm::vec3 v[4]);
 		PlanetFace(Planet* planet, PlanetFace* father, uint8_t id);
+		~PlanetFace();
 		
 		void deletePlanetFace(PlanetFaceBufferHandler* b);
 		void updateElevation(float e);
+		bool shouldHaveMiniworld(Camera& c);
 		bool isDetailedEnough(Camera& c);
-		void processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b);	
+		void processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b);
+		void createMiniWorld(void);
+		void removeMiniWorld(void);
 
 		TrackerPointer<PlanetFace>* getTptr(void);
 
@@ -78,6 +84,9 @@ class PlanetFace
 		Planet* planet;
 		PlanetFace* father; //father == NULL <=> toplevel face
 		PlanetFace* sons[4];
+
+		class MiniWorld* miniworld;
+
 		glm::vec3 vertex[9];
 		glm::vec3 uvertex[9];
 
@@ -98,6 +107,9 @@ class Planet
 		void processLevelOfDetail(Camera& c);
 		void draw(Camera& c);
 
+		void addMiniWorld(MiniWorld* mw);
+		void removeMiniWorld(MiniWorld* mw);
+
 		const planetInfo_s planetInfo; //read only
 		class ContentHandler& handler;
 		
@@ -109,6 +121,8 @@ class Planet
 		PlanetFace* faces[6];
 		PlanetFaceBufferHandler* faceBuffers[6];
 	private:
+
+		std::list<MiniWorld*> miniWorldList;
 
 		//TEMP
 			GLuint vaoBasic;

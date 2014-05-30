@@ -172,7 +172,7 @@ handle(shader.handle)
 
 ShaderProgram& ShaderProgram::loadFromFile(const char* vertexShader, const char* fragmentShader, const std::string &name)
 {
-    debug("Chargement d'un programme : %s , %s ",vertexShader,fragmentShader);
+    // debug("Chargement d'un programme : %s , %s ",vertexShader,fragmentShader);
     return ShaderProgram::loadFromShader(
                 Shader::loadFromFile(vertexShader,ShaderType::Vertex),
                 Shader::loadFromFile(fragmentShader,ShaderType::Fragment),
@@ -182,7 +182,7 @@ ShaderProgram& ShaderProgram::loadFromFile(const char* vertexShader, const char*
 
 ShaderProgram& ShaderProgram::loadFromFile(const char* vertexShader, const char* fragmentShader, const char* geometryShader, const std::string &name)
 {
-    debug("Chargement d'un programme : %s , %s, %s ",vertexShader,fragmentShader,geometryShader);
+    // debug("Chargement d'un programme : %s , %s, %s ",vertexShader,fragmentShader,geometryShader);
     return ShaderProgram::loadFromShader(
                 Shader::loadFromFile(vertexShader,ShaderType::Vertex),
                 Shader::loadFromFile(fragmentShader,ShaderType::Fragment),

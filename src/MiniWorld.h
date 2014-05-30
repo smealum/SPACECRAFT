@@ -11,16 +11,20 @@
 #include "Planet.h"
 #include "Chunk.h"
 
+#define MINIWORLD_SIZE (MINIWORLD_W*CHUNK_SIZE)
+
 class MiniWorld
 {
     public:
-    	MiniWorld(Planet* p);
+    	MiniWorld(Planet* p, PlanetFace* pf);
 
     	void draw(Camera& c);
 
     private:
     	Planet* planet;
+    	PlanetFace* face;
     	Chunk* chunks[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];
+    	glm::mat4 model;
 };
 
 #endif

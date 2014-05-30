@@ -26,10 +26,10 @@ struct GL_Vertex
 class Chunk
 {
     public:
-        Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z);
+        Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, glm::vec3 v2, glm::vec3 n);
 
         void draw(Camera& camera, glm::mat4 model);
-        void updateData(char data[CHUNK_N][CHUNK_N][CHUNK_N]);
+        void updateData(char data[CHUNK_N][CHUNK_N][CHUNK_N], std::vector<GL_Vertex> va);
         void destroyChunk(void);
         
         TrackerPointer<Chunk>* getTptr(void);
@@ -41,9 +41,8 @@ class Chunk
         void initGLObjects();
         void destroyGLObjects();
         
-        void computeChunk();
-
         int px, py, pz;
+        glm::vec3 v1, v2, n;
 
         TrackerPointer<Chunk>* tptr;
         Planet* planet;

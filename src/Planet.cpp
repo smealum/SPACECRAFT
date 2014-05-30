@@ -1,4 +1,5 @@
 #include "Planet.h"
+#include "MiniWorld.h"
 #include "data/ContentHandler.h"
 #include "Application.h"
 
@@ -19,7 +20,8 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	elevation(1.0f),
 	elevated(false),
 	id(5),
-	bufferID(-1)
+	bufferID(-1),
+	miniworld(NULL)
 {
 	uvertex[0]=v[0]; uvertex[1]=v[1];
 	uvertex[2]=v[2]; uvertex[3]=v[3];
@@ -35,7 +37,8 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	elevation(1.0f),
 	elevated(false),
 	id(id),
-	bufferID(-1)
+	bufferID(-1),
+	miniworld(NULL)
 {
 	//TODO : exception ?
 	// if(!father);
@@ -72,6 +75,11 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	
 	depth=father->depth+1;
 	finalize();
+}
+
+PlanetFace::~PlanetFace()
+{
+	removeMiniWorld();
 }
 
 void PlanetFace::deletePlanetFace(PlanetFaceBufferHandler* b)
@@ -111,18 +119,66 @@ void PlanetFace::updateElevation(float e)
 	elevated=true;
 }
 
+#include <cstdio>
+
+bool PlanetFace::shouldHaveMiniworld(Camera& c)
+{
+	// if(depth>15)printf("%f\n",glm::length(c.getPosition()-vertex[4]));
+	return depth>15;// && glm::length(c.getPosition()-vertex[4])<glm::length(vertex[1]-vertex[0])*5;
+}
+
 bool PlanetFace::isDetailedEnough(Camera& c)
 {
+	if(shouldHaveMiniworld(c))return true;
 	if(depth>15)return true;
+	// if(depth>8)return true;
 	glm::vec3 p1=c.getPosition();
 	glm::vec3 p2=vertex[4]*elevation;
 	glm::vec3 v=p2-p1;
 	// if(glm::dot(v,vertex[4])>0.0f)return true; //backface culling
 	// if(!c.isPointInFrustum(p2))return true; //frustum culling
 	if(depth<4)return false;
-	float d=2.0f/(1<<(depth-3));
+	float d=2.0f/(1<<(depth-2));
 	if(glm::length(v)/d<1.f)return false;
 	return true;
+}
+
+void PlanetFace::createMiniWorld(void)
+{
+	if(miniworld)return;
+
+	miniworld=new MiniWorld(planet, this);
+	planet->addMiniWorld(miniworld);
+}
+
+void PlanetFace::removeMiniWorld(void)
+{
+	if(!miniworld)return;
+
+	planet->removeMiniWorld(miniworld);
+	delete miniworld;
+	miniworld=NULL;
+}
+
+void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
+{
+	if(isDetailedEnough(c))
+	{
+		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
+		if(elevated)
+		{
+			b->addFace(this);
+			if(shouldHaveMiniworld(c))createMiniWorld();
+			else removeMiniWorld();
+		}
+	}else{
+		b->deleteFace(this);
+		for(int i=0;i<4;i++)
+		{
+			if(sons[i])sons[i]->processLevelOfDetail(c, b);
+			else sons[i]=new PlanetFace(planet,this,i);
+		}
+	}
 }
 
 glm::vec3 cubeArray[6][4]=
@@ -235,22 +291,6 @@ void Planet::drawDirect(void)
     }
 }
 
-void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
-{
-	if(isDetailedEnough(c))
-	{
-		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
-		if(elevated)b->addFace(this);
-	}else{
-		b->deleteFace(this);
-		for(int i=0;i<4;i++)
-		{
-			if(sons[i])sons[i]->processLevelOfDetail(c, b);
-			else sons[i]=new PlanetFace(planet,this,i);
-		}
-	}
-}
-
 void Planet::processLevelOfDetail(Camera& c)
 {
 	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, faceBuffers[i]);
@@ -349,4 +389,16 @@ void PlanetFaceBufferHandler::draw(Camera& c)
 void Planet::draw(Camera& c)
 {
 	for(int i=0;i<6;i++)faceBuffers[i]->draw(c);
+
+	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
+}
+
+void Planet::addMiniWorld(MiniWorld* mw)
+{
+	miniWorldList.push_back(mw);
+}
+
+void Planet::removeMiniWorld(MiniWorld* mw)
+{
+	miniWorldList.remove(mw);
 }

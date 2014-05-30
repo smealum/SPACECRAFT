@@ -1,8 +1,10 @@
 #ifndef CONTENTREQ_H
 #define CONTENTREQ_H
 
+#include <vector>
 #include "data/SynchronizationQueue.h"
 #include "utils/TrackerPointer.h"
+#include "utils/glm.h"
 
 class ContentRequest
 {
@@ -14,7 +16,6 @@ class ContentRequest
 };
 
 #include "Planet.h"
-#include "utils/glm.h"
 
 class PlanetElevationRequest : public ContentRequest
 {
@@ -40,6 +41,8 @@ class WorldChunkRequest : public ContentRequest
 		void process(void);
 		void update(void);
 		virtual ~WorldChunkRequest();
+
+		void computeChunk(void);
 		
 	private:
         char data[CHUNK_N][CHUNK_N][CHUNK_N];
@@ -47,6 +50,7 @@ class WorldChunkRequest : public ContentRequest
 		glm::vec3 origin, end;
 		Planet& planet;
 		TrackerPointer<Chunk>* chunk;
+        std::vector<GL_Vertex> vArray;
 };
 
 typedef SynchronizationQueue<ContentRequest*> ContentInputQueue;
