@@ -18,7 +18,7 @@ Chunk::Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, 
     v2(v2),
     n(n)
 {
-    planet->handler.requestContent(new WorldChunkRequest(*planet, *this, mw->face->uvertex[0], mw->face->uvertex[1]-mw->face->uvertex[0], mw->face->uvertex[3]-mw->face->uvertex[0], x, y, z));
+    planet->handler.requestContent(new WorldChunkRequest(*planet, *this, mw->face->elevation, mw->face->uvertex[0], mw->face->uvertex[1]-mw->face->uvertex[0], mw->face->uvertex[3]-mw->face->uvertex[0], x, y, z));
 
     memset(value,0,sizeof(char)*CHUNK_N*CHUNK_N*CHUNK_N);
 
@@ -43,7 +43,7 @@ void Chunk::draw(Camera& cam, glm::mat4 model)
     if(!vArray.size())return;
  
     program.use();
-    
+
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
@@ -68,7 +68,8 @@ void Chunk::initGLObjects()
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(GL_Vertex)*vArray.size(), &(vArray[0]), GL_STATIC_DRAW);
 
-        // log_info("%d octet",sizeof(GL_Vertex) * vArray.size());
+        // log_info("%d octet", sizeof(GL_Vertex) * vArray.size());
+        // log_info("%d faces", vArray.size());
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 
