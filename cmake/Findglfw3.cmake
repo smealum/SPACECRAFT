@@ -34,7 +34,7 @@ FIND_PATH(GLFW_INCLUDE_DIRS GLFW/glfw3.h DOC "Path to GLFW include directory."
   ${CMAKE_SOURCE_DIR}/extlibs/headers
 )
 
-SET(GLFW_LIB_NAMES libglfw3.a glfw3 glfw glfw3.dll glfw.dll GLFW3.lib)
+SET(GLFW_LIB_NAMES libglfw3.a glfw3.lib glfw3)
 
 FIND_LIBRARY(GLFW_LIBRARIES DOC "Absolute path to GLFW library."
   NAMES ${GLFW_LIB_NAMES}

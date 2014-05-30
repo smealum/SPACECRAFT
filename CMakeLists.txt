@@ -17,12 +17,23 @@ endif()
 
 project(spacecraft)
 
+# bin dir
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+
 # Configure OS versions with some variables
 set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${PROJECT_SOURCE_DIR}/extlibs/headers)
 if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   set(OS_WINDOWS 1)
-  set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${PROJECT_SOURCE_DIR}/extlibs/libs-win64)
+  set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} C:/CodeBlocks/MinGW/lib ${PROJECT_SOURCE_DIR}/extlibs/libs-win32)
+  set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} C:/CodeBlocks/MinGW/include )
   add_definitions(-DGLEW_NO_GLU -DGLEW_BUILD)
+  # create the bin dir and copy the dlls
+  file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
+  file(GLOB_RECURSE dll_files extlibs/dll/*)
+  foreach(file ${dll_files})
+    get_filename_component(name ${file} NAME)
+    configure_file(${file} ${EXECUTABLE_OUTPUT_PATH} COPYONLY)
+  endforeach()
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(OS_LINUX 1)
   set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${PROJECT_SOURCE_DIR}/extlibs/libs-linux)
@@ -58,10 +69,7 @@ else ()
 endif ()
 
 set(SRC ${PROJECT_SOURCE_DIR}/src)
-
-# durectories
 include_directories(${SRC})
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
 # modules
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})

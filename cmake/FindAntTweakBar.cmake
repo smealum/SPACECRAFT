@@ -17,7 +17,7 @@ FIND_PATH(ANTTWEAKBAR_INCLUDE_DIRS AntTweakBar.h DOC "Path to AntTweakBar includ
   ${CMAKE_SOURCE_DIR}/extlibs/headers
 )
 
-SET(ANTTWEAKBAR_LIB_NAMES libAntTweakBar.dylib libAntTweakBar.a AntTweakBar AntTweakBar.dll AntTweakBar.lib)
+SET(ANTTWEAKBAR_LIB_NAMES libAntTweakBar.dylib libAntTweakBar.a AntTweakBar.lib AntTweakBar)
 
 FIND_LIBRARY(ANTTWEAKBAR_LIBRARY DOC "Absolute path to AntTweakBar library."
   NAMES ${ANTTWEAKBAR_LIB_NAMES}
