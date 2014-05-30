@@ -59,6 +59,7 @@ class PlanetFace
 {
 	friend class PlanetFaceBufferHandler;
 	friend class MiniWorld;
+	friend class Chunk;
 	public:
 		PlanetFace(Planet* planet, glm::vec3 v[4]);
 		PlanetFace(Planet* planet, PlanetFace* father, uint8_t id);
@@ -107,6 +108,7 @@ class Planet
 		void processLevelOfDetail(Camera& c);
 		void draw(Camera& c);
 
+		int numMiniWorlds(void);
 		void addMiniWorld(MiniWorld* mw);
 		void removeMiniWorld(MiniWorld* mw);
 

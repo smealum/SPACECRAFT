@@ -4,7 +4,7 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec4 color;
 layout(location = 2) in vec3 normal;
 
-uniform mat4 projection = mat4(1.0);
+uniform mat4 proj = mat4(1.0);
 uniform mat4 model = mat4(1.0);
 uniform mat4 view = mat4(1.0);
 uniform float znear, zfar;
@@ -24,9 +24,8 @@ void main ()
 
     vec4 vVertex = view*model*vec4(position,1.0);
 
-    gl_Position = projection*vVertex;
-	// vec4 r = projection*vVertex;
-	// gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	vec4 r = proj*vVertex;
+	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
 	// gl_Position = vec4(r.xy,r.z,r.w);
 
     feyeDir = -vVertex.xyz;

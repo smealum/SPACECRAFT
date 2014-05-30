@@ -14,9 +14,9 @@
 
 struct GL_Vertex
 {
-    glm::vec3 position;
-    glm::vec4 color;
-    glm::vec3 normal;
+	glm::vec3 position;
+	glm::vec4 color;
+	glm::vec3 normal;
 };
 
 //do NOT instanciate directly
@@ -25,34 +25,34 @@ struct GL_Vertex
 //use destroyChunk
 class Chunk
 {
-    public:
-        Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, glm::vec3 v2, glm::vec3 n);
+	public:
+		Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, glm::vec3 v2, glm::vec3 n);
 
-        void draw(Camera& camera, glm::mat4 model);
-        void updateData(char data[CHUNK_N][CHUNK_N][CHUNK_N], std::vector<GL_Vertex> va);
-        void destroyChunk(void);
-        
-        TrackerPointer<Chunk>* getTptr(void);
+		void draw(Camera& camera, glm::mat4 model);
+		void updateData(char data[CHUNK_N][CHUNK_N][CHUNK_N], std::vector<GL_Vertex> va);
+		void destroyChunk(void);
 
-        Chunk* neighbour[4] ; // NULL <=> nothing
-        char value[CHUNK_N][CHUNK_N][CHUNK_N];
+		TrackerPointer<Chunk>* getTptr(void);
 
-    private:
-        void initGLObjects();
-        void destroyGLObjects();
-        
-        int px, py, pz;
-        glm::vec3 v1, v2, n;
+		Chunk* neighbour[4] ; // NULL <=> nothing
+		char value[CHUNK_N][CHUNK_N][CHUNK_N];
 
-        TrackerPointer<Chunk>* tptr;
-        Planet* planet;
-        class MiniWorld* miniWorld;
+	private:
+		void initGLObjects();
+		void destroyGLObjects();
 
-        GLuint vbo;
-        GLuint vao;
+		int px, py, pz;
+		glm::vec3 v1, v2, n;
 
-        std::vector<GL_Vertex> vArray;
-        ShaderProgram &program;
+		TrackerPointer<Chunk>* tptr;
+		Planet* planet;
+		class MiniWorld* miniWorld;
+
+		GLuint vbo;
+		GLuint vao;
+
+		std::vector<GL_Vertex> vArray;
+		ShaderProgram &program;
 };
 
 #endif /* end of include guard: CHUNK_4TYUGC3N */

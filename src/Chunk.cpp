@@ -1,4 +1,5 @@
 #include "Chunk.h"
+#include "MiniWorld.h"
 #include "data/ContentHandler.h"
 #include "utils/dbg.h"
 
@@ -17,7 +18,7 @@ Chunk::Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, 
     v2(v2),
     n(n)
 {
-    planet->handler.requestContent(new WorldChunkRequest(*planet, *this, glm::vec3(0.f,0.f,0.f), glm::vec3(1.f,1.f,1.f), x, y, z));
+    planet->handler.requestContent(new WorldChunkRequest(*planet, *this, mw->face->uvertex[0], mw->face->uvertex[1]-mw->face->uvertex[0], mw->face->uvertex[3]-mw->face->uvertex[0], x, y, z));
 
     memset(value,0,sizeof(char)*CHUNK_N*CHUNK_N*CHUNK_N);
 
@@ -39,15 +40,18 @@ void Chunk::destroyChunk(void)
 
 void Chunk::draw(Camera& cam, glm::mat4 model)
 {
+    if(!vArray.size())return;
+ 
     program.use();
+    
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    program.setUniform("projection",cam.proj);
+
+    cam.updateCamera(program);
     
     glm::mat3 modeltest=glm::mat3(v1,n*length(v1),v2);
-
     program.setUniform("model",glm::translate(model*glm::mat4(modeltest), glm::vec3(px,py,pz)*CHUNK_SIZE));
-    program.setUniform("view",cam.view);
+ 
     glDrawArrays(GL_TRIANGLES, 0 ,  vArray.size()); 
 }
 
@@ -58,20 +62,25 @@ TrackerPointer<Chunk>* Chunk::getTptr(void)
 
 void Chunk::initGLObjects()
 {
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GL_Vertex)*vArray.size(), &(vArray[0]), GL_STATIC_DRAW);
+    if(vArray.size())
+    {
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(GL_Vertex)*vArray.size(), &(vArray[0]), GL_STATIC_DRAW);
 
-    // log_info("%d octet",sizeof(GL_Vertex) * vArray.size());
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+        // log_info("%d octet",sizeof(GL_Vertex) * vArray.size());
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
 
-    program.setBuffers(vao, vbo, 0);
-    program.use();
-    glBindFragDataLocation(program.getHandle(), 0, "outColor");
-    program.setAttribute("position", 3, GL_FALSE, 10, 0);
-    program.setAttribute("color", 4, GL_FALSE, 10, 3);
-    program.setAttribute("normal", 3, GL_FALSE, 10, 7);
+        program.setBuffers(vao, vbo, 0);
+        program.use();
+        glBindFragDataLocation(program.getHandle(), 0, "outColor");
+        program.setAttribute("position", 3, GL_FALSE, 10, 0);
+        program.setAttribute("color", 4, GL_FALSE, 10, 3);
+        program.setAttribute("normal", 3, GL_FALSE, 10, 7);
+    }else{
+        vbo=vao=0;
+    }
 }
 
 void Chunk::destroyGLObjects()

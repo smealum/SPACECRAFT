@@ -2,29 +2,31 @@
 #define MINIWORLD_QZJL4BIM
 
 //in terms of chunks
-#define MINIWORLD_W 2
-#define MINIWORLD_H 2
-#define MINIWORLD_D 2
+#define MINIWORLD_W 8
+#define MINIWORLD_H 8
+#define MINIWORLD_D 8
 
 #include "utils/glm.h"
 #include "render/Camera.h"
 #include "Planet.h"
 #include "Chunk.h"
 
+#define MINIWORLD_N (MINIWORLD_W*CHUNK_N)
 #define MINIWORLD_SIZE (MINIWORLD_W*CHUNK_SIZE)
 
 class MiniWorld
 {
-    public:
-    	MiniWorld(Planet* p, PlanetFace* pf);
+    friend class Chunk;
+	public:
+		MiniWorld(Planet* p, PlanetFace* pf);
 
-    	void draw(Camera& c);
+		void draw(Camera& c);
 
-    private:
-    	Planet* planet;
-    	PlanetFace* face;
-    	Chunk* chunks[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];
-    	glm::mat4 model;
+	private:
+		Planet* planet;
+		PlanetFace* face;
+		Chunk* chunks[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];
+		glm::mat4 model;
 };
 
 #endif

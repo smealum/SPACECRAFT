@@ -1,4 +1,5 @@
 #include "data/ContentRequest.h"
+#include "MiniWorld.h"
 
 using namespace glm;
 
@@ -27,10 +28,11 @@ void PlanetElevationRequest::update(void)
 }
 
 //WorldChunkRequest stuff
-WorldChunkRequest::WorldChunkRequest(Planet& p, Chunk& c, glm::vec3 o, glm::vec3 e, int x, int y, int z):
+WorldChunkRequest::WorldChunkRequest(Planet& p, Chunk& c, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z):
 	planet(p),
 	origin(o),
-	end(e),
+	v1(v1),
+	v2(v2),
 	px(x),
 	py(y),
 	pz(z)
@@ -177,6 +179,8 @@ void WorldChunkRequest::computeChunk(void)
 	}
 }
 
+#include <cstdio>
+
 void WorldChunkRequest::process(void)
 {
 	//TEMP
@@ -184,7 +188,10 @@ void WorldChunkRequest::process(void)
 	{
 		for(int k=0;k<CHUNK_N;k++)
 		{
-			const int h=(int)((glm::simplex(glm::vec2(px*CHUNK_N+i,pz*CHUNK_N+k)*0.01f)+1.0f)*32);
+			// const int h=(int)((glm::simplex(glm::vec2(px*CHUNK_N+i,pz*CHUNK_N+k)*0.01f)+1.0f)*32);
+			const glm::vec3 v=(origin+(float(px*CHUNK_N+i)/MINIWORLD_N)*(v1)+(float(pz*CHUNK_N+k)/MINIWORLD_N)*(v2))*10000.0f;
+			const int h=(int)((glm::simplex(v)+1.0f)*32);
+			// printf("h %f %f %f %d\n",v.x,v.y,v.z,h);
 			// const int h=CHUNK_N/2;
 			// const int h=2;
 			for(int j=0;j<CHUNK_N;j++)
