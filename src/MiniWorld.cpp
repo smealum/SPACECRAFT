@@ -15,9 +15,9 @@ MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 						(pf->x*MINIWORLD_W+i)*CHUNK_N,
 						j*CHUNK_N,
 						(pf->z*MINIWORLD_D+k)*CHUNK_N,
-						face->vertex[1]-face->vertex[0],
-						face->vertex[3]-face->vertex[0],
-						face->vertex[0]);
+						face->toplevel->uvertex[1]-face->toplevel->uvertex[0],
+						face->toplevel->uvertex[3]-face->toplevel->uvertex[0],
+						face->toplevel->uvertex[0]);
 			}
 		}
 	}

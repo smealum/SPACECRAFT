@@ -41,7 +41,7 @@ class Chunk
 		void destroyGLObjects();
 
 		int px, py, pz;
-		glm::vec3 v1, v2, n;
+		glm::vec3 v1, v2, origin;
 
 		TrackerPointer<Chunk>* tptr;
 		Planet* planet;

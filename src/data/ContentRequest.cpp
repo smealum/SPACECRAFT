@@ -1,6 +1,8 @@
 #include "data/ContentRequest.h"
 #include "MiniWorld.h"
 
+#include <cstdio>
+
 using namespace glm;
 
 //PlanetElevationRequest stuff
@@ -18,7 +20,8 @@ PlanetElevationRequest::~PlanetElevationRequest()
 //temp
 float getElevation(glm::vec3 v)
 {
-	return 1.0+fabs(glm::simplex(glm::normalize(v*1000.0f)))*0.1f+fabs(glm::simplex(glm::normalize(v*100.0f)))*0.01f+glm::simplex(glm::normalize(v*10.0f))*0.001;
+	glm::vec3 c=glm::normalize(v);
+	return 1.0+fabs(glm::simplex(c))*0.1f+fabs(glm::simplex(c*100.0f+glm::vec3(1.0,0.0,0.0)))*0.001f;
 }
 
 void PlanetElevationRequest::process(void)
@@ -133,8 +136,6 @@ void WorldChunkRequest::computeChunk(void)
 	}
 }
 
-#include <cstdio>
-
 void WorldChunkRequest::process(void)
 {
 	//TEMP
@@ -142,13 +143,16 @@ void WorldChunkRequest::process(void)
 	{
 		for(int k=0;k<CHUNK_N;k++)
 		{
-			// // const int h=(int)((glm::simplex(glm::vec2(px*CHUNK_N+i,pz*CHUNK_N+k)*0.01f)+1.0f)*32);
-			// const glm::vec3 v=(origin+(float(px*CHUNK_N+i)/MINIWORLD_N)*(v1)+(float(pz*CHUNK_N+k)/MINIWORLD_N)*(v2))*1000.0f;
+			// const int h=(int)((glm::simplex(glm::vec2(px*CHUNK_N+i,pz*CHUNK_N+k)*0.01f)+1.0f)*32);
+			// const glm::vec3 v=glm::normalize(origin+(float(px+i)/MINIWORLD_N)*(v1)+(float(pz+k)/MINIWORLD_N)*(v2))*1000.0f;
 			// const int h=(int)((glm::simplex(v)+1.0f)*32);
-			// // const int h=(int)((getElevation(v)-elevation)*320);
-			// // printf("h %f\n",f);
-			// // const int h=CHUNK_N/2;
-			const int h=2;
+			const float val=(getElevation(origin+((v1*float(px+i))+(v2*float(pz+k)))/float(PLANETFACE_BLOCKS))-1.0f)*10.0f;
+			const int h=(val)*16;
+			// printf("%f\n",val);
+			// const int h=(int)((getElevation(v)-elevation)*320);
+			// printf("h %f\n",f);
+			// const int h=CHUNK_N/2;
+			// const int h=2;
 			for(int j=0;j<CHUNK_N;j++)
 			{
 				if(py*CHUNK_N+j<=h)data[i][j][k]=1;

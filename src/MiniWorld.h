@@ -3,8 +3,8 @@
 
 //in terms of chunks
 #define MINIWORLD_W 8
+#define MINIWORLD_D MINIWORLD_W
 #define MINIWORLD_H 8
-#define MINIWORLD_D 8
 
 #include "utils/glm.h"
 #include "render/Camera.h"
@@ -15,7 +15,7 @@
 #define MINIWORLD_SIZE (MINIWORLD_W*CHUNK_SIZE)
 
 // #define MINIWORLD_DETAIL (13)
-#define MINIWORLD_DETAIL (10)
+#define MINIWORLD_DETAIL (11)
 #define PLANETFACE_BLOCKS ((1<<MINIWORLD_DETAIL)*MINIWORLD_N)
 
 class MiniWorld
