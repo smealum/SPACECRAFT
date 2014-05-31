@@ -40,18 +40,28 @@ const vec3 d2[]=vec3[](vec3(0.0,0.0,1.0), //bottom
 						vec3(0.0,1.0,0.0) //far
 						);
 
+const vec3 n[]=vec3[](vec3(0.0,-1.0,0.0), //bottom
+						vec3(0.0,1.0,0.0), //top
+						vec3(-1.0,0.0,0.0), //left
+						vec3(1.0,0.0,1.0), //right
+						vec3(0.0,0.0,-1.0), //near
+						vec3(0.0,0.0,1.0) //far
+						);
+
 void main()
 {
 	vec4 r;
 	vec3 pos1, pos2;
 	float y;
 
+	const vec3 lightdir=normalize(vec3(1.0,1.0,0.5)); //TEMP
+	float col=(dot(n[dir[0]],lightdir)+1.0)/2;
 
 	pos1=pos[0]+o[dir[0]];
 	pos2=v1*pos1.x+v2*pos1.z;
 	y=1.0+pos1.y/numBlocks;
 
-	fcolor = gcolor[0];
+	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	// gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
 	gl_Position = r;
@@ -62,7 +72,7 @@ void main()
 	pos2=v1*pos1.x+v2*pos1.z;
 	y=1.0+pos1.y/numBlocks;
 
-	fcolor = gcolor[0];
+	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	// gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
 	gl_Position = r;
@@ -73,7 +83,7 @@ void main()
 	pos2=v1*pos1.x+v2*pos1.z;
 	y=1.0+pos1.y/numBlocks;
 
-	fcolor = gcolor[0];
+	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	// gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
 	gl_Position = r;
@@ -84,7 +94,7 @@ void main()
 	pos2=v1*pos1.x+v2*pos1.z;
 	y=1.0+pos1.y/numBlocks;
 
-	fcolor = vec4(pos[0],1.0);
+	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	// gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
 	gl_Position = r;
