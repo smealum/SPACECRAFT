@@ -163,8 +163,6 @@ void PlanetFace::removeMiniWorld(void)
 {
 	if(!miniworld)return;
 
-	return; //TEMP
-
 	planet->removeMiniWorld(miniworld);
 	delete miniworld;
 	miniworld=NULL;
@@ -177,9 +175,9 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
 		if(elevated)
 		{
-			b->addFace(this);
 			if(shouldHaveMiniworld(c))createMiniWorld();
 			else removeMiniWorld();
+			if(!miniworld)b->addFace(this);
 		}
 	}else{
 		bool done=true;
