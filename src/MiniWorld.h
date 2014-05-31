@@ -14,6 +14,10 @@
 #define MINIWORLD_N (MINIWORLD_W*CHUNK_N)
 #define MINIWORLD_SIZE (MINIWORLD_W*CHUNK_SIZE)
 
+// #define MINIWORLD_DETAIL (13)
+#define MINIWORLD_DETAIL (10)
+#define PLANETFACE_BLOCKS ((1<<MINIWORLD_DETAIL)*MINIWORLD_N)
+
 class MiniWorld
 {
     friend class Chunk;

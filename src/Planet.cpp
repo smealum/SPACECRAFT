@@ -21,7 +21,10 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	elevated(false),
 	id(5),
 	bufferID(-1),
-	miniworld(NULL)
+	miniworld(NULL),
+	toplevel(this),
+	x(0),
+	z(0)
 {
 	uvertex[0]=v[0]; uvertex[1]=v[1];
 	uvertex[2]=v[2]; uvertex[3]=v[3];
@@ -38,7 +41,8 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	elevated(false),
 	id(id),
 	bufferID(-1),
-	miniworld(NULL)
+	miniworld(NULL),
+	toplevel(father->toplevel)
 {
 	//TODO : exception ?
 	// if(!father);
@@ -49,24 +53,28 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 			uvertex[1]=father->uvertex[5];
 			uvertex[2]=father->uvertex[4];
 			uvertex[3]=father->uvertex[8];
+			x=father->x*2+0; z=father->z*2+0;
 			break;
 		case 1:
 			uvertex[0]=father->uvertex[5];
 			uvertex[1]=father->uvertex[1];
 			uvertex[2]=father->uvertex[6];
 			uvertex[3]=father->uvertex[4];
+			x=father->x*2+1; z=father->z*2+0;
 			break;
 		case 2:
 			uvertex[0]=father->uvertex[8];
 			uvertex[1]=father->uvertex[4];
 			uvertex[2]=father->uvertex[7];
 			uvertex[3]=father->uvertex[3];
+			x=father->x*2+0; z=father->z*2+1;
 			break;
 		case 3:
 			uvertex[0]=father->uvertex[4];
 			uvertex[1]=father->uvertex[6];
 			uvertex[2]=father->uvertex[2];
 			uvertex[3]=father->uvertex[7];
+			x=father->x*2+1; z=father->z*2+1;
 			break;
 		default:
 			//TODO : exception ?
@@ -124,13 +132,13 @@ void PlanetFace::updateElevation(float e)
 bool PlanetFace::shouldHaveMiniworld(Camera& c)
 {
 	// if(depth>13)printf("%f %f %f\n",vertex[4].x,vertex[4].y,vertex[4].z);
-	return depth>13;// && glm::length(c.getPosition()-vertex[4])<glm::length(vertex[1]-vertex[0])*5;
+	return depth>=MINIWORLD_DETAIL;// && glm::length(c.getPosition()-vertex[4])<glm::length(vertex[1]-vertex[0])*5;
 }
 
 bool PlanetFace::isDetailedEnough(Camera& c)
 {
 	if(shouldHaveMiniworld(c))return true;
-	if(depth>13)return true;
+	if(depth>=MINIWORLD_DETAIL)return true;
 	// if(depth>8)return true;
 	glm::vec3 p1=c.getPosition();
 	glm::vec3 p2=vertex[4]*elevation;
@@ -154,6 +162,8 @@ void PlanetFace::createMiniWorld(void)
 void PlanetFace::removeMiniWorld(void)
 {
 	if(!miniworld)return;
+
+	return; //TEMP
 
 	planet->removeMiniWorld(miniworld);
 	delete miniworld;

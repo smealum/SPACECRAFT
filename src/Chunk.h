@@ -15,8 +15,7 @@
 struct GL_Vertex
 {
 	glm::vec3 position;
-	glm::vec4 color;
-	glm::vec3 normal;
+	float facedir;
 };
 
 //do NOT instanciate directly

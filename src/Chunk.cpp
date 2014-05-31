@@ -7,7 +7,7 @@ using namespace std;
 using namespace glm;
 
 Chunk::Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, glm::vec3 v2, glm::vec3 n):
-    program(ShaderProgram::loadFromFile("shader/chunk/chunk.vert", "shader/chunk/chunk.frag", "chunk")),
+    program(ShaderProgram::loadFromFile("shader/chunk/chunk.vert", "shader/chunk/chunk.frag", "shader/chunk/chunk.geom", "chunk")),
     tptr(new TrackerPointer<Chunk>(this, true)),
     planet(p),
     miniWorld(mw),
@@ -50,9 +50,16 @@ void Chunk::draw(Camera& cam, glm::mat4 model)
     cam.updateCamera(program);
     
     glm::mat3 modeltest=glm::mat3(v1,n*length(v1),v2);
-    program.setUniform("model",glm::translate(model*glm::mat4(modeltest), glm::vec3(px,py,pz)*CHUNK_SIZE));
+
+    program.setUniform("origin",miniWorld->face->toplevel->uvertex[0]);
+    program.setUniform("v1",(miniWorld->face->toplevel->uvertex[1]-miniWorld->face->toplevel->uvertex[0]));
+    program.setUniform("v2",(miniWorld->face->toplevel->uvertex[3]-miniWorld->face->toplevel->uvertex[0]));
+    program.setUniform("numBlocks",float(PLANETFACE_BLOCKS));
+
+    // program.setUniform("model",glm::translate(model*glm::mat4(modeltest), glm::vec3(px,py,pz)*CHUNK_SIZE));
  
-    glDrawArrays(GL_TRIANGLES, 0 ,  vArray.size()); 
+    // glDrawArrays(GL_TRIANGLES, 0 ,  vArray.size()); 
+    glDrawArrays(GL_POINTS, 0 ,  vArray.size()); 
 }
 
 TrackerPointer<Chunk>* Chunk::getTptr(void)
@@ -76,9 +83,8 @@ void Chunk::initGLObjects()
         program.setBuffers(vao, vbo, 0);
         program.use();
         glBindFragDataLocation(program.getHandle(), 0, "outColor");
-        program.setAttribute("position", 3, GL_FALSE, 10, 0);
-        program.setAttribute("color", 4, GL_FALSE, 10, 3);
-        program.setAttribute("normal", 3, GL_FALSE, 10, 7);
+        program.setAttribute("position", 3, GL_FALSE, 4, 0);
+        program.setAttribute("facedir", 3, GL_FALSE, 4, 3);
     }else{
         vbo=vao=0;
     }

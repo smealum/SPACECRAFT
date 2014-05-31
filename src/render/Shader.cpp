@@ -35,6 +35,7 @@ struct ShaderProgram::attribute_t {
     GLboolean normalized;
     GLsizei stride;
     GLuint offset;
+    GLenum type;
 };
 
 Shader* getShader(const std::string& file)
@@ -430,7 +431,7 @@ void ShaderProgram::use()
             glVertexAttribPointer(
                     loc,
                     it->second.size,
-                    GL_FLOAT,
+                    it->second.type,
                     it->second.normalized,
                     it->second.stride*sizeof(GLfloat),
                     (void*)(it->second.offset*sizeof(GLfloat))
@@ -444,14 +445,14 @@ void ShaderProgram::use()
     glUseProgram(handle);
 }
 
-void ShaderProgram::setAttribute(const char *name, GLint size, GLboolean normalized, GLsizei stride, GLuint offset)
+void ShaderProgram::setAttribute(const char *name, GLint size, GLboolean normalized, GLsizei stride, GLuint offset, GLenum type)
 {
     GLint loc = attribLocation(name);
     glEnableVertexAttribArray(loc);
     glVertexAttribPointer(
             loc,
             size,
-            GL_FLOAT,
+            type,
             normalized,
             stride*sizeof(GLfloat),
             (void*)(offset*sizeof(GLfloat))
@@ -460,6 +461,7 @@ void ShaderProgram::setAttribute(const char *name, GLint size, GLboolean normali
     attributes[name].normalized = normalized;
     attributes[name].stride = stride;
     attributes[name].offset = offset;
+    attributes[name].type = type;
 }
 
 void ShaderProgram::setBuffers(GLint vao, GLint vbo, GLint ebo)

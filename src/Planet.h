@@ -84,6 +84,7 @@ class PlanetFace
 
 		Planet* planet;
 		PlanetFace* father; //father == NULL <=> toplevel face
+		PlanetFace* toplevel;
 		PlanetFace* sons[4];
 
 		class MiniWorld* miniworld;
@@ -94,6 +95,7 @@ class PlanetFace
 		TrackerPointer<PlanetFace>* tptr;
 
 		bool elevated;
+		int x, z;
 		int bufferID;
 		float elevation;
 		uint8_t id;
