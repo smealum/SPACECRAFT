@@ -32,7 +32,9 @@
 
 namespace glm
 {
+#if defined(__GCC__) || defined(__MINGW32__)
 	#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#endif
 		GLM_FUNC_QUALIFIER uint packUnorm2x16(vec2 const & v)
 		{
 			u16vec2 Topack(round(clamp(v, 0.0f, 1.0f) * 65535.0f));
@@ -50,7 +52,9 @@ namespace glm
 			i16vec2 Topack(round(clamp(v ,-1.0f, 1.0f) * 32767.0f));
 			return reinterpret_cast<uint32&>(Topack);
 		}
+#if defined(__GCC__) || defined(__MINGW32__)
 	#pragma GCC diagnostic pop
+#endif
 
 	GLM_FUNC_QUALIFIER vec2 unpackSnorm2x16(uint const & p)
 	{
