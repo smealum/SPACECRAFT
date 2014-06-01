@@ -206,7 +206,7 @@ void Application::loop()
     testPlanet->processLevelOfDetail(*camera);
 
     glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
-    // tt->draw();
+    //tt->draw();
     // testPlanet->drawDirect();
     testPlanet->draw(*camera);
     // testChunk->draw(*camera);
@@ -222,7 +222,7 @@ void Application::loop()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-        //TwDraw();
+        TwDraw();
     #endif
 
     glfwSwapBuffers(window);
