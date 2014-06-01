@@ -23,6 +23,7 @@ class MiniWorld
     friend class Chunk;
 	public:
 		MiniWorld(Planet* p, PlanetFace* pf);
+		~MiniWorld();
 
 		void draw(Camera& c);
 

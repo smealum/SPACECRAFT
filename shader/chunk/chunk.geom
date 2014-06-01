@@ -63,8 +63,8 @@ void main()
 
 	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
-	// gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
-	gl_Position = r;
+	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	// gl_Position = r;
 	EmitVertex();
 
 
@@ -74,8 +74,8 @@ void main()
 
 	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
-	// gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
-	gl_Position = r;
+	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	// gl_Position = r;
 	EmitVertex();
 
 
@@ -85,8 +85,8 @@ void main()
 
 	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
-	// gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
-	gl_Position = r;
+	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	// gl_Position = r;
 	EmitVertex();
 
 
@@ -96,8 +96,8 @@ void main()
 
 	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
-	// gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
-	gl_Position = r;
+	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	// gl_Position = r;
 	EmitVertex();
 	EndPrimitive();
 

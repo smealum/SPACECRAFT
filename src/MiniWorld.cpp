@@ -23,6 +23,14 @@ MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 	}
 }
 
+MiniWorld::~MiniWorld()
+{
+	for(int i=0;i<MINIWORLD_W;i++)
+		for(int j=0;j<MINIWORLD_H;j++)
+			for(int k=0;k<MINIWORLD_D;k++)
+				if(chunks[i][j][k])chunks[i][j][k]->destroyChunk();
+}
+
 void MiniWorld::draw(Camera& c)
 {
 	//TODO : frustum culling !
