@@ -4,6 +4,7 @@
 #include "utils/Input.h"
 #include "Planet.h"
 #include "MiniWorld.h"
+#include "utils/imageLoader.h"
 #define WIN_TITLE "SPACECRAFT"
 
 #ifndef NTWBAR
@@ -71,8 +72,9 @@ Application::Application() :
     // transparency
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glEnable(GL_TEXTURE_2D);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     #ifndef NTWBAR
         bar = TwNewBar("SPACECRAFT");
@@ -143,6 +145,7 @@ void Application::createWindowInFullscreen(bool fs)
 Planet* testPlanet;
 MiniWorld* testMiniWorld;
 PlanetFaceBufferHandler* testBuffer;
+int testTexture;
 
 void Application::run()
 {
@@ -162,6 +165,8 @@ void Application::run()
     // testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
     // testBuffer->addFace(testPlanet->faces[0]);
     // testPlanet->testFullGeneration(4, testBuffer);
+
+    testTexture=loadTexture("terrain.png", true);
 
     float timeA;
     char titleBuff[512];

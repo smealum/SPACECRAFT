@@ -54,7 +54,10 @@ WorldChunkRequest::WorldChunkRequest(Planet& p, Chunk& c, float elevation, glm::
 WorldChunkRequest::~WorldChunkRequest()
 {}
 
-#include <cstdio>
+//TEMP ! faire un vrai système de blocs
+
+const glm::vec2 topCoord[]={glm::vec2(0,0)/16.0f,glm::vec2(0,0)/16.0f};
+const glm::vec2 sideCoord[]={glm::vec2(3,0)/16.0f,glm::vec2(2,0)/16.0f};
 
 void WorldChunkRequest::computeChunk(void)
 {
@@ -65,12 +68,13 @@ void WorldChunkRequest::computeChunk(void)
 	for(int z=0;z<CHUNK_N;++z)
 	for(int x=1;x<CHUNK_N;++x)
 	{
-		if (data[x][y][z])
+		if(data[x][y][z])
 		{
 			if (!data[x-1][y][z])
 			{
 				GL_Vertex v;
 				v.facedir=2;
+				v.texcoord=sideCoord[int(data[x][y][z]-1)];
 				v.position=vec3(px+x,py+y,pz+z);
 				vArray.push_back(v);
 			}
@@ -79,6 +83,7 @@ void WorldChunkRequest::computeChunk(void)
 			{
 				GL_Vertex v;
 				v.facedir=3;
+				v.texcoord=sideCoord[int(data[x-1][y][z]-1)];
 				v.position=vec3(px+x-1,py+y,pz+z);
 				vArray.push_back(v);
 			}
@@ -90,12 +95,13 @@ void WorldChunkRequest::computeChunk(void)
 	for(int z=0;z<CHUNK_N;++z)
 	for(int y=1;y<CHUNK_N;++y)
 	{
-		if (data[x][y][z])
+		if(data[x][y][z])
 		{
 			if (!data[x][y-1][z])
 			{
 				GL_Vertex v;
 				v.facedir=0;
+				v.texcoord=topCoord[int(data[x][y][z]-1)];
 				v.position=vec3(px+x,py+y,pz+z);
 				vArray.push_back(v);
 			}
@@ -104,6 +110,7 @@ void WorldChunkRequest::computeChunk(void)
 			{
 				GL_Vertex v;
 				v.facedir=1;
+				v.texcoord=topCoord[int(data[x][y-1][z]-1)];
 				v.position=vec3(px+x,py+y-1,pz+z);
 				vArray.push_back(v);
 			}
@@ -115,12 +122,13 @@ void WorldChunkRequest::computeChunk(void)
 	for(int y=0;y<CHUNK_N;++y)
 	for(int z=1;z<CHUNK_N;++z)
 	{
-		if (data[x][y][z])
+		if(data[x][y][z])
 		{
 			if (!data[x][y][z-1])
 			{
 				GL_Vertex v;
 				v.facedir=4;
+				v.texcoord=sideCoord[int(data[x][y][z]-1)];
 				v.position=vec3(px+x,py+y,pz+z);
 				vArray.push_back(v);
 			}
@@ -129,6 +137,7 @@ void WorldChunkRequest::computeChunk(void)
 			{
 				GL_Vertex v;
 				v.facedir=5;
+				v.texcoord=sideCoord[int(data[x][y][z-1]-1)];
 				v.position=vec3(px+x,py+y,pz-1+z);
 				vArray.push_back(v);
 			}
@@ -156,7 +165,8 @@ void WorldChunkRequest::process(void)
 			// const int h=2;
 			for(int j=0;j<CHUNK_N;j++)
 			{
-				if(py*CHUNK_N+j<=h)data[i][j][k]=1;
+				if(py*CHUNK_N+j==h)data[i][j][k]=1;
+				else if(py*CHUNK_N+j<h)data[i][j][k]=2;
 				else data[i][j][k]=0;
 			}
 		}

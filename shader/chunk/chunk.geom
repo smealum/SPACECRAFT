@@ -11,32 +11,34 @@ uniform vec3 origin;
 uniform float numBlocks;
 
 in vec3 pos[];
+in vec2 gtexcoord[];
 in vec4 gcolor[];
 in int dir[];
 
 out vec4 fcolor;
+out vec2 texcoord;
 
 const vec3 o[]=vec3[](vec3(0.0,0.0,0.0), //bottom
 						vec3(0.0,1.0,0.0), //top
 						vec3(0.0,0.0,0.0), //left
-						vec3(1.0,0.0,0.0), //right
-						vec3(0.0,0.0,0.0), //near
+						vec3(1.0,0.0,1.0), //right
+						vec3(1.0,0.0,0.0), //near
 						vec3(0.0,0.0,1.0) //far
 						);
 
 const vec3 d1[]=vec3[](vec3(1.0,0.0,0.0), //bottom
 						vec3(0.0,0.0,1.0), //top
 						vec3(0.0,0.0,1.0), //left
-						vec3(0.0,1.0,0.0), //right
-						vec3(0.0,1.0,0.0), //near
+						vec3(0.0,0.0,-1.0), //right
+						vec3(-1.0,0.0,0.0), //near
 						vec3(1.0,0.0,0.0) //far
 						);
 
 const vec3 d2[]=vec3[](vec3(0.0,0.0,1.0), //bottom
 						vec3(1.0,0.0,0.0), //top
 						vec3(0.0,1.0,0.0), //left
-						vec3(0.0,0.0,1.0), //right
-						vec3(1.0,0.0,0.0), //near
+						vec3(0.0,1.0,0.0), //right
+						vec3(0.0,1.0,0.0), //near
 						vec3(0.0,1.0,0.0) //far
 						);
 
@@ -65,6 +67,7 @@ void main()
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
 	// gl_Position = r;
+	texcoord=gtexcoord[0]+vec2(1,1)/16;
 	EmitVertex();
 
 
@@ -76,6 +79,7 @@ void main()
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
 	// gl_Position = r;
+	texcoord=gtexcoord[0]+vec2(0,1)/16;
 	EmitVertex();
 
 
@@ -87,6 +91,7 @@ void main()
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
 	// gl_Position = r;
+	texcoord=gtexcoord[0]+vec2(1,0)/16;
 	EmitVertex();
 
 
@@ -98,6 +103,7 @@ void main()
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
 	// gl_Position = r;
+	texcoord=gtexcoord[0];
 	EmitVertex();
 	EndPrimitive();
 

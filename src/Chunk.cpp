@@ -38,6 +38,9 @@ void Chunk::destroyChunk(void)
     tptr->release();
 }
 
+//TEMP
+extern int testTexture;
+
 void Chunk::draw(Camera& cam, glm::mat4 model)
 {
     if(!vArray.size())return;
@@ -53,6 +56,8 @@ void Chunk::draw(Camera& cam, glm::mat4 model)
     program.setUniform("v1",v1);
     program.setUniform("v2",v2);
     program.setUniform("numBlocks",float(PLANETFACE_BLOCKS));
+
+    glBindTexture(GL_TEXTURE_2D, testTexture);
 
     glDrawArrays(GL_POINTS, 0 ,  vArray.size()); 
 }
@@ -78,8 +83,9 @@ void Chunk::initGLObjects()
         program.setBuffers(vao, vbo, 0);
         program.use();
         glBindFragDataLocation(program.getHandle(), 0, "outColor");
-        program.setAttribute("position", 3, GL_FALSE, 4, 0);
-        program.setAttribute("facedir", 3, GL_FALSE, 4, 3);
+        program.setAttribute("position", 3, GL_FALSE, 6, 0);
+        program.setAttribute("texcoord", 2, GL_FALSE, 6, 3);
+        program.setAttribute("facedir", 1, GL_FALSE, 6, 5);
     }else{
         vbo=vao=0;
     }
