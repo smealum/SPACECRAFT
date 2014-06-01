@@ -93,7 +93,7 @@ void Chunk::initGLObjects()
 
 void Chunk::destroyGLObjects()
 {
-    glDeleteBuffers(1, &vbo);
-    glDeleteBuffers(1, &vao);
+    if (vbo) glDeleteBuffers(1, &vbo);
+    if (vao) glDeleteBuffers(1, &vao);
     vbo=vao=0;
 }
