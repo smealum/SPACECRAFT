@@ -8,11 +8,13 @@
 class Producer
 {
 	public:
-		Producer(ContentInputQueue& inputQueue, ContentOutputQueue& outputQueue);
+		Producer(int id, ContentInputQueue& inputQueue, ContentOutputQueue& outputQueue);
 		void producerMain();
 		~Producer();
 	private:
 		Producer();
+		
+		int id;
 		sf::Thread *thread;
 		//FIFO synallagmatique
 		ContentInputQueue& inputQueue;

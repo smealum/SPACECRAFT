@@ -47,7 +47,8 @@ void main()
 
 	fcolor.a = 1.0;
 
-	fcolor.rgb = gcolor[0].rgb * vec3(0.2,0.9,0.2);
+	// fcolor.rgb = gcolor[0].rgb * vec3(0.2,0.9,0.2);
+	fcolor.rgb = gcolor[0].rgb;
 	
 	// TOP FACE
 	gl_Position = vec4(v[5].xy,(2*log(v[5].w/znear)/log(zfar/znear)-1)*v[5].w,v[5].w);	EmitVertex();

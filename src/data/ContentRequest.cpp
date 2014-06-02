@@ -18,32 +18,15 @@ PlanetElevationRequest::PlanetElevationRequest(Planet& p, PlanetFace& pf, glm::v
 PlanetElevationRequest::~PlanetElevationRequest()
 {}
 
-//temp
-float getElevation(glm::vec3 v)
+static inline float getElevation(int prod_id, Planet& planet, glm::vec3 v)
 {
-	glm::vec3 c=glm::normalize(v);
-	//return 1.0+(fabs(glm::simplex(c))+fabs(glm::simplex(c*100.0f+glm::vec3(1.0,0.0,0.0)))*0.01f)*0.0001;
-
-	//return 1.0+fabs(glm::simplex(c))*0.05;
-        //glm::vec3 c=glm::normalize(v);
-        //return 1.0+(fabs(glm::simplex(c))+fabs(glm::simplex(c*100.0f+glm::vec3(1.0,0.0,0.0)))*0.01f)*0.0001;
-
-	return 1.0+
-		0.1f*(
-		 fabs(glm::simplex(c*100.0f))*0.01f
-		+fabs(glm::simplex(c*1000.0f))*0.001f
-		+fabs(glm::simplex(c*10000.0f))*0.0001f
-		//+fabs(glm::simplex(c*100000.0f))*0.00001f
-		//+fabs(glm::simplex(c*1000000.0f))*0.000001f
-		);
+	return (planet.getElevation(prod_id, glm::normalize(v))+2.0f)/4.0f; //faut que ça nous sorte une valeur entre 0 et 1
 }
 
-void PlanetElevationRequest::process(void)
+void PlanetElevationRequest::process(int id)
 {
-	// elevation=1.0+glm::simplex(glm::normalize(coord))*0.1f;
-        //log_info("get coord: for %s", glm::to_string(glm::normalize(coord)).c_str());
-        // log_info("value read: %f", planet.getElevation(glm::vec3(-0.408248, -0.816497, -0.408248)));
-	elevation=getElevation(glm::normalize(coord));
+	// elevation=getElevation(glm::normalize(coord));
+	elevation=1.0f+(getElevation(id, planet, glm::normalize(coord))*CHUNK_N*MINIWORLD_H)/PLANETFACE_BLOCKS; //faudra passer par le helper hypothétique à terme, au cas où on aurait envie de changer les dimensions des blocs...
 }
 
 void PlanetElevationRequest::update(void)
@@ -161,7 +144,7 @@ void WorldChunkRequest::computeChunk(void)
 	}
 }
 
-void WorldChunkRequest::process(void)
+void WorldChunkRequest::process(int id)
 {
 	//TEMP
 	for(int i=0;i<CHUNK_N;i++)
@@ -169,8 +152,7 @@ void WorldChunkRequest::process(void)
 		for(int k=0;k<CHUNK_N;k++)
 		{
 			const glm::vec3 pos=origin+((v1*float(px+i))+(v2*float(pz+k)))/float(PLANETFACE_BLOCKS);
-			const float val=((getElevation(pos)));//+(glm::simplex(pos*10000.0f)+1.0f)*0.1f)-1.0f)*10.0f;
-			const int h=(val-1.0)*480000.0f;
+			const int h=int(getElevation(id, planet, pos)*CHUNK_N*MINIWORLD_H);
 			for(int j=0;j<CHUNK_N;j++)
 			{
 				if(py+j==h)data[i][j][k]=1;

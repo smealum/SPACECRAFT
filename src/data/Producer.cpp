@@ -10,10 +10,11 @@ void fakeProducerMain(Producer* p)
 	p->producerMain();
 }
 
-Producer::Producer(ContentInputQueue& iq, ContentOutputQueue& oq):
+Producer::Producer(int id, ContentInputQueue& iq, ContentOutputQueue& oq):
 	thread(new sf::Thread(fakeProducerMain, this)),
 	inputQueue(iq),
-	outputQueue(oq)
+	outputQueue(oq),
+	id(id)
 {
     thread->launch();
 }
@@ -32,7 +33,7 @@ void Producer::producerMain()
 		ContentRequest* cr=inputQueue.pop();
 		if(cr)
 		{
-			cr->process();
+			cr->process(id);
 			outputQueue.push(cr);
 		}else{
 			sf::sleep(sf::milliseconds(10));

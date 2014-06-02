@@ -149,8 +149,8 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	// if(glm::dot(v,vertex[4])>0.0f)return true; //backface culling
 	// if(!c.isPointInFrustum(p2))return true; //frustum culling
 	if(depth<4)return false;
-	// float d=2.0f/(1<<(depth-3));
-	float d=2.0f/(1<<(depth-2));
+	float d=2.0f/(1<<(depth-3));
+	// float d=2.0f/(1<<(depth-2));
 	if(glm::length(v)/d<1.f)return false;
 	return true;
 }

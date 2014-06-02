@@ -119,15 +119,16 @@ class Planet
 		const PlanetInfo planetInfo; //read only
 		class ContentHandler& handler;
 
-		inline float getElevation(const glm::vec3 &coord)
+		inline float getElevation(int id, const glm::vec3 &coord)
 		{
-			return generators[0]->getElevation(coord);
+			return generators[id]->getElevation(coord);
 		}
 		
 		//TEMP
 		void drawDirect(void);
 		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
 		ShaderProgram &programBasic;
+
 	private:
 		std::vector<PlanetGenerator*> generators;
 		std::list<MiniWorld*> miniWorldList;

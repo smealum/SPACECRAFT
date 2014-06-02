@@ -9,7 +9,7 @@
 class ContentRequest
 {
 	public:
-		virtual void process()=0;
+		virtual void process(int id)=0;
 		virtual void update()=0;
 		virtual ~ContentRequest() {}
 	private:		
@@ -21,7 +21,7 @@ class PlanetElevationRequest : public ContentRequest
 {
 	public:
 		PlanetElevationRequest(Planet& p, PlanetFace& pf, glm::vec3 c);
-		void process(void);
+		void process(int id);
 		void update(void);
 		virtual ~PlanetElevationRequest();
 		
@@ -38,7 +38,7 @@ class WorldChunkRequest : public ContentRequest
 {
 	public:
 		WorldChunkRequest(Planet& p, Chunk& c, float elevation, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z);
-		void process(void);
+		void process(int id);
 		void update(void);
 		virtual ~WorldChunkRequest();
 
