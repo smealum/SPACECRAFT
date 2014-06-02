@@ -194,6 +194,8 @@ void Application::run()
 
 }
 
+int testVal;
+
 void Application::loop()
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -219,6 +221,9 @@ void Application::loop()
     // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);
 
+    // printf("test %d\n",testVal);
+    testVal=0;
+
     contentHandler.handleNewContent();
 
     #ifndef NTWBAR
@@ -228,7 +233,7 @@ void Application::loop()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-        TwDraw();
+        // TwDraw();
     #endif
 
     glfwSwapBuffers(window);

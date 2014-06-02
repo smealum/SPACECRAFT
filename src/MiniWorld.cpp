@@ -33,11 +33,8 @@ MiniWorld::~MiniWorld()
 
 void MiniWorld::draw(Camera& c)
 {
-	//TODO : frustum culling !
+	//TODO : passer frustum culling en octree ?
 	//TODO : occlusion culling ?
-
-	// model=glm::scale(glm::mat4(1.f),glm::vec3(1.f/MINIWORLD_SIZE));
-	// model=glm::translate(glm::mat4(1.f),face->vertex[0]*face->elevation)*model;
 
 	for(int i=0;i<MINIWORLD_W;i++)
 	{

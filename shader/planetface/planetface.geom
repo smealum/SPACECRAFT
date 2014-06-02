@@ -1,7 +1,7 @@
 #version 330
 
 layout(points) in;
-layout(triangle_strip, max_vertices = 4) out;
+layout(triangle_strip, max_vertices = 8) out;
 
 uniform mat4 model, view, proj;
 uniform float znear, zfar;
@@ -11,6 +11,7 @@ in vec4 gcolor[];
 in vec3 gv1[];
 in vec3 gv2[];
 in float gelevation[];
+in float gminElevation[];
 in float gsize[];
 
 out vec4 fcolor;
@@ -45,4 +46,31 @@ void main()
 	// gl_Position = r;
 	EmitVertex();
 	EndPrimitive();
+
+/*
+	fcolor = gcolor[0];
+	r = proj * view * model * vec4(gminElevation[0]*normalize(pos[0]+v1-v2),1.0);
+	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	// gl_Position = r;
+	EmitVertex();
+
+	fcolor = gcolor[0];
+	r = proj * view * model * vec4(gminElevation[0]*normalize(pos[0]-v1-v2),1.0);
+	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	// gl_Position = r;
+	EmitVertex();
+
+	fcolor = gcolor[0];
+	r = proj * view * model * vec4(gminElevation[0]*normalize(pos[0]+v1+v2),1.0);
+	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	// gl_Position = r;
+	EmitVertex();
+
+	fcolor = gcolor[0];
+	r = proj * view * model * vec4(gminElevation[0]*normalize(pos[0]-v1+v2),1.0);
+	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	// gl_Position = r;
+	EmitVertex();
+	EndPrimitive();
+*/
 }
