@@ -33,6 +33,8 @@ float getElevation(glm::vec3 v)
 		fabs(glm::simplex(c*100.0f))*0.01f
 		+fabs(glm::simplex(c*1000.0f))*0.001f
 		+fabs(glm::simplex(c*10000.0f))*0.0001f
+		+fabs(glm::simplex(c*100000.0f))*0.00001f
+		+fabs(glm::simplex(c*1000000.0f))*0.000001f
 		);
 }
 
@@ -167,8 +169,8 @@ void WorldChunkRequest::process(void)
 		for(int k=0;k<CHUNK_N;k++)
 		{
 			const glm::vec3 pos=origin+((v1*float(px+i))+(v2*float(pz+k)))/float(PLANETFACE_BLOCKS);
-			const float val=((getElevation(pos)+(glm::simplex(pos*10000.0f)+1.0f)*0.1f)-1.0f)*10.0f;
-			const int h=(val)*16+16;
+			const float val=((getElevation(pos)));//+(glm::simplex(pos*10000.0f)+1.0f)*0.1f)-1.0f)*10.0f;
+			const int h=(val-1.0)*480000.0f;
 			for(int j=0;j<CHUNK_N;j++)
 			{
 				if(py+j==h)data[i][j][k]=1;
