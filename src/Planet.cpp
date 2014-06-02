@@ -126,7 +126,7 @@ void PlanetFace::finalize(void)
 void PlanetFace::updateElevation(float e)
 {
 	elevation=e;
-	minElevation=e-0.05;
+	minElevation=e-2.0f/(1<<depth);
 	elevated=true;
 }
 

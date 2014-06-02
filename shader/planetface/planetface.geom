@@ -45,8 +45,6 @@ void main()
 
 */
 
-
-
 	fcolor.a = 1.0;
 
 	fcolor.rgb = gcolor[0].rgb * vec3(0.2,0.9,0.2);

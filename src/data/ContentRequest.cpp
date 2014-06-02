@@ -30,11 +30,11 @@ float getElevation(glm::vec3 v)
 
 	return 1.0+
 		0.1f*(
-		fabs(glm::simplex(c*100.0f))*0.01f
+		 fabs(glm::simplex(c*100.0f))*0.01f
 		+fabs(glm::simplex(c*1000.0f))*0.001f
 		+fabs(glm::simplex(c*10000.0f))*0.0001f
-		+fabs(glm::simplex(c*100000.0f))*0.00001f
-		+fabs(glm::simplex(c*1000000.0f))*0.000001f
+		//+fabs(glm::simplex(c*100000.0f))*0.00001f
+		//+fabs(glm::simplex(c*1000000.0f))*0.000001f
 		);
 }
 
