@@ -349,7 +349,7 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	if(i>=maxSize)return;
 	faces.push_back(pf);
 	const glm::vec3 n=pf->uvertex[4];
-	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->elevation-0.1f,1.0f/(1<<pf->depth)};
+	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->elevation-0.05f,1.0f/(1<<pf->depth)};
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, i*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[i]);
