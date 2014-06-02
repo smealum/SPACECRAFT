@@ -193,6 +193,8 @@ void Application::run()
 
 }
 
+int testVal;
+
 void Application::loop()
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -217,6 +219,9 @@ void Application::loop()
     // testChunk->draw(*camera);
     // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);
+
+    printf("test %d\n",testVal);
+    testVal=0;
 
     contentHandler.handleNewContent();
 

@@ -19,6 +19,7 @@ class Camera {
 
 		bool isPointInFrustum(glm::vec3 p);
 		bool isBoxInFrustum(glm::vec3 o, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3);
+		bool isBoxInFrustum(glm::vec3 p[], int n);
 		
 		glm::mat4 view, proj, final;
 

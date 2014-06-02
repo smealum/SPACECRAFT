@@ -77,6 +77,22 @@ bool Camera::isBoxInFrustum(vec3 o, vec3 v1, vec3 v2, vec3 v3)
         }
         if(!in)return false;
     }
+    return true;
+}
+
+//idem, mais pas forcément une vraie boite, juste un ensemble de n points
+bool Camera::isBoxInFrustum(vec3 p[], int n)
+{
+    for(int i=0;i<6;i++)
+    {
+        int in=0, out=0;
+        for(int j=0;j<n && (!in || !out);j++)
+        {
+            if(dot(vec4(p[j],1.0f),frustumPlane[i])<0.0f)out++;
+            else in++;
+        }
+        if(!in)return false;
+    }
 	return true;
 }
 
