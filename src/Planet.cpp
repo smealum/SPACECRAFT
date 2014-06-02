@@ -19,6 +19,7 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
+	minElevation(elevation-0.01f),
 	elevated(false),
 	id(5),
 	bufferID(-1),
@@ -125,6 +126,7 @@ void PlanetFace::finalize(void)
 void PlanetFace::updateElevation(float e)
 {
 	elevation=e;
+	minElevation=e-0.05;
 	elevated=true;
 }
 
@@ -357,7 +359,7 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	if(i>=maxSize)return;
 	faces.push_back(pf);
 	const glm::vec3 n=pf->uvertex[4];
-	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->elevation-0.05f,1.0f/(1<<pf->depth)};
+	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->minElevation,1.0f/(1<<pf->depth)};
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, i*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[i]);

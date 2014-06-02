@@ -98,6 +98,7 @@ class PlanetFace
 		int x, z;
 		int bufferID;
 		float elevation;
+		float minElevation;
 		uint8_t id;
 		int depth;
 };

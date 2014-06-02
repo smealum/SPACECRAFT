@@ -24,9 +24,16 @@ float getElevation(glm::vec3 v)
 	glm::vec3 c=glm::normalize(v);
 	//return 1.0+(fabs(glm::simplex(c))+fabs(glm::simplex(c*100.0f+glm::vec3(1.0,0.0,0.0)))*0.01f)*0.0001;
 
-	return 1.0+fabs(glm::simplex(c))*0.05;
+	//return 1.0+fabs(glm::simplex(c))*0.05;
         //glm::vec3 c=glm::normalize(v);
         //return 1.0+(fabs(glm::simplex(c))+fabs(glm::simplex(c*100.0f+glm::vec3(1.0,0.0,0.0)))*0.01f)*0.0001;
+
+	return 1.0+
+		0.1f*(
+		fabs(glm::simplex(c*100.0f))*0.01f
+		+fabs(glm::simplex(c*1000.0f))*0.001f
+		+fabs(glm::simplex(c*10000.0f))*0.0001f
+		);
 }
 
 void PlanetElevationRequest::process(void)

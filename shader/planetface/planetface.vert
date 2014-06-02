@@ -17,7 +17,7 @@ out float gsize;
 
 void main()
 {
-    gcolor = vec4(vec3((elevation-1.0f)*10000),1.0);
+    gcolor = vec4(vec3((elevation-1.0f)*1000),1.0);
     // gcolor=vec4(abs(v1),1.0);
     pos=position;
     gv1=v1;
