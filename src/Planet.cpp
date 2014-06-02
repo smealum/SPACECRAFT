@@ -216,18 +216,19 @@ static GLuint elements[2*3] = {
     0,1,2,      0,2,3, // face 1
 };
 
-Planet::Planet(planetInfo_s &pi, ContentHandler& ch):
+Planet::Planet(PlanetInfo &pi, ContentHandler& ch):
 	planetInfo(pi),
 	handler(ch),
 	programBasic(ShaderProgram::loadFromFile("shader/planet/planet.vert", "shader/planet/planet.frag", "planet")),
 	generators(ch.getMaxProducers())
 {
+	for (size_t i = 0; i < ch.getMaxProducers(); i++)
+	    generators[i] = new PlanetGenerator(planetInfo);
+	
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
 	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], 1024*16, cubeArray[i][1]-cubeArray[i][0], cubeArray[i][3]-cubeArray[i][0]);
 
-	// for (size_t i = 0; i < ch.getMaxProducers(); i++)
-	//     generators[i] = new PlanetGenerator(planetInfo);
-	// log_info("generator: %f", generators[0]->getElevation(glm::vec3(-0.408248, -0.816497, -0.408248)));
+	// log_info("GENERATOR: %f", generators[0]->getElevation(glm::vec3(-0.408248, -0.816497, -0.408248)));
 	
 
 	//TEMP pour drawDirect

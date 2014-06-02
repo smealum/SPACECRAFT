@@ -42,7 +42,7 @@ void PlanetElevationRequest::process(void)
 {
 	// elevation=1.0+glm::simplex(glm::normalize(coord))*0.1f;
         //log_info("get coord: for %s", glm::to_string(glm::normalize(coord)).c_str());
-        //log_info("value read: %f", planet.getElevation(glm::vec3(-0.408248, -0.816497, -0.408248)));
+        // log_info("value read: %f", planet.getElevation(glm::vec3(-0.408248, -0.816497, -0.408248)));
 	elevation=getElevation(glm::normalize(coord));
 }
 

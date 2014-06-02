@@ -9,7 +9,7 @@
 // TODO tester d'enlever les cache ou de de les supprimer car ils ne conservent que la dernière valeur demandée
 
 class PlanetGenerator {
-	const planetInfo_s &pi;
+	const PlanetInfo &pi;
 	// noise modules
     // 1: [Continent module]: This Perlin-noise module generates the continents.
     //    This noise module has a high number of octaves so that detail is
@@ -615,7 +615,7 @@ class PlanetGenerator {
     noise::module::Cache continentsWithRivers;
 
 	public:
-	PlanetGenerator(const planetInfo_s& pinfo);
+	PlanetGenerator(const PlanetInfo& pinfo);
 	~PlanetGenerator();
 
 	inline float getElevation(const glm::vec3 &v)

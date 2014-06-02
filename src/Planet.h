@@ -106,7 +106,7 @@ class PlanetFace
 class Planet
 {
 	public:
-		Planet(planetInfo_s &pi, class ContentHandler& ch);
+		Planet(PlanetInfo &pi, class ContentHandler& ch);
 		~Planet(); // TODO faire tous les free
 		
 		void processLevelOfDetail(Camera& c);
@@ -116,21 +116,24 @@ class Planet
 		void addMiniWorld(MiniWorld* mw);
 		void removeMiniWorld(MiniWorld* mw);
 
-		const planetInfo_s planetInfo; //read only
+		const PlanetInfo planetInfo; //read only
 		class ContentHandler& handler;
+
+		inline float getElevation(const glm::vec3 &coord)
+		{
+			return generators[0]->getElevation(coord);
+		}
 		
 		//TEMP
 		void drawDirect(void);
 		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
 		ShaderProgram &programBasic;
-
-		PlanetFace* faces[6];
-		PlanetFaceBufferHandler* faceBuffers[6];
-
-		inline float getElevation(const glm::vec3 &coord) { return generators[0]->getElevation(coord); }
 	private:
 		std::vector<PlanetGenerator*> generators;
 		std::list<MiniWorld*> miniWorldList;
+
+		PlanetFace* faces[6];
+		PlanetFaceBufferHandler* faceBuffers[6];
 
 		//TEMP
 			GLuint vaoBasic;

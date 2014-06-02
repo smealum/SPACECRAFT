@@ -12,7 +12,8 @@
 #include "tests/testShaders.h"
 #include "data/ContentHandler.h"
 
-#define NUMPRODUCERS (3)
+// #define NUMPRODUCERS (3)
+#define NUMPRODUCERS (1)
 
 enum appState {
     appReady,

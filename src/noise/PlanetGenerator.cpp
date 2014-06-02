@@ -1,8 +1,8 @@
 #include "noise/PlanetGenerator.h"
 
-planetInfo_s defaultPlanetInfo;
+PlanetInfo defaultPlanetInfo;
 
-PlanetGenerator::PlanetGenerator(const planetInfo_s & pinfo):
+PlanetGenerator::PlanetGenerator(const PlanetInfo & pinfo):
 	pi(pinfo)
 {
     baseContinentDef_pe0.SetSeed (pi.seed + 0);
