@@ -1,6 +1,9 @@
 #include "data/Producer.h"
 #include <stdlib.h>
 #include <iostream>
+// waiting function
+#include <SFML/System/Sleep.hpp>
+#include <SFML/System/Time.hpp>
 
 void fakeProducerMain(Producer* p)
 {
@@ -23,6 +26,7 @@ Producer::~Producer()
 void Producer::producerMain()
 {
 	//TODO : attente passive avec signaux
+    //TODO : mieux qu'avec un sleep.
 	while(1)
 	{
 		ContentRequest* cr=inputQueue.pop();
@@ -31,5 +35,9 @@ void Producer::producerMain()
 			cr->process();
 			outputQueue.push(cr);
 		}
+        else
+        {
+            sf::sleep(sf::milliseconds(10));
+        }
 	}
 }
