@@ -43,6 +43,7 @@ class Chunk
 
 		int px, py, pz;
 		glm::vec3 v1, v2, origin;
+		glm::vec3 boundingVolume[8];
 
 		TrackerPointer<Chunk>* tptr;
 		Planet* planet;

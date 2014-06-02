@@ -153,7 +153,9 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 
 void PlanetFace::createMiniWorld(void)
 {
-	if(miniworld || planet->numMiniWorlds()>=16)return;
+	// if(miniworld || planet->numMiniWorlds()>=16)return;
+	// if(miniworld || planet->numMiniWorlds()>=128)return;
+	if(miniworld)return;
 
 	miniworld=new MiniWorld(planet, this);
 	planet->addMiniWorld(miniworld);

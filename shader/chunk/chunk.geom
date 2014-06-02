@@ -106,38 +106,4 @@ void main()
 	texcoord=gtexcoord[0];
 	EmitVertex();
 	EndPrimitive();
-
-	// vec4 r;
-
-	// vec3 pos1=vec3(0,0,0);
-
-	// fcolor = vec4(pos[0],1.0);
-	// fcolor = gcolor[0];
-	// r = pos1;
-	// r = proj * view * vec4(normalize(r),1.0);
-	// // gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
-	// gl_Position = r;
-	// EmitVertex();
-
-	// fcolor = gcolor[0];
-	// r = pos1 + v1/1000;
-	// r = proj * view * vec4(normalize(r),1.0);
-	// gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
-	// // gl_Position = r;
-	// EmitVertex();
-
-	// fcolor = gcolor[0];
-	// r = pos1 + v2/1000;
-	// r = proj * view * vec4(normalize(pos),1.0);
-	// gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
-	// // gl_Position = r;
-	// EmitVertex();
-
-	// fcolor = vec4(pos[0],1.0);
-	// r = pos1 + (v1+v2)/1000;
-	// r = proj * view * vec4(normalize(pos),1.0);
-	// gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
-	// // gl_Position = r;
-	// EmitVertex();
-	// EndPrimitive();
 }

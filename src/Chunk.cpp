@@ -22,6 +22,14 @@ Chunk::Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, 
 
     memset(value,0,sizeof(char)*CHUNK_N*CHUNK_N*CHUNK_N);
 
+    boundingVolume[0]=origin+(v1*float(px)+v2*float(pz))/float(PLANETFACE_BLOCKS);
+    boundingVolume[1]=origin+(v1*float(px+CHUNK_N)+v2*float(pz))/float(PLANETFACE_BLOCKS);
+    boundingVolume[2]=origin+(v1*float(px+CHUNK_N)+v2*float(pz+CHUNK_N))/float(PLANETFACE_BLOCKS);
+    boundingVolume[3]=origin+(v1*float(px)+v2*float(pz+CHUNK_N))/float(PLANETFACE_BLOCKS);
+    for(int i=0;i<4;i++)boundingVolume[i]=glm::normalize(boundingVolume[i]);
+    for(int i=0;i<4;i++)boundingVolume[i+4]=boundingVolume[i]*(1.0f+float(py+CHUNK_N)/float(PLANETFACE_BLOCKS));
+    for(int i=0;i<4;i++)boundingVolume[i]*=1.0f+float(py)/float(PLANETFACE_BLOCKS);
+
     initGLObjects();
 }
 
@@ -40,10 +48,17 @@ void Chunk::destroyChunk(void)
 
 //TEMP
 extern int testTexture;
+extern int testVal;
 
 void Chunk::draw(Camera& cam, glm::mat4 model)
 {
     if(!vArray.size())return;
+
+    //TEMP CULLING
+
+    if(!cam.isBoxInFrustum(boundingVolume, 8))return;
+
+    testVal++; //TEMP
  
     program.use();
 
