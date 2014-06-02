@@ -220,7 +220,7 @@ void Application::loop()
     // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);
 
-    printf("test %d\n",testVal);
+    // printf("test %d\n",testVal);
     testVal=0;
 
     contentHandler.handleNewContent();
