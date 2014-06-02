@@ -7,16 +7,16 @@
 #include "utils/TrackerPointer.h"
 #include "render/Shader.h"
 #include "render/Camera.h"
+#include "PlanetInfo.h"
+#include "noise/PlanetGenerator.h"
 
-typedef struct
-{
-	int seed;
-}planetInfo_s;
+#define PLANET_MAXDETAIL (16)
 
 typedef struct
 {
 	float pos[3];
 	float elevation;
+	float minElevation;
 	float size;
 }faceBufferEntry_s;
 
@@ -105,7 +105,8 @@ class PlanetFace
 class Planet
 {
 	public:
-		Planet(planetInfo_s pi, class ContentHandler& ch);
+		Planet(planetInfo_s &pi, class ContentHandler& ch);
+		~Planet(); // TODO faire tous les free
 		
 		void processLevelOfDetail(Camera& c);
 		void draw(Camera& c);
@@ -124,8 +125,10 @@ class Planet
 
 		PlanetFace* faces[6];
 		PlanetFaceBufferHandler* faceBuffers[6];
-	private:
 
+		inline float getElevation(const glm::vec3 &coord) { return generators[0]->getElevation(coord); }
+	private:
+		std::vector<PlanetGenerator*> generators;
 		std::list<MiniWorld*> miniWorldList;
 
 		//TEMP

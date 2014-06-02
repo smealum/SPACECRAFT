@@ -4,7 +4,7 @@
 //in terms of chunks
 #define MINIWORLD_W 1
 #define MINIWORLD_D MINIWORLD_W
-#define MINIWORLD_H 1
+#define MINIWORLD_H 32
 
 #include "utils/glm.h"
 #include "render/Camera.h"

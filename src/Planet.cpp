@@ -2,6 +2,7 @@
 #include "MiniWorld.h"
 #include "data/ContentHandler.h"
 #include "Application.h"
+#include "utils/dbg.h"
 
 //0-5-1
 //|\ /|
@@ -146,7 +147,8 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	// if(glm::dot(v,vertex[4])>0.0f)return true; //backface culling
 	// if(!c.isPointInFrustum(p2))return true; //frustum culling
 	if(depth<4)return false;
-	float d=2.0f/(1<<(depth-3));
+	// float d=2.0f/(1<<(depth-3));
+	float d=2.0f/(1<<(depth-2));
 	if(glm::length(v)/d<1.f)return false;
 	return true;
 }
@@ -212,13 +214,19 @@ static GLuint elements[2*3] = {
     0,1,2,      0,2,3, // face 1
 };
 
-Planet::Planet(planetInfo_s pi, ContentHandler& ch):
+Planet::Planet(planetInfo_s &pi, ContentHandler& ch):
 	planetInfo(pi),
 	handler(ch),
-	programBasic(ShaderProgram::loadFromFile("shader/planet/planet.vert", "shader/planet/planet.frag", "planet"))
+	programBasic(ShaderProgram::loadFromFile("shader/planet/planet.vert", "shader/planet/planet.frag", "planet")),
+	generators(ch.getMaxProducers())
 {
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
 	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], 1024*16, cubeArray[i][1]-cubeArray[i][0], cubeArray[i][3]-cubeArray[i][0]);
+
+	// for (size_t i = 0; i < ch.getMaxProducers(); i++)
+	//     generators[i] = new PlanetGenerator(planetInfo);
+	// log_info("generator: %f", generators[0]->getElevation(glm::vec3(-0.408248, -0.816497, -0.408248)));
+	
 
 	//TEMP pour drawDirect
 	    glGenBuffers(1, &vbo);
@@ -327,9 +335,10 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 	shader.use();
 	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
 
-	shader.setAttribute("position", 3, GL_FALSE, 5, 0);
-	shader.setAttribute("elevation", 1, GL_FALSE, 5, 3);
-	shader.setAttribute("size", 1, GL_FALSE, 5, 4);
+	shader.setAttribute("position", 3, GL_FALSE, 6, 0);
+	shader.setAttribute("elevation", 1, GL_FALSE, 6, 3);
+	shader.setAttribute("minElevation", 1, GL_FALSE, 6, 4);
+	shader.setAttribute("size", 1, GL_FALSE, 6, 5);
 
 	shader.setUniform("model", glm::mat4(1.0f));
 }
@@ -346,7 +355,7 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	if(i>=maxSize)return;
 	faces.push_back(pf);
 	const glm::vec3 n=pf->uvertex[4];
-	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,1.0f/(1<<pf->depth)};
+	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->elevation-0.1f,1.0f/(1<<pf->depth)};
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, i*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[i]);
