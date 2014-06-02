@@ -225,9 +225,9 @@ Planet::Planet(planetInfo_s &pi, ContentHandler& ch):
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
 	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], 1024*16, cubeArray[i][1]-cubeArray[i][0], cubeArray[i][3]-cubeArray[i][0]);
 
-	for (size_t i = 0; i < ch.getMaxProducers(); i++)
-	    generators[i] = new PlanetGenerator(planetInfo);
-	log_info("generator: %f", generators[0]->getElevation(glm::vec3(-0.408248, -0.816497, -0.408248)));
+	// for (size_t i = 0; i < ch.getMaxProducers(); i++)
+	//     generators[i] = new PlanetGenerator(planetInfo);
+	// log_info("generator: %f", generators[0]->getElevation(glm::vec3(-0.408248, -0.816497, -0.408248)));
 	
 
 	//TEMP pour drawDirect
