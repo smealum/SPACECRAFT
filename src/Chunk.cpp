@@ -103,8 +103,8 @@ bool Chunk::collidePoint(glm::vec3 p)
         localBlockPos.x>=CHUNK_N || localBlockPos.y>=CHUNK_N || localBlockPos.z>=CHUNK_N)
         return false;
 
-    printf("%d %d %d\n",localBlockPos.x,localBlockPos.y,localBlockPos.z);
-    printf("%d\n",value[localBlockPos.x][localBlockPos.y][localBlockPos.z]);
+    // printf("%d %d %d\n",localBlockPos.x,localBlockPos.y,localBlockPos.z);
+    // printf("%d\n",value[localBlockPos.x][localBlockPos.y][localBlockPos.z]);
 
     return false;
 }
