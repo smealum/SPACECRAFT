@@ -327,9 +327,10 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 	shader.use();
 	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
 
-	shader.setAttribute("position", 3, GL_FALSE, 5, 0);
-	shader.setAttribute("elevation", 1, GL_FALSE, 5, 3);
-	shader.setAttribute("size", 1, GL_FALSE, 5, 4);
+	shader.setAttribute("position", 3, GL_FALSE, 6, 0);
+	shader.setAttribute("elevation", 1, GL_FALSE, 6, 3);
+	shader.setAttribute("minElevation", 1, GL_FALSE, 6, 4);
+	shader.setAttribute("size", 1, GL_FALSE, 6, 5);
 
 	shader.setUniform("model", glm::mat4(1.0f));
 }
@@ -346,7 +347,7 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	if(i>=maxSize)return;
 	faces.push_back(pf);
 	const glm::vec3 n=pf->uvertex[4];
-	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,1.0f/(1<<pf->depth)};
+	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->elevation-0.1f,1.0f/(1<<pf->depth)};
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, i*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[i]);

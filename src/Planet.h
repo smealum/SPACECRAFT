@@ -17,6 +17,7 @@ typedef struct
 {
 	float pos[3];
 	float elevation;
+	float minElevation;
 	float size;
 }faceBufferEntry_s;
 

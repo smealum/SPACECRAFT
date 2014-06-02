@@ -11,6 +11,7 @@ in vec4 gcolor[];
 in vec3 gv1[];
 in vec3 gv2[];
 in float gelevation[];
+in float gminElevation[];
 in float gsize[];
 
 out vec4 fcolor;
