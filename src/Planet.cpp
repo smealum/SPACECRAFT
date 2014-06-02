@@ -2,6 +2,7 @@
 #include "MiniWorld.h"
 #include "data/ContentHandler.h"
 #include "Application.h"
+#include "utils/dbg.h"
 
 //0-5-1
 //|\ /|
@@ -225,6 +226,8 @@ Planet::Planet(planetInfo_s &pi, ContentHandler& ch):
 
 	for (size_t i = 0; i < ch.getMaxProducers(); i++)
 	    generators[i] = new PlanetGenerator(planetInfo);
+	log_info("generator: %f", generators[0]->getElevation(glm::vec3(-0.408248, -0.816497, -0.408248)));
+	
 
 	//TEMP pour drawDirect
 	    glGenBuffers(1, &vbo);

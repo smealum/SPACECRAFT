@@ -124,6 +124,8 @@ class Planet
 
 		PlanetFace* faces[6];
 		PlanetFaceBufferHandler* faceBuffers[6];
+
+		inline float getElevation(const glm::vec3 &coord) { return generators[0]->getElevation(coord); }
 	private:
 		std::vector<PlanetGenerator*> generators;
 		std::list<MiniWorld*> miniWorldList;

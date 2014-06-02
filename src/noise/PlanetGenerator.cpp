@@ -1,5 +1,7 @@
 #include "noise/PlanetGenerator.h"
 
+planetInfo_s defaultPlanetInfo;
+
 PlanetGenerator::PlanetGenerator(const planetInfo_s & pinfo):
 	pi(pinfo)
 {
