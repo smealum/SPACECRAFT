@@ -18,11 +18,15 @@
 	#define DEBUG_TEXT "[36m[DEBUG][0m"
 #endif
 
+#if defined(__GCC__) || defined(__MINGW32__)
+#pragma GCC diagnostic ignored "-Wwrite-strings"
+#endif
+
 // extract basename
-inline char* basename (char * filename)
+static const char* file_basename (const char * filename)
 {
-    char * pos = filename;
-    char * current = filename;
+    const char * pos = filename;
+    const char * current = filename;
     while(1)
     {
         if ((*current) == '\0') return pos;
@@ -33,13 +37,10 @@ inline char* basename (char * filename)
     }
 }
 
-
-#define BASEFILE basename(__FILE__)
-
 #ifdef NDEBUG
 #define debug(M, ...)
 #else
-#define debug(M, ...) fprintf(stderr, DEBUG_TEXT " %s:%d: " M "\n", BASEFILE, __LINE__, ##__VA_ARGS__)
+#define debug(M, ...) fprintf(stderr, DEBUG_TEXT " %s:%d: " M "\n", file_basename(__FILE__), __LINE__, ##__VA_ARGS__)
 #endif
 
 // used in the macros
@@ -48,13 +49,13 @@ inline char* basename (char * filename)
 // There's no need to use \n, it is included in all macros
 
 // Log for an error, ex: log_err("Id cannot be %u", 4);
-#define log_err(M, ...) fprintf(stderr, ERROR_TEXT " (%s:%d: errno: %s) " M "\n", BASEFILE, __LINE__, clean_errno(), ##__VA_ARGS__)
+#define log_err(M, ...) fprintf(stderr, ERROR_TEXT " (%s:%d: errno: %s) " M "\n", file_basename(__FILE__), __LINE__, clean_errno(), ##__VA_ARGS__)
 
 // the same for warning
-#define log_warn(M, ...) fprintf(stderr, WARN_TEXT " (%s:%d: errno: %s) " M "\n", BASEFILE, __LINE__, clean_errno(), ##__VA_ARGS__)
+#define log_warn(M, ...) fprintf(stderr, WARN_TEXT " (%s:%d: errno: %s) " M "\n", file_basename(__FILE__), __LINE__, clean_errno(), ##__VA_ARGS__)
 
 // the same for info
-#define log_info(M, ...) fprintf(stderr, INFO_TEXT " (%s:%d) " M "\n", basename(BASEFILE), __LINE__, ##__VA_ARGS__)
+#define log_info(M, ...) fprintf(stderr, INFO_TEXT " (%s:%d) " M "\n", file_basename(__FILE__), __LINE__, ##__VA_ARGS__)
 
 // check condition A. If A is not true, print an error and go to error label
 #define check(A, M, ...) if(!(A)) { log_err(M, ##__VA_ARGS__); errno=0; goto error; }
