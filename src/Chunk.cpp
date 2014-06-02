@@ -54,6 +54,8 @@ extern int testVal;
 
 void Chunk::draw(Camera& cam, glm::mat4 model)
 {
+    collidePoint(cam.getPosition());
+
     if(!vArray.size())return;
 
     //TEMP CULLING
@@ -76,9 +78,7 @@ void Chunk::draw(Camera& cam, glm::mat4 model)
 
     glBindTexture(GL_TEXTURE_2D, testTexture);
 
-    glDrawArrays(GL_POINTS, 0 ,  vArray.size()); 
-
-    collidePoint(cam.getPosition());
+    glDrawArrays(GL_POINTS, 0 ,  vArray.size());
 }
 
 TrackerPointer<Chunk>* Chunk::getTptr(void)
@@ -102,6 +102,9 @@ bool Chunk::collidePoint(glm::vec3 p)
     if(localBlockPos.x<0 || localBlockPos.y<0 || localBlockPos.z<0 ||
         localBlockPos.x>=CHUNK_N || localBlockPos.y>=CHUNK_N || localBlockPos.z>=CHUNK_N)
         return false;
+
+    printf("%d %d %d\n",localBlockPos.x,localBlockPos.y,localBlockPos.z);
+    printf("%d\n",value[localBlockPos.x][localBlockPos.y][localBlockPos.z]);
 
     return false;
 }

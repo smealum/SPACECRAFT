@@ -155,21 +155,13 @@ void WorldChunkRequest::process(void)
 	{
 		for(int k=0;k<CHUNK_N;k++)
 		{
-			// const int h=(int)((glm::simplex(glm::vec2(px*CHUNK_N+i,pz*CHUNK_N+k)*0.01f)+1.0f)*32);
-			// const glm::vec3 v=glm::normalize(origin+(float(px+i)/MINIWORLD_N)*(v1)+(float(pz+k)/MINIWORLD_N)*(v2))*1000.0f;
-			// const int h=(int)((glm::simplex(v)+1.0f)*32);
 			const glm::vec3 pos=origin+((v1*float(px+i))+(v2*float(pz+k)))/float(PLANETFACE_BLOCKS);
 			const float val=((getElevation(pos)+(glm::simplex(pos*10000.0f)+1.0f)*0.1f)-1.0f)*10.0f;
-			const int h=(val)*16;
-			// printf("%f\n",val);
-			// const int h=(int)((getElevation(v)-elevation)*320);
-			// printf("h %f\n",f);
-			// const int h=CHUNK_N/2;
-			// const int h=2;
+			const int h=(val)*16+16;
 			for(int j=0;j<CHUNK_N;j++)
 			{
-				if(py*CHUNK_N+j==h)data[i][j][k]=1;
-				else if(py*CHUNK_N+j<h)data[i][j][k]=2;
+				if(py+j==h)data[i][j][k]=1;
+				else if(py+j<h)data[i][j][k]=2;
 				else data[i][j][k]=0;
 			}
 		}
