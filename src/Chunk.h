@@ -32,6 +32,8 @@ class Chunk
 		void updateData(char data[CHUNK_N][CHUNK_N][CHUNK_N], std::vector<GL_Vertex> va);
 		void destroyChunk(void);
 
+		bool collidePoint(glm::vec3 p);
+
 		TrackerPointer<Chunk>* getTptr(void);
 
 		Chunk* neighbour[4] ; // NULL <=> nothing
@@ -42,7 +44,7 @@ class Chunk
 		void destroyGLObjects();
 
 		int px, py, pz;
-		glm::vec3 v1, v2, origin;
+		glm::vec3 v1, v2, origin, n;
 		glm::vec3 boundingVolume[8];
 
 		TrackerPointer<Chunk>* tptr;
