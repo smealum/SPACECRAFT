@@ -26,7 +26,7 @@ Producer::~Producer()
 void Producer::producerMain()
 {
 	//TODO : attente passive avec signaux
-    //TODO : mieux qu'avec un sleep.
+	//TODO : mieux qu'avec un sleep.
 	while(1)
 	{
 		ContentRequest* cr=inputQueue.pop();
@@ -34,10 +34,8 @@ void Producer::producerMain()
 		{
 			cr->process();
 			outputQueue.push(cr);
+		}else{
+			sf::sleep(sf::milliseconds(10));
 		}
-        else
-        {
-            sf::sleep(sf::milliseconds(10));
-        }
 	}
 }
