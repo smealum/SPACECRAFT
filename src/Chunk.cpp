@@ -30,6 +30,8 @@ Chunk::Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, 
     for(int i=0;i<4;i++)boundingVolume[i+4]=boundingVolume[i]*(1.0f+float(py+CHUNK_N)/float(PLANETFACE_BLOCKS));
     for(int i=0;i<4;i++)boundingVolume[i]*=1.0f+float(py)/float(PLANETFACE_BLOCKS);
 
+    n=mw->face->toplevel->vertex[4];
+
     initGLObjects();
 }
 
@@ -75,11 +77,33 @@ void Chunk::draw(Camera& cam, glm::mat4 model)
     glBindTexture(GL_TEXTURE_2D, testTexture);
 
     glDrawArrays(GL_POINTS, 0 ,  vArray.size()); 
+
+    collidePoint(cam.getPosition());
 }
 
 TrackerPointer<Chunk>* Chunk::getTptr(void)
 {
     return tptr;
+}
+
+bool Chunk::collidePoint(glm::vec3 p)
+{
+    glm::vec3 blockPos;
+    glm::vec3 unprojectedPos=(p*(glm::dot(origin,n)/glm::dot(p,n)))-origin;
+    //calcul de la position en blocs dans la toplevel
+    //TODO : passer ce genre de calculs dans des fonctions helper ?
+    //TODO : optimiser en ne la calculant qu'une fois par toplevel (max) par frame ?
+    blockPos.x=(glm::dot(unprojectedPos,glm::normalize(v1))*PLANETFACE_BLOCKS)/glm::length(v1);
+    blockPos.y=(glm::length(p)-1.0f)*PLANETFACE_BLOCKS;
+    blockPos.z=(glm::dot(unprojectedPos,glm::normalize(v2))*PLANETFACE_BLOCKS)/glm::length(v2);
+    
+    glm::i32vec3 localBlockPos=glm::i32vec3(blockPos.x-px,blockPos.y-py,blockPos.z-pz);
+    
+    if(localBlockPos.x<0 || localBlockPos.y<0 || localBlockPos.z<0 ||
+        localBlockPos.x>=CHUNK_N || localBlockPos.y>=CHUNK_N || localBlockPos.z>=CHUNK_N)
+        return false;
+
+    return false;
 }
 
 void Chunk::initGLObjects()

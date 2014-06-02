@@ -8,6 +8,8 @@
 #include "render/Shader.h"
 #include "render/Camera.h"
 
+#define PLANET_MAXDETAIL (16)
+
 typedef struct
 {
 	int seed;
