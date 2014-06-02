@@ -1,6 +1,8 @@
 // On enleve un warning de gcc (>2.8.*) pour glm.
 // Peut-être un bug de glm ?
+#if defined(__GNUC__) || defined(__GNUG__)
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#endif
 
 
 #define GLM_FORCE_RADIANS
