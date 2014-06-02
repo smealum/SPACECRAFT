@@ -1,5 +1,6 @@
 #include "data/ContentRequest.h"
 #include "MiniWorld.h"
+#include "utils/dbg.h"
 
 #include <cstdio>
 
@@ -24,12 +25,16 @@ float getElevation(glm::vec3 v)
 	//return 1.0+(fabs(glm::simplex(c))+fabs(glm::simplex(c*100.0f+glm::vec3(1.0,0.0,0.0)))*0.01f)*0.0001;
 
 	return 1.0+fabs(glm::simplex(c))*0.05;
+        //glm::vec3 c=glm::normalize(v);
+        //return 1.0+(fabs(glm::simplex(c))+fabs(glm::simplex(c*100.0f+glm::vec3(1.0,0.0,0.0)))*0.01f)*0.0001;
 }
 
 void PlanetElevationRequest::process(void)
 {
 	// elevation=1.0+glm::simplex(glm::normalize(coord))*0.1f;
-	elevation=getElevation(coord);
+        //log_info("get coord: for %s", glm::to_string(glm::normalize(coord)).c_str());
+        //log_info("value read: %f", planet.getElevation(glm::vec3(-0.408248, -0.816497, -0.408248)));
+	elevation=getElevation(glm::normalize(coord));
 }
 
 void PlanetElevationRequest::update(void)

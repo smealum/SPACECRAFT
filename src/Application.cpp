@@ -159,7 +159,8 @@ void Application::run()
     camera->setCameraManager(new CameraKeyboardMouse());
 
     tt = new testShaders;
-    testPlanet=new Planet((planetInfo_s){0}, contentHandler);
+    planetInfo_s planetInfo;
+    testPlanet=new Planet(planetInfo, contentHandler);
     // testChunk=new Chunk(testPlanet);
     // testMiniWorld=new MiniWorld(testPlanet, testPlanet->faces[2]);
     // testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
