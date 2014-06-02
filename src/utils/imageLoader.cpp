@@ -1,9 +1,6 @@
 #include "utils/stb_image.h"
 #include <cstdlib>
-#include <string>
-#include <GL/glew.h>
-#include <GL/gl.h>
-
+#include "utils/imageLoader.h"
 #include <iostream>
 using namespace std;
 
