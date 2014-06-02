@@ -23,7 +23,7 @@
 #endif
 
 // extract basename
-static const char* file_basename (const char * filename)
+static inline const char* file_basename (const char * filename)
 {
     const char * pos = filename;
     const char * current = filename;
@@ -37,10 +37,12 @@ static const char* file_basename (const char * filename)
     }
 }
 
+#define BASE_FILE file_basename(__FILE__)
+
 #ifdef NDEBUG
 #define debug(M, ...)
 #else
-#define debug(M, ...) fprintf(stderr, DEBUG_TEXT " %s:%d: " M "\n", file_basename(__FILE__), __LINE__, ##__VA_ARGS__)
+#define debug(M, ...) fprintf(stderr, DEBUG_TEXT " %s:%d: " M "\n", BASE_FILE, __LINE__, ##__VA_ARGS__)
 #endif
 
 // used in the macros
@@ -49,13 +51,13 @@ static const char* file_basename (const char * filename)
 // There's no need to use \n, it is included in all macros
 
 // Log for an error, ex: log_err("Id cannot be %u", 4);
-#define log_err(M, ...) fprintf(stderr, ERROR_TEXT " (%s:%d: errno: %s) " M "\n", file_basename(__FILE__), __LINE__, clean_errno(), ##__VA_ARGS__)
+#define log_err(M, ...) fprintf(stderr, ERROR_TEXT " (%s:%d: errno: %s) " M "\n", BASE_FILE, __LINE__, clean_errno(), ##__VA_ARGS__)
 
 // the same for warning
-#define log_warn(M, ...) fprintf(stderr, WARN_TEXT " (%s:%d: errno: %s) " M "\n", file_basename(__FILE__), __LINE__, clean_errno(), ##__VA_ARGS__)
+#define log_warn(M, ...) fprintf(stderr, WARN_TEXT " (%s:%d: errno: %s) " M "\n", BASE_FILE, __LINE__, clean_errno(), ##__VA_ARGS__)
 
 // the same for info
-#define log_info(M, ...) fprintf(stderr, INFO_TEXT " (%s:%d) " M "\n", file_basename(__FILE__), __LINE__, ##__VA_ARGS__)
+#define log_info(M, ...) fprintf(stderr, INFO_TEXT " (%s:%d) " M "\n", BASE_FILE, __LINE__, ##__VA_ARGS__)
 
 // check condition A. If A is not true, print an error and go to error label
 #define check(A, M, ...) if(!(A)) { log_err(M, ##__VA_ARGS__); errno=0; goto error; }
