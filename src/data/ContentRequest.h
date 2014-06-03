@@ -63,7 +63,7 @@ class MiniWorldDataRequest : public ContentRequest
 		virtual ~MiniWorldDataRequest();
 		
 	private:
-        char data[CHUNK_N*MINIWORLD_W][CHUNK_N*MINIWORLD_H][CHUNK_N*MINIWORLD_D];
+        char data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][CHUNK_N*CHUNK_N*CHUNK_N];
         int px, py, pz;
 		glm::vec3 origin, v1, v2;
 		Planet& planet;

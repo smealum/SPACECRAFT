@@ -32,7 +32,7 @@ class MiniWorld
 
 		void draw(Camera& c);
 		void destroyMiniWorld(void);
-		void updateChunks(char data[CHUNK_N*MINIWORLD_W][CHUNK_N*MINIWORLD_H][CHUNK_N*MINIWORLD_D], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D]);
+		void updateChunks(char data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][CHUNK_N*CHUNK_N*CHUNK_N], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D]);
 
 		TrackerPointer<MiniWorld>* getTptr(void);
 
@@ -41,6 +41,8 @@ class MiniWorld
 		PlanetFace* face;
 		Chunk* chunks[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];
 		glm::mat4 model;
+		glm::vec3 origin, v1, v2;
+		int x, z;
 
 		TrackerPointer<MiniWorld>* tptr;
 };

@@ -140,28 +140,28 @@ int randomSource=4;
 bool PlanetFace::shouldHaveMiniworld(Camera& c)
 {
 	// if(depth>13)printf("%f %f %f\n",vertex[4].x,vertex[4].y,vertex[4].z);
-	//return depth>=MINIWORLD_DETAIL;// && glm::length(c.getPosition()-vertex[4])<glm::length(vertex[1]-vertex[0])*5;
-    if (depth==MINIWORLD_DETAIL)
-    {
-		if (miniworld)
-			return true;
-		else
-		{
-			if (childrenDepth >= 10)
-			{
-				log_info("%d",childrenDepth);	
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-    }
-    else
-    {
-        return false;
-    }
+	return depth>=MINIWORLD_DETAIL;// && glm::length(c.getPosition()-vertex[4])<glm::length(vertex[1]-vertex[0])*5;
+  //   if (depth==MINIWORLD_DETAIL)
+  //   {
+		// if (miniworld)
+		// 	return true;
+		// else
+		// {
+		// 	if (childrenDepth >= 10)
+		// 	{
+		// 		log_info("%d",childrenDepth);	
+		// 		return true;
+		// 	}
+		// 	else
+		// 	{
+		// 		return false;
+		// 	}
+		// }
+  //   }
+  //   else
+  //   {
+  //       return false;
+  //   }
 }
 
 bool PlanetFace::isDetailedEnough(Camera& c)
@@ -194,7 +194,7 @@ void PlanetFace::removeMiniWorld(void)
 	if(!miniworld)return;
 
 	planet->removeMiniWorld(miniworld);
-	delete miniworld;
+	miniworld->destroyMiniWorld();
 	miniworld=NULL;
 }
 
@@ -215,12 +215,9 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 		if(elevated)
 		{
 			// Affichage Miniworld / face
-			if(shouldHaveMiniworld(c))
-				createMiniWorld();
-			else
-				removeMiniWorld();
-			if(!miniworld)
-				b->addFace(this);
+			if(shouldHaveMiniworld(c))createMiniWorld();
+			else removeMiniWorld();
+			if(!miniworld) b->addFace(this);
 		}
 		// suppression des éventuels enfants
 		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
