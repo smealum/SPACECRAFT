@@ -32,16 +32,15 @@ void main()
 	v[6]= projViewModel * vec4(gelevation[0]*normalize(pos[0]-v1+v2),1.0);
 	v[7]= projViewModel * vec4(gelevation[0]*normalize(pos[0]+v1+v2),1.0);
 
-
 /*
 
-  6--------7
- /|       /|
-4--------5 |
-| |      | |
-| 2------|-3
-|/       |/
-0--------1
+  6-------7
+ /|      /|
+4-------5 |
+| |     | |
+| 2-----|-3
+|/      |/
+0-------1
 
 */
 
@@ -58,7 +57,7 @@ void main()
 	EndPrimitive();
 
 
-	fcolor.rgb = gcolor[0].rgb * vec3(0.7,0.5,0.2);
+	fcolor.rgb = gcolor[0].rgb * 0.3;
 
 	// LEFT FACE
 	gl_Position = vec4(v[0].xy,(2*log(v[0].w/znear)/log(zfar/znear)-1)*v[0].w,v[0].w);	EmitVertex();
