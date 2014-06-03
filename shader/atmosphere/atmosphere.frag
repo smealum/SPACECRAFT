@@ -3,7 +3,7 @@
 // original code by sean p o'neill (http://sponeil.net/)
 // fragment shader adaptation by smea (http://smealum.net)
 
-in vec4 vPos;
+in vec3 vPos;
 
 out vec4 outColor;
 
@@ -49,7 +49,7 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 	vec4 fCameraDepth = vec4(0, 0, 0, 0);
 	vec4 fLightDepth;
 	vec4 fSampleDepth;
-	
+
 	if(fNear <= 0)
 	{
 		// If the near point is behind the camera, it means the camera is inside the atmosphere
@@ -114,9 +114,7 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 			fSampleDepth=texture(tex, vec2(fAltitude, 0.5f - fSampleAngle * 0.5f));
 			fRayleighDepth += fSampleDepth[1] - fCameraDepth[1];
 			fMieDepth += fSampleDepth[3] - fCameraDepth[3];
-		}
-		else
-		{
+		}else{
 			float fSampleAngle = dot(vRay, v) / fHeight;
 			//m_pbOpticalDepth.Interpolate(fSampleDepth, fAltitude, 0.5f - fSampleAngle * 0.5f);
 			// fSampleDepth=Interpolate(fAltitude, 0.5f - fSampleAngle * 0.5f);
@@ -173,23 +171,23 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 void main()
 {
 	float intensity;
-	vec3 vt=vPos.xyz;
-	float m=length(vt);
-	vt/=m;
+	vec3 vt=normalize(vPos);
 
 	if(sky)vt*=m_fOuterRadius;///m;
 	else vt*=m_fInnerRadius;
+
 	vec4 color=vec4(0.0,0.0,0.0,0.0);
 
 	vec3 t=SetColor(vt, cameraPosition, lightDirection);
 
-	if(sky)color=vec4(t[0],t[1],t[2],length(vec3(t[0],t[1],t[2]))*5);//t[1]);//length(vec3(t[0],t[1],t[2])));
-	else color=vec4(t[0],t[1],t[2],1.0);
+	if(sky)color=vec4(t,length(t)*5);//t[1]);//length(vec3(t[0],t[1],t[2])));
+	else color=vec4(t,1.0);
 
 	//color=texelFetch(tex, ivec2((int(gl_FragCoord[0])%texSize),(int(gl_FragCoord[1])%texSize)), 0);
 	// if(!sky)color*=gl_Color;
 	outColor = color;
 	// outColor = vec4(color.xyz,1.0);
+	// outColor = vec4(normalize(vt),1.0);
 	// outColor = vPos;
 	// outColor = texture(tex, vec2(vPos));
 	//gl_FragColor = gl_Color;
