@@ -11,12 +11,14 @@ BlockType::BlockType() :
 	// fill texcoord map
 	int blockSize = texWidth / texCols,
 		texRows = texHeight / blockSize;
-	for (int i = 0; i < BlockType::maxTypeValue; i++)
+
+	for (int i = 1; i < blockTypes::maxTypeValue; i++)
 	{
-		T t = (T)i;
+		blockTypes t = (blockTypes)i;
 		auto &side = texCoordMap[t].side;
+
 		switch (t) {
-			case T::grass:
+			case grass:
 				side[BlockType::top] = glm::vec2(0.f, 0.f);
 				side[BlockType::side] = glm::vec2(
 						(3.f*blockSize)/texWidth,
@@ -31,15 +33,15 @@ BlockType::BlockType() :
 				side[BlockType::top] = 
 					side[BlockType::side] =
 					side[BlockType::bottom] = glm::vec2(
-							(i % texCols) / (float)texCols,
-							(i / texCols) / (float)texRows
+							((i-1) % texCols) / (float)texCols,
+							((i-1) / texCols) / (float)texRows
 							);
 				break;
 		}
-		debug("Added texCoord for type %d: %f, %f", i, texCoordMap[(T)i].side[BlockType::top].x, texCoordMap[(T)i].side[BlockType::top].y);
+
+		debug("Added texCoord for type %d: %f, %f", i, texCoordMap[(blockTypes)i].side[BlockType::top].x, texCoordMap[(blockTypes)i].side[BlockType::top].y);
 	}
 }
 
 BlockType::~BlockType()
 {}
-

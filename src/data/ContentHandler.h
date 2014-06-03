@@ -12,10 +12,10 @@ class ContentHandler
 		void requestContent(ContentRequest* req);
 		void handleNewContent();
 
-		inline size_t getMaxProducers() const { return producers->size(); }
+		inline int getMaxProducers() const { return int(producers.size()); }
 	private:
 
-		std::vector<Producer*>* producers; // TODO is a pointer necessary
+		std::vector<Producer*> producers;
         ContentInputQueue inputQueue;
         ContentOutputQueue outputQueue;
 };

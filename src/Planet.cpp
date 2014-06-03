@@ -151,20 +151,21 @@ bool PlanetFace::shouldHaveMiniworld(Camera& c)
 
 bool PlanetFace::isDetailedEnough(Camera& c)
 {
-	if(depth > MINIWORLD_DETAIL + PLANET_ADDED_DETAIL + 1)
-		return true;
-	if(depth<4)
-		return false;
-	// if(depth>8)return true;
-	glm::vec3 p1=c.getPosition();
-	glm::vec3 p2=vertex[4]*elevation;
-	glm::vec3 v=p2-p1;
-	// if(glm::dot(v,vertex[4])>0.0f)return true; //backface culling
+	if(depth>MINIWORLD_DETAIL+PLANET_ADDED_DETAIL+1)return true;
+	if(depth<4)return false;
+
+	glm::vec3 p=c.getPosition();
+	if(glm::dot(vertex[0]*0.99f-p,vertex[0])>0.0f
+	&& glm::dot(vertex[1]*0.99f-p,vertex[1])>0.0f
+	&& glm::dot(vertex[2]*0.99f-p,vertex[2])>0.0f
+	&& glm::dot(vertex[3]*0.99f-p,vertex[3])>0.0f
+	&& glm::dot(vertex[4]*0.99f-p,vertex[4])>0.0f)return true; //backface culling
 	// if(!c.isPointInFrustum(p2))return true; //frustum culling
 	// float d=2.0f/(1<<(depth-3));
 	//float d=2.0f/(1<<(depth-2));
-	//if(glm::length(v)/d<1.2f)return false;
-	if(glm::length(v)*(2<<depth)<40.0f) return false;
+	//if(glm::length(vertex[4]*elevation-p)/d<1.2f)return false;
+	// if(glm::length(vertex[4]*elevation-p)*(2<<(depth))<40.0f) return false;
+	if(glm::length(vertex[4]*elevation-p)*(2<<(depth-1))<40.0f) return false;
 	return true;
 }
 
@@ -275,13 +276,10 @@ Planet::Planet(PlanetInfo &pi, ContentHandler& ch):
 	programBasic(ShaderProgram::loadFromFile("shader/planet/planet.vert", "shader/planet/planet.frag", "planet")),
 	generators(ch.getMaxProducers())
 {
-	for (size_t i = 0; i < ch.getMaxProducers(); i++)
-	    generators[i] = new PlanetGenerator(planetInfo);
+	for(int i=0;i<ch.getMaxProducers();i++)generators[i] = new PlanetGenerator(planetInfo);
 	
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
-	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], 1024*16, cubeArray[i][1]-cubeArray[i][0], cubeArray[i][3]-cubeArray[i][0]);
-
-	// log_info("GENERATOR: %f", generators[0]->getElevation(glm::vec3(-0.408248, -0.816497, -0.408248)));
+	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], PFBH_MAXSIZE, cubeArray[i][1]-cubeArray[i][0], cubeArray[i][3]-cubeArray[i][0]);
 	
 
 	//TEMP pour drawDirect
