@@ -55,6 +55,16 @@ WorldChunkRequest::~WorldChunkRequest()
 {}
 
 #define accessArray(data, w, h, d, px, py, pz, i, j, k) (data)[((px)+(py)*(w)+(pz)*(w)*(h))*CHUNK_N*CHUNK_N*CHUNK_N+(i)+(j)*(CHUNK_N)+(k)*(CHUNK_N)*(CHUNK_N)]
+//inline bool isEmpty(char* data, int w, int h, int d, int px, int py, int pz, int i, int j, int k)
+//{
+	//if (i<0) { i+=w; px--;} 
+	//else if (i>w) {i-=w; px++;}
+	//if (j<0) { j+=w; py--;} 
+	//else if (j>h) {j-=w; py++;}
+	//if (k<0) { k+=d; pz--;} 
+	//else if (k>d) {k-=d; pz++;}
+	//return accessArray(data,w,h,d,px,py,pz,i,j,k);
+//}
 
 //TODO : optimiser pour éviter les multiplications à chaque fois
 //(juste utiliser un pointeur à chaque fois...)
@@ -70,32 +80,34 @@ void computeChunkFaces(char* data,
 	// X
 	for(int y=0;y<CHUNK_N;++y)
 	for(int z=0;z<CHUNK_N;++z)
-	for(int x=1;x<CHUNK_N;++x)
 	{
-		if(accessArray(data,w,h,d,sx,sy,sz,x,y,z))
+		for(int x=1;x<CHUNK_N;++x)
 		{
-			if (!accessArray(data,w,h,d,sx,sy,sz,x-1,y,z))
+			if(accessArray(data,w,h,d,sx,sy,sz,x,y,z))
 			{
-				GL_Vertex v;
-				v.facedir=2;
-				v.texcoord= blockType.getTexcoord(
-					(BlockType::T)int(accessArray(data,w,h,d,sx,sy,sz,x,y,z)-1),
-					BlockType::side
-					);
-				v.position=vec3(px+x,py+y,pz+z);
-				vArray.push_back(v);
-			}
-		}else{
-			if (accessArray(data,w,h,d,sx,sy,sz,x-1,y,z))
-			{
-				GL_Vertex v;
-				v.facedir=3;
-				v.texcoord=blockType.getTexcoord(
-					(BlockType::T)int(accessArray(data,w,h,d,sx,sy,sz,x-1,y,z)-1),
-					BlockType::side
-					);
-				v.position=vec3(px+x-1,py+y,pz+z);
-				vArray.push_back(v);
+				if (!accessArray(data,w,h,d,sx,sy,sz,x-1,y,z))
+				{
+					GL_Vertex v;
+					v.facedir=2;
+					v.texcoord= blockType.getTexcoord(
+						(BlockType::T)int(accessArray(data,w,h,d,sx,sy,sz,x,y,z)-1),
+						BlockType::side
+						);
+					v.position=vec3(px+x,py+y,pz+z);
+					vArray.push_back(v);
+				}
+			}else{
+				if (accessArray(data,w,h,d,sx,sy,sz,x-1,y,z))
+				{
+					GL_Vertex v;
+					v.facedir=3;
+					v.texcoord=blockType.getTexcoord(
+						(BlockType::T)int(accessArray(data,w,h,d,sx,sy,sz,x-1,y,z)-1),
+						BlockType::side
+						);
+					v.position=vec3(px+x-1,py+y,pz+z);
+					vArray.push_back(v);
+				}
 			}
 		}
 	}
@@ -174,31 +186,52 @@ void generateWorldData(int prod_id, Planet& planet, char* data,
 		int px, int py, int pz, //offset in world
 		glm::vec3 origin, glm::vec3 v1, glm::vec3 v2) //toplevel characteristics
 {
+#define accessArray(data, w, h, d, px, py, pz, i, j, k) (data)[((px)+(py)*(w)+(pz)*(w)*(h))*CHUNK_N*CHUNK_N*CHUNK_N+(i)+(j)*(CHUNK_N)+(k)*(CHUNK_N)*(CHUNK_N)]
+
+	/*
+		i CHUNK_N
+		j CHUNK_N
+		k CHUNK_N
+		px w
+		py h
+		pz d
+	*/
+	int pxPos,pzPos,xPos,zPos,pyPos,yPos;
+	pxPos=0;
 	for(int cx=0;cx<w;cx++)
 	{
+		pzPos=pxPos;
 		const int vx=cx*CHUNK_N;
 		for(int cz=0;cz<d;cz++)
 		{
+			xPos=pzPos;
 			const int vz=cz*CHUNK_N;
 			for(int i=0;i<CHUNK_N;i++)
 			{
+				zPos=xPos;
 				for(int k=0;k<CHUNK_N;k++)
 				{
+					pyPos=zPos;
 					const glm::vec3 pos=origin+((v1*float(vx+px+i))+(v2*float(vz+pz+k)))/float(PLANETFACE_BLOCKS);
 					const int height=int(getElevation(prod_id, planet, pos)*CHUNK_N*MINIWORLD_H);
 					for(int cy=0;cy<h;cy++)
 					{
+						yPos=pyPos;
 						const int vy=cy*CHUNK_N;
 						for(int j=0;j<CHUNK_N;j++)
 						{
-							if(vy+py+j==height)accessArray(data,w,h,d,cx,cy,cz,i,j,k)=1; // 1 -> 0 <=> grass
-							else if(vy+py+j<height)accessArray(data,w,h,d,cx,cy,cz,i,j,k)=3; // 3 -> 2 <=> dirt
-							else accessArray(data,w,h,d,cx,cy,cz,i,j,k)=0;
-						}
-					}
-				}
-			}
-		}
+							if (vy+py+j == height) data[yPos]=1;
+							else if (vy+py+j < height) data[yPos]=3;
+							else data[yPos]=0;
+							//if(vy+py+j==height)accessArray(data,w,h,d,cx,cy,cz,i,j,k)=1; // 1 -> 0 <=> grass
+							//else if(vy+py+j<height)accessArray(data,w,h,d,cx,cy,cz,i,j,k)=3; // 3 -> 2 <=> dirt
+							//else accessArray(data,w,h,d,cx,cy,cz,i,j,k)=0;
+							yPos+=CHUNK_N;
+						}pyPos+=CHUNK_N*CHUNK_N*CHUNK_N*w;
+					}zPos+=CHUNK_N*CHUNK_N;
+				}xPos+=1;
+			} pzPos+=CHUNK_N*CHUNK_N*CHUNK_N*CHUNK_N*w*h;
+		} pxPos+=CHUNK_N*CHUNK_N*CHUNK_N*1;
 	}
 }
 
