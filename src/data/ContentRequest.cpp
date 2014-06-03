@@ -218,13 +218,13 @@ void WorldChunkRequest::update(void)
 
 //MiniWorldDataRequest stuff
 MiniWorldDataRequest::MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z):
-	planet(p),
+	px(x),
+	py(y),
+	pz(z),
 	origin(o),
 	v1(v1),
 	v2(v2),
-	px(x),
-	py(y),
-	pz(z)
+	planet(p)
 {
 	miniworld=mw.getTptr();
 	miniworld->grab();
