@@ -1,4 +1,5 @@
 #include "data/ContentRequest.h"
+#include "world/BlockType.h"
 #include "MiniWorld.h"
 #include "utils/dbg.h"
 
@@ -53,11 +54,6 @@ WorldChunkRequest::WorldChunkRequest(Planet& p, Chunk& c, float elevation, glm::
 WorldChunkRequest::~WorldChunkRequest()
 {}
 
-//TEMP ! faire un vrai système de blocs
-
-const glm::vec2 topCoord[]={glm::vec2(0,0)/16.0f,glm::vec2(0,0)/16.0f};
-const glm::vec2 sideCoord[]={glm::vec2(3,0)/16.0f,glm::vec2(2,0)/16.0f};
-
 #define accessArray(data, w, h, d, px, py, pz, i, j, k) (data)[((px)+(py)*(w)+(pz)*(w)*(h))*CHUNK_N*CHUNK_N*CHUNK_N+(i)+(j)*(CHUNK_N)+(k)*(CHUNK_N)*(CHUNK_N)]
 
 //TODO : optimiser pour éviter les multiplications à chaque fois
@@ -69,6 +65,7 @@ void computeChunkFaces(char* data,
 		std::vector<GL_Vertex>& vArray) //output
 {
     vArray.clear();
+    auto blockType = BlockType::getInstance();
 
 	// X
 	for(int y=0;y<CHUNK_N;++y)
@@ -81,7 +78,10 @@ void computeChunkFaces(char* data,
 			{
 				GL_Vertex v;
 				v.facedir=2;
-				v.texcoord=sideCoord[int(accessArray(data,w,h,d,sx,sy,sz,x,y,z)-1)];
+				v.texcoord= blockType.getTexcoord(
+					(BlockType::T)int(accessArray(data,w,h,d,sx,sy,sz,x,y,z)-1),
+					BlockType::side
+					);
 				v.position=vec3(px+x,py+y,pz+z);
 				vArray.push_back(v);
 			}
@@ -90,7 +90,10 @@ void computeChunkFaces(char* data,
 			{
 				GL_Vertex v;
 				v.facedir=3;
-				v.texcoord=sideCoord[int(accessArray(data,w,h,d,sx,sy,sz,x-1,y,z)-1)];
+				v.texcoord=blockType.getTexcoord(
+					(BlockType::T)int(accessArray(data,w,h,d,sx,sy,sz,x-1,y,z)-1),
+					BlockType::side
+					);
 				v.position=vec3(px+x-1,py+y,pz+z);
 				vArray.push_back(v);
 			}
@@ -108,7 +111,10 @@ void computeChunkFaces(char* data,
 			{
 				GL_Vertex v;
 				v.facedir=0;
-				v.texcoord=topCoord[int(accessArray(data,w,h,d,sx,sy,sz,x,y,z)-1)];
+				v.texcoord=blockType.getTexcoord(
+					(BlockType::T)int(accessArray(data,w,h,d,sx,sy,sz,x,y,z)-1),
+					BlockType::top
+					);
 				v.position=vec3(px+x,py+y,pz+z);
 				vArray.push_back(v);
 			}
@@ -117,7 +123,10 @@ void computeChunkFaces(char* data,
 			{
 				GL_Vertex v;
 				v.facedir=1;
-				v.texcoord=topCoord[int(accessArray(data,w,h,d,sx,sy,sz,x,y-1,z)-1)];
+				v.texcoord=blockType.getTexcoord(
+					(BlockType::T)int(accessArray(data,w,h,d,sx,sy,sz,x,y-1,z)-1),
+					BlockType::top
+					);
 				v.position=vec3(px+x,py+y-1,pz+z);
 				vArray.push_back(v);
 			}
@@ -135,7 +144,10 @@ void computeChunkFaces(char* data,
 			{
 				GL_Vertex v;
 				v.facedir=4;
-				v.texcoord=sideCoord[int(accessArray(data,w,h,d,sx,sy,sz,x,y,z)-1)];
+				v.texcoord=blockType.getTexcoord(
+					(BlockType::T)int(accessArray(data,w,h,d,sx,sy,sz,x,y,z)-1),
+					BlockType::side
+					);
 				v.position=vec3(px+x,py+y,pz+z);
 				vArray.push_back(v);
 			}
@@ -144,7 +156,10 @@ void computeChunkFaces(char* data,
 			{
 				GL_Vertex v;
 				v.facedir=5;
-				v.texcoord=sideCoord[int(accessArray(data,w,h,d,sx,sy,sz,x,y,z-1)-1)];
+				v.texcoord=blockType.getTexcoord(
+					(BlockType::T)int(accessArray(data,w,h,d,sx,sy,sz,x,y,z-1)-1),
+					BlockType::side
+					);
 				v.position=vec3(px+x,py+y,pz-1+z);
 				vArray.push_back(v);
 			}
@@ -176,8 +191,8 @@ void generateWorldData(int prod_id, Planet& planet, char* data,
 						const int vy=cy*CHUNK_N;
 						for(int j=0;j<CHUNK_N;j++)
 						{
-							if(vy+py+j==height)accessArray(data,w,h,d,cx,cy,cz,i,j,k)=1;
-							else if(vy+py+j<height)accessArray(data,w,h,d,cx,cy,cz,i,j,k)=2;
+							if(vy+py+j==height)accessArray(data,w,h,d,cx,cy,cz,i,j,k)=1; // 1 -> 0 <=> grass
+							else if(vy+py+j<height)accessArray(data,w,h,d,cx,cy,cz,i,j,k)=3; // 3 -> 2 <=> dirt
 							else accessArray(data,w,h,d,cx,cy,cz,i,j,k)=0;
 						}
 					}

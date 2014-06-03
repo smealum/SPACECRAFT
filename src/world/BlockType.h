@@ -10,17 +10,17 @@
 typedef glm::vec2 texCoord;
 
 class BlockType : public Singleton<BlockType> {
-	enum Plane {
-		top,
-		side,
-		bottom,
-		maxPlanes
-	};
-	struct blockTexcoord {
-		texCoord side[maxPlanes];
-	};
 	public:
 		// 1D index for a 2D array
+		enum Plane {
+			top,
+			side,
+			bottom,
+			maxPlanes
+		};
+		struct blockTexcoord {
+			texCoord side[maxPlanes];
+		};
 		enum T {
 			grass = 0,
 			stone = 1,
@@ -33,12 +33,16 @@ class BlockType : public Singleton<BlockType> {
 		{
 			return texCoordMap[type].side[p];
 		}
+		inline blockTexcoord getBlockTexcoord(T type)
+		{
+			return texCoordMap[type];
+		}
+		~BlockType();
 	private:
 		std::map<T, blockTexcoord> texCoordMap;
 		friend class Singleton<BlockType>;
 		int texWidth, texHeight, texCols;
 		BlockType();
-		~BlockType();
 };
 
 #endif
