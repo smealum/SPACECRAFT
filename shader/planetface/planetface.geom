@@ -18,8 +18,17 @@ out vec4 fcolor;
 
 void main()
 {
+
+	// on n'affiche plus les blocs qui sont de l'autre côté de la planete
+	vec4 PlanetCenter = view*model*vec4(0.0,0.0,0.0,1.0);
+	vec4 BlocPosition = view*model*vec4(pos[0],1.0);
+	if ( dot(BlocPosition,normalize(PlanetCenter)) > length(PlanetCenter) )
+		return;
+
+	
 	vec3 v1=gv1[0]*gsize[0];
 	vec3 v2=gv2[0]*gsize[0];
+
 	vec4 v[8];
 
 	mat4 projViewModel = proj*view*model;
