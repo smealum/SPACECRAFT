@@ -26,11 +26,12 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	miniworld(NULL),
 	toplevel(this),
 	x(0),
-	z(0)
+	z(0),
+	depth(0),
+	childrenDepth(0)
 {
 	uvertex[0]=v[0]; uvertex[1]=v[1];
 	uvertex[2]=v[2]; uvertex[3]=v[3];
-	depth=0;
 	finalize();
 }
 
@@ -44,7 +45,8 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	id(id),
 	bufferID(-1),
 	miniworld(NULL),
-	toplevel(father->toplevel)
+	toplevel(father->toplevel),
+	childrenDepth(0)
 {
 	//TODO : exception ?
 	// if(!father);
@@ -84,6 +86,7 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	}
 	
 	depth=father->depth+1;
+
 	finalize();
 }
 
@@ -132,31 +135,32 @@ void PlanetFace::updateElevation(float e)
 
 #include <cstdio>
 
+int randomSource=4;
+
 bool PlanetFace::shouldHaveMiniworld(Camera& c)
 {
-	// if(depth>13)printf("%f %f %f\n",vertex[4].x,vertex[4].y,vertex[4].z);
-	//return depth>=MINIWORLD_DETAIL;// && glm::length(c.getPosition()-vertex[4])<glm::length(vertex[1]-vertex[0])*5;
-    if (depth>=MINIWORLD_DETAIL)
-    {
-        return true; 
-    }
-    else
-    {
-        return false;
-    }
+    return
+	(
+		depth==MINIWORLD_DETAIL and
+		(
+			miniworld or
+			(childrenDepth >= PLANET_ADDED_DETAIL)
+		)
+	);
 }
 
 bool PlanetFace::isDetailedEnough(Camera& c)
 {
-	if(shouldHaveMiniworld(c))return true;
-	if(depth>=MINIWORLD_DETAIL)return true;
+	if(depth > MINIWORLD_DETAIL + PLANET_ADDED_DETAIL +100)
+		return true;
+	if(depth<4)
+		return false;
 	// if(depth>8)return true;
 	glm::vec3 p1=c.getPosition();
 	glm::vec3 p2=vertex[4]*elevation;
 	glm::vec3 v=p2-p1;
 	// if(glm::dot(v,vertex[4])>0.0f)return true; //backface culling
 	// if(!c.isPointInFrustum(p2))return true; //frustum culling
-	if(depth<4)return false;
 	// float d=2.0f/(1<<(depth-3));
 	float d=2.0f/(1<<(depth-2));
 	if(glm::length(v)/d<1.f)return false;
@@ -176,30 +180,67 @@ void PlanetFace::removeMiniWorld(void)
 	if(!miniworld)return;
 
 	planet->removeMiniWorld(miniworld);
-	delete miniworld;
+	miniworld->destroyMiniWorld();
 	miniworld=NULL;
 }
 
+static inline int max(int a, int b)
+{
+	return (a>b)?a:b;
+}
 void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 {
+	// update childrenDepth
+	childrenDepth = 0;
+	for(int i=0;i<4;i++)
+		if(sons[i])
+			childrenDepth = max(childrenDepth,(sons[i]->childrenDepth + 1));
+
+	// face assez détaillé, on l'affiche
 	if(isDetailedEnough(c))
 	{
-		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
-		if(elevated)
-		{
-			if(shouldHaveMiniworld(c))createMiniWorld();
-			else removeMiniWorld();
-			if(!miniworld)b->addFace(this);
-		}
-	}else{
-		bool done=true;
+		// suppression des éventuels enfants
 		for(int i=0;i<4;i++)
+			if(sons[i])
+				sons[i]->deletePlanetFace(b);
+
+		// dessin de la face
+		if (elevated)
+			b->addFace(this);
+	}
+	else
+	{
+		// creation/destruction du miniWorld
+		if(shouldHaveMiniworld(c))
 		{
-			if(sons[i])sons[i]->processLevelOfDetail(c, b);
-			else sons[i]=new PlanetFace(planet,this,i);
-			if(!sons[i]->elevated)done=false;
+			// suppression des éventuels enfants
+			for(int i=0;i<4;i++)
+				if(sons[i])
+					sons[i]->deletePlanetFace(b);
+			
+			// creation du miniworld
+			createMiniWorld();
+			b->deleteFace(this);
 		}
-		if(done)b->deleteFace(this);
+		else
+		{
+			// suppresion du MiniWorld
+			removeMiniWorld();
+
+			// ajout des éventuels enfants
+			bool done=true;
+			for(int i=0;i<4;i++)
+			{
+				if(sons[i])
+					sons[i]->processLevelOfDetail(c, b);
+				else
+					sons[i]=new PlanetFace(planet,this,i);
+				if(!sons[i]->elevated)
+					done=false;
+			}
+			if(done)b->deleteFace(this);
+		}
+
 	}
 }
 

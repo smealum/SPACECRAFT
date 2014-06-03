@@ -19,6 +19,10 @@
 #define MINIWORLD_DETAIL (14)
 #define PLANETFACE_BLOCKS ((1<<MINIWORLD_DETAIL)*MINIWORLD_N)
 
+//do NOT instanciate directly
+//	use new
+//do NOT destroy directly
+//	use destroyMiniWorld
 class MiniWorld
 {
     friend class Chunk;
@@ -27,12 +31,20 @@ class MiniWorld
 		~MiniWorld();
 
 		void draw(Camera& c);
+		void destroyMiniWorld(void);
+		void updateChunks(char data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][CHUNK_N*CHUNK_N*CHUNK_N], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D]);
+
+		TrackerPointer<MiniWorld>* getTptr(void);
 
 	private:
 		Planet* planet;
 		PlanetFace* face;
 		Chunk* chunks[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];
 		glm::mat4 model;
+		glm::vec3 origin, v1, v2;
+		int x, z;
+
+		TrackerPointer<MiniWorld>* tptr;
 };
 
 #endif

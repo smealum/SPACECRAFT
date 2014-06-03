@@ -101,6 +101,7 @@ class PlanetFace
 		float minElevation;
 		uint8_t id;
 		int depth;
+		int childrenDepth;
 };
 
 class Planet

@@ -29,7 +29,7 @@ class Chunk
 		Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, glm::vec3 v2, glm::vec3 n);
 
 		void draw(Camera& camera, glm::mat4 model);
-		void updateData(char data[CHUNK_N][CHUNK_N][CHUNK_N], std::vector<GL_Vertex> va);
+		void updateData(char* data, std::vector<GL_Vertex> va);
 		void destroyChunk(void);
 
 		bool collidePoint(glm::vec3 p);

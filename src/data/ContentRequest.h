@@ -41,8 +41,6 @@ class WorldChunkRequest : public ContentRequest
 		void process(int id);
 		void update(void);
 		virtual ~WorldChunkRequest();
-
-		void computeChunk(void);
 		
 	private:
         char data[CHUNK_N][CHUNK_N][CHUNK_N];
@@ -52,6 +50,25 @@ class WorldChunkRequest : public ContentRequest
 		Planet& planet;
 		TrackerPointer<Chunk>* chunk;
         std::vector<GL_Vertex> vArray;
+};
+
+#include "MiniWorld.h"
+
+class MiniWorldDataRequest : public ContentRequest
+{
+	public:
+		MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z);
+		void process(int id);
+		void update(void);
+		virtual ~MiniWorldDataRequest();
+		
+	private:
+        char data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][CHUNK_N*CHUNK_N*CHUNK_N];
+        int px, py, pz;
+		glm::vec3 origin, v1, v2;
+		Planet& planet;
+		TrackerPointer<MiniWorld>* miniworld;
+        std::vector<GL_Vertex> vArray[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];
 };
 
 typedef SynchronizationQueue<ContentRequest*> ContentInputQueue;
