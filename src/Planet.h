@@ -11,6 +11,8 @@
 #include "noise/PlanetGenerator.h"
 
 #define PLANET_ADDED_DETAIL (4)
+// #define PFBH_MAXSIZE (1024*16)
+#define PFBH_MAXSIZE (1024*64)
 
 typedef struct
 {

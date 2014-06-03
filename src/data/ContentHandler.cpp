@@ -3,8 +3,7 @@
 
 ContentHandler::ContentHandler(int numProducers)
 {
-	producers=new std::vector<Producer*>;
-	for(int i=0;i<numProducers;i++)producers->push_back(new Producer(i, inputQueue, outputQueue));
+	for(int i=0;i<numProducers;i++)producers.push_back(new Producer(i, inputQueue, outputQueue));
 }
 
 void ContentHandler::requestContent(ContentRequest* req)
