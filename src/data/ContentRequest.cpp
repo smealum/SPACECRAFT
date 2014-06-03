@@ -185,12 +185,14 @@ void generateWorldData(int prod_id, Planet& planet, char* data,
 				for(int k=0;k<CHUNK_N;k++)
 				{
 					const glm::vec3 pos=origin+((v1*float(vx+px+i))+(v2*float(vz+pz+k)))/float(PLANETFACE_BLOCKS);
+					//const float relativeHeight = planet.getElevation(prod_id, glm::normalize(pos));
 					const int height=int(getElevation(prod_id, planet, pos)*CHUNK_N*MINIWORLD_H);
 					for(int cy=0;cy<h;cy++)
 					{
 						const int vy=cy*CHUNK_N;
 						for(int j=0;j<CHUNK_N;j++)
 						{
+							//if (relativeHeight < 0.f && vy+py+j >= height) accessArray(data,w,h,d,cx,cy,cz,i,j,k)=2;
 							if(vy+py+j==height)accessArray(data,w,h,d,cx,cy,cz,i,j,k)=1; // 1 -> 0 <=> grass
 							else if(vy+py+j<height)accessArray(data,w,h,d,cx,cy,cz,i,j,k)=3; // 3 -> 2 <=> dirt
 							else accessArray(data,w,h,d,cx,cy,cz,i,j,k)=0;
