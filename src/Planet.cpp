@@ -139,8 +139,6 @@ int randomSource=4;
 
 bool PlanetFace::shouldHaveMiniworld(Camera& c)
 {
-	// if(depth>13)printf("%f %f %f\n",vertex[4].x,vertex[4].y,vertex[4].z);
-	//return depth>=MINIWORLD_DETAIL;// && glm::length(c.getPosition()-vertex[4])<glm::length(vertex[1]-vertex[0])*5;
     return
 	(
 		depth==MINIWORLD_DETAIL and
@@ -182,7 +180,7 @@ void PlanetFace::removeMiniWorld(void)
 	if(!miniworld)return;
 
 	planet->removeMiniWorld(miniworld);
-	delete miniworld;
+	miniworld->destroyMiniWorld();
 	miniworld=NULL;
 }
 
