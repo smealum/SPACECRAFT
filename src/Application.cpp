@@ -5,6 +5,7 @@
 #include "Planet.h"
 #include "MiniWorld.h"
 #include "utils/TextureManager.h"
+#include "world/BlockType.h"
 #define WIN_TITLE "SPACECRAFT"
 
 #ifndef NTWBAR
@@ -149,6 +150,7 @@ int testTexture;
 
 void Application::run()
 {
+    BlockType::getInstance(); // TODO can be deleted when used
     state = appInLoop;
     camera = new Camera(0.000001f, 100.f);
     camera->view = glm::lookAt(

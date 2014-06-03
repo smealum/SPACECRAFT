@@ -35,7 +35,7 @@ GLuint TextureManager::loadTexture(const std::string& filename)
 {
 	auto it(textures.find(filename));
 	if (it != textures.end())
-		return it->second;
+		return it->second.id;
 
 	GLuint texture;
 	int width, height, comp;
@@ -60,14 +60,25 @@ GLuint TextureManager::loadTexture(const std::string& filename)
 
 	free(data);
 
+	textures[filename].id = texture;
+	textures[filename].width = width;
+	textures[filename].height = height;
+
 	return texture;
 }
 
 TextureManager::~TextureManager()
 {
 	for (auto it(textures.begin()); it != textures.end(); ++it) {
-		glDeleteTextures(1, &it->second);
+		glDeleteTextures(1, &it->second.id);
 	}
 }
 
+void TextureManager::getTextureSize(const std::string& filename, int *width, int *height)
+{
+	loadTexture(filename);
+	auto it(textures.find(filename));
+	*width = it->second.width;
+	*height = it->second.height;
+}
 
