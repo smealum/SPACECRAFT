@@ -3,6 +3,7 @@
 MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 	planet(p),
 	model(glm::mat4(1.0f)),
+    tptr(new TrackerPointer<MiniWorld>(this, true)),
 	face(pf)
 {
 	for(int i=0;i<MINIWORLD_W;i++)
@@ -46,4 +47,19 @@ void MiniWorld::draw(Camera& c)
 			}
 		}
 	}
+}
+
+void MiniWorld::destroyMiniWorld(void)
+{
+    tptr->release();
+}
+
+TrackerPointer<MiniWorld>* MiniWorld::getTptr(void)
+{
+    return tptr;
+}
+
+void MiniWorld::updateChunks(char data[CHUNK_N*MINIWORLD_W][CHUNK_N*MINIWORLD_H][CHUNK_N*MINIWORLD_D], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D])
+{
+	
 }

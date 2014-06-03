@@ -58,7 +58,15 @@ WorldChunkRequest::~WorldChunkRequest()
 const glm::vec2 topCoord[]={glm::vec2(0,0)/16.0f,glm::vec2(0,0)/16.0f};
 const glm::vec2 sideCoord[]={glm::vec2(3,0)/16.0f,glm::vec2(2,0)/16.0f};
 
-void WorldChunkRequest::computeChunk(void)
+#define accessArray(data, w, h, d, i, j, k) (data)[(i)+(j)*(w)+(k)*(w)*(h)]
+
+//TODO : optimiser pour éviter les multiplications à chaque fois
+//(juste utiliser un pointeur à chaque fois...)
+void computeChunkFaces(char* data,
+		int w, int h, int d, //array sizes
+		int sx, int sy, int sz, //chunk start in array
+		int px, int py, int pz, //chunk offset in world
+		std::vector<GL_Vertex>& vArray) //output
 {
     vArray.clear();
 
@@ -67,22 +75,22 @@ void WorldChunkRequest::computeChunk(void)
 	for(int z=0;z<CHUNK_N;++z)
 	for(int x=1;x<CHUNK_N;++x)
 	{
-		if(data[x][y][z])
+		if(accessArray(data,w,h,d,x,y,z))
 		{
-			if (!data[x-1][y][z])
+			if (!accessArray(data,w,h,d,x-1,y,z))
 			{
 				GL_Vertex v;
 				v.facedir=2;
-				v.texcoord=sideCoord[int(data[x][y][z]-1)];
+				v.texcoord=sideCoord[int(accessArray(data,w,h,d,x,y,z)-1)];
 				v.position=vec3(px+x,py+y,pz+z);
 				vArray.push_back(v);
 			}
 		}else{
-			if (data[x-1][y][z])
+			if (accessArray(data,w,h,d,x-1,y,z))
 			{
 				GL_Vertex v;
 				v.facedir=3;
-				v.texcoord=sideCoord[int(data[x-1][y][z]-1)];
+				v.texcoord=sideCoord[int(accessArray(data,w,h,d,x-1,y,z)-1)];
 				v.position=vec3(px+x-1,py+y,pz+z);
 				vArray.push_back(v);
 			}
@@ -94,22 +102,22 @@ void WorldChunkRequest::computeChunk(void)
 	for(int z=0;z<CHUNK_N;++z)
 	for(int y=1;y<CHUNK_N;++y)
 	{
-		if(data[x][y][z])
+		if(accessArray(data,w,h,d,x,y,z))
 		{
-			if (!data[x][y-1][z])
+			if (!accessArray(data,w,h,d,x,y-1,z))
 			{
 				GL_Vertex v;
 				v.facedir=0;
-				v.texcoord=topCoord[int(data[x][y][z]-1)];
+				v.texcoord=topCoord[int(accessArray(data,w,h,d,x,y,z)-1)];
 				v.position=vec3(px+x,py+y,pz+z);
 				vArray.push_back(v);
 			}
 		}else{
-			if (data[x][y-1][z])
+			if (accessArray(data,w,h,d,x,y-1,z))
 			{
 				GL_Vertex v;
 				v.facedir=1;
-				v.texcoord=topCoord[int(data[x][y-1][z]-1)];
+				v.texcoord=topCoord[int(accessArray(data,w,h,d,x,y-1,z)-1)];
 				v.position=vec3(px+x,py+y-1,pz+z);
 				vArray.push_back(v);
 			}
@@ -121,22 +129,22 @@ void WorldChunkRequest::computeChunk(void)
 	for(int y=0;y<CHUNK_N;++y)
 	for(int z=1;z<CHUNK_N;++z)
 	{
-		if(data[x][y][z])
+		if(accessArray(data,w,h,d,x,y,z))
 		{
-			if (!data[x][y][z-1])
+			if (!accessArray(data,w,h,d,x,y,z-1))
 			{
 				GL_Vertex v;
 				v.facedir=4;
-				v.texcoord=sideCoord[int(data[x][y][z]-1)];
+				v.texcoord=sideCoord[int(accessArray(data,w,h,d,x,y,z)-1)];
 				v.position=vec3(px+x,py+y,pz+z);
 				vArray.push_back(v);
 			}
 		}else{
-			if (data[x][y][z-1])
+			if (accessArray(data,w,h,d,x,y,z-1))
 			{
 				GL_Vertex v;
 				v.facedir=5;
-				v.texcoord=sideCoord[int(data[x][y][z-1]-1)];
+				v.texcoord=sideCoord[int(accessArray(data,w,h,d,x,y,z-1)-1)];
 				v.position=vec3(px+x,py+y,pz-1+z);
 				vArray.push_back(v);
 			}
@@ -144,29 +152,63 @@ void WorldChunkRequest::computeChunk(void)
 	}
 }
 
-void WorldChunkRequest::process(int id)
+//TODO : optimiser (si si on peut, et beaucoup en plus)
+void generateWorldData(int prod_id, Planet& planet, char* data,
+		int w, int h, int d, //array sizes
+		int px, int py, int pz, //offset in world
+		glm::vec3 origin, glm::vec3 v1, glm::vec3 v2) //toplevel characteristics
 {
-	//TEMP
-	for(int i=0;i<CHUNK_N;i++)
+	for(int i=0;i<w;i++)
 	{
-		for(int k=0;k<CHUNK_N;k++)
+		for(int k=0;k<d;k++)
 		{
 			const glm::vec3 pos=origin+((v1*float(px+i))+(v2*float(pz+k)))/float(PLANETFACE_BLOCKS);
-			const int h=int(getElevation(id, planet, pos)*CHUNK_N*MINIWORLD_H);
-			for(int j=0;j<CHUNK_N;j++)
+			const int height=int(getElevation(prod_id, planet, pos)*CHUNK_N*MINIWORLD_H);
+			for(int j=0;j<h;j++)
 			{
-				if(py+j==h)data[i][j][k]=1;
-				else if(py+j<h)data[i][j][k]=2;
-				else data[i][j][k]=0;
+				if(py+j==height)accessArray(data,w,h,d,i,j,k)=1;
+				else if(py+j<height)accessArray(data,w,h,d,i,j,k)=2;
+				else accessArray(data,w,h,d,i,j,k)=0;
 			}
 		}
 	}
+}
 
-	computeChunk();
+void WorldChunkRequest::process(int id)
+{
+	generateWorldData(id, planet, (char*)data, CHUNK_N, CHUNK_N, CHUNK_N, px, py, pz, origin, v1, v2);
+	computeChunkFaces((char*)data, CHUNK_N, CHUNK_N, CHUNK_N, 0, 0, 0, px, py, pz, vArray);
 }
 
 void WorldChunkRequest::update(void)
 {
 	chunk->getPointer()->updateData(data, vArray);
 	chunk->release();
+}
+
+//MiniWorldDataRequest stuff
+MiniWorldDataRequest::MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z):
+	planet(p),
+	origin(o),
+	v1(v1),
+	v2(v2),
+	px(x),
+	py(y),
+	pz(z)
+{
+	miniworld=mw.getTptr();
+	miniworld->grab();
+}
+
+MiniWorldDataRequest::~MiniWorldDataRequest()
+{}
+
+void MiniWorldDataRequest::process(int id)
+{
+}
+
+void MiniWorldDataRequest::update(void)
+{
+	miniworld->getPointer()->updateChunks(data, vArray);
+	miniworld->release();
 }
