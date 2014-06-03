@@ -151,7 +151,7 @@ bool PlanetFace::shouldHaveMiniworld(Camera& c)
 
 bool PlanetFace::isDetailedEnough(Camera& c)
 {
-	if(depth > MINIWORLD_DETAIL + PLANET_ADDED_DETAIL +100)
+	if(depth > MINIWORLD_DETAIL + PLANET_ADDED_DETAIL + 1)
 		return true;
 	if(depth<4)
 		return false;
@@ -162,8 +162,9 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	// if(glm::dot(v,vertex[4])>0.0f)return true; //backface culling
 	// if(!c.isPointInFrustum(p2))return true; //frustum culling
 	// float d=2.0f/(1<<(depth-3));
-	float d=2.0f/(1<<(depth-2));
-	if(glm::length(v)/d<1.f)return false;
+	//float d=2.0f/(1<<(depth-2));
+	//if(glm::length(v)/d<1.2f)return false;
+	if(glm::length(v)*(2<<depth)<40.0f) return false;
 	return true;
 }
 
@@ -203,6 +204,9 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 		for(int i=0;i<4;i++)
 			if(sons[i])
 				sons[i]->deletePlanetFace(b);
+
+		// suppresion des éventuels miniWorld
+		removeMiniWorld();
 
 		// dessin de la face
 		if (elevated)

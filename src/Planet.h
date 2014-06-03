@@ -10,7 +10,7 @@
 #include "PlanetInfo.h"
 #include "noise/PlanetGenerator.h"
 
-#define PLANET_ADDED_DETAIL (3)
+#define PLANET_ADDED_DETAIL (4)
 
 typedef struct
 {
