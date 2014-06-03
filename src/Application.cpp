@@ -4,6 +4,7 @@
 #include "utils/Input.h"
 #include "Planet.h"
 #include "MiniWorld.h"
+#include "render/Atmosphere.h"
 #include "utils/TextureManager.h"
 #include "world/BlockType.h"
 #define WIN_TITLE "SPACECRAFT"
@@ -72,7 +73,7 @@ Application::Application() :
 
     // transparency
     glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -144,8 +145,7 @@ void Application::createWindowInFullscreen(bool fs)
 }
 
 Planet* testPlanet;
-MiniWorld* testMiniWorld;
-PlanetFaceBufferHandler* testBuffer;
+Atmosphere* testAtmosphere;
 int testTexture;
 
 void Application::run()
@@ -163,6 +163,7 @@ void Application::run()
     tt = new testShaders;
     PlanetInfo planetInfo;
     testPlanet=new Planet(planetInfo, contentHandler);
+    testAtmosphere=new Atmosphere();
     // testChunk=new Chunk(testPlanet);
     // testMiniWorld=new MiniWorld(testPlanet, testPlanet->faces[2]);
     // testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
@@ -219,6 +220,7 @@ void Application::loop()
     //tt->draw();
     // testPlanet->drawDirect();
     testPlanet->draw(*camera);
+    // testAtmosphere->draw(*camera);
     // testChunk->draw(*camera);
     // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);
@@ -229,7 +231,7 @@ void Application::loop()
     contentHandler.handleNewContent();
 
     #ifndef NTWBAR
-        // Draw tweak bars
+        // Draw tweak bars (or don't)
         glUseProgram(0);
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
