@@ -4,7 +4,7 @@
 #include "utils/Input.h"
 #include "Planet.h"
 #include "MiniWorld.h"
-#include "utils/imageLoader.h"
+#include "utils/TextureManager.h"
 #define WIN_TITLE "SPACECRAFT"
 
 #ifndef NTWBAR
@@ -167,7 +167,7 @@ void Application::run()
     // testBuffer->addFace(testPlanet->faces[0]);
     // testPlanet->testFullGeneration(4, testBuffer);
 
-    testTexture=loadTexture("terrain.png", true);
+    testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
 
     float timeA;
     char titleBuff[512];
