@@ -45,7 +45,8 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	id(id),
 	bufferID(-1),
 	miniworld(NULL),
-	toplevel(father->toplevel)
+	toplevel(father->toplevel),
+	childrenDepth(0)
 {
 	//TODO : exception ?
 	// if(!father);
@@ -206,10 +207,8 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 	// update childrenDepth
 	childrenDepth = 0;
 	for(int i=0;i<4;i++)
-	{
 		if(sons[i])
-			childrenDepth = max(childrenDepth,(sons[i]->childrenDepth)+1);
-	}
+			childrenDepth = max(childrenDepth,(sons[i]->childrenDepth));
 
 	if(isDetailedEnough(c))
 	{
