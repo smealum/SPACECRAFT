@@ -10,7 +10,8 @@ MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 	v1(face->toplevel->uvertex[1]-face->toplevel->uvertex[0]),
 	v2(face->toplevel->uvertex[3]-face->toplevel->uvertex[0]),
 	x(pf->x*MINIWORLD_W*CHUNK_N),
-	z(pf->z*MINIWORLD_D*CHUNK_N)
+	z(pf->z*MINIWORLD_D*CHUNK_N),
+	generated(false)
 {
 	for(int i=0;i<MINIWORLD_W;i++)
 	{
@@ -68,6 +69,7 @@ TrackerPointer<MiniWorld>* MiniWorld::getTptr(void)
 
 void MiniWorld::updateChunks(char data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D])
 {
+	generated=true;
 	for(int i=0;i<MINIWORLD_W;i++)
 	{
 		for(int j=0;j<MINIWORLD_H;j++)

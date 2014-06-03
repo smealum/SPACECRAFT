@@ -212,23 +212,22 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 		// dessin de la face
 		if (elevated)
 			b->addFace(this);
-	}
-	else
-	{
+	}else{
 		// creation/destruction du miniWorld
 		if(shouldHaveMiniworld(c))
 		{
-			// suppression des éventuels enfants
-			for(int i=0;i<4;i++)
-				if(sons[i])
-					sons[i]->deletePlanetFace(b);
+			if(miniworld && miniworld->isGenerated())
+			{
+				b->deleteFace(this);
+				// suppression des éventuels enfants
+				for(int i=0;i<4;i++)
+					if(sons[i])
+						sons[i]->deletePlanetFace(b);
+			}
 			
 			// creation du miniworld
 			createMiniWorld();
-			b->deleteFace(this);
-		}
-		else
-		{
+		}else{
 			// suppresion du MiniWorld
 			removeMiniWorld();
 
