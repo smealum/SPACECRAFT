@@ -37,7 +37,7 @@ class Chunk
 		TrackerPointer<Chunk>* getTptr(void);
 
 		Chunk* neighbour[4] ; // NULL <=> nothing
-		char value[CHUNK_N][CHUNK_N][CHUNK_N];
+		char value[CHUNK_N+2][CHUNK_N+2][CHUNK_N+2];
 
 	private:
 		void initGLObjects();

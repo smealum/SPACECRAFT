@@ -21,9 +21,9 @@ class BlockType : public Singleton<BlockType> {
 	public:
 		// 1D index for a 2D array
 		enum Plane {
-			top,
-			side,
-			bottom,
+			top=0,
+			side=1,
+			bottom=2,
 			maxPlanes
 		};
 
