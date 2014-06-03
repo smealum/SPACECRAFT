@@ -213,6 +213,7 @@ void generateWorldData(int prod_id, Planet& planet, char* data,
 				{
 					pyPos=zPos;
 					const glm::vec3 pos=origin+((v1*float(vx+px+i))+(v2*float(vz+pz+k)))/float(PLANETFACE_BLOCKS);
+					//const float relativeHeight = planet.getElevation(prod_id, glm::normalize(pos));
 					const int height=int(getElevation(prod_id, planet, pos)*CHUNK_N*MINIWORLD_H);
 					for(int cy=0;cy<h;cy++)
 					{
