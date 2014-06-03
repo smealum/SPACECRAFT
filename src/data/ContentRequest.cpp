@@ -54,19 +54,21 @@ WorldChunkRequest::~WorldChunkRequest()
 {}
 
 //TODO pour computeChunkFaces et generateWorldData : NETTOYER (on peut clairement faire plus jolie et lisible)
+//
+
+
+// DOCUMENTATION:
+//
+// Valeurs des bornes:
+// 0<=px<w
+// 0<=py<h
+// 0<=pz<d
+// -1<=i<CHUNK_N+1
+// -1<=j<CHUNK_N+1
+// -1<=k<CHUNK_N+1
 
 #define accessArray(data, w, h, d, px, py, pz, i, j, k) (data)[((px)+(py)*(w)+(pz)*(w)*(h))*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)+((i)+1)+((j)+1)*(CHUNK_N+2)+((k)+1)*(CHUNK_N+2)*(CHUNK_N+2)]
 
-//inline bool isEmpty(char* data, int w, int h, int d, int px, int py, int pz, int i, int j, int k)
-//{
-	//if (i<0) { i+=w; px--;} 
-	//else if (i>w) {i-=w; px++;}
-	//if (j<0) { j+=w; py--;} 
-	//else if (j>h) {j-=w; py++;}
-	//if (k<0) { k+=d; pz--;} 
-	//else if (k>d) {k-=d; pz++;}
-	//return accessArray(data,w,h,d,px,py,pz,i,j,k);
-//}
 
 //TODO : optimiser pour éviter les multiplications à chaque fois
 //(juste utiliser un pointeur à chaque fois...)
@@ -79,102 +81,118 @@ void computeChunkFaces(char* data,
 	vArray.clear();
 	auto blockType = BlockType::getInstance();
 
+	char previous,current;
 	// X
 	for(int y=0;y<CHUNK_N;++y)
 	for(int z=0;z<CHUNK_N;++z)
-	for(int x=0;x<CHUNK_N+1;++x)
 	{
-		if(accessArray(data,w,h,d,sx,sy,sz,x,y,z))
+		previous = accessArray(data,w,h,d,sx,sy,sz,-1,y,z);
+		for(int x=0;x<CHUNK_N+1;++x)
 		{
-			if (!accessArray(data,w,h,d,sx,sy,sz,x-1,y,z))
+			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
+			if(current)
 			{
-				GL_Vertex v;
-				v.facedir=2;
-				v.texcoord= blockType.getTexcoord(
-					(blockTypes)int(accessArray(data,w,h,d,sx,sy,sz,x,y,z)),
-					BlockType::side
-					);
-				v.position=vec3(px+x,py+y,pz+z);
-				vArray.push_back(v);
+				if (!previous)
+				{
+					GL_Vertex v;
+					v.facedir=2;
+					v.texcoord= blockType.getTexcoord(
+						(blockTypes)int(current),
+						BlockType::side
+						);
+					v.position=vec3(px+x,py+y,pz+z);
+					vArray.push_back(v);
+				}
+			}else{
+				if (previous)
+				{
+					GL_Vertex v;
+					v.facedir=3;
+					v.texcoord=blockType.getTexcoord(
+						(blockTypes)int(previous),
+						BlockType::side
+						);
+					v.position=vec3(px+x-1,py+y,pz+z);
+					vArray.push_back(v);
+				}
 			}
-		}else{
-			if (accessArray(data,w,h,d,sx,sy,sz,x-1,y,z))
-			{
-				GL_Vertex v;
-				v.facedir=3;
-				v.texcoord=blockType.getTexcoord(
-					(blockTypes)int(accessArray(data,w,h,d,sx,sy,sz,x-1,y,z)),
-					BlockType::side
-					);
-				v.position=vec3(px+x-1,py+y,pz+z);
-				vArray.push_back(v);
-			}
+			previous=current;
 		}
 	}
 
 	// Y
 	for(int x=0;x<CHUNK_N;++x)
 	for(int z=0;z<CHUNK_N;++z)
-	for(int y=0;y<CHUNK_N+1;++y)
 	{
-		if(accessArray(data,w,h,d,sx,sy,sz,x,y,z))
+		previous = accessArray(data,w,h,d,sx,sy,sz,x,-1,z);
+		for(int y=0;y<CHUNK_N+1;++y)
 		{
-			if (!accessArray(data,w,h,d,sx,sy,sz,x,y-1,z))
+			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
+			if(current)
 			{
-				GL_Vertex v;
-				v.facedir=0;
-				v.texcoord=blockType.getTexcoord(
-					(blockTypes)int(accessArray(data,w,h,d,sx,sy,sz,x,y,z)),
-					BlockType::top
-					);
-				v.position=vec3(px+x,py+y,pz+z);
-				vArray.push_back(v);
+				if (!previous)
+				{
+					GL_Vertex v;
+					v.facedir=0;
+					v.texcoord=blockType.getTexcoord(
+						(blockTypes)int(current),
+						BlockType::top
+						);
+					v.position=vec3(px+x,py+y,pz+z);
+					vArray.push_back(v);
+				}
+			}else{
+				if (previous)
+				{
+					GL_Vertex v;
+					v.facedir=1;
+					v.texcoord=blockType.getTexcoord(
+						(blockTypes)int(previous),
+						BlockType::top
+						);
+					v.position=vec3(px+x,py+y-1,pz+z);
+					vArray.push_back(v);
+				}
 			}
-		}else{
-			if (accessArray(data,w,h,d,sx,sy,sz,x,y-1,z))
-			{
-				GL_Vertex v;
-				v.facedir=1;
-				v.texcoord=blockType.getTexcoord(
-					(blockTypes)int(accessArray(data,w,h,d,sx,sy,sz,x,y-1,z)),
-					BlockType::top
-					);
-				v.position=vec3(px+x,py+y-1,pz+z);
-				vArray.push_back(v);
-			}
+			previous=current;
 		}
 	}
 
 	// Z
 	for(int x=0;x<CHUNK_N;++x)
 	for(int y=0;y<CHUNK_N;++y)
-	for(int z=0;z<CHUNK_N+1;++z)
 	{
-		if(accessArray(data,w,h,d,sx,sy,sz,x,y,z))
+		previous = accessArray(data,w,h,d,sx,sy,sz,x,y,-1);
+		for(int z=0;z<CHUNK_N+1;++z)
 		{
-			if (!accessArray(data,w,h,d,sx,sy,sz,x,y,z-1))
+			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
+			if(current)
 			{
-				GL_Vertex v;
-				v.facedir=4;
-				v.texcoord=blockType.getTexcoord(
-					(blockTypes)int(accessArray(data,w,h,d,sx,sy,sz,x,y,z)),
-					BlockType::side
-					);
-				v.position=vec3(px+x,py+y,pz+z);
-				vArray.push_back(v);
+				if (!previous)
+				{
+					GL_Vertex v;
+					v.facedir=4;
+					v.texcoord=blockType.getTexcoord(
+						(blockTypes)int(current),
+						BlockType::side
+						);
+					v.position=vec3(px+x,py+y,pz+z);
+					vArray.push_back(v);
+				}
+			}else{
+				if (previous)
+				{
+					GL_Vertex v;
+					v.facedir=5;
+					v.texcoord=blockType.getTexcoord(
+						(blockTypes)int(previous),
+						BlockType::side
+						);
+					v.position=vec3(px+x,py+y,pz-1+z);
+					vArray.push_back(v);
+				}
 			}
-		}else{
-			if (accessArray(data,w,h,d,sx,sy,sz,x,y,z-1))
-			{
-				GL_Vertex v;
-				v.facedir=5;
-				v.texcoord=blockType.getTexcoord(
-					(blockTypes)int(accessArray(data,w,h,d,sx,sy,sz,x,y,z-1)),
-					BlockType::side
-					);
-				v.position=vec3(px+x,py+y,pz-1+z);
-				vArray.push_back(v);
-			}
+			previous=current;
 		}
 	}
 }
