@@ -4,7 +4,6 @@
 #include "utils/glm.h"
 #include "utils/TextureManager.h"
 #include "utils/Singleton.h"
-#include <map>
 
 // x, y in [0..1]
 typedef glm::vec2 texCoord;
@@ -47,7 +46,7 @@ class BlockType : public Singleton<BlockType> {
 
 		~BlockType();
 	private:
-		std::map<blockTypes, blockTexcoord> texCoordMap;
+		blockTexcoord texCoordMap[maxTypeValue];
 		friend class Singleton<BlockType>;
 		int texWidth, texHeight, texCols;
 		BlockType();

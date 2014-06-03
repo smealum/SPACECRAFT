@@ -56,6 +56,16 @@ WorldChunkRequest::~WorldChunkRequest()
 //TODO pour computeChunkFaces et generateWorldData : NETTOYER (on peut clairement faire plus jolie et lisible)
 
 #define accessArray(data, w, h, d, px, py, pz, i, j, k) (data)[((px)+(py)*(w)+(pz)*(w)*(h))*CHUNK_N*CHUNK_N*CHUNK_N+(i)+(j)*(CHUNK_N)+(k)*(CHUNK_N)*(CHUNK_N)]
+//inline bool isEmpty(char* data, int w, int h, int d, int px, int py, int pz, int i, int j, int k)
+//{
+	//if (i<0) { i+=w; px--;} 
+	//else if (i>w) {i-=w; px++;}
+	//if (j<0) { j+=w; py--;} 
+	//else if (j>h) {j-=w; py++;}
+	//if (k<0) { k+=d; pz--;} 
+	//else if (k>d) {k-=d; pz++;}
+	//return accessArray(data,w,h,d,px,py,pz,i,j,k);
+//}
 
 //TODO : optimiser pour éviter les multiplications à chaque fois
 //(juste utiliser un pointeur à chaque fois...)
@@ -175,45 +185,74 @@ void generateWorldData(int prod_id, Planet& planet, char* data,
 		int px, int py, int pz, //offset in world
 		glm::vec3 origin, glm::vec3 v1, glm::vec3 v2) //toplevel characteristics
 {
+	/*
+		i CHUNK_N
+		j CHUNK_N
+		k CHUNK_N
+		px w
+		py h
+		pz d
+	*/
+	int pxPos,pzPos,xPos,zPos,pyPos,yPos;
+	pxPos=0;
 	for(int cx=0;cx<w;cx++)
 	{
+		pzPos=pxPos;
 		const int vx=cx*CHUNK_N;
 		for(int cz=0;cz<d;cz++)
 		{
+			xPos=pzPos;
 			const int vz=cz*CHUNK_N;
 			for(int i=0;i<CHUNK_N;i++)
 			{
+				zPos=xPos;
 				for(int k=0;k<CHUNK_N;k++)
 				{
+					pyPos=zPos;
 					const glm::vec3 pos=origin+((v1*float(vx+px+i))+(v2*float(vz+pz+k)))/float(PLANETFACE_BLOCKS);
 					const int height=int(getElevation(prod_id, planet, pos)*CHUNK_N*MINIWORLD_H);
-					//TEMP, juste pour tester
-					if(height<=512)
+
+					//TEMP (pour tester)
+
+					if(height<512)
 					{
+						//UNDER THE SEAAAAAA
 						for(int cy=0;cy<h;cy++)
 						{
+							yPos=pyPos;
 							const int vy=cy*CHUNK_N;
 							for(int j=0;j<CHUNK_N;j++)
 							{
-								if(vy+py+j<=height)accessArray(data,w,h,d,cx,cy,cz,i,j,k)=blockTypes::sand;
-								else accessArray(data,w,h,d,cx,cy,cz,i,j,k)=blockTypes::air;
+								if (vy+py+j <= height) data[yPos]=blockTypes::sand;
+								else data[yPos]=blockTypes::air;
+								yPos+=CHUNK_N;
 							}
+							pyPos+=CHUNK_N*CHUNK_N*CHUNK_N*w;
 						}
 					}else{
 						for(int cy=0;cy<h;cy++)
 						{
+							yPos=pyPos;
 							const int vy=cy*CHUNK_N;
 							for(int j=0;j<CHUNK_N;j++)
 							{
-								if(vy+py+j==height)accessArray(data,w,h,d,cx,cy,cz,i,j,k)=blockTypes::grass;
-								else if(vy+py+j<height)accessArray(data,w,h,d,cx,cy,cz,i,j,k)=blockTypes::dirt;
-								else accessArray(data,w,h,d,cx,cy,cz,i,j,k)=blockTypes::air;
+								if (vy+py+j == height) data[yPos]=blockTypes::grass;
+								else if (vy+py+j < height) data[yPos]=blockTypes::dirt;
+								else data[yPos]=blockTypes::air;
+								yPos+=CHUNK_N;
 							}
+							pyPos+=CHUNK_N*CHUNK_N*CHUNK_N*w;
 						}
 					}
+
+
+					zPos+=CHUNK_N*CHUNK_N;
 				}
+				xPos+=1;
 			}
+			pzPos+=CHUNK_N*CHUNK_N*CHUNK_N*CHUNK_N*w*h;
 		}
+		pxPos+=CHUNK_N*CHUNK_N*CHUNK_N*1;
 	}
 }
 
@@ -231,13 +270,13 @@ void WorldChunkRequest::update(void)
 
 //MiniWorldDataRequest stuff
 MiniWorldDataRequest::MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z):
-	planet(p),
+	px(x),
+	py(y),
+	pz(z),
 	origin(o),
 	v1(v1),
 	v2(v2),
-	px(x),
-	py(y),
-	pz(z)
+	planet(p)
 {
 	miniworld=mw.getTptr();
 	miniworld->grab();
