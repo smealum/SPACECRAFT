@@ -135,7 +135,15 @@ void PlanetFace::updateElevation(float e)
 bool PlanetFace::shouldHaveMiniworld(Camera& c)
 {
 	// if(depth>13)printf("%f %f %f\n",vertex[4].x,vertex[4].y,vertex[4].z);
-	return depth>=MINIWORLD_DETAIL;// && glm::length(c.getPosition()-vertex[4])<glm::length(vertex[1]-vertex[0])*5;
+	//return depth>=MINIWORLD_DETAIL;// && glm::length(c.getPosition()-vertex[4])<glm::length(vertex[1]-vertex[0])*5;
+    if (depth>=MINIWORLD_DETAIL)
+    {
+        return true; 
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool PlanetFace::isDetailedEnough(Camera& c)
