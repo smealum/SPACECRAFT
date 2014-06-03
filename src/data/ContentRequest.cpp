@@ -55,7 +55,8 @@ WorldChunkRequest::~WorldChunkRequest()
 
 //TODO pour computeChunkFaces et generateWorldData : NETTOYER (on peut clairement faire plus jolie et lisible)
 
-#define accessArray(data, w, h, d, px, py, pz, i, j, k) (data)[((px)+(py)*(w)+(pz)*(w)*(h))*CHUNK_N*CHUNK_N*CHUNK_N+(i)+(j)*(CHUNK_N)+(k)*(CHUNK_N)*(CHUNK_N)]
+#define accessArray(data, w, h, d, px, py, pz, i, j, k) (data)[((px)+(py)*(w)+(pz)*(w)*(h))*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)+((i)+1)+((j)+1)*(CHUNK_N+2)+((k)+1)*(CHUNK_N+2)*(CHUNK_N+2)]
+
 //inline bool isEmpty(char* data, int w, int h, int d, int px, int py, int pz, int i, int j, int k)
 //{
 	//if (i<0) { i+=w; px--;} 
@@ -81,7 +82,7 @@ void computeChunkFaces(char* data,
 	// X
 	for(int y=0;y<CHUNK_N;++y)
 	for(int z=0;z<CHUNK_N;++z)
-	for(int x=1;x<CHUNK_N;++x)
+	for(int x=0;x<CHUNK_N+1;++x)
 	{
 		if(accessArray(data,w,h,d,sx,sy,sz,x,y,z))
 		{
@@ -114,7 +115,7 @@ void computeChunkFaces(char* data,
 	// Y
 	for(int x=0;x<CHUNK_N;++x)
 	for(int z=0;z<CHUNK_N;++z)
-	for(int y=1;y<CHUNK_N;++y)
+	for(int y=0;y<CHUNK_N+1;++y)
 	{
 		if(accessArray(data,w,h,d,sx,sy,sz,x,y,z))
 		{
@@ -147,7 +148,7 @@ void computeChunkFaces(char* data,
 	// Z
 	for(int x=0;x<CHUNK_N;++x)
 	for(int y=0;y<CHUNK_N;++y)
-	for(int z=1;z<CHUNK_N;++z)
+	for(int z=0;z<CHUNK_N+1;++z)
 	{
 		if(accessArray(data,w,h,d,sx,sy,sz,x,y,z))
 		{
@@ -198,15 +199,15 @@ void generateWorldData(int prod_id, Planet& planet, char* data,
 	for(int cx=0;cx<w;cx++)
 	{
 		pzPos=pxPos;
-		const int vx=cx*CHUNK_N;
+		const int vx=cx*(CHUNK_N+2);
 		for(int cz=0;cz<d;cz++)
 		{
 			xPos=pzPos;
-			const int vz=cz*CHUNK_N;
-			for(int i=0;i<CHUNK_N;i++)
+			const int vz=cz*(CHUNK_N+2);
+			for(int i=0;i<(CHUNK_N+2);i++)
 			{
 				zPos=xPos;
-				for(int k=0;k<CHUNK_N;k++)
+				for(int k=0;k<(CHUNK_N+2);k++)
 				{
 					pyPos=zPos;
 					const glm::vec3 pos=origin+((v1*float(vx+px+i))+(v2*float(vz+pz+k)))/float(PLANETFACE_BLOCKS);
@@ -221,38 +222,38 @@ void generateWorldData(int prod_id, Planet& planet, char* data,
 						{
 							yPos=pyPos;
 							const int vy=cy*CHUNK_N;
-							for(int j=0;j<CHUNK_N;j++)
+							for(int j=0;j<(CHUNK_N+2);j++)
 							{
 								if (vy+py+j <= height) data[yPos]=blockTypes::sand;
 								else data[yPos]=blockTypes::air;
-								yPos+=CHUNK_N;
+								yPos+=(CHUNK_N+2);
 							}
-							pyPos+=CHUNK_N*CHUNK_N*CHUNK_N*w;
+							pyPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w;
 						}
 					}else{
 						for(int cy=0;cy<h;cy++)
 						{
 							yPos=pyPos;
 							const int vy=cy*CHUNK_N;
-							for(int j=0;j<CHUNK_N;j++)
+							for(int j=0;j<(CHUNK_N+2);j++)
 							{
 								if (vy+py+j == height) data[yPos]=blockTypes::grass;
 								else if (vy+py+j < height) data[yPos]=blockTypes::dirt;
 								else data[yPos]=blockTypes::air;
-								yPos+=CHUNK_N;
+								yPos+=(CHUNK_N+2);
 							}
-							pyPos+=CHUNK_N*CHUNK_N*CHUNK_N*w;
+							pyPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w;
 						}
 					}
 
 
-					zPos+=CHUNK_N*CHUNK_N;
+					zPos+=(CHUNK_N+2)*(CHUNK_N+2);
 				}
 				xPos+=1;
 			}
-			pzPos+=CHUNK_N*CHUNK_N*CHUNK_N*CHUNK_N*w*h;
+			pzPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w*h;
 		}
-		pxPos+=CHUNK_N*CHUNK_N*CHUNK_N*1;
+		pxPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*1;
 	}
 }
 

@@ -55,8 +55,7 @@ void main()
 
 	fcolor.a = 1.0;
 
-	// fcolor.rgb = gcolor[0].rgb * vec3(0.2,0.9,0.2);
-	fcolor.rgb = gcolor[0].rgb;
+	fcolor.rgb = gcolor[0].rgb * vec3(84,124,60) *(0.8/255.0);
 	
 	// TOP FACE
 	gl_Position = vec4(v[5].xy,(2*log(v[5].w/znear)/log(zfar/znear)-1)*v[5].w,v[5].w);	EmitVertex();
@@ -66,7 +65,7 @@ void main()
 	EndPrimitive();
 
 
-	fcolor.rgb = gcolor[0].rgb * 0.3;
+	fcolor.rgb = gcolor[0].rgb * vec3(161,103,88) *(0.5/255.0);
 
 	// LEFT FACE
 	gl_Position = vec4(v[0].xy,(2*log(v[0].w/znear)/log(zfar/znear)-1)*v[0].w,v[0].w);	EmitVertex();
@@ -81,6 +80,8 @@ void main()
 	gl_Position = vec4(v[7].xy,(2*log(v[7].w/znear)/log(zfar/znear)-1)*v[7].w,v[7].w);	EmitVertex();
 	gl_Position = vec4(v[5].xy,(2*log(v[5].w/znear)/log(zfar/znear)-1)*v[5].w,v[5].w);	EmitVertex();
 	EndPrimitive();
+
+	fcolor.rgb = gcolor[0].rgb * vec3(161,103,88) *(0.9/255.0);
 
 	// FRONT FACE
 	gl_Position = vec4(v[1].xy,(2*log(v[1].w/znear)/log(zfar/znear)-1)*v[1].w,v[1].w);	EmitVertex();
