@@ -1,6 +1,7 @@
 #include "Chunk.h"
 #include "MiniWorld.h"
 #include "data/ContentHandler.h"
+#include "utils/positionMath.h"
 #include "utils/dbg.h"
 
 using namespace std;
@@ -89,23 +90,18 @@ TrackerPointer<Chunk>* Chunk::getTptr(void)
 
 bool Chunk::collidePoint(glm::vec3 p)
 {
-    glm::vec3 blockPos;
-    glm::vec3 unprojectedPos=(p*(glm::dot(origin,n)/glm::dot(p,n)))-origin;
-    //calcul de la position en blocs dans la toplevel
-    //TODO : passer ce genre de calculs dans des fonctions helper ?
     //TODO : optimiser en ne la calculant qu'une fois par toplevel (max) par frame ?
-    blockPos.x=(glm::dot(unprojectedPos,glm::normalize(v1))*PLANETFACE_BLOCKS)/glm::length(v1);
-    blockPos.y=(glm::length(p)-1.0f)*PLANETFACE_BLOCKS;
-    blockPos.z=(glm::dot(unprojectedPos,glm::normalize(v2))*PLANETFACE_BLOCKS)/glm::length(v2);
+    glm::vec3 blockPos=spaceToBlock(p,origin,v1,v2,n);
     
-    glm::i32vec3 localBlockPos=glm::i32vec3(blockPos.x-px,blockPos.y-py,blockPos.z-pz);
+    glm::vec3 localBlockPosf=glm::vec3(blockPos.x-px,blockPos.y-py,blockPos.z-pz);
+    glm::i32vec3 localBlockPosi=glm::i32vec3(blockPos.x-px,blockPos.y-py,blockPos.z-pz);
     
-    if(localBlockPos.x<0 || localBlockPos.y<0 || localBlockPos.z<0 ||
-        localBlockPos.x>=CHUNK_N || localBlockPos.y>=CHUNK_N || localBlockPos.z>=CHUNK_N)
+    if(localBlockPosf.x<0 || localBlockPosf.y<0 || localBlockPosf.z<0 ||
+        localBlockPosf.x>=CHUNK_N || localBlockPosf.y>=CHUNK_N || localBlockPosf.z>=CHUNK_N)
         return false;
 
-    // printf("%d %d %d\n",localBlockPos.x,localBlockPos.y,localBlockPos.z);
-    // printf("%d\n",value[localBlockPos.x][localBlockPos.y][localBlockPos.z]);
+    // printf("\n%d %d %d (%f %f %f)\n",localBlockPosi.x,localBlockPosi.y,localBlockPosi.z,blockPos.x,blockPos.y,blockPos.z);
+    // printf("%d\n",value[localBlockPosi.z+1][localBlockPosi.y+1][localBlockPosi.x+1]);
 
     return false;
 }
