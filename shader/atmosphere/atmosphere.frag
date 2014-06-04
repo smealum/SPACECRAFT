@@ -76,8 +76,14 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 	}
 
 	// Initialize a few variables to use inside the loop
-	float fRayleighSum[3] = {0.0, 0.0, 0.0};
-	float fMieSum[3] = {0.0, 0.0, 0.0};
+	float fRayleighSum[3];
+	float fMieSum[3];
+	fRayleighSum[0] = 0;
+	fRayleighSum[1] = 0;
+	fRayleighSum[2] = 0;
+	fMieSum[0] = 0;
+	fMieSum[1] = 0;
+	fMieSum[2] = 0;
 	float fSampleLength = fFar / m_nSamples;
 	float fScaledLength = fSampleLength * m_fScale;
 	vec3 vSampleRay = (vRay*fSampleLength);
