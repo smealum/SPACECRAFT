@@ -18,6 +18,7 @@ void SphereManager::draw(Camera& c,ShaderProgram& shader, int levelOfDetails)
 
 	// pas trouvé, on le génère.
 	Sphere* sphere = new Sphere(shader,levelOfDetails);
+	sphere->generateVBO();
 	spheres[shader.getHandle()][levelOfDetails] = sphere;
 	sphere->draw(c);
 }
