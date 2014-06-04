@@ -170,10 +170,10 @@ void main()
 
 	//color=texelFetch(tex, ivec2((int(gl_FragCoord[0])%texSize),(int(gl_FragCoord[1])%texSize)), 0);
 	// if(!sky)color*=gl_Color;
-	// outColor = color;
+	outColor = color;
 	// outColor = vec4(color.xyz,1.0);
 	// outColor = vec4(normalize(vt),1.0);
-	outColor = vec4(vPos+vec3(0.5,0,0),1.0);
+	// outColor = vec4(vPos+vec3(0.5,0,0),1.0);
 	// outColor = texture(tex, vec2(vPos));
 	//gl_FragColor = gl_Color;
 }
