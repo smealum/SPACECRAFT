@@ -31,6 +31,7 @@ void TW_CALL reloadAllShaders(void * /*clientData*/)
     }
 }
 #endif
+blockTypes::T tmp_type;
 
 Application::Application() : 
     state(appReady),
@@ -87,6 +88,7 @@ Application::Application() :
         TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
         TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
         TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
+		TwAddVarRW(bar, "blockType", TW_TYPE_INT32, (int*)&tmp_type, "label='type of the underwater block'");
 
         // vsync on
         glfwSwapInterval(vsync);
@@ -237,7 +239,7 @@ void Application::loop()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		// TwDraw();
+		TwDraw();
     #endif
 
     glfwSwapBuffers(window);
