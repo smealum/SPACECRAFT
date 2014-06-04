@@ -222,7 +222,7 @@ void Application::loop()
     //tt->draw();
     // testPlanet->drawDirect();
     testPlanet->draw(*camera);
-    // testAtmosphere->draw(*camera);
+    testAtmosphere->draw(*camera);
     // testChunk->draw(*camera);
     // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);

@@ -11,22 +11,21 @@ const float PI=3.14159265;
 
 uniform sampler2D tex;
 
-uniform float m_fOuterRadius = 1.1;
-uniform float m_fScale = 1.0 ;
-uniform float m_fInnerRadius = 1.0 ;
-uniform float m_Kr = 1.0 ;
-uniform float m_Km = 1.0 ;
-uniform float m_Kr4PI = 1.0 ;
-uniform float m_Km4PI = 1.0 ;
-uniform vec3 m_fWavelength4 = vec3(1.0,1.0,1.0);
-uniform float m_g = 1.0 ;
-uniform float m_ESun = 1.0 ;
-uniform bool sky = false ;
+uniform float m_fOuterRadius;
+uniform float m_fScale;
+uniform float m_fInnerRadius;
+uniform float m_Kr;
+uniform float m_Km;
+uniform float m_Kr4PI;
+uniform float m_Km4PI;
+uniform vec3 m_fWavelength4;
+uniform float m_g;
+uniform float m_ESun;
+uniform bool sky;
 
-uniform vec3 cameraPosition = vec3(1.0,0.0,0.0);
-uniform vec3 lightDirection = vec3(0.0,0.0,1.0);
+uniform vec3 cameraPosition, lightDirection;
 
-uniform int m_nSamples = 2;
+uniform int m_nSamples;
 
 const int texSize=128;
 const float DELTA = 0.000001;
@@ -45,21 +44,23 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 	float fDet = max(0.0f, B*B - 4.0f * C);
 	float fNear = 0.5f * (-B - sqrt(fDet));
 
-	float bCameraAbove_f = 1.0f;
+	bool bCameraInAtmosphere = false;
 	bool bCameraAbove = true;
-	vec4 fCameraDepth = vec4(0);
+	vec4 fCameraDepth = vec4(0, 0, 0, 0);
 	vec4 fLightDepth;
 	vec4 fSampleDepth;
 
 	if(fNear <= 0)
 	{
 		// If the near point is behind the camera, it means the camera is inside the atmosphere
+		bCameraInAtmosphere = true;
 		fNear = 0;
 		float fCameraHeight = length(vCamera);
 		float fCameraAltitude = (fCameraHeight - m_fInnerRadius) * m_fScale;
 		bCameraAbove = fCameraHeight >= length(v);
 		float fCameraAngle = dot((bCameraAbove ? (-vRay) : vRay), vCamera) / fCameraHeight;
-		bCameraAbove_f = bCameraAbove?-1.0f:1.0f;
+		//m_pbOpticalDepth.Interpolate(fCameraDepth, fCameraAltitude, 0.5f - fCameraAngle * 0.5f);
+		// fCameraDepth=Interpolate(fCameraAltitude, 0.5f - fCameraAngle * 0.5f);
 		fCameraDepth=texture(tex, vec2(fCameraAltitude, 0.5f - fCameraAngle * 0.5f));
 	}else{
 		// Otherwise, move the camera up to the near intersection point
@@ -90,6 +91,8 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 		// Start by looking up the optical depth coming from the light source to this point
 		float fLightAngle = dot(lightDir, v) / fHeight;
 		float fAltitude = (fHeight - m_fInnerRadius) * m_fScale;
+		//m_pbOpticalDepth.Interpolate(fLightDepth, fAltitude, 0.5f - fLightAngle * 0.5f);
+		// fLightDepth=Interpolate(fAltitude, 0.5f - fLightAngle * 0.5f);
 		fLightDepth=texture(tex, vec2(fAltitude, 0.5f - fLightAngle * 0.5f));
 
 		// If no light light reaches this part of the atmosphere, no light is scattered in at this point
@@ -103,10 +106,22 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 
 		// If the camera is above the point we're shading, we calculate the optical depth from the sample point to the camera
 		// Otherwise, we calculate the optical depth from the camera to the sample point
-		float fSampleAngle = bCameraAbove_f*dot(vRay, v) / fHeight;
-		fSampleDepth=texture(tex, vec2(fAltitude, 0.5f-fSampleAngle*0.5f));
-		fRayleighDepth += bCameraAbove_f*(fSampleDepth[1] - fCameraDepth[1]);
-		fMieDepth += bCameraAbove_f*(fSampleDepth[3] - fCameraDepth[3]);
+		if(bCameraAbove)
+		{
+			float fSampleAngle = -dot(vRay, v) / fHeight;
+			//m_pbOpticalDepth.Interpolate(fSampleDepth, fAltitude, 0.5f - fSampleAngle * 0.5f);
+			// fSampleDepth=Interpolate(fAltitude, 0.5f - fSampleAngle * 0.5f);
+			fSampleDepth=texture(tex, vec2(fAltitude, 0.5f - fSampleAngle * 0.5f));
+			fRayleighDepth += fSampleDepth[1] - fCameraDepth[1];
+			fMieDepth += fSampleDepth[3] - fCameraDepth[3];
+		}else{
+			float fSampleAngle = dot(vRay, v) / fHeight;
+			//m_pbOpticalDepth.Interpolate(fSampleDepth, fAltitude, 0.5f - fSampleAngle * 0.5f);
+			// fSampleDepth=Interpolate(fAltitude, 0.5f - fSampleAngle * 0.5f);
+			fSampleDepth=texture(tex, vec2(fAltitude, 0.5f - fSampleAngle * 0.5f));
+			fRayleighDepth += fCameraDepth[1] - fSampleDepth[1];
+			fMieDepth += fCameraDepth[3] - fSampleDepth[3];
+		}
 
 		// Now multiply the optical depth by the attenuation factor for the sample ray
 		fRayleighDepth *= m_Kr4PI;

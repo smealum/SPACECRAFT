@@ -16,6 +16,7 @@
 #define MIEDEPTH 0.1f
 
 #include "utils/glm.h"
+#include "utils/Sphere.h"
 #include "render/Camera.h"
 
 class Atmosphere
@@ -51,6 +52,8 @@ class Atmosphere
 		
 		GLuint texture;
 		GLuint vao, vbo, ebo;
+
+		int lod;
 };
 
 #endif

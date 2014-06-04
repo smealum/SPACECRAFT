@@ -9,10 +9,11 @@
 #include "render/Camera.h"
 #include "PlanetInfo.h"
 #include "noise/PlanetGenerator.h"
+#include "render/Cloud.h"
 
 #define PLANET_ADDED_DETAIL (4)
 // #define PFBH_MAXSIZE (1024*16)
-#define PFBH_MAXSIZE (1024*64)
+#define PFBH_MAXSIZE (1024*256)
 
 typedef struct
 {
@@ -143,6 +144,8 @@ class Planet
 			GLuint vaoBasic;
 			GLuint vbo;
 			GLuint ebo;
+
+		Cloud cloud;
 };
 
 #endif
