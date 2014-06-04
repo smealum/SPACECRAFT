@@ -1,5 +1,6 @@
 #include "Cloud.h"
 #include "Application.h"
+#include "utils/SphereManager.h"
 
 Cloud::Cloud():
 	shader(ShaderProgram::loadFromFile(
@@ -19,4 +20,7 @@ void Cloud::draw(Camera& c)
 	// draw
 	shader.use();
 	shader.setUniform("time",time);
+
+	SphereManager::getInstance().draw(c,shader,4);
+	
 }
