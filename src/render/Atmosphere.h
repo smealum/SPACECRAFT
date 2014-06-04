@@ -16,6 +16,7 @@
 #define MIEDEPTH 0.1f
 
 #include "utils/glm.h"
+#include "utils/sphere.h"
 #include "render/Camera.h"
 
 class Atmosphere
@@ -33,6 +34,8 @@ class Atmosphere
 
 	private:
 		ShaderProgram& shader;
+
+		Sphere sphere;
 
 		int m_nSamples;
 		float m_Kr, m_Kr4PI;
