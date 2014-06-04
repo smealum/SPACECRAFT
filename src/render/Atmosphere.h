@@ -16,7 +16,7 @@
 #define MIEDEPTH 0.1f
 
 #include "utils/glm.h"
-#include "utils/sphere.h"
+#include "utils/Sphere.h"
 #include "render/Camera.h"
 
 class Atmosphere
