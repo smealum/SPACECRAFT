@@ -23,8 +23,8 @@ void CameraKeyboard::update(Camera& camera)
     if (Input::isKeyPressed(GLFW_KEY_H))   speed/=10.0f;
 
     // changement de la vitesse (manière smooth)
-    if (Input::isKeyHold(GLFW_KEY_T))    speed*=exp(delta*0.4);
-    if (Input::isKeyHold(GLFW_KEY_G))   speed*=exp(-delta*0.4);
+    if (Input::isKeyHold(GLFW_KEY_T))    speed*=exp(delta*0.6);
+    if (Input::isKeyHold(GLFW_KEY_G))   speed*=exp(-delta*0.6);
 
     // vitesse en translation
     float tS = speed * delta;
