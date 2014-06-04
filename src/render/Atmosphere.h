@@ -35,8 +35,6 @@ class Atmosphere
 	private:
 		ShaderProgram& shader;
 
-		Sphere sphere;
-
 		int m_nSamples;
 		float m_Kr, m_Kr4PI;
 		float m_Km, m_Km4PI;
@@ -54,6 +52,8 @@ class Atmosphere
 		
 		GLuint texture;
 		GLuint vao, vbo, ebo;
+
+		int lod;
 };
 
 #endif
