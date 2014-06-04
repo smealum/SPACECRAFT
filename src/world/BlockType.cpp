@@ -39,7 +39,7 @@ BlockType::BlockType() :
 				break;
 		}
 
-		debug("Added texCoord for type %d: %f, %f", i, texCoordMap[(blockTypes)i].side[BlockType::top].x, texCoordMap[(blockTypes)i].side[BlockType::top].y);
+		// debug("Added texCoord for type %d: %f, %f", i, texCoordMap[(blockTypes)i].side[BlockType::top].x, texCoordMap[(blockTypes)i].side[BlockType::top].y);
 	}
 }
 
