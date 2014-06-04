@@ -175,7 +175,7 @@ glm::vec3 Chunk::collidePoint(glm::vec3 p, glm::vec3 v)
 
     // printf("collision %d %d %d (%f %f %f) %f (%f %f %f)\n",cur.x,cur.y,cur.z,localBlockPosf.x,localBlockPosf.y,localBlockPosf.z,d,tMaxX,tMaxY,tMaxZ);
 
-    // return blockToSpace(blockPos2-vec3(0,localBlockPosf.y-float(localBlockPosi2.y+1),0), origin, v1, v2)-p;
+    return blockToSpace(vec3(cur)-vec3(0,localBlockPosf.y-float(localBlockPosi2.y+1),0), origin, v1, v2)-p;
 
     return v;
 }
