@@ -233,7 +233,7 @@ void generateWorldData(int prod_id, Planet& planet, char* data,
 
 					//TEMP (pour tester)
 
-					if(height<512)
+					if(height<CHUNK_N*MINIWORLD_H/2.f+12)
 					{
 						//UNDER THE SEAAAAAA
 						for(int cy=0;cy<h;cy++)
