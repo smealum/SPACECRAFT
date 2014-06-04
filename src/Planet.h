@@ -10,6 +10,7 @@
 #include "PlanetInfo.h"
 #include "noise/PlanetGenerator.h"
 #include "render/Cloud.h"
+#include "render/Atmosphere.h"
 
 #define PLANET_ADDED_DETAIL (4)
 // #define PFBH_MAXSIZE (1024*16)
@@ -148,6 +149,7 @@ class Planet
 			GLuint ebo;
 
 		Cloud cloud;
+		Atmosphere atmosphere;
 };
 
 #endif

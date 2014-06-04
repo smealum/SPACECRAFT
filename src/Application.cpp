@@ -148,7 +148,6 @@ void Application::createWindowInFullscreen(bool fs)
 }
 
 Planet* testPlanet;
-Atmosphere* testAtmosphere;
 int testTexture;
 
 void Application::run()
@@ -166,7 +165,6 @@ void Application::run()
     tt = new testShaders;
     PlanetInfo planetInfo;
     testPlanet=new Planet(planetInfo, contentHandler);
-    testAtmosphere=new Atmosphere();
     // testChunk=new Chunk(testPlanet);
     // testMiniWorld=new MiniWorld(testPlanet, testPlanet->faces[2]);
     // testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
@@ -195,6 +193,7 @@ void Application::run()
                 sprintf(titleBuff, "%s FPS: %.1f", WIN_TITLE, fps);
                 glfwSetWindowTitle(window, titleBuff);
             }
+			BlockAnimated::animation(deltaTime);
         }
     }
 
@@ -223,7 +222,6 @@ void Application::loop()
     //tt->draw();
     // testPlanet->drawDirect();
     testPlanet->draw(*camera);
-    testAtmosphere->draw(*camera);
     // testChunk->draw(*camera);
     // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);
@@ -242,7 +240,7 @@ void Application::loop()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		// TwDraw();
+		TwDraw();
     #endif
 
     glfwSwapBuffers(window);

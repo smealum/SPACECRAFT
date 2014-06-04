@@ -5,6 +5,7 @@
 #include "utils/TextureManager.h"
 #include "utils/Singleton.h"
 #include <vector>
+#include <list>
 #define TEXCOLS 16
 
 // x, y in [0..1]
@@ -54,6 +55,7 @@ class BlockAnimated : public BlockTexCoord {
 	private:
 		static const float frameTime; // in seconds
 		static BlockType *btype;
+		static std::list<BlockAnimated*> list;
 		std::vector<blockTypes::T> frames;
 		uint32_t current,
 				 size;
@@ -65,6 +67,7 @@ class BlockAnimated : public BlockTexCoord {
 		}
 	public:
 		static void setStaticInstance(BlockType *bt); // this need to be called after the creation of OGL context
+		static void animation(float delta);
 		BlockAnimated(std::initializer_list<blockTypes::T> frames);
 		~BlockAnimated();
 		virtual inline texCoord getSide(blockPlane::T p) const; // unused parameter of side because all sides are equal :D

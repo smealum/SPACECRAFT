@@ -30,7 +30,7 @@ class Chunk
 		Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, glm::vec3 v2, glm::vec3 n);
 
 		void draw(Camera& camera, glm::mat4 model);
-		void updateData(char* data, std::vector<GL_Vertex> va);
+		void updateData(chunkVal* data, std::vector<GL_Vertex> va);
 		void destroyChunk(void);
 
 		void collidePoint(glm::vec3& p, glm::vec3& v);
@@ -38,7 +38,7 @@ class Chunk
 		TrackerPointer<Chunk>* getTptr(void);
 
 		Chunk* neighbour[4] ; // NULL <=> nothing
-		char value[CHUNK_N+2][CHUNK_N+2][CHUNK_N+2];
+		chunkVal value[CHUNK_N+2][CHUNK_N+2][CHUNK_N+2];
 
 	private:
 		void initGLObjects();

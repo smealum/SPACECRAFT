@@ -193,7 +193,7 @@ void main()
 
         alpha = clamp(alpha,0.0,0.8);
 
-        outColor = vec4(1.0,1.0,1.0,alpha);
+        outColor = vec4(0.9,0.9,0.9,alpha);
     }
 }
 

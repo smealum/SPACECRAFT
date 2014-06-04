@@ -3,6 +3,7 @@
 
 const float BlockAnimated::frameTime(0.5f);
 BlockType *BlockAnimated::btype(NULL);
+std::list<BlockAnimated*> BlockAnimated::list;
 
 BlockType::BlockType() :
 	texWidth(0),
@@ -35,15 +36,15 @@ BlockType::BlockType() :
 							)
 						);
 				break;
-			//case blockTypes::water:
-				//side = new BlockAnimated({
-						//blockTypes::water,
-						//blockTypes::water_1,
-						//blockTypes::water_2,
-						//blockTypes::water_3,
-						//blockTypes::water_4
-						//});
-				//break;
+			case blockTypes::water:
+				side = new BlockAnimated({
+						blockTypes::water,
+						blockTypes::water_1,
+						blockTypes::water_2,
+						blockTypes::water_3,
+						blockTypes::water_4
+						});
+				break;
 			default:
 				auto v = glm::vec2(
 							((i-1) % texCols) / (float)texCols,
@@ -54,10 +55,8 @@ BlockType::BlockType() :
 				break;
 		}
 
-		debug("Added texCoord for type %d: %s", i, glm::to_string(texCoordMap[i]->getSide(blockPlane::top)).c_str());
+		debug("Added texCoord for type %d", i);
 	}
-	auto p = texCoordMap[blockTypes::water];
-	debug("water(%u): %p, framenow: %s", blockTypes::water, p, glm::to_string(p->getSide(blockPlane::top)).c_str());
 	BlockAnimated::setStaticInstance(this);
 }
 
@@ -75,6 +74,7 @@ BlockAnimated::BlockAnimated(std::initializer_list<blockTypes::T> frames) :
 	timer(0.f)
 {
 	// sides remain unused
+	list.push_back(this);
 }
 
 void BlockAnimated::animate(float delta)
@@ -87,7 +87,9 @@ void BlockAnimated::animate(float delta)
 }
 
 BlockAnimated::~BlockAnimated()
-{}
+{
+	list.remove(this);
+}
 
 BlockStatic::BlockStatic(const texCoord& top, const texCoord& bot, const texCoord &side) :
 	BlockTexCoord()
@@ -101,5 +103,11 @@ BlockStatic::BlockStatic(const texCoord& top, const texCoord& bot, const texCoor
 void BlockAnimated::setStaticInstance(BlockType *bt)
 {
 	btype = bt;
+}
+
+void BlockAnimated::animation(float delta)
+{
+	for (auto it(list.begin()); it != list.end(); ++it)
+		(*it)->animate(delta);
 }
 
