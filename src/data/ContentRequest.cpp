@@ -196,7 +196,6 @@ void computeChunkFaces(chunkVal* data,
 		}
 	}
 }
-extern blockTypes::T tmp_type;
 //TODO : optimiser et proprifier
 //(on peut largement optimiser les accès à data, éviter *énormément* de multiplications)
 void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
@@ -242,7 +241,7 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 							const int vy=cy*CHUNK_N;
 							for(int j=0;j<(CHUNK_N+2);j++)
 							{
-								if (vy+py+j <= height) data[yPos]=tmp_type;
+								if (vy+py+j <= height) data[yPos]=blockTypes::sand;
 								else data[yPos]=blockTypes::air;
 								yPos+=(CHUNK_N+2);
 							}
