@@ -4,7 +4,7 @@
 Atmosphere::Atmosphere():
 	shader(ShaderProgram::loadFromFile("shader/atmosphere/atmosphere.vert", "shader/atmosphere/atmosphere.frag", "atmosphere")),
 	m_fInnerRadius(1.0f),
-	m_fOuterRadius(1.1f),
+	m_fOuterRadius(1.05f),
 	opticalBuffer(NULL),
 	sphere(shader, 4)
 {

@@ -214,12 +214,12 @@ void Application::loop()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     camera->updateFrustum();
-    // testPlanet->processLevelOfDetail(*camera);
+    testPlanet->processLevelOfDetail(*camera);
 
     glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
     //tt->draw();
     // testPlanet->drawDirect();
-    // testPlanet->draw(*camera);
+    testPlanet->draw(*camera);
     testAtmosphere->draw(*camera);
     // testChunk->draw(*camera);
     // testMiniWorld->draw(*camera);
