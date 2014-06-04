@@ -1,7 +1,7 @@
 #ifndef CHUNK_4TYUGC3N
 #define CHUNK_4TYUGC3N
 
-#define BLOCK_SIZE 0.1f
+#define BLOCK_SIZE 1.0f
 #define CHUNK_N 32
 #define CHUNK_SIZE (BLOCK_SIZE*CHUNK_N)
 
@@ -11,6 +11,7 @@
 #include "Planet.h"
 
 #include <vector>
+typedef uint8_t chunkVal;
 
 struct GL_Vertex
 {

@@ -1,4 +1,4 @@
-#include "utils/sphere.h"
+#include "utils/Sphere.h"
 #include <vector>
 #include <algorithm>
 
@@ -93,7 +93,11 @@ void Sphere::generateVBO(void)
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
+
 	shader.setBuffers(vao, vbo, ebo);
+
+	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
+	shader.setAttribute("position", 3, GL_FALSE, 3, 0);
 }
 
 void Sphere::draw(Camera& c)

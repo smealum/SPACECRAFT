@@ -1,27 +1,20 @@
 #include <cstdlib>
 #include "Atmosphere.h"
+#include "utils/SphereManager.h"
 
 Atmosphere::Atmosphere():
 	shader(ShaderProgram::loadFromFile("shader/atmosphere/atmosphere.vert", "shader/atmosphere/atmosphere.frag", "atmosphere")),
 	m_fInnerRadius(1.0f),
 	m_fOuterRadius(1.05f),
 	opticalBuffer(NULL),
-	sphere(shader, 6)
+	lod(6)
 {
 	initLightConstants();
 	makeOpticalDepthBuffer();
-	generateVBO();
 
 	shader.use();
-	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
-	shader.setAttribute("position", 3, GL_FALSE, 3, 0);
 }
 
-//TODO : créer juste un VBO sphère global ?
-void Atmosphere::generateVBO(void)
-{
-	sphere.generateVBO();
-}
 
 void Atmosphere::initLightConstants(void)
 {
@@ -173,7 +166,7 @@ void Atmosphere::draw(Camera& c)
 
 	//TODO : check la bonne valeur ?
 	glFrontFace(GL_CW);
-		sphere.draw(c);
+		SphereManager::getInstance().draw(c,shader,lod);
 	glFrontFace(GL_CCW);
 }
 
