@@ -6,7 +6,7 @@ Atmosphere::Atmosphere():
 	m_fInnerRadius(1.0f),
 	m_fOuterRadius(1.05f),
 	opticalBuffer(NULL),
-	sphere(shader, 4)
+	sphere(shader, 6)
 {
 	initLightConstants();
 	makeOpticalDepthBuffer();

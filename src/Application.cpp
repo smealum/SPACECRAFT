@@ -152,7 +152,7 @@ void Application::run()
 {
     BlockType::getInstance(); // TODO can be deleted when used
     state = appInLoop;
-    camera = new Camera(0.000001f, 100.f);
+    camera = new Camera(0.0000001f, 10.f);
     camera->view = glm::lookAt(
             glm::vec3(1.5, 1.5f, 1.5f),
             glm::vec3(0.f),
@@ -224,6 +224,8 @@ void Application::loop()
     // testChunk->draw(*camera);
     // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);
+
+    if (Input::isKeyHold(GLFW_KEY_N))reloadAllShaders(NULL);
 
     // printf("test %d\n",testVal);
     testVal=0;

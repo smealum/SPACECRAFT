@@ -20,7 +20,8 @@ void Camera::updateCamera(ShaderProgram &prog)
 	prog.setUniform("view", view);
     prog.setUniform("proj", proj);
     prog.setUniform("znear", znear);
-	prog.setUniform("zfar", zfar);
+    prog.setUniform("zfar", zfar);
+	prog.setUniform("logconst", 2.0f/log2(zfar+1.0f));
 }
 
 glm::vec3 Camera::getPosition(void)
