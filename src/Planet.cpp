@@ -139,6 +139,7 @@ int randomSource=4;
 
 bool PlanetFace::shouldHaveMiniworld(Camera& c)
 {
+	// if(planet->numMiniWorlds()>0 && !miniworld)return false; //TEMP DEBUG
 	if (depth == MINIWORLD_DETAIL)
 	{
 		if (miniworld)
