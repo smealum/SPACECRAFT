@@ -13,8 +13,6 @@ Atmosphere::Atmosphere():
 	makeOpticalDepthBuffer();
 
 	shader.use();
-	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
-	shader.setAttribute("position", 3, GL_FALSE, 3, 0);
 }
 
 
