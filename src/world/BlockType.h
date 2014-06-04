@@ -13,7 +13,7 @@ typedef glm::vec2 texCoord;
 namespace blockTypes
 {
 	// 1D index for a 2D array
-	enum T : uint16_t {
+	enum T : uint32_t {
 		air = 0,
 		grass = 1,
 		stone = 2,

@@ -88,6 +88,7 @@ Application::Application() :
         TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
         TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
         TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
+		tmp_type = blockTypes::sand;
 		TwAddVarRW(bar, "blockType", TW_TYPE_INT32, (int*)&tmp_type, "label='type of the underwater block'");
 
         // vsync on
