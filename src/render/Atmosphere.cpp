@@ -50,14 +50,14 @@ void Atmosphere::initLightConstants(void)
 //(attention aux appels GL)
 void Atmosphere::makeOpticalDepthBuffer(void)
 {
-	const int nSize = 128;
+	// const int nSize = 128;
+	const int nSize = 256;
 	const int nSamples = 50;
 	const float fScale = 1.0f / (m_fOuterRadius - m_fInnerRadius);
 	const int m_nChannels=4;
 	
 	opticalBuffer=(float*)malloc(sizeof(float)*m_nChannels*nSize*nSize);
 
-	//Init(nSize, nSize, 1, 4, GL_RGBA, GL_FLOAT);
 	int nIndex = 0;
 	for(int nAngle=0; nAngle<nSize; nAngle++)
 	{
@@ -137,11 +137,13 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 	glBindTexture(GL_TEXTURE_2D, texture);
 }
 
+extern float testAngle;
+
 void Atmosphere::bind(Camera& c)
 {
 	shader.use();
 
-	glm::vec3 lightDirection(1,0,0);
+	glm::vec3 lightDirection(cos(testAngle),0,sin(testAngle));
 
 	shader.setUniform("cameraPosition", c.getPosition());
 	shader.setUniform("lightDirection", lightDirection);

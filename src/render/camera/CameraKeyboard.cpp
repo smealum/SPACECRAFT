@@ -14,6 +14,8 @@ CameraKeyboard::CameraKeyboard():
 
 }
 
+float testAngle=0.0f;
+
 void CameraKeyboard::update(Camera& camera)
 {
     float delta = Application::getInstance().getFrameDeltaTime();
@@ -35,6 +37,9 @@ void CameraKeyboard::update(Camera& camera)
     // mode de précision (instantanée)
     if (Input::isKeyHold(GLFW_KEY_LEFT_SHIFT)){tS/=10.0f;rS=0.0003f;}
     if (Input::isKeyHold(GLFW_KEY_LEFT_CONTROL)){tS/=100.0f;rS=0.0003f;}
+    
+    if (Input::isKeyHold(GLFW_KEY_P))testAngle+=0.05f;
+    if (Input::isKeyHold(GLFW_KEY_M))testAngle-=0.05f;
 
     // translation
     if (Input::isKeyHold(GLFW_KEY_A))
