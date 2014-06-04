@@ -139,14 +139,19 @@ int randomSource=4;
 
 bool PlanetFace::shouldHaveMiniworld(Camera& c)
 {
-    return
-	(
-		depth==MINIWORLD_DETAIL and
-		(
-			miniworld or
-			(childrenDepth >= PLANET_ADDED_DETAIL)
-		)
-	);
+	if (depth == MINIWORLD_DETAIL)
+	{
+		if (miniworld)
+		{
+			glm::vec3 p=c.getPosition();
+			return glm::length(vertex[4]*elevation-p)*(2<<(depth))<20.0f;
+		}
+		else
+		{
+			return (childrenDepth >= PLANET_ADDED_DETAIL);
+		}
+	}
+	return false;
 }
 
 bool PlanetFace::isDetailedEnough(Camera& c)
@@ -160,7 +165,10 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	&& glm::dot(vertex[2]*0.99f-p,vertex[2])>0.0f
 	&& glm::dot(vertex[3]*0.99f-p,vertex[3])>0.0f
 	&& glm::dot(vertex[4]*0.99f-p,vertex[4])>0.0f)return true; //backface culling
-	// if(!c.isPointInFrustum(p2))return true; //frustum culling
+	
+	//if (!sons[0])
+		//if(!c.isPointInFrustum(vertex[4]))
+			//return true; //frustum culling
 	// float d=2.0f/(1<<(depth-3));
 	//float d=2.0f/(1<<(depth-2));
 	//if(glm::length(vertex[4]*elevation-p)/d<1.2f)return false;
