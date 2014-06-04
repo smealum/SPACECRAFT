@@ -22,7 +22,7 @@ Chunk::Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, 
     //fait dans miniworld maintenant
     // planet->handler.requestContent(new WorldChunkRequest(*planet, *this, mw->face->elevation, origin, v1, v2, x, y, z));
 
-    memset(value,0,sizeof(char)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2));
+    memset(value,0,sizeof(chunkVal)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2));
 
     boundingVolume[0]=origin+(v1*float(px)+v2*float(pz))/float(PLANETFACE_BLOCKS);
     boundingVolume[1]=origin+(v1*float(px+CHUNK_N)+v2*float(pz))/float(PLANETFACE_BLOCKS);
@@ -37,9 +37,9 @@ Chunk::Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, 
     initGLObjects();
 }
 
-void Chunk::updateData(char* data, std::vector<GL_Vertex> va)
+void Chunk::updateData(chunkVal* data, std::vector<GL_Vertex> va)
 {
-    memcpy(value,data,sizeof(char)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2));
+    memcpy(value,data,sizeof(chunkVal)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2));
     vArray.swap(va);
     destroyGLObjects();
     initGLObjects();

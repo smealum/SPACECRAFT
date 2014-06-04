@@ -43,7 +43,7 @@ class WorldChunkRequest : public ContentRequest
 		virtual ~WorldChunkRequest();
 		
 	private:
-        char data[(CHUNK_N+2)][(CHUNK_N+2)][(CHUNK_N+2)];
+        chunkVal data[(CHUNK_N+2)][(CHUNK_N+2)][(CHUNK_N+2)];
         int px, py, pz;
         float elevation;
 		glm::vec3 origin, v1, v2;
@@ -63,7 +63,7 @@ class MiniWorldDataRequest : public ContentRequest
 		virtual ~MiniWorldDataRequest();
 		
 	private:
-        char data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)];
+        chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)];
         int px, py, pz;
 		glm::vec3 origin, v1, v2;
 		Planet& planet;

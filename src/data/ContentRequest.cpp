@@ -72,7 +72,7 @@ WorldChunkRequest::~WorldChunkRequest()
 
 //TODO : optimiser pour éviter les multiplications à chaque fois
 //(juste utiliser un pointeur à chaque fois...)
-void computeChunkFaces(char* data,
+void computeChunkFaces(chunkVal* data,
 		int w, int h, int d, //array sizes (in chunks)
 		int sx, int sy, int sz, //chunk in array (in chunks)
 		int px, int py, int pz, //chunk offset in world (in blocks)
@@ -81,7 +81,7 @@ void computeChunkFaces(char* data,
 	vArray.clear();
 	auto &blockType = BlockType::getInstance();
 
-	char previous,current;
+	chunkVal previous,current;
 	// X
 	for(int y=0;y<CHUNK_N;++y)
 	for(int z=0;z<CHUNK_N;++z)
@@ -199,7 +199,7 @@ void computeChunkFaces(char* data,
 extern blockTypes::T tmp_type;
 //TODO : optimiser et proprifier
 //(on peut largement optimiser les accès à data, éviter *énormément* de multiplications)
-void generateWorldData(int prod_id, Planet& planet, char* data,
+void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 		int w, int h, int d, //array sizes (in chunks)
 		int px, int py, int pz, //offset in world
 		glm::vec3 origin, glm::vec3 v1, glm::vec3 v2) //toplevel characteristics
@@ -277,13 +277,13 @@ void generateWorldData(int prod_id, Planet& planet, char* data,
 
 void WorldChunkRequest::process(int id)
 {
-	generateWorldData(id, planet, (char*)data, 1, 1, 1, px, py, pz, origin, v1, v2);
-	computeChunkFaces((char*)data, 1, 1, 1, 0, 0, 0, px, py, pz, vArray);
+	generateWorldData(id, planet, (chunkVal*)data, 1, 1, 1, px, py, pz, origin, v1, v2);
+	computeChunkFaces((chunkVal*)data, 1, 1, 1, 0, 0, 0, px, py, pz, vArray);
 }
 
 void WorldChunkRequest::update(void)
 {
-	chunk->getPointer()->updateData((char*)data, vArray);
+	chunk->getPointer()->updateData((chunkVal*)data, vArray);
 	chunk->release();
 }
 
@@ -306,12 +306,12 @@ MiniWorldDataRequest::~MiniWorldDataRequest()
 
 void MiniWorldDataRequest::process(int id)
 {
-	generateWorldData(id, planet, (char*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, px, py, pz, origin, v1, v2);
+	generateWorldData(id, planet, (chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, px, py, pz, origin, v1, v2);
 
 	for(int i=0;i<MINIWORLD_W;i++)
 		for(int j=0;j<MINIWORLD_H;j++)
 			for(int k=0;k<MINIWORLD_D;k++)
-				computeChunkFaces((char*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, i, j, k, px+i*CHUNK_N, py+j*CHUNK_N, pz+k*CHUNK_N, vArray[i][j][k]);
+				computeChunkFaces((chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, i, j, k, px+i*CHUNK_N, py+j*CHUNK_N, pz+k*CHUNK_N, vArray[i][j][k]);
 }
 
 void MiniWorldDataRequest::update(void)
