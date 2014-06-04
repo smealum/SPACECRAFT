@@ -193,6 +193,7 @@ void Application::run()
                 sprintf(titleBuff, "%s FPS: %.1f", WIN_TITLE, fps);
                 glfwSetWindowTitle(window, titleBuff);
             }
+			BlockAnimated::animation(deltaTime);
         }
     }
 
