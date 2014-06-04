@@ -120,6 +120,8 @@ class Planet
 		void addMiniWorld(MiniWorld* mw);
 		void removeMiniWorld(MiniWorld* mw);
 
+		glm::vec3 collidePoint(glm::vec3 p, glm::vec3 v);;
+
 		const PlanetInfo planetInfo; //read only
 		class ContentHandler& handler;
 

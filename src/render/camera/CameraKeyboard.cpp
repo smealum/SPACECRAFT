@@ -15,10 +15,13 @@ CameraKeyboard::CameraKeyboard():
 }
 
 float testAngle=0.0f;
+extern Planet* testPlanet;
 
 void CameraKeyboard::update(Camera& camera)
 {
     float delta = Application::getInstance().getFrameDeltaTime();
+
+    speedVect=vec3(0,0,0);
 
     // changement de la vitesse (manière brusque)
     if (Input::isKeyPressed(GLFW_KEY_Y))    speed*=10.0f;
@@ -41,20 +44,6 @@ void CameraKeyboard::update(Camera& camera)
     if (Input::isKeyHold(GLFW_KEY_P))testAngle+=0.05f;
     if (Input::isKeyHold(GLFW_KEY_M))testAngle-=0.05f;
 
-    // translation
-    if (Input::isKeyHold(GLFW_KEY_A))
-        camera.view = translate(mat4(1.f), vec3(+tS,0.0,0.0))*camera.view;
-    if (Input::isKeyHold(GLFW_KEY_D))
-        camera.view = translate(mat4(1.0),vec3(-tS,0.0,0.0))*camera.view;
-    if (Input::isKeyHold(GLFW_KEY_W))
-        camera.view = translate(mat4(1.0),vec3(0,0.0,+tS))*camera.view;
-    if (Input::isKeyHold(GLFW_KEY_S))
-        camera.view = translate(mat4(1.0),vec3(0,0,-tS))*camera.view;
-    if (Input::isKeyHold(GLFW_KEY_E))
-        camera.view = translate(mat4(1.0),vec3(0.0,-tS, 0.0))*camera.view;
-    if (Input::isKeyHold(GLFW_KEY_Q))
-        camera.view = translate(mat4(1.0),vec3(0.0,+tS, 0.0))*camera.view;
-
     // rotation
     if (Input::isKeyHold(GLFW_KEY_K))
         camera.view = rotate(mat4(1.0),rS,vec3(1.0,0.0,0.0))*camera.view;
@@ -69,4 +58,30 @@ void CameraKeyboard::update(Camera& camera)
     if (Input::isKeyHold(GLFW_KEY_O))
         camera.view = rotate(mat4(1.0),rS,vec3(0.0,0.0,+1.0))*camera.view;
 
+    // translation
+    if (Input::isKeyHold(GLFW_KEY_A))
+        speedVect+=vec3(+tS,0.0,0.0);
+        // camera.view = translate(mat4(1.f), vec3(+tS,0.0,0.0))*camera.view;
+    if (Input::isKeyHold(GLFW_KEY_D))
+        speedVect+=vec3(-tS,0.0,0.0);
+        // camera.view = translate(mat4(1.0),vec3(-tS,0.0,0.0))*camera.view;
+    if (Input::isKeyHold(GLFW_KEY_W))
+        speedVect+=vec3(0,0.0,+tS);
+        // camera.view = translate(mat4(1.0),vec3(0,0.0,+tS))*camera.view;
+    if (Input::isKeyHold(GLFW_KEY_S))
+        speedVect+=vec3(0,0,-tS);
+        // camera.view = translate(mat4(1.0),vec3(0,0,-tS))*camera.view;
+    if (Input::isKeyHold(GLFW_KEY_E))
+        speedVect+=vec3(0.0,-tS, 0.0);
+        // camera.view = translate(mat4(1.0),vec3(0.0,-tS, 0.0))*camera.view;
+    if (Input::isKeyHold(GLFW_KEY_Q))
+        speedVect+=vec3(0.0,+tS, 0.0);
+        // camera.view = translate(mat4(1.0),vec3(0.0,+tS, 0.0))*camera.view;
+
+    speedVect=speedVect*mat3(camera.view);
+
+    //TEMP
+    speedVect=-testPlanet->collidePoint(camera.getPosition(),-speedVect);
+    
+    camera.view = translate(camera.view,speedVect);
 }

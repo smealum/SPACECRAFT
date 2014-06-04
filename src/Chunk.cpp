@@ -1,5 +1,6 @@
 #include "Chunk.h"
 #include "MiniWorld.h"
+#include "world/BlockType.h"
 #include "data/ContentHandler.h"
 #include "utils/positionMath.h"
 #include "utils/dbg.h"
@@ -56,8 +57,6 @@ extern int testVal;
 
 void Chunk::draw(Camera& cam, glm::mat4 model)
 {
-    collidePoint(cam.getPosition());
-
     if(!vArray.size())return;
 
     //TEMP CULLING
@@ -88,22 +87,97 @@ TrackerPointer<Chunk>* Chunk::getTptr(void)
     return tptr;
 }
 
-bool Chunk::collidePoint(glm::vec3 p)
+
+
+glm::vec3 Chunk::collidePoint(glm::vec3 p, glm::vec3 v)
 {
+    if(glm::length(v)<=0.000000000001f)return v;
     //TODO : optimiser en ne la calculant qu'une fois par toplevel (max) par frame ?
     glm::vec3 blockPos=spaceToBlock(p,origin,v1,v2,n);
+    glm::vec3 blockPos2=spaceToBlock(p+v,origin,v1,v2,n);
     
     glm::vec3 localBlockPosf=glm::vec3(blockPos.x-px,blockPos.y-py,blockPos.z-pz);
-    glm::i32vec3 localBlockPosi=glm::i32vec3(blockPos.x-px,blockPos.y-py,blockPos.z-pz);
+    glm::vec3 localBlockPosf2=glm::vec3(blockPos2.x-px,blockPos2.y-py,blockPos2.z-pz);
+    glm::i32vec3 localBlockPosi=glm::i32vec3(floorf(blockPos.x)-px,floorf(blockPos.y)-py,floorf(blockPos.z)-pz);
+    glm::i32vec3 localBlockPosi2=glm::i32vec3(floorf(blockPos2.x)-px,floorf(blockPos2.y)-py,floorf(blockPos2.z)-pz);
     
-    if(localBlockPosf.x<0 || localBlockPosf.y<0 || localBlockPosf.z<0 ||
-        localBlockPosf.x>=CHUNK_N || localBlockPosf.y>=CHUNK_N || localBlockPosf.z>=CHUNK_N)
-        return false;
+    if(localBlockPosf2.x<0 || localBlockPosf2.y<0 || localBlockPosf2.z<0 ||
+        localBlockPosf2.x>=CHUNK_N || localBlockPosf2.y>=CHUNK_N || localBlockPosf2.z>=CHUNK_N)
+        return v;
 
-    // printf("\n%d %d %d (%f %f %f)\n",localBlockPosi.x,localBlockPosi.y,localBlockPosi.z,blockPos.x,blockPos.y,blockPos.z);
-    // printf("%d\n",value[localBlockPosi.z+1][localBlockPosi.y+1][localBlockPosi.x+1]);
+    // printf("\n%d %d %d (%f %f %f)\n",localBlockPosi2.x,localBlockPosi2.y,localBlockPosi2.z,blockPos2.x,blockPos2.y,blockPos2.z);
+    // printf("%d\n",value[localBlockPosi2.z+1][localBlockPosi2.y+1][localBlockPosi2.x+1]);
 
-    return false;
+    // if(value[localBlockPosi2.z+1][localBlockPosi2.y+1][localBlockPosi2.x+1]!=blockTypes::air)
+    // {
+    //     // const float d=(localBlockPosf.y-float(localBlockPosi2.y+1))/(blockPos2-blockPos).y;
+    //     // return v-vec3(0,localBlockPosf.y-float(localBlockPosi2.y+1),0);
+
+    //     return blockToSpace(blockPos2-vec3(0,localBlockPosf.y-float(localBlockPosi2.y+1),0), origin, v1, v2)-p;
+    // }
+
+
+    //même principe que raymarching de http://www.cse.yorku.ca/~amana/research/grid.pdf
+    glm::i32vec3 cur(localBlockPosf);
+    glm::vec3 u=glm::normalize(localBlockPosf2-localBlockPosf);
+    const float d=glm::length(localBlockPosf2-localBlockPosf);
+    const int stepX=(localBlockPosf2.x>localBlockPosf.x)?1:-1;
+    const int stepY=(localBlockPosf2.y>localBlockPosf.y)?1:-1;
+    const int stepZ=(localBlockPosf2.z>localBlockPosf.z)?1:-1;
+    const float tDeltaX=fabs(1.0f/u.x); // w/u.x
+    const float tDeltaY=fabs(1.0f/u.y); // h/u.y
+    const float tDeltaZ=fabs(1.0f/u.z); // z/u.z
+    float tMaxX=fabs((localBlockPosf.x-int(localBlockPosf.x)+((localBlockPosf2.x>localBlockPosf.x)?-1:0))/u.x);
+    float tMaxY=fabs((localBlockPosf.y-int(localBlockPosf.y)+((localBlockPosf2.y>localBlockPosf.y)?-1:0))/u.y);
+    float tMaxZ=fabs((localBlockPosf.z-int(localBlockPosf.z)+((localBlockPosf2.z>localBlockPosf.z)?-1:0))/u.z);
+
+    return v;
+
+    // if(value[localBlockPosi2.z+1][localBlockPosi2.y+1][localBlockPosi2.x+1]==blockTypes::air || value[localBlockPosi.z+1][localBlockPosi.y+1][localBlockPosi.x+1]!=blockTypes::air)return v;
+
+    // printf("precollision %d %d %d (%f %f %f) %f (%f %f %f)\n",cur.x,cur.y,cur.z,u.x,u.y,u.z,d,tMaxX,tMaxY,tMaxZ);
+
+    do{
+        if(cur==localBlockPosi2)
+        {
+            printf("no collision %d %d %d (%f %f %f) %f (%f %f %f)\n\n",cur.x,cur.y,cur.z,localBlockPosf.x,localBlockPosf.y,localBlockPosf.z,d,tMaxX,tMaxY,tMaxZ);
+            // printf("no collision %d %d %d (%f %f %f) %f (%f %f %f)\n\n",cur.x,cur.y,cur.z,localBlockPosf2.x,localBlockPosf2.y,localBlockPosf2.z,d,tMaxX,tMaxY,tMaxZ);
+            return v;
+        }
+        if(tMaxX < tMaxY)
+        {
+            if(tMaxX < tMaxZ)
+            {
+                printf("step X\n");
+                cur.x+=stepX;
+                if(cur.x<0 || cur.x>CHUNK_N)return v;
+                tMaxX+=tDeltaX;
+            }else{
+                printf("step Z\n");
+                cur.z+=stepZ;
+                if(cur.z<0 || cur.z>CHUNK_N)return v;
+                tMaxZ+=tDeltaZ;
+            }   
+        } else {
+            if(tMaxY < tMaxZ) {
+                printf("step Y\n");
+                cur.y+=stepY;
+                if(cur.y<0 || cur.y>CHUNK_N)return v;
+                tMaxY+=tDeltaY;
+            }else{
+                printf("step Z\n");
+                cur.z+=stepZ;
+                if(cur.z<0 || cur.z>CHUNK_N)return v;
+                tMaxZ+=tDeltaZ;
+            }
+        }
+    }while(value[cur.z+1][cur.y+1][cur.x+1]==blockTypes::air);
+
+    // printf("collision %d %d %d (%f %f %f) %f (%f %f %f)\n",cur.x,cur.y,cur.z,localBlockPosf.x,localBlockPosf.y,localBlockPosf.z,d,tMaxX,tMaxY,tMaxZ);
+
+    // return blockToSpace(blockPos2-vec3(0,localBlockPosf.y-float(localBlockPosi2.y+1),0), origin, v1, v2)-p;
+
+    return v;
 }
 
 void Chunk::initGLObjects()
