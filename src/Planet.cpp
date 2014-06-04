@@ -473,6 +473,9 @@ void Planet::draw(Camera& c)
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
 
 	// printf("%d\n",miniWorldList.size());
+	
+	// dessin des nuages
+	cloud.draw(c);
 }
 
 void Planet::addMiniWorld(MiniWorld* mw)
