@@ -11,6 +11,7 @@
 #include "Planet.h"
 
 #include <vector>
+typedef uint8_t chunkVal;
 
 struct GL_Vertex
 {

@@ -1,10 +1,12 @@
 #version 330
 
+#define logDepth(v) vec4(v.xy,(log2(max(1e-6,1.0+v.w))*logconst-1.0)*v.w,v.w)
+
 layout(points) in;
 layout(triangle_strip, max_vertices = 4) out;
 
 uniform mat4 model, view, proj;
-uniform float znear, zfar;
+uniform float logconst, zfar;
 
 uniform vec3 v1, v2;
 uniform vec3 origin;
@@ -65,7 +67,7 @@ void main()
 
 	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
-	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	gl_Position = logDepth(r);
 	// gl_Position = r;
 	texcoord=gtexcoord[0]+vec2(1,1)/16;
 	EmitVertex();
@@ -77,7 +79,7 @@ void main()
 
 	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
-	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	gl_Position = logDepth(r);
 	// gl_Position = r;
 	texcoord=gtexcoord[0]+vec2(0,1)/16;
 	EmitVertex();
@@ -89,7 +91,7 @@ void main()
 
 	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
-	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	gl_Position = logDepth(r);
 	// gl_Position = r;
 	texcoord=gtexcoord[0]+vec2(1,0)/16;
 	EmitVertex();
@@ -101,7 +103,7 @@ void main()
 
 	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
-	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	gl_Position = logDepth(r);
 	// gl_Position = r;
 	texcoord=gtexcoord[0];
 	EmitVertex();
