@@ -81,7 +81,7 @@ void CameraKeyboard::update(Camera& camera)
     speedVect=speedVect*mat3(camera.view);
 
     //TEMP
-    speedVect=-testPlanet->collidePoint(camera.getPosition(),-speedVect);
+    speedVect=camera.getPosition()-testPlanet->collidePoint(camera.getPosition(),-speedVect);
     
     camera.view = translate(camera.view,speedVect);
 }

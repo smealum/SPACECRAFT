@@ -34,7 +34,7 @@ class MiniWorld
 		void destroyMiniWorld(void);
 		void updateChunks(char data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D]);
 		
-		glm::vec3 collidePoint(glm::vec3 p, glm::vec3 v);
+		void collidePoint(glm::vec3& p, glm::vec3& v);
 
 		inline bool isGenerated(void)
 		{
