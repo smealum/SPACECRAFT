@@ -6,7 +6,7 @@
 in vec3 position;
 
 
-uniform float logconst = 0.0;
+uniform float logconst = 10.0;
 uniform mat4 model = mat4(1.0);
 uniform mat4 view = mat4(1.0);
 uniform mat4 proj = mat4(1.0);
@@ -18,6 +18,6 @@ out vec3 vPos;
 void main()
 {	
 	vPos = position;
-	vec4 pos = proj * view * model * vec4(1.03*normalize(position), 1.0);
+	vec4 pos = proj * view * model * vec4(1.01*normalize(position), 1.0);
     gl_Position = logDepth(pos);
 }

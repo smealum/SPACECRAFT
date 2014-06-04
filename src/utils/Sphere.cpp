@@ -104,7 +104,6 @@ void Sphere::draw(Camera& c)
 {
 	shader.use();
 
-	shader.setUniform("model", glm::mat4(1.f));
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
