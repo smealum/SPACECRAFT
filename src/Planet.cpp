@@ -474,8 +474,12 @@ void Planet::draw(Camera& c)
 
 	// printf("%d\n",miniWorldList.size());
 	
+	// dessin de l'athmosphere
+	atmosphere.draw(c);
+
 	// dessin des nuages
 	cloud.draw(c);
+
 }
 
 void Planet::addMiniWorld(MiniWorld* mw)
