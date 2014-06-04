@@ -44,21 +44,23 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 	float fDet = max(0.0f, B*B - 4.0f * C);
 	float fNear = 0.5f * (-B - sqrt(fDet));
 
-	float bCameraAbove_f = 1.0f;
+	bool bCameraInAtmosphere = false;
 	bool bCameraAbove = true;
-	vec4 fCameraDepth = vec4(0);
+	vec4 fCameraDepth = vec4(0, 0, 0, 0);
 	vec4 fLightDepth;
 	vec4 fSampleDepth;
 
 	if(fNear <= 0)
 	{
 		// If the near point is behind the camera, it means the camera is inside the atmosphere
+		bCameraInAtmosphere = true;
 		fNear = 0;
 		float fCameraHeight = length(vCamera);
 		float fCameraAltitude = (fCameraHeight - m_fInnerRadius) * m_fScale;
 		bCameraAbove = fCameraHeight >= length(v);
 		float fCameraAngle = dot((bCameraAbove ? (-vRay) : vRay), vCamera) / fCameraHeight;
-		bCameraAbove_f = bCameraAbove?-1.0f:1.0f;
+		//m_pbOpticalDepth.Interpolate(fCameraDepth, fCameraAltitude, 0.5f - fCameraAngle * 0.5f);
+		// fCameraDepth=Interpolate(fCameraAltitude, 0.5f - fCameraAngle * 0.5f);
 		fCameraDepth=texture(tex, vec2(fCameraAltitude, 0.5f - fCameraAngle * 0.5f));
 	}else{
 		// Otherwise, move the camera up to the near intersection point
@@ -89,6 +91,8 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 		// Start by looking up the optical depth coming from the light source to this point
 		float fLightAngle = dot(lightDir, v) / fHeight;
 		float fAltitude = (fHeight - m_fInnerRadius) * m_fScale;
+		//m_pbOpticalDepth.Interpolate(fLightDepth, fAltitude, 0.5f - fLightAngle * 0.5f);
+		// fLightDepth=Interpolate(fAltitude, 0.5f - fLightAngle * 0.5f);
 		fLightDepth=texture(tex, vec2(fAltitude, 0.5f - fLightAngle * 0.5f));
 
 		// If no light light reaches this part of the atmosphere, no light is scattered in at this point
@@ -102,10 +106,22 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 
 		// If the camera is above the point we're shading, we calculate the optical depth from the sample point to the camera
 		// Otherwise, we calculate the optical depth from the camera to the sample point
-		float fSampleAngle = bCameraAbove_f*dot(vRay, v) / fHeight;
-		fSampleDepth=texture(tex, vec2(fAltitude, 0.5f-fSampleAngle*0.5f));
-		fRayleighDepth += bCameraAbove_f*(fSampleDepth[1] - fCameraDepth[1]);
-		fMieDepth += bCameraAbove_f*(fSampleDepth[3] - fCameraDepth[3]);
+		if(bCameraAbove)
+		{
+			float fSampleAngle = -dot(vRay, v) / fHeight;
+			//m_pbOpticalDepth.Interpolate(fSampleDepth, fAltitude, 0.5f - fSampleAngle * 0.5f);
+			// fSampleDepth=Interpolate(fAltitude, 0.5f - fSampleAngle * 0.5f);
+			fSampleDepth=texture(tex, vec2(fAltitude, 0.5f - fSampleAngle * 0.5f));
+			fRayleighDepth += fSampleDepth[1] - fCameraDepth[1];
+			fMieDepth += fSampleDepth[3] - fCameraDepth[3];
+		}else{
+			float fSampleAngle = dot(vRay, v) / fHeight;
+			//m_pbOpticalDepth.Interpolate(fSampleDepth, fAltitude, 0.5f - fSampleAngle * 0.5f);
+			// fSampleDepth=Interpolate(fAltitude, 0.5f - fSampleAngle * 0.5f);
+			fSampleDepth=texture(tex, vec2(fAltitude, 0.5f - fSampleAngle * 0.5f));
+			fRayleighDepth += fCameraDepth[1] - fSampleDepth[1];
+			fMieDepth += fCameraDepth[3] - fSampleDepth[3];
+		}
 
 		// Now multiply the optical depth by the attenuation factor for the sample ray
 		fRayleighDepth *= m_Kr4PI;
