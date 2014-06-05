@@ -32,10 +32,13 @@ PlanetFace::PlanetFace(Planet* planet, vec3 v[4]):
 	x(0),
 	z(0),
 	depth(0),
-	childrenDepth(0)
+	childrenDepth(0),
+	detailsPower(30.0f)
 {
 	uvertex[0]=v[0]; uvertex[1]=v[1];
 	uvertex[2]=v[2]; uvertex[3]=v[3];
+	detailsPower = 30.0;
+	this->detailsPower = 30.0;
 	finalize();
 }
 
@@ -178,7 +181,12 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	//float d=2.0f/(1<<(depth-2));
 	//if(length(vertex[4]*elevation-p)/d<1.2f)return false;
 	// if(length(vertex[4]*elevation-p)*(2<<(depth))<40.0f) return false;
-	if(length(vertex[4]*elevation-p)*(2<<(depth-1))<40.0f) return false;
+	if (detailsPower < 10.0)
+	{
+		// TODO Fix, pourquoi cette valeur est reset à 0
+		detailsPower = 40.0;
+	}
+	if(length(vertex[4]*elevation-p)*(2<<(depth-1))<detailsPower) return false;
 	return true;
 }
 
@@ -311,6 +319,11 @@ void Planet::testFullGeneration(int depth, PlanetFaceBufferHandler* b)
 	// faces[0]->deletePlanetFace();
 }
 
+void PlanetFace::setLodPower(double detailsPower)
+{
+	this->detailsPower=detailsPower;
+}
+
 void Planet::processLevelOfDetail(Camera& c)
 {
 	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, faceBuffers[i]);
@@ -324,9 +337,9 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, vec3 v1
 	v1(normalize(v1)),
 	v2(normalize(v2))
 {
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, ms*sizeof(faceBufferEntry_s), NULL, GL_STATIC_DRAW);
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, ms*sizeof(faceBufferEntry_s), NULL, GL_STATIC_DRAW);
 
     buffer=(faceBufferEntry_s*)malloc(ms*sizeof(faceBufferEntry_s));
 
@@ -394,6 +407,7 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 
 void PlanetFaceBufferHandler::draw(Camera& c, vec3 lightdir)
 {
+
 	shader.use();
 	c.updateCamera(shader);
 
@@ -466,4 +480,12 @@ glm::dvec3 Planet::getGravityVector(glm::dvec3 p)
 void Planet::setSunPosition(vec3 position)
 {
 	sunPosition = position;
+}
+
+void Planet::setLodPower(double detailsPower)
+{
+	for(int i=0;i<6;++i)
+	{
+		faces[i]->setLodPower(detailsPower);
+	}
 }
