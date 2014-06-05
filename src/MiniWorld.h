@@ -37,6 +37,9 @@ class MiniWorld
 		bool collidePoint(glm::dvec3& p, glm::dvec3& v);
 		bool selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out);
 
+		void changeBlock(glm::i32vec3 p, blockTypes::T v);
+		void deleteBlock(glm::i32vec3 p);
+
 		inline bool isGenerated(void)
 		{
 			return generated;

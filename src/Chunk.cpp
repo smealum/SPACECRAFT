@@ -1,7 +1,7 @@
 #include "Chunk.h"
 #include "MiniWorld.h"
-#include "world/BlockType.h"
 #include "data/ContentHandler.h"
+#include "world/blockProcessing.h"
 #include "utils/positionMath.h"
 #include "utils/dbg.h"
 
@@ -255,7 +255,7 @@ bool Chunk::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out)
 
     // printf("BLOCK1 %f %f %f\n",blockPos.x,blockPos.y,blockPos.z);
     // printf("BLOCK2 %f %f %f\n",blockPos2.x,blockPos2.y,blockPos2.z);
-    
+
     int dir;
     out=performRayMarch(localBlockPosf, localBlockPosf2, &dir);
     if(value[out.z+1][out.y+1][out.x+1]==blockTypes::air)return false;
@@ -263,6 +263,27 @@ bool Chunk::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out)
     out+=glm::i32vec3(px,py,pz);
 
     return true;
+}
+
+void Chunk::changeBlock(glm::i32vec3 p, blockTypes::T v)
+{
+    p-=glm::i32vec3(px,py,pz);
+    if(p.x<-1 || p.y<-1 || p.z<-1 || p.x>CHUNK_N || p.y>CHUNK_N || p.z>CHUNK_N)return;
+    if(value[p.z+1][p.y+1][p.x+1]==v)return;
+    if(v!=blockTypes::air && value[p.z+1][p.y+1][p.x+1]!=blockTypes::air)return; //on peut soit créer soit supprimer, pas remplacer
+
+    value[p.z+1][p.y+1][p.x+1]=v;
+
+    //TODO (pas sûr qu'on puisse de façon efficace/utile) : mieux optimiser la modification du VBO ?
+    computeChunkFaces((chunkVal*)value, 1, 1, 1, 0, 0, 0, px, py, pz, vArray);
+
+    destroyGLObjects();
+    initGLObjects();
+}
+
+void Chunk::deleteBlock(glm::i32vec3 p)
+{
+    changeBlock(p,blockTypes::air);
 }
 
 void Chunk::initGLObjects()

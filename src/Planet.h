@@ -11,6 +11,7 @@
 #include "noise/PlanetGenerator.h"
 #include "render/Cloud.h"
 #include "render/Atmosphere.h"
+#include "world/BlockType.h"
 
 #define PLANET_ADDED_DETAIL (4)
 // #define PFBH_MAXSIZE (1024*16)
@@ -129,6 +130,9 @@ class Planet
 
 		bool collidePoint(glm::dvec3 p, glm::dvec3 v, glm::dvec3& out);
 		bool selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out);
+
+		void changeBlock(glm::i32vec3 p, blockTypes::T v);
+		void deleteBlock(glm::i32vec3 p);
 
 		const PlanetInfo planetInfo; //read only
 		class ContentHandler& handler;

@@ -116,4 +116,22 @@ bool MiniWorld::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out)
 	return ret;
 }
 
+void MiniWorld::changeBlock(glm::i32vec3 p, blockTypes::T v)
+{
+	//TODO : culling dès ici
+	for(int i=0;i<MINIWORLD_W;i++)
+	{
+		for(int j=0;j<MINIWORLD_H;j++)
+		{
+			for(int k=0;k<MINIWORLD_D;k++)
+			{
+				chunks[i][j][k]->changeBlock(p,v);
+			}
+		}
+	}
+}
 
+void MiniWorld::deleteBlock(glm::i32vec3 p)
+{
+	changeBlock(p,blockTypes::air);
+}

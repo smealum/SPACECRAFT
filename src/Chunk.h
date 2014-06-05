@@ -8,6 +8,7 @@
 #include "utils/glm.h"
 #include "render/Camera.h"
 #include "utils/TrackerPointer.h"
+#include "world/BlockType.h"
 #include "Planet.h"
 
 #include <vector>
@@ -36,6 +37,9 @@ class Chunk
 		glm::i32vec3 performRayMarch(glm::dvec3 localBlockPosf, glm::dvec3 localBlockPosf2, int* dir);
 		bool collidePoint(glm::dvec3& p, glm::dvec3& v);
 		bool selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out);
+
+		void changeBlock(glm::i32vec3 p, blockTypes::T v);
+		void deleteBlock(glm::i32vec3 p);
 
 		TrackerPointer<Chunk>* getTptr(void);
 

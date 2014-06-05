@@ -489,3 +489,14 @@ void Planet::setLodPower(double detailsPower)
 		faces[i]->setLodPower(detailsPower);
 	}
 }
+
+//TODO : filtrer par toplevel (en pratique devrait pas être nécessaire, mais on sait jamais)
+void Planet::changeBlock(glm::i32vec3 p, blockTypes::T v)
+{
+	for(auto it(miniWorldList.begin());it!=miniWorldList.end();++it)(*it)->changeBlock(p,v);
+}
+
+void Planet::deleteBlock(glm::i32vec3 p)
+{
+	changeBlock(p, blockTypes::air);
+}

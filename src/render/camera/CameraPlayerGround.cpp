@@ -81,7 +81,10 @@ void CameraPlayerGround::update(Camera& camera)
 		bool ret=testPlanet->selectBlock(camera.pos, v*range, out);
 
 		// printf("v %f %f %f (%f)\n",v.x,v.y,v.z,glm::dot(v,g));
-		// if(ret)printf("block %d %d %d\n",out.x,out.y,out.z);
-		// else printf("no block !\n");
+		if(ret)
+		{
+			printf("block %d %d %d\n",out.x,out.y,out.z);
+			if(Input::isKeyPressed(GLFW_KEY_X))testPlanet->deleteBlock(out);
+		}// else printf("no block !\n");
 	}
 }
