@@ -479,7 +479,7 @@ void Planet::draw(Camera& c)
 	atmosphere.draw(c);
 
 	// dessin des nuages
-	cloud.draw(c);
+	//cloud.draw(c);
 
 }
 

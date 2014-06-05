@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include "utils/Input.h"
 #include "Planet.h"
+#include "render/Sun.h"
 #include "MiniWorld.h"
 #include "render/Atmosphere.h"
 #include "utils/TextureManager.h"
@@ -148,13 +149,14 @@ void Application::createWindowInFullscreen(bool fs)
 }
 
 Planet* testPlanet;
+Sun* sun;
 int testTexture;
 
 void Application::run()
 {
     BlockType::getInstance(); // TODO can be deleted when used
     state = appInLoop;
-    camera = new Camera(0.0000001f, 10.f);
+    camera = new Camera(0.0000001f, 100.f);
     camera->view = glm::lookAt(
             glm::vec3(1.5, 1.5f, 1.5f),
             glm::vec3(0.f),
@@ -165,6 +167,7 @@ void Application::run()
     tt = new testShaders;
     PlanetInfo planetInfo;
     testPlanet=new Planet(planetInfo, contentHandler);
+	sun = new Sun();
     // testChunk=new Chunk(testPlanet);
     // testMiniWorld=new MiniWorld(testPlanet, testPlanet->faces[2]);
     // testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
@@ -222,6 +225,7 @@ void Application::loop()
     //tt->draw();
     // testPlanet->drawDirect();
     testPlanet->draw(*camera);
+	sun->draw(*camera);
     // testChunk->draw(*camera);
     // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);
