@@ -13,9 +13,11 @@ uniform float zfar = 1.0;
 
 out vec3 vPos;
 
+#define SunWidth (108.f)
+
 void main()
 {	
-	vPos = position;
-	vec4 pos = proj * view * model * vec4(1.01*normalize(position), 1.0);
+	vPos = SunWidth * position;
+	vec4 pos = proj * view * model * vec4(vPos, 1.0);
     gl_Position = logDepth(pos);
 }

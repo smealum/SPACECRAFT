@@ -138,6 +138,8 @@ class Planet
 		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
 		ShaderProgram &programBasic;
 
+		void setSunPosition(glm::vec3 position);
+
 	private:
 		std::vector<PlanetGenerator*> generators;
 		std::list<MiniWorld*> miniWorldList;
@@ -146,6 +148,7 @@ class Planet
 		PlanetFaceBufferHandler* faceBuffers[6];
 
 		glm::vec3 lightdir;
+		glm::vec3 sunPosition;
 
 		//TEMP
 			GLuint vaoBasic;

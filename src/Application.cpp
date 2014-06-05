@@ -8,7 +8,13 @@
 #include "render/Atmosphere.h"
 #include "utils/TextureManager.h"
 #include "world/BlockType.h"
+#include "utils/glm.h"
 #define WIN_TITLE "SPACECRAFT"
+
+#define EARTH_SUN (23400.0)
+
+using namespace std;
+using namespace glm;
 
 #ifndef NTWBAR
 inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
@@ -156,7 +162,7 @@ void Application::run()
 {
     BlockType::getInstance(); // TODO can be deleted when used
     state = appInLoop;
-    camera = new Camera(0.0000001f, 100.f);
+    camera = new Camera(0.0000001f, 2.0*EARTH_SUN);
     camera->view = glm::lookAt(
             glm::vec3(1.5, 1.5f, 1.5f),
             glm::vec3(0.f),
@@ -223,13 +229,25 @@ void Application::loop()
     glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
     //tt->draw();
     // testPlanet->drawDirect();
-    testPlanet->draw(*camera);
 	sun->draw(*camera);
+    testPlanet->draw(*camera);
+	sun->drawGlow(*camera);
     // testChunk->draw(*camera);
     // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);
 
-    if (Input::isKeyHold(GLFW_KEY_N))reloadAllShaders(NULL);
+    if (Input::isKeyHold(GLFW_KEY_N))	reloadAllShaders(NULL);
+	// sunPosition
+	{
+		static float testAngle = 0.0;
+    	float d=getFrameDeltaTime();
+		if (Input::isKeyHold(GLFW_KEY_P))	testAngle+=0.8f*d;
+		if (Input::isKeyHold(GLFW_KEY_M))	testAngle-=0.8f*d;
+		vec4 sunPosition(EARTH_SUN,0.0,0.0,1.0);
+		sunPosition = rotate(mat4(1.0),testAngle,vec3(0.0,1.0,0.0)) * sunPosition;
+		sun->setPosition(vec3(sunPosition));
+		testPlanet->setSunPosition(vec3(sunPosition));
+	}
 
     // printf("test %d\n",testVal);
     testVal=0;
