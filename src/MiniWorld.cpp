@@ -96,6 +96,5 @@ bool MiniWorld::collidePoint(glm::dvec3& p, glm::dvec3& v)
 			}
 		}
 	}
-	printf("%d\n",(int)ret);
 	return ret;
 }

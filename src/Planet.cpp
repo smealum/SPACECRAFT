@@ -513,7 +513,6 @@ bool Planet::collidePoint(dvec3 p, dvec3 v, dvec3& out)
 	bool ret=false;
 	for(auto it(miniWorldList.begin());it!=miniWorldList.end();++it)ret=ret||(*it)->collidePoint(p,v);
 	out=p+v;
-	printf(" %d\n",(int)ret);
 	return ret;
 }
 

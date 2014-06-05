@@ -217,7 +217,6 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
                     double r=(targetZ-blockPos.z)/u.z;
                     blockPos+=u*r;
                     blockPos.z=targetZ;
-                    // printf("COLLIDED : %f %f %f (%f)\n",blockPos.x,blockPos.y,blockPos.z-pz,d);
                     p=dblockToSpace(blockPos, dvec3(origin), dvec3(v1), dvec3(v2));
                     u.z=0;v=u*(d-r);
                 }

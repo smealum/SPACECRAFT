@@ -20,9 +20,9 @@ void CameraPlayerGround::update(Camera& camera)
 
 	if(Input::isKeyPressed(GLFW_KEY_R))camera.setCameraManager(new CameraKeyboardMouse()); //TODO : méga fuite à virer
 
-	const double tS=1e-4*delta;
-	const double gS=1e-4*delta;
-	const double jS=4e-6;
+	const double tS=1e-5*delta;
+	const double gS=1e-5*delta;
+	const double jS=1e-6;
     const float rS=1.5*delta;
 
     // rotation
@@ -60,8 +60,11 @@ void CameraPlayerGround::update(Camera& camera)
 
 	camera.pos-=speedVect;
 
-	printf("FROT FROT FROT %d\n",(int)ret);
 	if(ret)speedVect/=2.0; //frottements sol
+	else{
+		double gval=glm::dot(g,speedVect);
+		speedVect=(speedVect-gval*g)*0.8+gval*g*0.97;
+	}
 
 	camera.updateView();
 	camera.updateFrustum();
