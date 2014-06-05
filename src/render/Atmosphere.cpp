@@ -35,9 +35,7 @@ void Atmosphere::initLightConstants(void)
 
 	m_fScale = 1 / (m_fOuterRadius - m_fInnerRadius);
 
-	m_fWavelength[0] = WAVELENGTH0;
-	m_fWavelength[1] = WAVELENGTH1;
-	m_fWavelength[2] = WAVELENGTH2;
+	m_fWavelength = glm::vec3(WAVELENGTH0, WAVELENGTH1, WAVELENGTH2);
 	m_fWavelength4[0] = powf(m_fWavelength[0], 4.0f);
 	m_fWavelength4[1] = powf(m_fWavelength[1], 4.0f);
 	m_fWavelength4[2] = powf(m_fWavelength[2], 4.0f);
