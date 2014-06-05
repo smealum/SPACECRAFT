@@ -452,13 +452,14 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 	curSize--;
 }
 
-void PlanetFaceBufferHandler::draw(Camera& c)
+void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 {
 	shader.use();
 	c.updateCamera(shader);
 
 	shader.setUniform("v1", v1);
 	shader.setUniform("v2", v2);
+	shader.setUniform("lightdir", lightdir);
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -467,19 +468,23 @@ void PlanetFaceBufferHandler::draw(Camera& c)
 	// printf("%d, %d\n",curSize,faces.size());
 }
 
+extern float testAngle; 
+
 void Planet::draw(Camera& c)
 {
-	for(int i=0;i<6;i++)faceBuffers[i]->draw(c);
+	lightdir=glm::vec3(cos(testAngle),0,sin(testAngle));
+
+	for(int i=0;i<6;i++)faceBuffers[i]->draw(c, lightdir);
 
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
 
 	// printf("%d\n",miniWorldList.size());
 	
 	// dessin de l'athmosphere
-	atmosphere.draw(c);
+	atmosphere.draw(c, lightdir);
 
 	// dessin des nuages
-	//cloud.draw(c);
+	// cloud.draw(c);
 
 }
 
@@ -498,7 +503,7 @@ int Planet::numMiniWorlds(void)
 	return miniWorldList.size();
 }
 
-glm::vec3 Planet::collidePoint(glm::vec3 p, glm::vec3 v)
+glm::dvec3 Planet::collidePoint(glm::dvec3 p, glm::dvec3 v)
 {
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->collidePoint(p,v);
 	return p+v;

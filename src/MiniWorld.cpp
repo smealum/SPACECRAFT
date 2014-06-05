@@ -82,7 +82,7 @@ void MiniWorld::updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D
 	}
 }
 
-void MiniWorld::collidePoint(glm::vec3& p, glm::vec3& v)
+void MiniWorld::collidePoint(glm::dvec3& p, glm::dvec3& v)
 {
 	//TODO : culling dès ici
 	for(int i=0;i<MINIWORLD_W;i++)

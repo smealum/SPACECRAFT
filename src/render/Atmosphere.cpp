@@ -28,9 +28,7 @@ void Atmosphere::initLightConstants(void)
 
 	m_fScale = 1 / (m_fOuterRadius - m_fInnerRadius);
 
-	m_fWavelength[0] = WAVELENGTH0;
-	m_fWavelength[1] = WAVELENGTH1;
-	m_fWavelength[2] = WAVELENGTH2;
+	m_fWavelength = glm::vec3(WAVELENGTH0, WAVELENGTH1, WAVELENGTH2);
 	m_fWavelength4[0] = powf(m_fWavelength[0], 4.0f);
 	m_fWavelength4[1] = powf(m_fWavelength[1], 4.0f);
 	m_fWavelength4[2] = powf(m_fWavelength[2], 4.0f);
@@ -132,11 +130,9 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 
 extern float testAngle;
 
-void Atmosphere::bind(Camera& c)
+void Atmosphere::bind(Camera& c, glm::vec3 lightDirection)
 {
 	shader.use();
-
-	glm::vec3 lightDirection(cos(testAngle),0,sin(testAngle));
 
 	shader.setUniform("cameraPosition", c.getPosition());
 	shader.setUniform("lightDirection", lightDirection);
@@ -155,9 +151,9 @@ void Atmosphere::bind(Camera& c)
 	glBindTexture(GL_TEXTURE_2D, texture);
 }
 
-void Atmosphere::draw(Camera& c)
+void Atmosphere::draw(Camera& c, glm::vec3 lightDirection)
 {
-	bind(c);
+	bind(c, lightDirection);
 	
 	shader.setUniform("sky", true);
 	shader.setUniform("model", glm::mat4(1.f));

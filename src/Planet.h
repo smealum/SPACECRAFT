@@ -47,7 +47,7 @@ class PlanetFaceBufferHandler
 		void addFace(PlanetFace* pf);
 		void deleteFace(PlanetFace* pf);
 		void changeFace(PlanetFace* pf, int i);
-		void draw(Camera& c);
+		void draw(Camera& c, glm::vec3 lightdir);
 
 	private:
 		ShaderProgram &shader;
@@ -110,6 +110,7 @@ class PlanetFace
 
 class Planet
 {
+	friend class Chunk;
 	public:
 		Planet(PlanetInfo &pi, class ContentHandler& ch);
 		~Planet(); // TODO faire tous les free
@@ -121,7 +122,7 @@ class Planet
 		void addMiniWorld(MiniWorld* mw);
 		void removeMiniWorld(MiniWorld* mw);
 
-		glm::vec3 collidePoint(glm::vec3 p, glm::vec3 v);;
+		glm::dvec3 collidePoint(glm::dvec3 p, glm::dvec3 v);
 
 		const PlanetInfo planetInfo; //read only
 		class ContentHandler& handler;
@@ -142,6 +143,8 @@ class Planet
 
 		PlanetFace* faces[6];
 		PlanetFaceBufferHandler* faceBuffers[6];
+
+		glm::vec3 lightdir;
 
 		//TEMP
 			GLuint vaoBasic;
