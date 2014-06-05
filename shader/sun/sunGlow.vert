@@ -14,9 +14,10 @@ uniform float zfar = 1.0;
 out vec3 e2p; // eye to point after modelview
 out vec3 c2p; // center to point after modelview
 
+#define SunWidth (108.f)
 void main()
 {	
-	vec3 posi = 1.5 * position;
+	vec3 posi = SunWidth * 1.5 * position;
 	c2p = (view * model * vec4(posi,0.0) ).xyz;
 	e2p = (view * model * vec4(posi,1.0) ).xyz;
 	vec4 pos = proj * view * model * vec4(posi, 1.0);

@@ -11,6 +11,8 @@
 #include "utils/glm.h"
 #define WIN_TITLE "SPACECRAFT"
 
+#define EARTH_SUN (23400.0)
+
 using namespace std;
 using namespace glm;
 
@@ -160,7 +162,7 @@ void Application::run()
 {
     BlockType::getInstance(); // TODO can be deleted when used
     state = appInLoop;
-    camera = new Camera(0.0000001f, 100.f);
+    camera = new Camera(0.0000001f, 2.0*EARTH_SUN);
     camera->view = glm::lookAt(
             glm::vec3(1.5, 1.5f, 1.5f),
             glm::vec3(0.f),
@@ -241,7 +243,7 @@ void Application::loop()
     	float d=getFrameDeltaTime();
 		if (Input::isKeyHold(GLFW_KEY_P))	testAngle+=0.8f*d;
 		if (Input::isKeyHold(GLFW_KEY_M))	testAngle-=0.8f*d;
-		vec4 sunPosition(8.0,0.0,0.0,1.0);
+		vec4 sunPosition(EARTH_SUN,0.0,0.0,1.0);
 		sunPosition = rotate(mat4(1.0),testAngle,vec3(0.0,1.0,0.0)) * sunPosition;
 		sun->setPosition(vec3(sunPosition));
 		planet->setSunPosition(vec3(sunPosition));

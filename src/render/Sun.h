@@ -5,6 +5,7 @@
 #include "render/Camera.h"
 #include "utils/glm.h"
 
+
 class Sun
 {
 	public:

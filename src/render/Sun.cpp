@@ -3,6 +3,8 @@
 #include "utils/SphereManager.h"
 #include "utils/glm.h"
 
+#define SunWidth (108.0f)
+
 using namespace std;
 using namespace glm;
 
@@ -25,8 +27,8 @@ void Sun::draw(Camera& c)
 	// mise a jour du levelOfDetails
 	glm::vec3 p=c.getPosition();
 	
-	double l = length(p-position);
-	lod=clamp(4.0/log(l),3.0,4.0);
+	double l = length(p-position)/SunWidth;
+	lod=clamp(400/log(l),3.0,4.0);
 
 	// update time
     float delta = Application::getInstance().getFrameDeltaTime();
