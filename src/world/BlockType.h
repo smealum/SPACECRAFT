@@ -6,6 +6,7 @@
 #include "utils/Singleton.h"
 #include <vector>
 #include <list>
+#include <cassert>
 #define TEXCOLS 16
 
 // x, y in [0..1]
@@ -14,11 +15,12 @@ typedef glm::vec2 texCoord;
 namespace blockTypes
 {
 	// 1D index for a 2D array
-	enum T : uint32_t {
+	enum T : uint16_t {
 		air = 0,
 		grass = 1,
 		stone = 2,
 		dirt = 3,
+		grass_side = 4,
 		sand = 19,
 		sponge = 3*TEXCOLS+1,
 		water = 12*TEXCOLS+14,
@@ -30,7 +32,7 @@ namespace blockTypes
 	};
 }
 namespace blockPlane {
-	enum T {
+	enum T : uint8_t {
 		top,
 		side,
 		bottom,
@@ -38,23 +40,36 @@ namespace blockPlane {
 	};
 }
 
+namespace blockTransparency
+{
+	enum T : uint8_t {
+		// for some pixel...
+		opaque, // alpha == 1
+		seeThrough, // alpha > 0.01 && < 1
+		transparent // alpha == 0
+	};
+}
+
+class BlockType;
+
 // bass class for texcoord
 class BlockTexCoord {
 	protected:
-		texCoord *sides; // array or single value
+		blockTransparency::T trans;
+		static BlockType *btype;
 	public:
 		virtual inline texCoord getSide(blockPlane::T t) const = 0;
-		BlockTexCoord() : sides(NULL) {}
-		virtual ~BlockTexCoord() { delete[] sides; }
+		inline blockTransparency::T getTransparency() const { return trans; }
+		inline void setTransparency(blockTransparency::T type) { trans = type; }
+		BlockTexCoord() {}
+		virtual ~BlockTexCoord() {}
+		static void setStaticInstance(BlockType *bt); // this need to be called after the creation of OGL context
 };
-
-class BlockType;
 
 // class to control animation of blocks
 class BlockAnimated : public BlockTexCoord {
 	private:
 		static const float frameTime; // in seconds
-		static BlockType *btype;
 		static std::list<BlockAnimated*> list;
 		std::vector<blockTypes::T> frames;
 		uint32_t current,
@@ -66,7 +81,6 @@ class BlockAnimated : public BlockTexCoord {
 			return frames[current];
 		}
 	public:
-		static void setStaticInstance(BlockType *bt); // this need to be called after the creation of OGL context
 		static void animation(float delta);
 		BlockAnimated(std::initializer_list<blockTypes::T> frames);
 		~BlockAnimated();
@@ -74,40 +88,50 @@ class BlockAnimated : public BlockTexCoord {
 };
 
 class BlockStatic : public BlockTexCoord {
+	private:
+		std::vector<blockTypes::T> sides;
 	public:
-		BlockStatic(const texCoord& top, const texCoord& bot, const texCoord &side);
-		virtual inline texCoord getSide(blockPlane::T p) const
-		{
-			return sides[p];
-		}
+		BlockStatic(std::initializer_list<blockTypes::T> sdes);
+		virtual inline texCoord getSide(blockPlane::T p) const;
 };
 
 class BlockType : public Singleton<BlockType> {
 	public:
 		// get top-left coord
-		inline texCoord getTexcoord(blockTypes::T type, blockPlane::T p)
+		inline texCoord getTexcoord(blockTypes::T type) // this refers to a plane
 		{
-			//TODO : exception pour type==0
-			return texCoordMap[type]->getSide(p);
+			assert(type != 0);
+			return texCoords[type];
 		}
 
-		inline BlockTexCoord& getBlockTexcoord(blockTypes::T type)
+		inline texCoord getTexcoord(blockTypes::T type, blockPlane::T p) // this refers to a plane
 		{
-			//TODO : exception pour type==0
-			return *texCoordMap[type];
+			assert(type != 0);
+			return blocks[type]->getSide(p);
+		}
+
+		inline BlockTexCoord& getBlockTexcoord(blockTypes::T type) // this refers to the block type
+		{
+			assert(type != 0);
+			return *blocks[type];
 		}
 
 		~BlockType();
 	private:
-		BlockTexCoord* texCoordMap[blockTypes::maxTypeValue];
+		BlockTexCoord* blocks[blockTypes::maxTypeValue];
+		texCoord texCoords[blockTypes::maxTypeValue];
 		friend class Singleton<BlockType>;
 		int texWidth, texHeight, texCols;
 		BlockType();
 };
 
-texCoord BlockAnimated::getSide(blockPlane::T p) const
+texCoord BlockAnimated::getSide(blockPlane::T) const
 {
-	return btype->getTexcoord(frames[current], p);
+	return btype->getTexcoord(frames[current]);
+}
+texCoord BlockStatic::getSide(blockPlane::T p) const
+{
+	return btype->getTexcoord(sides[p]);
 }
 
 #endif
