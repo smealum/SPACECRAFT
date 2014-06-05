@@ -76,6 +76,7 @@ void Chunk::draw(Camera& cam, glm::mat4 model)
     program.setUniform("v1",v1);
     program.setUniform("v2",v2);
     program.setUniform("numBlocks",float(PLANETFACE_BLOCKS));
+    program.setUniform("lightdir",planet->lightdir);
 
     glBindTexture(GL_TEXTURE_2D, testTexture);
 
@@ -113,20 +114,20 @@ void Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
     const int stepX=(localBlockPosf2.x>localBlockPosf.x)?1:-1;
     const int stepY=(localBlockPosf2.y>localBlockPosf.y)?1:-1;
     const int stepZ=(localBlockPosf2.z>localBlockPosf.z)?1:-1;
-    const double tDeltaX=fabs(1.0f/u.x); // w/u.x
-    const double tDeltaY=fabs(1.0f/u.y); // h/u.y
-    const double tDeltaZ=fabs(1.0f/u.z); // z/u.z
+    const double tDeltaX=abs(1.0/u.x); // w/u.x
+    const double tDeltaY=abs(1.0/u.y); // h/u.y
+    const double tDeltaZ=abs(1.0/u.z); // z/u.z
 
     double tMaxX, tMaxY, tMaxZ;
 
-    if(fabs(u.x)<0.001f)tMaxX=d;
-    else tMaxX=fabs((localBlockPosf.x-floorf(localBlockPosf.x)+((localBlockPosf2.x>localBlockPosf.x)?-1.0f:0.0f))/u.x);
+    if(abs(u.x)<0.001)tMaxX=d;
+    else tMaxX=abs((localBlockPosf.x-floorf(localBlockPosf.x)+((localBlockPosf2.x>localBlockPosf.x)?-1.0:0.0))/u.x);
 
-    if(fabs(u.y)<0.001f)tMaxY=d;
-    else {tMaxY=fabs((localBlockPosf.y-floorf(localBlockPosf.y)+((localBlockPosf2.y>localBlockPosf.y)?-1.0f:0.0f))/u.y);}
+    if(abs(u.y)<0.001)tMaxY=d;
+    else {tMaxY=abs((localBlockPosf.y-floorf(localBlockPosf.y)+((localBlockPosf2.y>localBlockPosf.y)?-1.0:0.0))/u.y);}
 
-    if(fabs(u.z)<0.001f)tMaxZ=d;
-    else tMaxZ=fabs((localBlockPosf.z-floorf(localBlockPosf.z)+((localBlockPosf2.z>localBlockPosf.z)?-1.0f:0.0f))/u.z);
+    if(abs(u.z)<0.001)tMaxZ=d;
+    else tMaxZ=abs((localBlockPosf.z-floorf(localBlockPosf.z)+((localBlockPosf2.z>localBlockPosf.z)?-1.0:0.0))/u.z);
 
     if(value[localBlockPosi.z+1][localBlockPosi.y+1][localBlockPosi.x+1]!=blockTypes::air){return;}
 
@@ -148,13 +149,13 @@ void Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
                 // printf("step X\n");
                 cur.x+=stepX;
                 dir=0;
-                if(cur.x<0 || cur.x>CHUNK_N){return;}
+                if(cur.x<0 || cur.x>CHUNK_N)return;
                 tMaxX+=tDeltaX;
             }else{
                 // printf("step Z\n");
                 cur.z+=stepZ;
                 dir=2;
-                if(cur.z<0 || cur.z>CHUNK_N){return;}
+                if(cur.z<0 || cur.z>CHUNK_N)return;
                 tMaxZ+=tDeltaZ;
             }   
         } else {
@@ -162,13 +163,13 @@ void Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
                 // printf("step Y\n");
                 cur.y+=stepY;
                 dir=1;
-                if(cur.y<0 || cur.y>CHUNK_N){return;}
+                if(cur.y<0 || cur.y>CHUNK_N)return;
                 tMaxY+=tDeltaY;
             }else{
                 // printf("step Z\n");
                 cur.z+=stepZ;
                 dir=2;
-                if(cur.z<0 || cur.z>CHUNK_N){return;}
+                if(cur.z<0 || cur.z>CHUNK_N)return;
                 tMaxZ+=tDeltaZ;
             }
         }

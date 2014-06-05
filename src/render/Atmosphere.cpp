@@ -130,11 +130,9 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 
 extern float testAngle;
 
-void Atmosphere::bind(Camera& c)
+void Atmosphere::bind(Camera& c, glm::vec3 lightDirection)
 {
 	shader.use();
-
-	glm::vec3 lightDirection(cos(testAngle),0,sin(testAngle));
 
 	shader.setUniform("cameraPosition", c.getPosition());
 	shader.setUniform("lightDirection", lightDirection);
@@ -153,9 +151,9 @@ void Atmosphere::bind(Camera& c)
 	glBindTexture(GL_TEXTURE_2D, texture);
 }
 
-void Atmosphere::draw(Camera& c)
+void Atmosphere::draw(Camera& c, glm::vec3 lightDirection)
 {
-	bind(c);
+	bind(c, lightDirection);
 	
 	shader.setUniform("sky", true);
 	shader.setUniform("model", glm::mat4(1.f));

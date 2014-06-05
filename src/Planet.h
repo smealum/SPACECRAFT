@@ -110,6 +110,7 @@ class PlanetFace
 
 class Planet
 {
+	friend class Chunk;
 	public:
 		Planet(PlanetInfo &pi, class ContentHandler& ch);
 		~Planet(); // TODO faire tous les free
@@ -142,6 +143,8 @@ class Planet
 
 		PlanetFace* faces[6];
 		PlanetFaceBufferHandler* faceBuffers[6];
+
+		glm::vec3 lightdir;
 
 		//TEMP
 			GLuint vaoBasic;

@@ -467,8 +467,12 @@ void PlanetFaceBufferHandler::draw(Camera& c)
 	// printf("%d, %d\n",curSize,faces.size());
 }
 
+extern float testAngle; 
+
 void Planet::draw(Camera& c)
 {
+	lightdir=glm::vec3(cos(testAngle),0,sin(testAngle));
+
 	for(int i=0;i<6;i++)faceBuffers[i]->draw(c);
 
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
@@ -476,7 +480,7 @@ void Planet::draw(Camera& c)
 	// printf("%d\n",miniWorldList.size());
 	
 	// dessin de l'athmosphere
-	atmosphere.draw(c);
+	atmosphere.draw(c, lightdir);
 
 	// dessin des nuages
 	// cloud.draw(c);

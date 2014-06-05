@@ -29,8 +29,8 @@ class Atmosphere
 		void makeOpticalDepthBuffer(void);
 		void generateVBO(void);
 
-		void bind(Camera& c);
-		void draw(Camera& c);
+		void bind(Camera& c, glm::vec3 lightDirection);
+		void draw(Camera& c, glm::vec3 lightDirection);
 
 	private:
 		ShaderProgram& shader;
