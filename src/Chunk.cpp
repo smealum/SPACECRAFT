@@ -154,6 +154,7 @@ glm::i32vec3 Chunk::performRayMarch(glm::dvec3 localBlockPosf, glm::dvec3 localB
             }
         }
     }while(value[cur.z+1][cur.y+1][cur.x+1]==blockTypes::air);
+
     return cur;
 }
 
@@ -238,7 +239,7 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
     return ret;
 }
 
-bool Chunk::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out)
+bool Chunk::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir)
 {
     // TODO : optimiser en ne la calculant qu'une fois par toplevel (max) par frame ?
     glm::dvec3 blockPos=dspaceToBlock(glm::dvec3(p),glm::dvec3(origin),glm::dvec3(v1),glm::dvec3(v2),glm::dvec3(n));
@@ -256,9 +257,16 @@ bool Chunk::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out)
     // printf("BLOCK1 %f %f %f\n",blockPos.x,blockPos.y,blockPos.z);
     // printf("BLOCK2 %f %f %f\n",blockPos2.x,blockPos2.y,blockPos2.z);
 
-    int dir;
     out=performRayMarch(localBlockPosf, localBlockPosf2, &dir);
     if(value[out.z+1][out.y+1][out.x+1]==blockTypes::air)return false;
+
+    dir*=2;
+    switch(dir)
+    {
+        case 0: dir+=(localBlockPosf.x<localBlockPosf2.x)?(0):(1); break;
+        case 2: dir+=(localBlockPosf.y<localBlockPosf2.y)?(0):(1); break;
+        case 4: dir+=(localBlockPosf.z<localBlockPosf2.z)?(0):(1); break;
+    }
 
     out+=glm::i32vec3(px,py,pz);
 

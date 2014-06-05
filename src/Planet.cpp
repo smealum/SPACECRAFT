@@ -465,11 +465,14 @@ bool Planet::collidePoint(dvec3 p, dvec3 v, dvec3& out)
 	return ret;
 }
 
-bool Planet::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out)
+Chunk* Planet::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir)
 {
-	bool ret=false;
-	for(auto it(miniWorldList.begin());it!=miniWorldList.end() && !ret;++it)ret=ret||(*it)->selectBlock(p,v,out);
-	return ret;
+	for(auto it(miniWorldList.begin());it!=miniWorldList.end();++it)
+	{
+		Chunk* ret=(*it)->selectBlock(p,v,out,dir);
+		if(ret)return ret;
+	}
+	return NULL;
 }
 
 glm::dvec3 Planet::getGravityVector(glm::dvec3 p)

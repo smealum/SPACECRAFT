@@ -2,11 +2,13 @@
 #include "utils/Input.h"
 #include "render/camera/CameraPlayerGround.h"
 #include "render/camera/CameraKeyboardMouse.h"
+#include "render/Cursor.h"
 #include "Planet.h"
 #include "MiniWorld.h"
 
 //TEMP
 extern Planet* testPlanet;
+extern Cursor* testCursor;
 
 CameraPlayerGround::CameraPlayerGround():
 	speedVect(0.0)
@@ -78,13 +80,18 @@ void CameraPlayerGround::update(Camera& camera)
 		glm::dvec3 g=testPlanet->getGravityVector(camera.pos);
 		glm::i32vec3 out;
 		glm::dvec3 v(-glm::transpose(camera.view3)[2]);
-		bool ret=testPlanet->selectBlock(camera.pos, v*range, out);
+		int dir;
+		Chunk* ret=testPlanet->selectBlock(camera.pos, v*range, out, dir);
 
 		// printf("v %f %f %f (%f)\n",v.x,v.y,v.z,glm::dot(v,g));
 		if(ret)
 		{
-			printf("block %d %d %d\n",out.x,out.y,out.z);
+			// printf("%d block %d %d %d\n",dir,out.x,out.y,out.z);
 			if(Input::isKeyPressed(GLFW_KEY_X))testPlanet->deleteBlock(out);
-		}// else printf("no block !\n");
+			testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2);
+		}else{
+			// printf("no block !\n");
+			testCursor->unaffect();
+		}
 	}
 }

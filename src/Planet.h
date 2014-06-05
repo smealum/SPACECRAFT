@@ -5,13 +5,13 @@
 #include <list>
 #include "utils/glm.h"
 #include "utils/TrackerPointer.h"
+#include "noise/PlanetGenerator.h"
 #include "render/Shader.h"
 #include "render/Camera.h"
-#include "PlanetInfo.h"
-#include "noise/PlanetGenerator.h"
 #include "render/Cloud.h"
 #include "render/Atmosphere.h"
 #include "world/BlockType.h"
+#include "PlanetInfo.h"
 
 #define PLANET_ADDED_DETAIL (4)
 // #define PFBH_MAXSIZE (1024*16)
@@ -129,7 +129,7 @@ class Planet
 		void removeMiniWorld(MiniWorld* mw);
 
 		bool collidePoint(glm::dvec3 p, glm::dvec3 v, glm::dvec3& out);
-		bool selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out);
+		class Chunk* selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir);
 
 		void changeBlock(glm::i32vec3 p, blockTypes::T v);
 		void deleteBlock(glm::i32vec3 p);

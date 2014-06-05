@@ -27,6 +27,7 @@ struct GL_Vertex
 //	use destroyChunk
 class Chunk
 {
+	friend class CameraPlayerGround;
 	public:
 		Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, glm::vec3 v2, glm::vec3 n);
 
@@ -36,7 +37,7 @@ class Chunk
 
 		glm::i32vec3 performRayMarch(glm::dvec3 localBlockPosf, glm::dvec3 localBlockPosf2, int* dir);
 		bool collidePoint(glm::dvec3& p, glm::dvec3& v);
-		bool selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out);
+		bool selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir);
 
 		void changeBlock(glm::i32vec3 p, blockTypes::T v);
 		void deleteBlock(glm::i32vec3 p);

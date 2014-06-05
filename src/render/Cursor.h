@@ -13,12 +13,15 @@ class Cursor
 
 		void draw(Camera& c);
 
-		void setPosition(glm::i32vec3 pos, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2);
+		void setPosition(glm::i32vec3 pos, int dir, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2);
 		void unaffect(void);
 
 	private:
 		bool affected;
+
+		int dir;
 		glm::i32vec3 pos;
+		
 		glm::vec3 origin, v1, v2;
 		PlanetFace* toplevel;
 

@@ -1,11 +1,12 @@
 #include "render/Cursor.h"
+#include "MiniWorld.h"
 
 static GLfloat vertices[] =
 {
-	-1.0f, -1.0f, 0.0f,
-	-1.0f, +1.0f, 0.0f,
-	+1.0f, +1.0f, 0.0f,
-	+1.0f, -1.0f, 0.0f,
+	0.0f, 0.0f, 0.0f,
+	0.0f, 0.0f, 1.0f,
+	0.0f, 1.0f, 0.0f,
+	0.0f, 1.0f, 1.0f,
 };
 
 Cursor::Cursor():
@@ -24,7 +25,7 @@ Cursor::Cursor():
 
 	shader.use();
 	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
-	shader.setAttribute("position", 3, GL_FALSE, 3, 0);
+	shader.setAttribute("offset", 3, GL_FALSE, 3, 0);
 }
 
 void Cursor::draw(Camera& c)
@@ -37,14 +38,47 @@ void Cursor::draw(Camera& c)
 
 	c.updateCamera(shader);
 
-	shader.setUniform("model", glm::mat4(1.0f));
+	glm::mat4 model(1.0f);
+
+	switch(dir)
+	{
+		case 1:
+			model=glm::rotate(model,PI,glm::vec3(0.0f,1.0f,0.0f));
+			model=glm::translate(glm::mat4(1.0f),glm::vec3(1.0f,0.0f,1.0f))*model;
+			break;
+		case 2:
+			model=glm::rotate(model,PI/2.0f,glm::vec3(0.0f,0.0f,1.0f));
+			model=glm::translate(glm::mat4(1.0f),glm::vec3(1.0f,0.0f,0.0f))*model;
+			break;
+		case 3:
+			model=glm::rotate(model,-PI/2.0f,glm::vec3(0.0f,0.0f,1.0f));
+			model=glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,1.0f,0.0f))*model;
+			break;
+		case 4:
+			model=glm::rotate(model,-PI/2.0f,glm::vec3(0.0f,1.0f,0.0f));
+			model=glm::translate(glm::mat4(1.0f),glm::vec3(1.0f,0.0f,0.0f))*model;
+			break;
+		case 5:
+			model=glm::rotate(model,PI/2.0f,glm::vec3(0.0f,1.0f,0.0f));
+			model=glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,0.0f,1.0f))*model;
+			break;
+	}
+
+	shader.setUniform("model", model);
+	
+	shader.setUniform("origin", origin);
+	shader.setUniform("v1", v1);
+	shader.setUniform("v2", v2);
+	shader.setUniform("position", glm::vec3(pos));
+    shader.setUniform("numBlocks",float(PLANETFACE_BLOCKS));
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 12);
 }
 
-void Cursor::setPosition(glm::i32vec3 pos, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2)
+void Cursor::setPosition(glm::i32vec3 pos, int dir, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2)
 {
 	affected=true;
+	this->dir=dir;
 	this->pos=pos;
 	this->origin=origin;
 	this->v1=v1;

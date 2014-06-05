@@ -35,7 +35,7 @@ class MiniWorld
 		void updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D]);
 
 		bool collidePoint(glm::dvec3& p, glm::dvec3& v);
-		bool selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out);
+		Chunk* selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir);
 
 		void changeBlock(glm::i32vec3 p, blockTypes::T v);
 		void deleteBlock(glm::i32vec3 p);

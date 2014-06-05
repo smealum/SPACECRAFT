@@ -1,7 +1,7 @@
 #ifndef ATMOSPHERE_H
 #define ATMOSPHERE_H
 
-#define PI 3.14159265
+#define PI 3.14159265f
 #define DELTA 1e-6f
 
 #define NUMSAMPLES 4

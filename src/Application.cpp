@@ -237,6 +237,7 @@ void Application::loop()
     // testChunk->draw(*camera);
     // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);
+    testCursor->draw(*camera);
 
     if (Input::isKeyHold(GLFW_KEY_N))	reloadAllShaders(NULL);
 	// sunPosition
