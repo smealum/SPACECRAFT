@@ -43,6 +43,8 @@ class Application : public Singleton<Application> {
 
         void glfwWindowHints();
 
+		float planetDetails;
+
     public:
         ~Application();
         void run();

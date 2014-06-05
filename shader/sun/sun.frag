@@ -178,7 +178,7 @@ void main()
 {
 
 	float noise1  = snoise(vec4(vPos*1.0/SunWidth,time))*1.0;
-	//noise1+=snoise(vec4(vPos*10.0,time))*0.1;
+	noise1+=snoise(vec4(vPos*10.0,time))*0.1;
 	float noise2  = snoise(vec4(vPos*2.0/SunWidth,time))*1.0;
 
 	float c1 = min(abs(noise1),0.5)+0.5;

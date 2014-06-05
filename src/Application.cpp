@@ -60,7 +60,8 @@ Application::Application() :
     deltaTime(0.f),
     time(0.f),
     fps(0.f),
-    fpsCounter(0)
+    fpsCounter(0),
+	planetDetails(30.0)
 {
     if (!glfwInit())
     {
@@ -91,6 +92,7 @@ Application::Application() :
         //TwDefine((name+" iconified=true").c_str()); // minimizes
         TwWindowSize(width, height);
         TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
+        TwAddVarRW(bar, "Planet LOD Details", TW_TYPE_FLOAT, &planetDetails, " label='Planet LOD' ");
         TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
         TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
         TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
@@ -217,6 +219,7 @@ void Application::loop()
         glfwSetWindowShouldClose(window, GL_TRUE);
         state = appExiting;
     }
+	
 
     Input::update(window);
     camera->update();
@@ -224,6 +227,7 @@ void Application::loop()
     glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	testPlanet->setLodPower(planetDetails);
     testPlanet->processLevelOfDetail(*camera);
 
     glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
@@ -261,7 +265,7 @@ void Application::loop()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		// TwDraw();
+		TwDraw();
     #endif
 
     glfwSwapBuffers(window);

@@ -83,6 +83,10 @@ class PlanetFace
 		void drawDirect(void);
 		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
 
+
+
+		void setLodPower(double detailsPower);
+
 	private:
 		void finalize(void);
 
@@ -106,6 +110,8 @@ class PlanetFace
 		uint8_t id;
 		int depth;
 		int childrenDepth;
+
+		float detailsPower;
 };
 
 class Planet
@@ -139,6 +145,8 @@ class Planet
 		ShaderProgram &programBasic;
 
 		void setSunPosition(glm::vec3 position);
+
+		void setLodPower(double detailsPower);
 
 	private:
 		std::vector<PlanetGenerator*> generators;
