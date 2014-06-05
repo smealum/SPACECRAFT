@@ -40,30 +40,38 @@ void Cursor::draw(Camera& c)
 
 	glm::mat4 model(1.0f);
 
+	const float margin=0.1f;
+
+	//TODO : passer dans un tableau de matrices constantes
 	switch(dir)
 	{
 		case 0:
-			model=glm::translate(glm::mat4(1.0f),glm::vec3(0.01f,0.0f,0.0f))*model;
+			model=glm::translate(glm::mat4(1.0f),glm::vec3(-margin,0.0f,0.0f))*model;
 			break;
 		case 1:
 			model=glm::rotate(model,PI,glm::vec3(0.0f,1.0f,0.0f));
 			model=glm::translate(glm::mat4(1.0f),glm::vec3(1.0f,0.0f,1.0f))*model;
+			model=glm::translate(glm::mat4(1.0f),glm::vec3(margin,0.0f,0.0f))*model;
 			break;
 		case 2:
 			model=glm::rotate(model,PI/2.0f,glm::vec3(0.0f,0.0f,1.0f));
 			model=glm::translate(glm::mat4(1.0f),glm::vec3(1.0f,0.0f,0.0f))*model;
+			model=glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,-margin,0.0f))*model;
 			break;
 		case 3:
 			model=glm::rotate(model,-PI/2.0f,glm::vec3(0.0f,0.0f,1.0f));
 			model=glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,1.0f,0.0f))*model;
+			model=glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,margin,0.0f))*model;
 			break;
 		case 4:
 			model=glm::rotate(model,-PI/2.0f,glm::vec3(0.0f,1.0f,0.0f));
 			model=glm::translate(glm::mat4(1.0f),glm::vec3(1.0f,0.0f,0.0f))*model;
+			model=glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,0.0f,-margin))*model;
 			break;
 		case 5:
 			model=glm::rotate(model,PI/2.0f,glm::vec3(0.0f,1.0f,0.0f));
 			model=glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,0.0f,1.0f))*model;
+			model=glm::translate(glm::mat4(1.0f),glm::vec3(0.0f,0.0f,margin))*model;
 			break;
 	}
 
