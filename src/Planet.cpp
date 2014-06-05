@@ -508,3 +508,8 @@ glm::dvec3 Planet::collidePoint(glm::dvec3 p, glm::dvec3 v)
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->collidePoint(p,v);
 	return p+v;
 }
+
+glm::dvec3 Planet::getGravityVector(glm::dvec3 p)
+{
+	return glm::normalize(p);
+}

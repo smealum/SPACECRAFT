@@ -123,6 +123,7 @@ class Planet
 		void removeMiniWorld(MiniWorld* mw);
 
 		glm::dvec3 collidePoint(glm::dvec3 p, glm::dvec3 v);
+		glm::dvec3 getGravityVector(glm::dvec3 p);
 
 		const PlanetInfo planetInfo; //read only
 		class ContentHandler& handler;

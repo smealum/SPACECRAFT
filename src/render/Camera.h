@@ -10,6 +10,7 @@ class Camera {
 	friend class CameraManager;
 	friend class CameraKeyboard;
 	friend class CameraKeyboardMouse;
+	friend class CameraPlayerGround;
 	public:
 		Camera(float znear, float zfar);
 

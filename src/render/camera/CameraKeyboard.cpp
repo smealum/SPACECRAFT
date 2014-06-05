@@ -72,7 +72,7 @@ void CameraKeyboard::update(Camera& camera)
     if (Input::isKeyHold(GLFW_KEY_Q))
         speedVect+=dvec3(0.0,+tS, 0.0);
 
-    speedVect=dvec3(vec3(speedVect)*camera.view3);
+    speedVect=(speedVect*glm::dmat3(camera.view3));
 
     //TEMP
     speedVect=camera.getPositionDouble()-testPlanet->collidePoint(camera.getPositionDouble(),-speedVect);
