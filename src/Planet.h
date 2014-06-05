@@ -47,7 +47,7 @@ class PlanetFaceBufferHandler
 		void addFace(PlanetFace* pf);
 		void deleteFace(PlanetFace* pf);
 		void changeFace(PlanetFace* pf, int i);
-		void draw(Camera& c);
+		void draw(Camera& c, glm::vec3 lightdir);
 
 	private:
 		ShaderProgram &shader;

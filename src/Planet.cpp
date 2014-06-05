@@ -452,13 +452,14 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 	curSize--;
 }
 
-void PlanetFaceBufferHandler::draw(Camera& c)
+void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 {
 	shader.use();
 	c.updateCamera(shader);
 
 	shader.setUniform("v1", v1);
 	shader.setUniform("v2", v2);
+	shader.setUniform("lightdir", lightdir);
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -473,7 +474,7 @@ void Planet::draw(Camera& c)
 {
 	lightdir=glm::vec3(cos(testAngle),0,sin(testAngle));
 
-	for(int i=0;i<6;i++)faceBuffers[i]->draw(c);
+	for(int i=0;i<6;i++)faceBuffers[i]->draw(c, lightdir);
 
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
 
