@@ -122,7 +122,8 @@ class Planet
 		void addMiniWorld(MiniWorld* mw);
 		void removeMiniWorld(MiniWorld* mw);
 
-		glm::dvec3 collidePoint(glm::dvec3 p, glm::dvec3 v);
+		bool collidePoint(glm::dvec3 p, glm::dvec3 v, glm::dvec3& out);
+		glm::dvec3 getGravityVector(glm::dvec3 p);
 
 		const PlanetInfo planetInfo; //read only
 		class ContentHandler& handler;
@@ -137,6 +138,8 @@ class Planet
 		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
 		ShaderProgram &programBasic;
 
+		void setSunPosition(glm::vec3 position);
+
 	private:
 		std::vector<PlanetGenerator*> generators;
 		std::list<MiniWorld*> miniWorldList;
@@ -145,6 +148,7 @@ class Planet
 		PlanetFaceBufferHandler* faceBuffers[6];
 
 		glm::vec3 lightdir;
+		glm::vec3 sunPosition;
 
 		//TEMP
 			GLuint vaoBasic;

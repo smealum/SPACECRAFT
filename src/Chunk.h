@@ -33,7 +33,7 @@ class Chunk
 		void updateData(chunkVal* data, std::vector<GL_Vertex> va);
 		void destroyChunk(void);
 
-		void collidePoint(glm::dvec3& p, glm::dvec3& v);
+		bool collidePoint(glm::dvec3& p, glm::dvec3& v);
 
 		TrackerPointer<Chunk>* getTptr(void);
 

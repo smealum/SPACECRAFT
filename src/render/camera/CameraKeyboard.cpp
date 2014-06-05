@@ -40,9 +40,6 @@ void CameraKeyboard::update(Camera& camera)
     // mode de précision (instantanée)
     if (Input::isKeyHold(GLFW_KEY_LEFT_SHIFT)){tS/=10.0f;rS=0.0003f;}
     if (Input::isKeyHold(GLFW_KEY_LEFT_CONTROL)){tS/=100.0f;rS=0.0003f;}
-    
-    if (Input::isKeyHold(GLFW_KEY_P))testAngle+=0.05f;
-    if (Input::isKeyHold(GLFW_KEY_M))testAngle-=0.05f;
 
     // rotation
     if (Input::isKeyHold(GLFW_KEY_K))
@@ -72,10 +69,10 @@ void CameraKeyboard::update(Camera& camera)
     if (Input::isKeyHold(GLFW_KEY_Q))
         speedVect+=dvec3(0.0,+tS, 0.0);
 
-    speedVect=dvec3(vec3(speedVect)*camera.view3);
+    speedVect=(speedVect*glm::dmat3(camera.view3));
 
-    //TEMP
-    speedVect=camera.getPositionDouble()-testPlanet->collidePoint(camera.getPositionDouble(),-speedVect);
+    // //TEMP
+    // speedVect=camera.getPositionDouble()-testPlanet->collidePoint(camera.getPositionDouble(),-speedVect);
     
     camera.pos-=speedVect;
     

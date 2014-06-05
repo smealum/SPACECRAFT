@@ -3,11 +3,18 @@
 #include <cstdlib>
 #include "utils/Input.h"
 #include "Planet.h"
+#include "render/Sun.h"
 #include "MiniWorld.h"
 #include "render/Atmosphere.h"
 #include "utils/TextureManager.h"
 #include "world/BlockType.h"
+#include "utils/glm.h"
 #define WIN_TITLE "SPACECRAFT"
+
+#define EARTH_SUN (23400.0)
+
+using namespace std;
+using namespace glm;
 
 #ifndef NTWBAR
 inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
@@ -148,23 +155,25 @@ void Application::createWindowInFullscreen(bool fs)
 }
 
 Planet* testPlanet;
+Sun* sun;
 int testTexture;
 
 void Application::run()
 {
     BlockType::getInstance(); // TODO can be deleted when used
     state = appInLoop;
-    camera = new Camera(0.0000001f, 10.f);
-    // camera->view = glm::lookAt(
-    //         glm::vec3(1.5, 1.5f, 1.5f),
-    //         glm::vec3(0.f),
-    //         glm::vec3(0, 1.f, 0.f)
-    //         );
+    camera = new Camera(0.0000001f, 2.0*EARTH_SUN);
+    camera->view = glm::lookAt(
+            glm::vec3(1.5, 1.5f, 1.5f),
+            glm::vec3(0.f),
+            glm::vec3(0, 1.f, 0.f)
+            );
     camera->setCameraManager(new CameraKeyboardMouse());
 
     tt = new testShaders;
     PlanetInfo planetInfo;
     testPlanet=new Planet(planetInfo, contentHandler);
+	sun = new Sun();
     // testChunk=new Chunk(testPlanet);
     // testMiniWorld=new MiniWorld(testPlanet, testPlanet->faces[2]);
     // testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
@@ -220,12 +229,25 @@ void Application::loop()
     glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
     //tt->draw();
     // testPlanet->drawDirect();
+	sun->draw(*camera);
     testPlanet->draw(*camera);
+	sun->drawGlow(*camera);
     // testChunk->draw(*camera);
     // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);
 
-    if (Input::isKeyHold(GLFW_KEY_N))reloadAllShaders(NULL);
+    if (Input::isKeyHold(GLFW_KEY_N))	reloadAllShaders(NULL);
+	// sunPosition
+	{
+		static float testAngle = 0.0;
+    	float d=getFrameDeltaTime();
+		if (Input::isKeyHold(GLFW_KEY_P))	testAngle+=0.8f*d;
+		if (Input::isKeyHold(GLFW_KEY_M))	testAngle-=0.8f*d;
+		vec4 sunPosition(EARTH_SUN,0.0,0.0,1.0);
+		sunPosition = rotate(mat4(1.0),testAngle,vec3(0.0,1.0,0.0)) * sunPosition;
+		sun->setPosition(vec3(sunPosition));
+		testPlanet->setSunPosition(vec3(sunPosition));
+	}
 
     // printf("test %d\n",testVal);
     testVal=0;
@@ -239,7 +261,7 @@ void Application::loop()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		TwDraw();
+		// TwDraw();
     #endif
 
     glfwSwapBuffers(window);

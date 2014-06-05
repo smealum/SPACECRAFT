@@ -10,6 +10,7 @@ class Camera {
 	friend class CameraManager;
 	friend class CameraKeyboard;
 	friend class CameraKeyboardMouse;
+	friend class CameraPlayerGround;
 	public:
 		Camera(float znear, float zfar);
 
@@ -27,12 +28,12 @@ class Camera {
 		bool isBoxInFrustum(glm::vec3 p[], int n);
 		
 
+		glm::mat4 view, proj, final;
 	private:
 		//view should be computed from view3 and pos
 		//never modify view directly
 		glm::mat3 view3;
 		glm::dvec3 pos;
-		glm::mat4 view, proj, final;
 		glm::vec4 frustumPlane[6]; 
 		float znear, zfar;
 
