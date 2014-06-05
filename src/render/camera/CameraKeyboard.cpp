@@ -21,7 +21,7 @@ void CameraKeyboard::update(Camera& camera)
 {
     float delta = Application::getInstance().getFrameDeltaTime();
 
-    speedVect=vec3(0,0,0);
+    speedVect=dvec3(0,0,0);
 
     // changement de la vitesse (manière brusque)
     if (Input::isKeyPressed(GLFW_KEY_Y))    speed*=10.0f;
@@ -60,22 +60,23 @@ void CameraKeyboard::update(Camera& camera)
 
     // translation
     if (Input::isKeyHold(GLFW_KEY_A))
-        speedVect+=vec3(+tS,0.0,0.0);
+        speedVect+=dvec3(+tS,0.0,0.0);
     if (Input::isKeyHold(GLFW_KEY_D))
-        speedVect+=vec3(-tS,0.0,0.0);
+        speedVect+=dvec3(-tS,0.0,0.0);
     if (Input::isKeyHold(GLFW_KEY_W))
-        speedVect+=vec3(0,0.0,+tS);
+        speedVect+=dvec3(0,0.0,+tS);
     if (Input::isKeyHold(GLFW_KEY_S))
-        speedVect+=vec3(0,0,-tS);
+        speedVect+=dvec3(0,0,-tS);
     if (Input::isKeyHold(GLFW_KEY_E))
-        speedVect+=vec3(0.0,-tS, 0.0);
+        speedVect+=dvec3(0.0,-tS, 0.0);
     if (Input::isKeyHold(GLFW_KEY_Q))
-        speedVect+=vec3(0.0,+tS, 0.0);
+        speedVect+=dvec3(0.0,+tS, 0.0);
 
-    speedVect=speedVect*camera.view3;
+    speedVect=dvec3(vec3(speedVect)*camera.view3);
 
     //TEMP
-    // speedVect=camera.getPosition()-testPlanet->collidePoint(camera.getPosition(),-speedVect);
+    speedVect=camera.getPositionDouble()-testPlanet->collidePoint(camera.getPositionDouble(),-speedVect);
+    
     camera.pos-=speedVect;
     
     camera.updateView();

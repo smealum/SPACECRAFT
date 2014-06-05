@@ -498,7 +498,7 @@ int Planet::numMiniWorlds(void)
 	return miniWorldList.size();
 }
 
-glm::vec3 Planet::collidePoint(glm::vec3 p, glm::vec3 v)
+glm::dvec3 Planet::collidePoint(glm::dvec3 p, glm::dvec3 v)
 {
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->collidePoint(p,v);
 	return p+v;
