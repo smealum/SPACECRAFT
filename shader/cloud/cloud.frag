@@ -1,5 +1,6 @@
 #version 330
 
+
 in vec3 vPos;
 
 uniform float time;
@@ -138,10 +139,61 @@ float snoise(vec4 v)
 //-------------------------------
 
 
+// version coordonée polaires
+/*
 void main()
 {
-	float noise = snoise(vec4(vPos,time));
+    vec3 np = normalize(vPos);
+
+    vec3 vvPos;
+    vvPos.x = asin(np.z);
+    vvPos.y = asin(np.y/cos(vvPos.x));
+    vvPos = vvPos * 0.1592356;
+    vvPos.z = 1.0;
+    //vvPos.x = vPos.x * cos(time*0.05) - vPos.y*sin(time*0.05);
+    //vvPos.y = vPos.x * sin(time*0.05) + vPos.y*cos(time*0.05);
+    //vvPos.z = vPos.z;
+
+    // pixelisation
+    vvPos = ivec3(vvPos*500)*0.002;
+
+	float noise = snoise(vec4(vvPos*20.f,time*0.05));
+	noise += snoise(vec4(vvPos*40.f,time*0.05))*0.5f;
 	if (noise<0.0)
 		discard;
-	outColor = vec4(noise,noise,noise,1.0);
+    noise=clamp(noise,0.0,1.0);
+    float alpha = 1.0 - pow(1.0-noise,3.0);
+
+    alpha *= 2.0*(1.0-np.z)*(np.z+1.0);
+    alpha = clamp(alpha,0.0,1.0);
+
+    //alpha=int(alpha*10.0)*0.1;
+
+	outColor = vec4(1.0,1.0,1.0,alpha);
 }
+*/
+
+// version 3D cartésienne
+void main()
+{
+
+	float noise;
+    noise  = snoise(vec4(vPos*1.0,time*0.05))*3.0;
+    noise += snoise(vec4(vPos*4.f,time*0.05));
+	noise += snoise(vec4(vPos*20.f,time*0.05))*0.05f;
+	if (noise<0.0)
+	{
+        discard;
+    }
+    else
+    {
+        noise=clamp(noise,0.0,1.0);
+        //float alpha = 1.0 - pow(1.0-noise,3.0);
+        float alpha = noise;
+
+        alpha = clamp(alpha,0.0,0.8);
+
+        outColor = vec4(0.9,0.9,0.9,alpha);
+    }
+}
+

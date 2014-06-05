@@ -139,6 +139,7 @@ int randomSource=4;
 
 bool PlanetFace::shouldHaveMiniworld(Camera& c)
 {
+	// if(planet->numMiniWorlds()>0 && !miniworld)return false; //TEMP DEBUG
 	if (depth == MINIWORLD_DETAIL)
 	{
 		if (miniworld)
@@ -474,8 +475,12 @@ void Planet::draw(Camera& c)
 
 	// printf("%d\n",miniWorldList.size());
 	
+	// dessin de l'athmosphere
+	atmosphere.draw(c);
+
 	// dessin des nuages
 	cloud.draw(c);
+
 }
 
 void Planet::addMiniWorld(MiniWorld* mw)
@@ -491,4 +496,10 @@ void Planet::removeMiniWorld(MiniWorld* mw)
 int Planet::numMiniWorlds(void)
 {
 	return miniWorldList.size();
+}
+
+glm::vec3 Planet::collidePoint(glm::vec3 p, glm::vec3 v)
+{
+	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->collidePoint(p,v);
+	return p+v;
 }

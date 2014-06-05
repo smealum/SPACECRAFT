@@ -31,6 +31,7 @@ void TW_CALL reloadAllShaders(void * /*clientData*/)
     }
 }
 #endif
+blockTypes::T tmp_type;
 
 Application::Application() : 
     state(appReady),
@@ -87,6 +88,8 @@ Application::Application() :
         TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
         TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
         TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
+		tmp_type = blockTypes::sand;
+		TwAddVarRW(bar, "blockType", TW_TYPE_INT32, (int*)&tmp_type, "label='type of the underwater block'");
 
         // vsync on
         glfwSwapInterval(vsync);
@@ -145,14 +148,13 @@ void Application::createWindowInFullscreen(bool fs)
 }
 
 Planet* testPlanet;
-Atmosphere* testAtmosphere;
 int testTexture;
 
 void Application::run()
 {
     BlockType::getInstance(); // TODO can be deleted when used
     state = appInLoop;
-    camera = new Camera(0.000001f, 100.f);
+    camera = new Camera(0.0000001f, 10.f);
     camera->view = glm::lookAt(
             glm::vec3(1.5, 1.5f, 1.5f),
             glm::vec3(0.f),
@@ -163,7 +165,6 @@ void Application::run()
     tt = new testShaders;
     PlanetInfo planetInfo;
     testPlanet=new Planet(planetInfo, contentHandler);
-    testAtmosphere=new Atmosphere();
     // testChunk=new Chunk(testPlanet);
     // testMiniWorld=new MiniWorld(testPlanet, testPlanet->faces[2]);
     // testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
@@ -192,6 +193,7 @@ void Application::run()
                 sprintf(titleBuff, "%s FPS: %.1f", WIN_TITLE, fps);
                 glfwSetWindowTitle(window, titleBuff);
             }
+			BlockAnimated::animation(deltaTime);
         }
     }
 
@@ -220,10 +222,11 @@ void Application::loop()
     //tt->draw();
     // testPlanet->drawDirect();
     testPlanet->draw(*camera);
-    testAtmosphere->draw(*camera);
     // testChunk->draw(*camera);
     // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);
+
+    if (Input::isKeyHold(GLFW_KEY_N))reloadAllShaders(NULL);
 
     // printf("test %d\n",testVal);
     testVal=0;
@@ -237,7 +240,7 @@ void Application::loop()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		// TwDraw();
+		TwDraw();
     #endif
 
     glfwSwapBuffers(window);

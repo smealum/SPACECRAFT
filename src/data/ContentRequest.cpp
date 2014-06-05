@@ -9,8 +9,8 @@ using namespace glm;
 
 //PlanetElevationRequest stuff
 PlanetElevationRequest::PlanetElevationRequest(Planet& p, PlanetFace& pf, glm::vec3 c):
-	planet(p),
-	coord(c)
+	coord(c),
+	planet(p)
 {
 	face=pf.getTptr();
 	face->grab();
@@ -37,14 +37,14 @@ void PlanetElevationRequest::update(void)
 
 //WorldChunkRequest stuff
 WorldChunkRequest::WorldChunkRequest(Planet& p, Chunk& c, float elevation, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z):
-	planet(p),
-	origin(o),
-	elevation(elevation),
-	v1(v1),
-	v2(v2),
 	px(x),
 	py(y),
-	pz(z)
+	pz(z),
+	elevation(elevation),
+	origin(o),
+	v1(v1),
+	v2(v2),
+	planet(p)
 {
 	chunk=c.getTptr();
 	chunk->grab();
@@ -72,16 +72,16 @@ WorldChunkRequest::~WorldChunkRequest()
 
 //TODO : optimiser pour éviter les multiplications à chaque fois
 //(juste utiliser un pointeur à chaque fois...)
-void computeChunkFaces(char* data,
+void computeChunkFaces(chunkVal* data,
 		int w, int h, int d, //array sizes (in chunks)
 		int sx, int sy, int sz, //chunk in array (in chunks)
 		int px, int py, int pz, //chunk offset in world (in blocks)
 		std::vector<GL_Vertex>& vArray) //output
 {
 	vArray.clear();
-	auto blockType = BlockType::getInstance();
+	auto &blockType = BlockType::getInstance();
 
-	char previous,current;
+	chunkVal previous,current;
 	// X
 	for(int y=0;y<CHUNK_N;++y)
 	for(int z=0;z<CHUNK_N;++z)
@@ -97,8 +97,8 @@ void computeChunkFaces(char* data,
 					GL_Vertex v;
 					v.facedir=2;
 					v.texcoord= blockType.getTexcoord(
-						(blockTypes)int(current),
-						BlockType::side
+						(blockTypes::T)int(current),
+						blockPlane::side
 						);
 					v.position=vec3(px+x,py+y,pz+z);
 					vArray.push_back(v);
@@ -109,8 +109,8 @@ void computeChunkFaces(char* data,
 					GL_Vertex v;
 					v.facedir=3;
 					v.texcoord=blockType.getTexcoord(
-						(blockTypes)int(previous),
-						BlockType::side
+						(blockTypes::T)int(previous),
+						blockPlane::side
 						);
 					v.position=vec3(px+x-1,py+y,pz+z);
 					vArray.push_back(v);
@@ -135,8 +135,8 @@ void computeChunkFaces(char* data,
 					GL_Vertex v;
 					v.facedir=0;
 					v.texcoord=blockType.getTexcoord(
-						(blockTypes)int(current),
-						BlockType::top
+						(blockTypes::T)int(current),
+						blockPlane::top
 						);
 					v.position=vec3(px+x,py+y,pz+z);
 					vArray.push_back(v);
@@ -147,8 +147,8 @@ void computeChunkFaces(char* data,
 					GL_Vertex v;
 					v.facedir=1;
 					v.texcoord=blockType.getTexcoord(
-						(blockTypes)int(previous),
-						BlockType::top
+						(blockTypes::T)int(previous),
+						blockPlane::top
 						);
 					v.position=vec3(px+x,py+y-1,pz+z);
 					vArray.push_back(v);
@@ -173,8 +173,8 @@ void computeChunkFaces(char* data,
 					GL_Vertex v;
 					v.facedir=4;
 					v.texcoord=blockType.getTexcoord(
-						(blockTypes)int(current),
-						BlockType::side
+						(blockTypes::T)int(current),
+						blockPlane::side
 						);
 					v.position=vec3(px+x,py+y,pz+z);
 					vArray.push_back(v);
@@ -185,8 +185,8 @@ void computeChunkFaces(char* data,
 					GL_Vertex v;
 					v.facedir=5;
 					v.texcoord=blockType.getTexcoord(
-						(blockTypes)int(previous),
-						BlockType::side
+						(blockTypes::T)int(previous),
+						blockPlane::side
 						);
 					v.position=vec3(px+x,py+y,pz-1+z);
 					vArray.push_back(v);
@@ -196,10 +196,9 @@ void computeChunkFaces(char* data,
 		}
 	}
 }
-
 //TODO : optimiser et proprifier
 //(on peut largement optimiser les accès à data, éviter *énormément* de multiplications)
-void generateWorldData(int prod_id, Planet& planet, char* data,
+void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 		int w, int h, int d, //array sizes (in chunks)
 		int px, int py, int pz, //offset in world
 		glm::vec3 origin, glm::vec3 v1, glm::vec3 v2) //toplevel characteristics
@@ -277,13 +276,13 @@ void generateWorldData(int prod_id, Planet& planet, char* data,
 
 void WorldChunkRequest::process(int id)
 {
-	generateWorldData(id, planet, (char*)data, 1, 1, 1, px, py, pz, origin, v1, v2);
-	computeChunkFaces((char*)data, 1, 1, 1, 0, 0, 0, px, py, pz, vArray);
+	generateWorldData(id, planet, (chunkVal*)data, 1, 1, 1, px, py, pz, origin, v1, v2);
+	computeChunkFaces((chunkVal*)data, 1, 1, 1, 0, 0, 0, px, py, pz, vArray);
 }
 
 void WorldChunkRequest::update(void)
 {
-	chunk->getPointer()->updateData((char*)data, vArray);
+	chunk->getPointer()->updateData((chunkVal*)data, vArray);
 	chunk->release();
 }
 
@@ -306,12 +305,12 @@ MiniWorldDataRequest::~MiniWorldDataRequest()
 
 void MiniWorldDataRequest::process(int id)
 {
-	generateWorldData(id, planet, (char*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, px, py, pz, origin, v1, v2);
+	generateWorldData(id, planet, (chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, px, py, pz, origin, v1, v2);
 
 	for(int i=0;i<MINIWORLD_W;i++)
 		for(int j=0;j<MINIWORLD_H;j++)
 			for(int k=0;k<MINIWORLD_D;k++)
-				computeChunkFaces((char*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, i, j, k, px+i*CHUNK_N, py+j*CHUNK_N, pz+k*CHUNK_N, vArray[i][j][k]);
+				computeChunkFaces((chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, i, j, k, px+i*CHUNK_N, py+j*CHUNK_N, pz+k*CHUNK_N, vArray[i][j][k]);
 }
 
 void MiniWorldDataRequest::update(void)

@@ -11,21 +11,22 @@ const float PI=3.14159265;
 
 uniform sampler2D tex;
 
-uniform float m_fOuterRadius;
-uniform float m_fScale;
-uniform float m_fInnerRadius;
-uniform float m_Kr;
-uniform float m_Km;
-uniform float m_Kr4PI;
-uniform float m_Km4PI;
-uniform vec3 m_fWavelength4;
-uniform float m_g;
-uniform float m_ESun;
-uniform bool sky;
+uniform float m_fOuterRadius = 1.1;
+uniform float m_fScale = 1.0 ;
+uniform float m_fInnerRadius = 1.0 ;
+uniform float m_Kr = 1.0 ;
+uniform float m_Km = 1.0 ;
+uniform float m_Kr4PI = 1.0 ;
+uniform float m_Km4PI = 1.0 ;
+uniform vec3 m_fWavelength4 = vec3(1.0,1.0,1.0);
+uniform float m_g = 1.0 ;
+uniform float m_ESun = 1.0 ;
+uniform bool sky = false ;
 
-uniform vec3 cameraPosition, lightDirection;
+uniform vec3 cameraPosition = vec3(1.0,0.0,0.0);
+uniform vec3 lightDirection = vec3(0.0,0.0,1.0);
 
-uniform int m_nSamples;
+uniform int m_nSamples = 2;
 
 const int texSize=128;
 const float DELTA = 0.000001;

@@ -67,7 +67,7 @@ TrackerPointer<MiniWorld>* MiniWorld::getTptr(void)
     return tptr;
 }
 
-void MiniWorld::updateChunks(char data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D])
+void MiniWorld::updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D])
 {
 	generated=true;
 	for(int i=0;i<MINIWORLD_W;i++)
@@ -77,6 +77,21 @@ void MiniWorld::updateChunks(char data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(C
 			for(int k=0;k<MINIWORLD_D;k++)
 			{
 				chunks[i][j][k]->updateData(data[i][j][k], va[i][j][k]);
+			}
+		}
+	}
+}
+
+void MiniWorld::collidePoint(glm::vec3& p, glm::vec3& v)
+{
+	//TODO : culling dès ici
+	for(int i=0;i<MINIWORLD_W;i++)
+	{
+		for(int j=0;j<MINIWORLD_H;j++)
+		{
+			for(int k=0;k<MINIWORLD_D;k++)
+			{
+				chunks[i][j][k]->collidePoint(p,v);
 			}
 		}
 	}
