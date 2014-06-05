@@ -1,6 +1,7 @@
 #include "utils/stb_image.h"
 #include <cstdlib>
 #include "utils/TextureManager.h"
+#include "utils/dbg.h"
 #include <iostream>
 using namespace std;
 
@@ -56,7 +57,7 @@ GLuint TextureManager::loadTexture(const std::string& filename)
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, (comp==3)?GL_RGB:GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, (comp==4)?GL_RGBA:GL_RGB, GL_UNSIGNED_BYTE, data);
 
 	free(data);
 

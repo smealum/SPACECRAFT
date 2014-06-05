@@ -20,9 +20,9 @@ void CameraPlayerGround::update(Camera& camera)
 
 	if(Input::isKeyPressed(GLFW_KEY_R))camera.setCameraManager(new CameraKeyboardMouse()); //TODO : méga fuite à virer
 
-	const double tS=1e-4*delta;
-	const double gS=1e-4*delta;
-	const double jS=1e-5;
+	const double tS=1e-5*delta;
+	const double gS=1e-5*delta;
+	const double jS=1e-6;
     const float rS=1.5*delta;
 
     // rotation
@@ -54,9 +54,17 @@ void CameraPlayerGround::update(Camera& camera)
 	speedVect+=localSpeedVect+g*gS; //gravité
 
 	glm::dvec3 tp=camera.getPositionDouble()-g*(1.0/PLANETFACE_BLOCKS);
-	speedVect=tp-testPlanet->collidePoint(tp,-speedVect);
+	glm::dvec3 out;
+	bool ret=testPlanet->collidePoint(tp,-speedVect,out);
+	speedVect=tp-out;
 
 	camera.pos-=speedVect;
+
+	if(ret)speedVect/=2.0; //frottements sol
+	else{
+		double gval=glm::dot(g,speedVect);
+		speedVect=(speedVect-gval*g)*0.8+gval*g*0.97;
+	}
 
 	camera.updateView();
 	camera.updateFrustum();
