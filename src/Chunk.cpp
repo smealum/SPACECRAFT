@@ -88,7 +88,74 @@ TrackerPointer<Chunk>* Chunk::getTptr(void)
     return tptr;
 }
 
+//même principe que raymarching de http://www.cse.yorku.ca/~amana/research/grid.pdf
+glm::i32vec3 Chunk::performRayMarch(glm::dvec3 localBlockPosf, glm::dvec3 localBlockPosf2, int* dir)
+{
+    glm::i32vec3 cur(localBlockPosf);
+    glm::dvec3 u=glm::normalize(localBlockPosf2-localBlockPosf);
+    const double d=glm::length(localBlockPosf2-localBlockPosf);
+    const int stepX=(localBlockPosf2.x>localBlockPosf.x)?1:-1;
+    const int stepY=(localBlockPosf2.y>localBlockPosf.y)?1:-1;
+    const int stepZ=(localBlockPosf2.z>localBlockPosf.z)?1:-1;
+    const double tDeltaX=abs(1.0/u.x); // w/u.x
+    const double tDeltaY=abs(1.0/u.y); // h/u.y
+    const double tDeltaZ=abs(1.0/u.z); // z/u.z
 
+    double tMaxX, tMaxY, tMaxZ;
+
+    if(abs(u.x)<0.001)tMaxX=d;
+    else tMaxX=abs((localBlockPosf.x-floorf(localBlockPosf.x)+((localBlockPosf2.x>localBlockPosf.x)?-1.0:0.0))/u.x);
+
+    if(abs(u.y)<0.001)tMaxY=d;
+    else tMaxY=abs((localBlockPosf.y-floorf(localBlockPosf.y)+((localBlockPosf2.y>localBlockPosf.y)?-1.0:0.0))/u.y);
+
+    if(abs(u.z)<0.001)tMaxZ=d;
+    else tMaxZ=abs((localBlockPosf.z-floorf(localBlockPosf.z)+((localBlockPosf2.z>localBlockPosf.z)?-1.0:0.0))/u.z);
+
+    // printf("precollision %d %d %d (%f %f %f) %f (%f %f %f)\n",cur.x,cur.y,cur.z,fabs(u.x),fabs(u.y),fabs(u.z),d,tMaxX,tMaxY,tMaxZ);
+
+    do{
+        if(tMaxX>=d && tMaxY>=d && tMaxZ>=d)
+        {
+            // on a parcouru tout v, donc on s'arrête
+            // printf("no collision %d %d %d (%f %f %f) %f (%f %f %f)\n\n",cur.x,cur.y,cur.z,localBlockPosf.x,localBlockPosf.y,localBlockPosf.z,d,tMaxX,tMaxY,tMaxZ);
+            // printf("no collision %d %d %d (%f %f %f) %f (%f %f %f)\n\n",cur.x,cur.y,cur.z,localBlockPosf2.x,localBlockPosf2.y,localBlockPosf2.z,d,tMaxX,tMaxY,tMaxZ);
+            return cur;
+        }
+        if(tMaxX < tMaxY)
+        {
+            if(tMaxX < tMaxZ)
+            {
+                // printf("step X\n");
+                cur.x+=stepX;
+                if(dir)*dir=0;
+                if(cur.x<0 || cur.x>CHUNK_N)return cur;
+                tMaxX+=tDeltaX;
+            }else{
+                // printf("step Z\n");
+                cur.z+=stepZ;
+                if(dir)*dir=2;
+                if(cur.z<0 || cur.z>CHUNK_N)return cur;
+                tMaxZ+=tDeltaZ;
+            }   
+        } else {
+            if(tMaxY < tMaxZ) {
+                // printf("step Y\n");
+                cur.y+=stepY;
+                if(dir)*dir=1;
+                if(cur.y<0 || cur.y>CHUNK_N)return cur;
+                tMaxY+=tDeltaY;
+            }else{
+                // printf("step Z\n");
+                cur.z+=stepZ;
+                if(dir)*dir=2;
+                if(cur.z<0 || cur.z>CHUNK_N)return cur;
+                tMaxZ+=tDeltaZ;
+            }
+        }
+    }while(value[cur.z+1][cur.y+1][cur.x+1]==blockTypes::air);
+    return cur;
+}
 
 bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
 {
@@ -113,79 +180,21 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
 
         // printf("LENGTH1 %f\n",glm::length(v));
 
-        //même principe que raymarching de http://www.cse.yorku.ca/~amana/research/grid.pdf
-        glm::i32vec3 cur(localBlockPosf);
-        glm::dvec3 u=glm::normalize(localBlockPosf2-localBlockPosf);
-        const double d=glm::length(localBlockPosf2-localBlockPosf);
-        const int stepX=(localBlockPosf2.x>localBlockPosf.x)?1:-1;
-        const int stepY=(localBlockPosf2.y>localBlockPosf.y)?1:-1;
-        const int stepZ=(localBlockPosf2.z>localBlockPosf.z)?1:-1;
-        const double tDeltaX=abs(1.0/u.x); // w/u.x
-        const double tDeltaY=abs(1.0/u.y); // h/u.y
-        const double tDeltaZ=abs(1.0/u.z); // z/u.z
-
-        double tMaxX, tMaxY, tMaxZ;
-
-        if(abs(u.x)<0.001)tMaxX=d;
-        else tMaxX=abs((localBlockPosf.x-floorf(localBlockPosf.x)+((localBlockPosf2.x>localBlockPosf.x)?-1.0:0.0))/u.x);
-
-        if(abs(u.y)<0.001)tMaxY=d;
-        else tMaxY=abs((localBlockPosf.y-floorf(localBlockPosf.y)+((localBlockPosf2.y>localBlockPosf.y)?-1.0:0.0))/u.y);
-
-        if(abs(u.z)<0.001)tMaxZ=d;
-        else tMaxZ=abs((localBlockPosf.z-floorf(localBlockPosf.z)+((localBlockPosf2.z>localBlockPosf.z)?-1.0:0.0))/u.z);
-
         if(value[localBlockPosi.z+1][localBlockPosi.y+1][localBlockPosi.x+1]!=blockTypes::air){return ret;}
 
-        // printf("precollision %d %d %d (%f %f %f) %f (%f %f %f)\n",cur.x,cur.y,cur.z,fabs(u.x),fabs(u.y),fabs(u.z),d,tMaxX,tMaxY,tMaxZ);
-
         int dir;
-        do{
-            if(tMaxX>=d && tMaxY>=d && tMaxZ>=d)
-            {
-                // on a parcouru tout v, donc on s'arrête
-                // printf("no collision %d %d %d (%f %f %f) %f (%f %f %f)\n\n",cur.x,cur.y,cur.z,localBlockPosf.x,localBlockPosf.y,localBlockPosf.z,d,tMaxX,tMaxY,tMaxZ);
-                // printf("no collision %d %d %d (%f %f %f) %f (%f %f %f)\n\n",cur.x,cur.y,cur.z,localBlockPosf2.x,localBlockPosf2.y,localBlockPosf2.z,d,tMaxX,tMaxY,tMaxZ);
-                return ret;
-            }
-            if(tMaxX < tMaxY)
-            {
-                if(tMaxX < tMaxZ)
-                {
-                    // printf("step X\n");
-                    cur.x+=stepX;
-                    dir=0;
-                    if(cur.x<0 || cur.x>CHUNK_N)return ret;
-                    tMaxX+=tDeltaX;
-                }else{
-                    // printf("step Z\n");
-                    cur.z+=stepZ;
-                    dir=2;
-                    if(cur.z<0 || cur.z>CHUNK_N)return ret;
-                    tMaxZ+=tDeltaZ;
-                }   
-            } else {
-                if(tMaxY < tMaxZ) {
-                    // printf("step Y\n");
-                    cur.y+=stepY;
-                    dir=1;
-                    if(cur.y<0 || cur.y>CHUNK_N)return ret;
-                    tMaxY+=tDeltaY;
-                }else{
-                    // printf("step Z\n");
-                    cur.z+=stepZ;
-                    dir=2;
-                    if(cur.z<0 || cur.z>CHUNK_N)return ret;
-                    tMaxZ+=tDeltaZ;
-                }
-            }
-        }while(value[cur.z+1][cur.y+1][cur.x+1]==blockTypes::air);
+        glm::i32vec3 cur=performRayMarch(localBlockPosf, localBlockPosf2, &dir);
+        if(value[cur.z+1][cur.y+1][cur.x+1]==blockTypes::air)return ret;
+        
+        glm::dvec3 u=glm::normalize(localBlockPosf2-localBlockPosf);
+        const double d=glm::length(localBlockPosf2-localBlockPosf);
 
         // printf("collision %d %d %d (%f %f %f) %f (%f %f %f)\n",cur.x,cur.y,cur.z,localBlockPosf.x,localBlockPosf.y,localBlockPosf.z,d,tMaxX,tMaxY,tMaxZ);
         switch(dir)
         {
             case 0:
                 {
+                    const int stepX=(localBlockPosf2.x>localBlockPosf.x)?1:-1;
                     double targetX=(cur.x+px)*1.0;
                     if(stepX<0)targetX+=1.0;
                     targetX-=0.01*stepX; //marge de 1cm
@@ -198,6 +207,7 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
                 break;
             case 1:
                 {
+                    const int stepY=(localBlockPosf2.y>localBlockPosf.y)?1:-1;
                     double targetY=(cur.y+py)*1.0;
                     ret=true;
                     if(stepY<0)targetY+=1.0;
@@ -211,6 +221,7 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
                 break;
             default:
                 {
+                    const int stepZ=(localBlockPosf2.z>localBlockPosf.z)?1:-1;
                     double targetZ=(cur.z+pz)*1.0;
                     if(stepZ<0)targetZ+=1.0;
                     targetZ-=0.01*stepZ; //marge de 1cm
