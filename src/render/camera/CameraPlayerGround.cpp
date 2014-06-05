@@ -22,7 +22,7 @@ void CameraPlayerGround::update(Camera& camera)
 
 	const double tS=1e-4*delta;
 	const double gS=1e-4*delta;
-	const double jS=1e-5;
+	const double jS=4e-6;
     const float rS=1.5*delta;
 
     // rotation
@@ -54,9 +54,14 @@ void CameraPlayerGround::update(Camera& camera)
 	speedVect+=localSpeedVect+g*gS; //gravité
 
 	glm::dvec3 tp=camera.getPositionDouble()-g*(1.0/PLANETFACE_BLOCKS);
-	speedVect=tp-testPlanet->collidePoint(tp,-speedVect);
+	glm::dvec3 out;
+	bool ret=testPlanet->collidePoint(tp,-speedVect,out);
+	speedVect=tp-out;
 
 	camera.pos-=speedVect;
+
+	printf("FROT FROT FROT %d\n",(int)ret);
+	if(ret)speedVect/=2.0; //frottements sol
 
 	camera.updateView();
 	camera.updateFrustum();

@@ -90,9 +90,11 @@ TrackerPointer<Chunk>* Chunk::getTptr(void)
 
 
 
-void Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
+bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
 {
-    if(glm::length(v)<=1e-12)return;
+    if(glm::length(v)<=1e-12)return false;
+
+    bool ret=false;
 
     while(glm::length(v)>1e-12)
     {
@@ -107,7 +109,7 @@ void Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
         
         if(localBlockPosf2.x<0 || localBlockPosf2.y<0 || localBlockPosf2.z<0 ||
             localBlockPosf2.x>=CHUNK_N || localBlockPosf2.y>=CHUNK_N || localBlockPosf2.z>=CHUNK_N)
-            return;
+            return ret;
 
         // printf("LENGTH1 %f\n",glm::length(v));
 
@@ -133,7 +135,7 @@ void Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
         if(abs(u.z)<0.001)tMaxZ=d;
         else tMaxZ=abs((localBlockPosf.z-floorf(localBlockPosf.z)+((localBlockPosf2.z>localBlockPosf.z)?-1.0:0.0))/u.z);
 
-        if(value[localBlockPosi.z+1][localBlockPosi.y+1][localBlockPosi.x+1]!=blockTypes::air){return;}
+        if(value[localBlockPosi.z+1][localBlockPosi.y+1][localBlockPosi.x+1]!=blockTypes::air){return ret;}
 
         // printf("precollision %d %d %d (%f %f %f) %f (%f %f %f)\n",cur.x,cur.y,cur.z,fabs(u.x),fabs(u.y),fabs(u.z),d,tMaxX,tMaxY,tMaxZ);
 
@@ -144,7 +146,7 @@ void Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
                 // on a parcouru tout v, donc on s'arrête
                 // printf("no collision %d %d %d (%f %f %f) %f (%f %f %f)\n\n",cur.x,cur.y,cur.z,localBlockPosf.x,localBlockPosf.y,localBlockPosf.z,d,tMaxX,tMaxY,tMaxZ);
                 // printf("no collision %d %d %d (%f %f %f) %f (%f %f %f)\n\n",cur.x,cur.y,cur.z,localBlockPosf2.x,localBlockPosf2.y,localBlockPosf2.z,d,tMaxX,tMaxY,tMaxZ);
-                return;
+                return ret;
             }
             if(tMaxX < tMaxY)
             {
@@ -153,13 +155,13 @@ void Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
                     // printf("step X\n");
                     cur.x+=stepX;
                     dir=0;
-                    if(cur.x<0 || cur.x>CHUNK_N)return;
+                    if(cur.x<0 || cur.x>CHUNK_N)return ret;
                     tMaxX+=tDeltaX;
                 }else{
                     // printf("step Z\n");
                     cur.z+=stepZ;
                     dir=2;
-                    if(cur.z<0 || cur.z>CHUNK_N)return;
+                    if(cur.z<0 || cur.z>CHUNK_N)return ret;
                     tMaxZ+=tDeltaZ;
                 }   
             } else {
@@ -167,13 +169,13 @@ void Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
                     // printf("step Y\n");
                     cur.y+=stepY;
                     dir=1;
-                    if(cur.y<0 || cur.y>CHUNK_N)return;
+                    if(cur.y<0 || cur.y>CHUNK_N)return ret;
                     tMaxY+=tDeltaY;
                 }else{
                     // printf("step Z\n");
                     cur.z+=stepZ;
                     dir=2;
-                    if(cur.z<0 || cur.z>CHUNK_N)return;
+                    if(cur.z<0 || cur.z>CHUNK_N)return ret;
                     tMaxZ+=tDeltaZ;
                 }
             }
@@ -197,6 +199,7 @@ void Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
             case 1:
                 {
                     double targetY=(cur.y+py)*1.0;
+                    ret=true;
                     if(stepY<0)targetY+=1.0;
                     targetY-=0.01*stepY; //marge de 1cm
                     double r=(targetY-blockPos.y)/u.y;
@@ -222,6 +225,7 @@ void Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
         }
         v=dblockToSpace(blockPos+v, dvec3(origin), dvec3(v1), dvec3(v2))-p;
     }
+    return ret;
 }
 
 void Chunk::initGLObjects()

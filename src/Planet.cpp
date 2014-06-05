@@ -508,10 +508,13 @@ int Planet::numMiniWorlds(void)
 	return miniWorldList.size();
 }
 
-dvec3 Planet::collidePoint(dvec3 p, dvec3 v)
+bool Planet::collidePoint(dvec3 p, dvec3 v, dvec3& out)
 {
-	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->collidePoint(p,v);
-	return p+v;
+	bool ret=false;
+	for(auto it(miniWorldList.begin());it!=miniWorldList.end();++it)ret=ret||(*it)->collidePoint(p,v);
+	out=p+v;
+	printf(" %d\n",(int)ret);
+	return ret;
 }
 
 glm::dvec3 Planet::getGravityVector(glm::dvec3 p)
