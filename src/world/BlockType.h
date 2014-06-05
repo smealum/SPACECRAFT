@@ -21,7 +21,12 @@ namespace blockTypes
 		stone = 2,
 		dirt = 3,
 		grass_side = 4,
+		flower_red = 13,
+		flower_yellow = 14,
 		sand = 19,
+		tree = 21,
+		tree_top = 22,
+		grass_blaze = 2*TEXCOLS+8,
 		sponge = 3*TEXCOLS+1,
 		water = 12*TEXCOLS+14,
 		water_1 = water+2,
@@ -44,9 +49,9 @@ namespace blockTransparency
 {
 	enum T : uint8_t {
 		// for some pixel...
-		opaque, // alpha == 1
-		seeThrough, // alpha > 0.01 && < 1
-		transparent // alpha == 0
+		opaque = 0, // alpha == 1
+		seeThrough = 1, // alpha > 0.01 && < 1
+		transparent = 2 // alpha == 0
 	};
 }
 
@@ -100,19 +105,16 @@ class BlockType : public Singleton<BlockType> {
 		// get top-left coord
 		inline texCoord getTexcoord(blockTypes::T type) // this refers to a plane
 		{
-			assert(type != 0);
 			return texCoords[type];
 		}
 
 		inline texCoord getTexcoord(blockTypes::T type, blockPlane::T p) // this refers to a plane
 		{
-			assert(type != 0);
 			return blocks[type]->getSide(p);
 		}
 
 		inline BlockTexCoord& getBlockTexcoord(blockTypes::T type) // this refers to the block type
 		{
-			assert(type != 0);
 			return *blocks[type];
 		}
 

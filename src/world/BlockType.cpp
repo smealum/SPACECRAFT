@@ -5,19 +5,19 @@ const float BlockAnimated::frameTime(0.5f);
 BlockType *BlockTexCoord::btype(NULL);
 std::list<BlockAnimated*> BlockAnimated::list;
 
-blockTransparency::T getTextureTransparency(const unsigned char *img, int xx, int yy, int w, int h)
+blockTransparency::T getTextureTransparency(const unsigned char *img, int xx, int yy, int w, int h, int texWidth)
 {
 	blockTransparency::T t = blockTransparency::opaque;
-	for (int y = yy; y < yy+h; ++y)
+	for (int y = yy; y < yy+h; ++y) {
 		for(int x = xx; x < xx+w; ++x)
 		{
-			unsigned char alpha = img[x + y * w + 3];
+			unsigned char alpha = img[(x + y * texWidth)*4 + 3];
 			if (alpha > 3 && alpha < 255)
 				return blockTransparency::seeThrough;
-			if (t == blockTransparency::opaque)
-				if (alpha < 3)
-					t = blockTransparency::transparent;
+			if (t == blockTransparency::opaque && alpha < 3)
+				t = blockTransparency::transparent;
 		}
+	}
 	return t;
 }
 
@@ -37,6 +37,14 @@ BlockType::BlockType() :
 		texRows = texHeight / blockSize;
 
 	debug("%u texcoord will be generated", blockTypes::maxTypeValue);
+	// special air:
+	blocks[0] =  new BlockStatic({
+			blockTypes::air,
+			blockTypes::air,
+			blockTypes::air
+			});
+	blocks[0]->setTransparency(blockTransparency::transparent);
+	texCoords[0] = glm::vec2(0.f);
 	for (uint32_t i = 1; i < blockTypes::maxTypeValue; i++)
 	{
 		blockTypes::T t = (blockTypes::T)i;
@@ -74,7 +82,7 @@ BlockType::BlockType() :
 					getTextureTransparency(img,
 						((i-1) % texCols) * blockSize,
 						((i-1) / texCols) * blockSize,
-						blockSize, blockSize)
+						blockSize, blockSize, texWidth)
 					);
 
 		glm::vec2 v(

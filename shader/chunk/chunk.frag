@@ -11,4 +11,6 @@ void main()
 {
     // outColor = fcolor;
     outColor = texture(Texture, texcoord)*fcolor;
+	if (outColor.a < 0.01)
+		discard;
 }
