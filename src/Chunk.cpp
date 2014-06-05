@@ -257,7 +257,7 @@ bool Chunk::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir)
     // printf("BLOCK1 %f %f %f\n",blockPos.x,blockPos.y,blockPos.z);
     // printf("BLOCK2 %f %f %f\n",blockPos2.x,blockPos2.y,blockPos2.z);
 
-    out=performRayMarch(localBlockPosf, localBlockPosf2, &dir);
+    out=performRayMarch(localBlockPosf, localBlockPosf2, &dir); //TODO : bug aux bordures de chunks ?
     if(value[out.z+1][out.y+1][out.x+1]==blockTypes::air)return false;
 
     dir*=2;
