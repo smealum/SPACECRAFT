@@ -12,5 +12,6 @@ out vec4 fColor;
 void main()
 {
     fColor = vec4(1,0,0,1);
-    gl_Position = proj * view * model * vec4(position, 1.0);
+    vec4 v = proj * view * model * vec4(position, 1.0);
+    gl_Position = logDepth(v);
 }
