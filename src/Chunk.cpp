@@ -172,10 +172,10 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
         glm::dvec3 localBlockPosf=glm::dvec3(blockPos.x-px,blockPos.y-py,blockPos.z-pz);
         glm::dvec3 localBlockPosf2=glm::dvec3(blockPos2.x-px,blockPos2.y-py,blockPos2.z-pz);
         glm::i32vec3 localBlockPosi=glm::i32vec3(floor(blockPos.x)-px,floor(blockPos.y)-py,floor(blockPos.z)-pz);
-        glm::i32vec3 localBlockPosi2=glm::i32vec3(floor(blockPos2.x)-px,floor(blockPos2.y)-py,floor(blockPos2.z)-pz);
+        // glm::i32vec3 localBlockPosi2=glm::i32vec3(floor(blockPos2.x)-px,floor(blockPos2.y)-py,floor(blockPos2.z)-pz);
         
-        if(localBlockPosf2.x<0 || localBlockPosf2.y<0 || localBlockPosf2.z<0 ||
-            localBlockPosf2.x>=CHUNK_N || localBlockPosf2.y>=CHUNK_N || localBlockPosf2.z>=CHUNK_N)
+        if(localBlockPosf.x<0 || localBlockPosf.y<0 || localBlockPosf.z<0 ||
+            localBlockPosf.x>=CHUNK_N || localBlockPosf.y>=CHUNK_N || localBlockPosf.z>=CHUNK_N)
             return ret;
 
         // printf("LENGTH1 %f\n",glm::length(v));
@@ -236,6 +236,33 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
         v=dblockToSpace(blockPos+v, dvec3(origin), dvec3(v1), dvec3(v2))-p;
     }
     return ret;
+}
+
+bool Chunk::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out)
+{
+    // TODO : optimiser en ne la calculant qu'une fois par toplevel (max) par frame ?
+    glm::dvec3 blockPos=dspaceToBlock(glm::dvec3(p),glm::dvec3(origin),glm::dvec3(v1),glm::dvec3(v2),glm::dvec3(n));
+    glm::dvec3 blockPos2=dspaceToBlock(glm::dvec3(p+v),glm::dvec3(origin),glm::dvec3(v1),glm::dvec3(v2),glm::dvec3(n));
+    
+    glm::dvec3 localBlockPosf=glm::dvec3(blockPos.x-px,blockPos.y-py,blockPos.z-pz);
+    glm::dvec3 localBlockPosf2=glm::dvec3(blockPos2.x-px,blockPos2.y-py,blockPos2.z-pz);
+    glm::i32vec3 localBlockPosi=glm::i32vec3(floor(blockPos.x)-px,floor(blockPos.y)-py,floor(blockPos.z)-pz);
+    // glm::i32vec3 localBlockPosi2=glm::i32vec3(floor(blockPos2.x)-px,floor(blockPos2.y)-py,floor(blockPos2.z)-pz);
+    
+    if(localBlockPosf.x<0 || localBlockPosf.y<0 || localBlockPosf.z<0 ||
+        localBlockPosf.x>=CHUNK_N || localBlockPosf.y>=CHUNK_N || localBlockPosf.z>=CHUNK_N)
+        return false;
+
+    // printf("BLOCK1 %f %f %f\n",blockPos.x,blockPos.y,blockPos.z);
+    // printf("BLOCK2 %f %f %f\n",blockPos2.x,blockPos2.y,blockPos2.z);
+    
+    int dir;
+    out=performRayMarch(localBlockPosf, localBlockPosf2, &dir);
+    if(value[out.z+1][out.y+1][out.x+1]==blockTypes::air)return false;
+
+    out+=glm::i32vec3(px,py,pz);
+
+    return true;
 }
 
 void Chunk::initGLObjects()

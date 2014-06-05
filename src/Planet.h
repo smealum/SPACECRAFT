@@ -80,7 +80,6 @@ class PlanetFace
 		TrackerPointer<PlanetFace>* getTptr(void);
 
 		//TEMP
-		void drawDirect(void);
 		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
 
 	private:
@@ -123,22 +122,21 @@ class Planet
 		void removeMiniWorld(MiniWorld* mw);
 
 		bool collidePoint(glm::dvec3 p, glm::dvec3 v, glm::dvec3& out);
-		glm::dvec3 getGravityVector(glm::dvec3 p);
+		bool selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out);
 
 		const PlanetInfo planetInfo; //read only
 		class ContentHandler& handler;
 
+		glm::dvec3 getGravityVector(glm::dvec3 p);
 		inline float getElevation(int id, const glm::vec3 &coord)
 		{
 			return generators[id]->getElevation(coord);
 		}
 		
-		//TEMP
-		void drawDirect(void);
-		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
-		ShaderProgram &programBasic;
-
 		void setSunPosition(glm::vec3 position);
+
+		//TEMP
+		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
 
 	private:
 		std::vector<PlanetGenerator*> generators;
@@ -149,11 +147,6 @@ class Planet
 
 		glm::vec3 lightdir;
 		glm::vec3 sunPosition;
-
-		//TEMP
-			GLuint vaoBasic;
-			GLuint vbo;
-			GLuint ebo;
 
 		Cloud cloud;
 		Atmosphere atmosphere;

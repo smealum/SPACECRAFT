@@ -285,7 +285,6 @@ static GLuint elements[2*3] = {
 Planet::Planet(PlanetInfo &pi, ContentHandler& ch):
 	planetInfo(pi),
 	handler(ch),
-	programBasic(ShaderProgram::loadFromFile("shader/planet/planet.vert", "shader/planet/planet.frag", "planet")),
 	generators(ch.getMaxProducers()),
 	sunPosition(8.0,0.0,0.0)
 {
@@ -293,33 +292,6 @@ Planet::Planet(PlanetInfo &pi, ContentHandler& ch):
 	
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
 	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], PFBH_MAXSIZE, cubeArray[i][1]-cubeArray[i][0], cubeArray[i][3]-cubeArray[i][0]);
-	
-
-	//TEMP pour drawDirect
-	    glGenBuffers(1, &vbo);
-	    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	    glGenBuffers(1, &ebo);
-	    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
-
-	    // basic programme configuration
-	    {
-			glGenVertexArrays(1, &vaoBasic);
-			glBindVertexArray(vaoBasic);
-
-			programBasic.setBuffers(vaoBasic, vbo, ebo);
-				programBasic.use();
-				glBindFragDataLocation(programBasic.getHandle(), 0, "outColor");
-				programBasic.setAttribute("position", 3, GL_FALSE, 10, 0);
-				programBasic.setAttribute("color", 4, GL_FALSE, 10, 3);
-				// programBasic.setAttribute("texcoord", 2, GL_FALSE, 10, 0); // XXX pas de texcoord
-
-				programBasic.setUniform("overrideColor", vec4(1.f));
-
-				programBasic.setUniform("model", mat4(1.0f));
-	    }
 }
 
 void PlanetFace::testFullGeneration(int depth, PlanetFaceBufferHandler* b)
@@ -337,43 +309,6 @@ void Planet::testFullGeneration(int depth, PlanetFaceBufferHandler* b)
 {
 	for(int i=0;i<6;i++)faces[i]->testFullGeneration(depth, b);
 	// faces[0]->deletePlanetFace();
-}
-
-void PlanetFace::drawDirect(void)
-{
-	quat q(vec3(1.0,0.0,0.0),vertex[4]);
-	if(sons[0])
-	{
-		for(int i=0;i<4;i++)
-		{
-			if(sons[i])sons[i]->drawDirect();
-		}
-	}else{
-		float v=2.0f/(1<<depth);
-	    planet->programBasic.setUniform("model", translate(mat4(1.0f),vertex[4]*elevation)*scale(mat4_cast(q),vec3(v)));
-        planet->programBasic.setUniform("overrideColor", vec4(vec3((elevation-1.0f)*10),1.0f));
-	    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	}
-}
-
-void Planet::drawDirect(void)
-{
-    Camera &cam(Application::getInstance().getCamera());
-    // basic program
-    {
-        programBasic.use();
-        glBindVertexArray(vaoBasic);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        cam.updateCamera(programBasic);
-
-        // mat4 model = translate(mat4(1.0),-vec3(-1.0,0.0,0.0));
-        // // model = rotate(model,1.0f,vec3(1.0,0.0,1.0));
-        // programBasic.setUniform("model", model);
-
-        // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    	for(int i=0;i<6;i++)faces[i]->drawDirect();
-    }
 }
 
 void Planet::processLevelOfDetail(Camera& c)
@@ -513,6 +448,13 @@ bool Planet::collidePoint(dvec3 p, dvec3 v, dvec3& out)
 	bool ret=false;
 	for(auto it(miniWorldList.begin());it!=miniWorldList.end();++it)ret=ret||(*it)->collidePoint(p,v);
 	out=p+v;
+	return ret;
+}
+
+bool Planet::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out)
+{
+	bool ret=false;
+	for(auto it(miniWorldList.begin());it!=miniWorldList.end() && !ret;++it)ret=ret||(*it)->selectBlock(p,v,out);
 	return ret;
 }
 

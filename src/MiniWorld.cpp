@@ -98,3 +98,22 @@ bool MiniWorld::collidePoint(glm::dvec3& p, glm::dvec3& v)
 	}
 	return ret;
 }
+
+bool MiniWorld::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out)
+{
+	bool ret=false;
+	//TODO : culling dès ici
+	for(int i=0;i<MINIWORLD_W;i++)
+	{
+		for(int j=0;j<MINIWORLD_H;j++)
+		{
+			for(int k=0;k<MINIWORLD_D;k++)
+			{
+				ret=ret||chunks[i][j][k]->selectBlock(p,v,out);
+			}
+		}
+	}
+	return ret;
+}
+
+

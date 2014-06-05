@@ -35,6 +35,7 @@ class Chunk
 
 		glm::i32vec3 performRayMarch(glm::dvec3 localBlockPosf, glm::dvec3 localBlockPosf2, int* dir);
 		bool collidePoint(glm::dvec3& p, glm::dvec3& v);
+		bool selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out);
 
 		TrackerPointer<Chunk>* getTptr(void);
 
