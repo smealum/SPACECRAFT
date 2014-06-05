@@ -275,6 +275,7 @@ void Chunk::changeBlock(glm::i32vec3 p, blockTypes::T v)
     value[p.z+1][p.y+1][p.x+1]=v;
 
     //TODO (pas sûr qu'on puisse de façon efficace/utile) : mieux optimiser la modification du VBO ?
+    //(de toute façon, changeBlock est un évènement *très* ponctuel, donc ça ne devrait pas géner)
     computeChunkFaces((chunkVal*)value, 1, 1, 1, 0, 0, 0, px, py, pz, vArray);
 
     destroyGLObjects();

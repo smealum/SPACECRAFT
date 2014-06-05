@@ -6,6 +6,7 @@
 #include "render/Sun.h"
 #include "MiniWorld.h"
 #include "render/Atmosphere.h"
+#include "render/Cursor.h"
 #include "utils/TextureManager.h"
 #include "world/BlockType.h"
 #include "utils/glm.h"
@@ -157,6 +158,7 @@ void Application::createWindowInFullscreen(bool fs)
 }
 
 Planet* testPlanet;
+Cursor* testCursor;
 Sun* sun;
 int testTexture;
 
@@ -172,15 +174,11 @@ void Application::run()
             );
     camera->setCameraManager(new CameraKeyboardMouse());
 
-    tt = new testShaders;
+    tt=new testShaders;
     PlanetInfo planetInfo;
     testPlanet=new Planet(planetInfo, contentHandler);
-	sun = new Sun();
-    // testChunk=new Chunk(testPlanet);
-    // testMiniWorld=new MiniWorld(testPlanet, testPlanet->faces[2]);
-    // testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
-    // testBuffer->addFace(testPlanet->faces[0]);
-    // testPlanet->testFullGeneration(4, testBuffer);
+	sun=new Sun();
+    testCursor=new Cursor();
 
     testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
 
