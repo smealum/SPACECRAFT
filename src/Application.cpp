@@ -4,7 +4,9 @@
 #include "utils/Input.h"
 #include "Planet.h"
 #include "MiniWorld.h"
-#include "utils/imageLoader.h"
+#include "render/Atmosphere.h"
+#include "utils/TextureManager.h"
+#include "world/BlockType.h"
 #define WIN_TITLE "SPACECRAFT"
 
 #ifndef NTWBAR
@@ -29,6 +31,7 @@ void TW_CALL reloadAllShaders(void * /*clientData*/)
     }
 }
 #endif
+blockTypes::T tmp_type;
 
 Application::Application() : 
     state(appReady),
@@ -85,6 +88,8 @@ Application::Application() :
         TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
         TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
         TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
+		tmp_type = blockTypes::sand;
+		TwAddVarRW(bar, "blockType", TW_TYPE_INT32, (int*)&tmp_type, "label='type of the underwater block'");
 
         // vsync on
         glfwSwapInterval(vsync);
@@ -143,19 +148,18 @@ void Application::createWindowInFullscreen(bool fs)
 }
 
 Planet* testPlanet;
-MiniWorld* testMiniWorld;
-PlanetFaceBufferHandler* testBuffer;
 int testTexture;
 
 void Application::run()
 {
+    BlockType::getInstance(); // TODO can be deleted when used
     state = appInLoop;
-    camera = new Camera(0.000001f, 100.f);
-    camera->view = glm::lookAt(
-            glm::vec3(1.5, 1.5f, 1.5f),
-            glm::vec3(0.f),
-            glm::vec3(0, 1.f, 0.f)
-            );
+    camera = new Camera(0.0000001f, 10.f);
+    // camera->view = glm::lookAt(
+    //         glm::vec3(1.5, 1.5f, 1.5f),
+    //         glm::vec3(0.f),
+    //         glm::vec3(0, 1.f, 0.f)
+    //         );
     camera->setCameraManager(new CameraKeyboardMouse());
 
     tt = new testShaders;
@@ -167,7 +171,7 @@ void Application::run()
     // testBuffer->addFace(testPlanet->faces[0]);
     // testPlanet->testFullGeneration(4, testBuffer);
 
-    testTexture=loadTexture("terrain.png", true);
+    testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
 
     float timeA;
     char titleBuff[512];
@@ -189,6 +193,7 @@ void Application::run()
                 sprintf(titleBuff, "%s FPS: %.1f", WIN_TITLE, fps);
                 glfwSetWindowTitle(window, titleBuff);
             }
+			BlockAnimated::animation(deltaTime);
         }
     }
 
@@ -210,7 +215,6 @@ void Application::loop()
     glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    camera->updateFrustum();
     testPlanet->processLevelOfDetail(*camera);
 
     glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
@@ -221,19 +225,21 @@ void Application::loop()
     // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);
 
+    if (Input::isKeyHold(GLFW_KEY_N))reloadAllShaders(NULL);
+
     // printf("test %d\n",testVal);
     testVal=0;
 
     contentHandler.handleNewContent();
 
     #ifndef NTWBAR
-        // Draw tweak bars
+        // Draw tweak bars (or don't)
         glUseProgram(0);
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		// TwDraw();
+		TwDraw();
     #endif
 
     glfwSwapBuffers(window);

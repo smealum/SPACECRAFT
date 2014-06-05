@@ -1,7 +1,7 @@
 #ifndef CHUNK_4TYUGC3N
 #define CHUNK_4TYUGC3N
 
-#define BLOCK_SIZE 0.1f
+#define BLOCK_SIZE 1.0f
 #define CHUNK_N 32
 #define CHUNK_SIZE (BLOCK_SIZE*CHUNK_N)
 
@@ -11,6 +11,7 @@
 #include "Planet.h"
 
 #include <vector>
+typedef uint8_t chunkVal;
 
 struct GL_Vertex
 {
@@ -29,15 +30,15 @@ class Chunk
 		Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, glm::vec3 v2, glm::vec3 n);
 
 		void draw(Camera& camera, glm::mat4 model);
-		void updateData(char data[CHUNK_N][CHUNK_N][CHUNK_N], std::vector<GL_Vertex> va);
+		void updateData(chunkVal* data, std::vector<GL_Vertex> va);
 		void destroyChunk(void);
 
-		bool collidePoint(glm::vec3 p);
+		void collidePoint(glm::dvec3& p, glm::dvec3& v);
 
 		TrackerPointer<Chunk>* getTptr(void);
 
 		Chunk* neighbour[4] ; // NULL <=> nothing
-		char value[CHUNK_N][CHUNK_N][CHUNK_N];
+		chunkVal value[CHUNK_N+2][CHUNK_N+2][CHUNK_N+2];
 
 	private:
 		void initGLObjects();

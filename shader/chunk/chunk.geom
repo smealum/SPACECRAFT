@@ -1,14 +1,18 @@
 #version 330
 
+#define logDepth(v) vec4(v.xy,(log2(max(1e-6,1.0+v.w))*logconst-1.0)*v.w,v.w)
+
 layout(points) in;
 layout(triangle_strip, max_vertices = 4) out;
 
 uniform mat4 model, view, proj;
-uniform float znear, zfar;
+uniform float logconst, zfar;
 
 uniform vec3 v1, v2;
 uniform vec3 origin;
 uniform float numBlocks;
+
+uniform vec3 lightdir;
 
 in vec3 pos[];
 in vec2 gtexcoord[];
@@ -56,16 +60,18 @@ void main()
 	vec3 pos1, pos2;
 	float y;
 
-	const vec3 lightdir=normalize(vec3(1.0,1.0,0.5)); //TEMP
-	float col=(dot(n[dir[0]],lightdir)+1.0)/2;
 
 	pos1=pos[0]+o[dir[0]];
 	pos2=v1*pos1.x+v2*pos1.z;
 	y=1.0+pos1.y/numBlocks;
 
+	vec3 rn=(normalize(origin+(pos2)/numBlocks)*y);
+
+	float col=(dot(vec3(normalize(n[dir[0]].x*v1+n[dir[0]].z*v2+n[dir[0]].y*rn)),lightdir)+1.0)/2; //suit pas parfaitement la rotondité mais devrait suffire
+
 	fcolor = vec4(vec3(col),1.0);
-	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
-	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	r = proj * view * vec4(rn,1.0);
+	gl_Position = logDepth(r);
 	// gl_Position = r;
 	texcoord=gtexcoord[0]+vec2(1,1)/16;
 	EmitVertex();
@@ -77,7 +83,7 @@ void main()
 
 	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
-	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	gl_Position = logDepth(r);
 	// gl_Position = r;
 	texcoord=gtexcoord[0]+vec2(0,1)/16;
 	EmitVertex();
@@ -89,7 +95,7 @@ void main()
 
 	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
-	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	gl_Position = logDepth(r);
 	// gl_Position = r;
 	texcoord=gtexcoord[0]+vec2(1,0)/16;
 	EmitVertex();
@@ -101,7 +107,7 @@ void main()
 
 	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
-	gl_Position = vec4(r.xy,(2*log(r.w/znear)/log(zfar/znear)-1)*r.w,r.w);
+	gl_Position = logDepth(r);
 	// gl_Position = r;
 	texcoord=gtexcoord[0];
 	EmitVertex();

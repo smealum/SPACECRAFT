@@ -7,10 +7,11 @@ using namespace glm;
 
 Camera::Camera(float znear, float zfar):
 	view(1.f),
-    proj(perspective(DEG2RAD(90.f), Application::getInstance().getWindowRatio(), znear, zfar)),
-    cameraManager(NULL),
-    znear(znear),
-    zfar(zfar)
+	pos(0.0,0.0,5.0),
+	proj(perspective(DEG2RAD(90.f), Application::getInstance().getWindowRatio(), znear, zfar)),
+	cameraManager(NULL),
+	znear(znear),
+	zfar(zfar)
 {
 
 }
@@ -18,31 +19,42 @@ Camera::Camera(float znear, float zfar):
 void Camera::updateCamera(ShaderProgram &prog)
 {
 	prog.setUniform("view", view);
-    prog.setUniform("proj", proj);
-    prog.setUniform("znear", znear);
+	prog.setUniform("proj", proj);
+	prog.setUniform("znear", znear);
 	prog.setUniform("zfar", zfar);
+	prog.setUniform("logconst", 2.0f/log2(zfar+1.0f));
 }
 
 glm::vec3 Camera::getPosition(void)
 {
-	return glm::vec3(glm::inverse(view)[3]);
+	return vec3(pos);
+}
+
+glm::dvec3 Camera::getPositionDouble(void)
+{
+	return pos;
 }
 
 void Camera::updateFrustum(void)
 {
 	final=proj*view;
 
-    vec4 rowX = row(final, 0);
-    vec4 rowY = row(final, 1);
-    vec4 rowZ = row(final, 2);
-    vec4 rowW = row(final, 3);
+	vec4 rowX = row(final, 0);
+	vec4 rowY = row(final, 1);
+	vec4 rowZ = row(final, 2);
+	vec4 rowW = row(final, 3);
 
-    frustumPlane[0] = normalize(rowW + rowX);
-    frustumPlane[1] = normalize(rowW - rowX);
-    frustumPlane[2] = normalize(rowW + rowY);
-    frustumPlane[3] = normalize(rowW - rowY);
-    frustumPlane[4] = normalize(rowW + rowZ);
-    frustumPlane[5] = normalize(rowW - rowZ);
+	frustumPlane[0] = normalize(rowW + rowX);
+	frustumPlane[1] = normalize(rowW - rowX);
+	frustumPlane[2] = normalize(rowW + rowY);
+	frustumPlane[3] = normalize(rowW - rowY);
+	frustumPlane[4] = normalize(rowW + rowZ);
+	frustumPlane[5] = normalize(rowW - rowZ);
+}
+
+void Camera::updateView(void)
+{
+	view=translate(mat4(view3),vec3(-pos));
 }
 
 bool Camera::isPointInFrustum(vec3 p)

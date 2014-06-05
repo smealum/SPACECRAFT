@@ -26,11 +26,12 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	miniworld(NULL),
 	toplevel(this),
 	x(0),
-	z(0)
+	z(0),
+	depth(0),
+	childrenDepth(0)
 {
 	uvertex[0]=v[0]; uvertex[1]=v[1];
 	uvertex[2]=v[2]; uvertex[3]=v[3];
-	depth=0;
 	finalize();
 }
 
@@ -44,7 +45,8 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	id(id),
 	bufferID(-1),
 	miniworld(NULL),
-	toplevel(father->toplevel)
+	toplevel(father->toplevel),
+	childrenDepth(0)
 {
 	//TODO : exception ?
 	// if(!father);
@@ -84,6 +86,7 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	}
 	
 	depth=father->depth+1;
+
 	finalize();
 }
 
@@ -132,26 +135,46 @@ void PlanetFace::updateElevation(float e)
 
 #include <cstdio>
 
+int randomSource=4;
+
 bool PlanetFace::shouldHaveMiniworld(Camera& c)
 {
-	// if(depth>13)printf("%f %f %f\n",vertex[4].x,vertex[4].y,vertex[4].z);
-	return depth>=MINIWORLD_DETAIL;// && glm::length(c.getPosition()-vertex[4])<glm::length(vertex[1]-vertex[0])*5;
+	// if(planet->numMiniWorlds()>0 && !miniworld)return false; //TEMP DEBUG
+	if (depth == MINIWORLD_DETAIL)
+	{
+		if (miniworld)
+		{
+			glm::vec3 p=c.getPosition();
+			return glm::length(vertex[4]*elevation-p)*(2<<(depth))<20.0f;
+		}
+		else
+		{
+			return (childrenDepth >= PLANET_ADDED_DETAIL);
+		}
+	}
+	return false;
 }
 
 bool PlanetFace::isDetailedEnough(Camera& c)
 {
-	if(shouldHaveMiniworld(c))return true;
-	if(depth>=MINIWORLD_DETAIL)return true;
-	// if(depth>8)return true;
-	glm::vec3 p1=c.getPosition();
-	glm::vec3 p2=vertex[4]*elevation;
-	glm::vec3 v=p2-p1;
-	// if(glm::dot(v,vertex[4])>0.0f)return true; //backface culling
-	// if(!c.isPointInFrustum(p2))return true; //frustum culling
+	if(depth>MINIWORLD_DETAIL+PLANET_ADDED_DETAIL+1)return true;
 	if(depth<4)return false;
+
+	glm::vec3 p=c.getPosition();
+	if(glm::dot(vertex[0]*0.99f-p,vertex[0])>0.0f
+	&& glm::dot(vertex[1]*0.99f-p,vertex[1])>0.0f
+	&& glm::dot(vertex[2]*0.99f-p,vertex[2])>0.0f
+	&& glm::dot(vertex[3]*0.99f-p,vertex[3])>0.0f
+	&& glm::dot(vertex[4]*0.99f-p,vertex[4])>0.0f)return true; //backface culling
+	
+	//if (!sons[0])
+		//if(!c.isPointInFrustum(vertex[4]))
+			//return true; //frustum culling
 	// float d=2.0f/(1<<(depth-3));
-	float d=2.0f/(1<<(depth-2));
-	if(glm::length(v)/d<1.f)return false;
+	//float d=2.0f/(1<<(depth-2));
+	//if(glm::length(vertex[4]*elevation-p)/d<1.2f)return false;
+	// if(glm::length(vertex[4]*elevation-p)*(2<<(depth))<40.0f) return false;
+	if(glm::length(vertex[4]*elevation-p)*(2<<(depth-1))<40.0f) return false;
 	return true;
 }
 
@@ -168,30 +191,69 @@ void PlanetFace::removeMiniWorld(void)
 	if(!miniworld)return;
 
 	planet->removeMiniWorld(miniworld);
-	delete miniworld;
+	miniworld->destroyMiniWorld();
 	miniworld=NULL;
 }
 
+static inline int max(int a, int b)
+{
+	return (a>b)?a:b;
+}
 void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 {
+	// update childrenDepth
+	childrenDepth = 0;
+	for(int i=0;i<4;i++)
+		if(sons[i])
+			childrenDepth = max(childrenDepth,(sons[i]->childrenDepth + 1));
+
+	// face assez détaillé, on l'affiche
 	if(isDetailedEnough(c))
 	{
-		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
-		if(elevated)
-		{
-			if(shouldHaveMiniworld(c))createMiniWorld();
-			else removeMiniWorld();
-			if(!miniworld)b->addFace(this);
-		}
-	}else{
-		bool done=true;
+		// suppression des éventuels enfants
 		for(int i=0;i<4;i++)
+			if(sons[i])
+				sons[i]->deletePlanetFace(b);
+
+		// suppresion des éventuels miniWorld
+		removeMiniWorld();
+
+		// dessin de la face
+		if (elevated)
+			b->addFace(this);
+	}else{
+		// creation/destruction du miniWorld
+		if(shouldHaveMiniworld(c))
 		{
-			if(sons[i])sons[i]->processLevelOfDetail(c, b);
-			else sons[i]=new PlanetFace(planet,this,i);
-			if(!sons[i]->elevated)done=false;
+			if(miniworld && miniworld->isGenerated())
+			{
+				b->deleteFace(this);
+				// suppression des éventuels enfants
+				for(int i=0;i<4;i++)
+					if(sons[i])
+						sons[i]->deletePlanetFace(b);
+			}
+			
+			// creation du miniworld
+			createMiniWorld();
+		}else{
+			// suppresion du MiniWorld
+			removeMiniWorld();
+
+			// ajout des éventuels enfants
+			bool done=true;
+			for(int i=0;i<4;i++)
+			{
+				if(sons[i])
+					sons[i]->processLevelOfDetail(c, b);
+				else
+					sons[i]=new PlanetFace(planet,this,i);
+				if(!sons[i]->elevated)
+					done=false;
+			}
+			if(done)b->deleteFace(this);
 		}
-		if(done)b->deleteFace(this);
+
 	}
 }
 
@@ -222,13 +284,10 @@ Planet::Planet(PlanetInfo &pi, ContentHandler& ch):
 	programBasic(ShaderProgram::loadFromFile("shader/planet/planet.vert", "shader/planet/planet.frag", "planet")),
 	generators(ch.getMaxProducers())
 {
-	for (size_t i = 0; i < ch.getMaxProducers(); i++)
-	    generators[i] = new PlanetGenerator(planetInfo);
+	for(int i=0;i<ch.getMaxProducers();i++)generators[i] = new PlanetGenerator(planetInfo);
 	
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
-	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], 1024*16, cubeArray[i][1]-cubeArray[i][0], cubeArray[i][3]-cubeArray[i][0]);
-
-	// log_info("GENERATOR: %f", generators[0]->getElevation(glm::vec3(-0.408248, -0.816497, -0.408248)));
+	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], PFBH_MAXSIZE, cubeArray[i][1]-cubeArray[i][0], cubeArray[i][3]-cubeArray[i][0]);
 	
 
 	//TEMP pour drawDirect
@@ -393,13 +452,14 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 	curSize--;
 }
 
-void PlanetFaceBufferHandler::draw(Camera& c)
+void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 {
 	shader.use();
 	c.updateCamera(shader);
 
 	shader.setUniform("v1", v1);
 	shader.setUniform("v2", v2);
+	shader.setUniform("lightdir", lightdir);
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -408,13 +468,24 @@ void PlanetFaceBufferHandler::draw(Camera& c)
 	// printf("%d, %d\n",curSize,faces.size());
 }
 
+extern float testAngle; 
+
 void Planet::draw(Camera& c)
 {
-	for(int i=0;i<6;i++)faceBuffers[i]->draw(c);
+	lightdir=glm::vec3(cos(testAngle),0,sin(testAngle));
+
+	for(int i=0;i<6;i++)faceBuffers[i]->draw(c, lightdir);
 
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
 
 	// printf("%d\n",miniWorldList.size());
+	
+	// dessin de l'athmosphere
+	atmosphere.draw(c, lightdir);
+
+	// dessin des nuages
+	// cloud.draw(c);
+
 }
 
 void Planet::addMiniWorld(MiniWorld* mw)
@@ -430,4 +501,10 @@ void Planet::removeMiniWorld(MiniWorld* mw)
 int Planet::numMiniWorlds(void)
 {
 	return miniWorldList.size();
+}
+
+glm::dvec3 Planet::collidePoint(glm::dvec3 p, glm::dvec3 v)
+{
+	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->collidePoint(p,v);
+	return p+v;
 }

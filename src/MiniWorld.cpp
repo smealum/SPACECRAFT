@@ -1,9 +1,17 @@
 #include "MiniWorld.h"
+#include "data/ContentHandler.h"
 
 MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 	planet(p),
 	model(glm::mat4(1.0f)),
-	face(pf)
+    tptr(new TrackerPointer<MiniWorld>(this, true)),
+	face(pf),
+	origin(face->toplevel->uvertex[0]),
+	v1(face->toplevel->uvertex[1]-face->toplevel->uvertex[0]),
+	v2(face->toplevel->uvertex[3]-face->toplevel->uvertex[0]),
+	x(pf->x*MINIWORLD_W*CHUNK_N),
+	z(pf->z*MINIWORLD_D*CHUNK_N),
+	generated(false)
 {
 	for(int i=0;i<MINIWORLD_W;i++)
 	{
@@ -21,6 +29,7 @@ MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 			}
 		}
 	}
+    planet->handler.requestContent(new MiniWorldDataRequest(*planet, *this, origin, v1, v2, x, 0, z));
 }
 
 MiniWorld::~MiniWorld()
@@ -43,6 +52,46 @@ void MiniWorld::draw(Camera& c)
 			for(int k=0;k<MINIWORLD_D;k++)
 			{
 				chunks[i][j][k]->draw(c, model);
+			}
+		}
+	}
+}
+
+void MiniWorld::destroyMiniWorld(void)
+{
+    tptr->release();
+}
+
+TrackerPointer<MiniWorld>* MiniWorld::getTptr(void)
+{
+    return tptr;
+}
+
+void MiniWorld::updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D])
+{
+	generated=true;
+	for(int i=0;i<MINIWORLD_W;i++)
+	{
+		for(int j=0;j<MINIWORLD_H;j++)
+		{
+			for(int k=0;k<MINIWORLD_D;k++)
+			{
+				chunks[i][j][k]->updateData(data[i][j][k], va[i][j][k]);
+			}
+		}
+	}
+}
+
+void MiniWorld::collidePoint(glm::dvec3& p, glm::dvec3& v)
+{
+	//TODO : culling dès ici
+	for(int i=0;i<MINIWORLD_W;i++)
+	{
+		for(int j=0;j<MINIWORLD_H;j++)
+		{
+			for(int k=0;k<MINIWORLD_D;k++)
+			{
+				chunks[i][j][k]->collidePoint(p,v);
 			}
 		}
 	}

@@ -9,8 +9,12 @@
 #include "render/Camera.h"
 #include "PlanetInfo.h"
 #include "noise/PlanetGenerator.h"
+#include "render/Cloud.h"
+#include "render/Atmosphere.h"
 
-#define PLANET_MAXDETAIL (16)
+#define PLANET_ADDED_DETAIL (4)
+// #define PFBH_MAXSIZE (1024*16)
+#define PFBH_MAXSIZE (1024*256)
 
 typedef struct
 {
@@ -43,7 +47,7 @@ class PlanetFaceBufferHandler
 		void addFace(PlanetFace* pf);
 		void deleteFace(PlanetFace* pf);
 		void changeFace(PlanetFace* pf, int i);
-		void draw(Camera& c);
+		void draw(Camera& c, glm::vec3 lightdir);
 
 	private:
 		ShaderProgram &shader;
@@ -101,10 +105,12 @@ class PlanetFace
 		float minElevation;
 		uint8_t id;
 		int depth;
+		int childrenDepth;
 };
 
 class Planet
 {
+	friend class Chunk;
 	public:
 		Planet(PlanetInfo &pi, class ContentHandler& ch);
 		~Planet(); // TODO faire tous les free
@@ -115,6 +121,8 @@ class Planet
 		int numMiniWorlds(void);
 		void addMiniWorld(MiniWorld* mw);
 		void removeMiniWorld(MiniWorld* mw);
+
+		glm::dvec3 collidePoint(glm::dvec3 p, glm::dvec3 v);
 
 		const PlanetInfo planetInfo; //read only
 		class ContentHandler& handler;
@@ -136,10 +144,15 @@ class Planet
 		PlanetFace* faces[6];
 		PlanetFaceBufferHandler* faceBuffers[6];
 
+		glm::vec3 lightdir;
+
 		//TEMP
 			GLuint vaoBasic;
 			GLuint vbo;
 			GLuint ebo;
+
+		Cloud cloud;
+		Atmosphere atmosphere;
 };
 
 #endif
