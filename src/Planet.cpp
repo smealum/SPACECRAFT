@@ -479,7 +479,7 @@ void Planet::draw(Camera& c)
 	atmosphere.draw(c);
 
 	// dessin des nuages
-	cloud.draw(c);
+	// cloud.draw(c);
 
 }
 
@@ -496,4 +496,10 @@ void Planet::removeMiniWorld(MiniWorld* mw)
 int Planet::numMiniWorlds(void)
 {
 	return miniWorldList.size();
+}
+
+glm::dvec3 Planet::collidePoint(glm::dvec3 p, glm::dvec3 v)
+{
+	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->collidePoint(p,v);
+	return p+v;
 }

@@ -155,11 +155,11 @@ void Application::run()
     BlockType::getInstance(); // TODO can be deleted when used
     state = appInLoop;
     camera = new Camera(0.0000001f, 10.f);
-    camera->view = glm::lookAt(
-            glm::vec3(1.5, 1.5f, 1.5f),
-            glm::vec3(0.f),
-            glm::vec3(0, 1.f, 0.f)
-            );
+    // camera->view = glm::lookAt(
+    //         glm::vec3(1.5, 1.5f, 1.5f),
+    //         glm::vec3(0.f),
+    //         glm::vec3(0, 1.f, 0.f)
+    //         );
     camera->setCameraManager(new CameraKeyboardMouse());
 
     tt = new testShaders;
@@ -215,7 +215,6 @@ void Application::loop()
     glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    camera->updateFrustum();
     testPlanet->processLevelOfDetail(*camera);
 
     glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
