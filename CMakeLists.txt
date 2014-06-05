@@ -111,6 +111,13 @@ add_custom_target(run
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
   )
 
+add_custom_target(valgrind
+  COMMAND valgrind --leak-check=full --tool=memcheck
+  ${EXECUTABLE_OUTPUT_PATH}/${EXEC}
+  DEPENDS ${EXEC}
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  )
+
 # tests
 #enable_testing()
 #add_test(test ${PROJECT_SOURCE_DIR}/tests/test.sh)
