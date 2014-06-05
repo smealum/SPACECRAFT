@@ -108,58 +108,58 @@ testShaders::testShaders() :
         
     }
 
-    Camera &cam(Application::getInstance().getCamera());
-    cam.view = glm::lookAt(
-            glm::vec3(0, 0, -5.f),
-            glm::vec3(0.f,0.f,0.f),
-            glm::vec3(0, 1.f, 0.f)
-            );
+    // Camera &cam(Application::getInstance().getCamera());
+    // cam.view = glm::lookAt(
+    //         glm::vec3(0, 0, -5.f),
+    //         glm::vec3(0.f,0.f,0.f),
+    //         glm::vec3(0, 1.f, 0.f)
+    //         );
 }
 
 void testShaders::draw()
 {
-    static float modelAngle=0.0;
-    modelAngle+=0.04;
+    // static float modelAngle=0.0;
+    // modelAngle+=0.04;
 
-    Camera &cam(Application::getInstance().getCamera());
-    // basic program
-    {
-        programBasic.use();
-        glBindVertexArray(vaoBasic);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        cam.updateCamera(programBasic);
+    // Camera &cam(Application::getInstance().getCamera());
+    // // basic program
+    // {
+    //     programBasic.use();
+    //     glBindVertexArray(vaoBasic);
+    //     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    //     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    //     cam.updateCamera(programBasic);
 
-        model = glm::translate(glm::mat4(1.0),-glm::vec3(-1.0,0.0,0.0));
-        model = glm::rotate(model,modelAngle,glm::vec3(sin(modelAngle),0.0,1.0));
-        programBasic.setUniform("model", model);
-        programBasic.setUniform("overrideColor", glm::vec4(1.f));
+    //     model = glm::translate(glm::mat4(1.0),-glm::vec3(-1.0,0.0,0.0));
+    //     model = glm::rotate(model,modelAngle,glm::vec3(sin(modelAngle),0.0,1.0));
+    //     programBasic.setUniform("model", model);
+    //     programBasic.setUniform("overrideColor", glm::vec4(1.f));
 
-        glDrawElements(
-                GL_TRIANGLES,
-                36,
-                GL_UNSIGNED_INT,
-                0
-                );
-    }
-    // phong program
-    {
-        model = glm::translate(glm::mat4(1.0),-glm::vec3(1.0,0.0,0.0));
-        model = glm::rotate(model,modelAngle,glm::vec3(sin(modelAngle),0.0,1.0));
+    //     glDrawElements(
+    //             GL_TRIANGLES,
+    //             36,
+    //             GL_UNSIGNED_INT,
+    //             0
+    //             );
+    // }
+    // // phong program
+    // {
+    //     model = glm::translate(glm::mat4(1.0),-glm::vec3(1.0,0.0,0.0));
+    //     model = glm::rotate(model,modelAngle,glm::vec3(sin(modelAngle),0.0,1.0));
 
-        programPhong.use();
-        glBindVertexArray(vaoPhong);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        programPhong.setUniform("projection",cam.proj);
-        programPhong.setUniform("model",model);
-        programPhong.setUniform("view",cam.view);
+    //     programPhong.use();
+    //     glBindVertexArray(vaoPhong);
+    //     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    //     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    //     programPhong.setUniform("projection",cam.proj);
+    //     programPhong.setUniform("model",model);
+    //     programPhong.setUniform("view",cam.view);
 
-        glDrawElements(
-                GL_TRIANGLES,
-                36,
-                GL_UNSIGNED_INT,
-                0
-                );
-    }
+    //     glDrawElements(
+    //             GL_TRIANGLES,
+    //             36,
+    //             GL_UNSIGNED_INT,
+    //             0
+    //             );
+    // }
 }
