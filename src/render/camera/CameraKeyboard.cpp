@@ -15,7 +15,7 @@ CameraKeyboard::CameraKeyboard():
 }
 
 float testAngle=0.0f;
-extern Planet* testPlanet;
+extern Planet* planet;
 
 void CameraKeyboard::update(Camera& camera)
 {
@@ -41,8 +41,6 @@ void CameraKeyboard::update(Camera& camera)
     if (Input::isKeyHold(GLFW_KEY_LEFT_SHIFT)){tS/=10.0f;rS=0.0003f;}
     if (Input::isKeyHold(GLFW_KEY_LEFT_CONTROL)){tS/=100.0f;rS=0.0003f;}
     
-    if (Input::isKeyHold(GLFW_KEY_P))testAngle+=0.05f;
-    if (Input::isKeyHold(GLFW_KEY_M))testAngle-=0.05f;
 
     // rotation
     if (Input::isKeyHold(GLFW_KEY_K))
@@ -75,7 +73,7 @@ void CameraKeyboard::update(Camera& camera)
     speedVect=dvec3(vec3(speedVect)*camera.view3);
 
     //TEMP
-    speedVect=camera.getPositionDouble()-testPlanet->collidePoint(camera.getPositionDouble(),-speedVect);
+    speedVect=camera.getPositionDouble()-planet->collidePoint(camera.getPositionDouble(),-speedVect);
     
     camera.pos-=speedVect;
     

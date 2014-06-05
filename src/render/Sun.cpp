@@ -22,12 +22,11 @@ Sun::Sun():
 
 void Sun::draw(Camera& c)
 {
+	// mise a jour du levelOfDetails
 	glm::vec3 p=c.getPosition();
-
 	
 	double l = length(p-position);
-	int lod=clamp(4.0/log(l),3.0,4.0);
-
+	lod=clamp(4.0/log(l),3.0,4.0);
 
 	// update time
     float delta = Application::getInstance().getFrameDeltaTime();
@@ -49,6 +48,9 @@ void Sun::draw(Camera& c)
 		//glEnable(GL_CULL_FACE);
 
 
+}
+void Sun::drawGlow(Camera& c)
+{
 	// sun glow
 		// rotation et animation
 		shaderGlow.use();
@@ -64,4 +66,9 @@ void Sun::draw(Camera& c)
 		glFrontFace(GL_CW);
 		SphereManager::getInstance().draw(c,shaderGlow,lod-1);
 		glFrontFace(GL_CCW);
+}
+
+void Sun::setPosition(glm::vec3 p)
+{
+	position = p;
 }
