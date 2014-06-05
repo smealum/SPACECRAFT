@@ -89,9 +89,12 @@ void computeChunkFaces(chunkVal* data,
 		previous = accessArray(data,w,h,d,sx,sy,sz,-1,y,z);
 		for(int x=0;x<CHUNK_N+1;++x)
 		{
+			//BlockTexCoord &bCur = blockType.getBlockTexcoord((blockTypes::T)current),
+						  //&bPrev = blockType.getBlockTexcoord((blockTypes::T)current);
 			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
-			if(current)
+			if(current != blockTypes::air)
 			{
+				//if (bPrev.getTransparency() != blockTransparency::opaque)
 				if (!previous)
 				{
 					GL_Vertex v;
@@ -104,6 +107,7 @@ void computeChunkFaces(chunkVal* data,
 					vArray.push_back(v);
 				}
 			}else{
+			//}else if (bCur.getTransparency() != blockTransparency::opaque){
 				if (previous)
 				{
 					GL_Vertex v;
@@ -256,6 +260,7 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 							{
 								if (vy+py+j == height) data[yPos]=blockTypes::grass;
 								else if (vy+py+j < height) data[yPos]=blockTypes::dirt;
+								else if (vy+py+j == height+1 && rand()%100 == 1) data[yPos]=blockTypes::flower_red;
 								else data[yPos]=blockTypes::air;
 								yPos+=(CHUNK_N+2);
 							}
