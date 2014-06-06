@@ -43,7 +43,7 @@ void main()
 	v[6]=vec4(gelevation[0]*normalize(pos[0]-v1+v2),1.0);
 	v[7]=vec4(gelevation[0]*normalize(pos[0]+v1+v2),1.0);
 
-	const float ambient=0.0f
+	const float ambient=0.0;
 	c[0]=(max(dot(lightdir,normalize(vec3(v[0]))),0.0)+ambient)/255.0;
 	c[1]=(max(dot(lightdir,normalize(vec3(v[1]-v[0]))),0.0)+ambient)/255.0;
 	c[2]=(max(dot(lightdir,normalize(vec3(v[0]-v[1]))),0.0)+ambient)/255.0;
