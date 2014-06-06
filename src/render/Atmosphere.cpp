@@ -43,10 +43,7 @@ void Atmosphere::initLightConstants(void)
 //(attention aux appels GL)
 void Atmosphere::makeOpticalDepthBuffer(void)
 {
-	// FILE* fout=fopen("test.txt","w");
-	// printf("%p\n",fout);
-	const int nSize = 128;
-	// const int nSize = 256;
+	const int nSize = 256;
 	const int nSamples = 50;
 	const float fScale = 1.0f / (m_fOuterRadius - m_fInnerRadius);
 	const int m_nChannels=4;
