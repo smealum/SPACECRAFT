@@ -13,7 +13,8 @@ uniform float zfar = 1.0;
 
 out vec3 vPos;
 
-#define SunWidth (108.f)
+#define SunWidth (1.f)
+//#define SunWidth (108.f)
 
 void main()
 {	
