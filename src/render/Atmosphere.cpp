@@ -183,24 +183,29 @@ extern float testAngle;
 
 void Atmosphere::bind(Camera& c, glm::vec3 lightDirection)
 {
-	shader.use();
+	bind(c,lightDirection,shader);
+}
 
-	shader.setUniform("cameraPosition", c.getPosition());
-	shader.setUniform("lightDirection", lightDirection);
-	shader.setUniform("m_fWavelength4", m_fWavelength4);
-	shader.setUniform("m_g", m_g);
-	shader.setUniform("m_ESun", m_ESun);
-	shader.setUniform("m_Kr", m_Kr);
-	shader.setUniform("m_Km", m_Km);
-	shader.setUniform("m_Kr4PI", m_Kr4PI);
-	shader.setUniform("m_Km4PI", m_Km4PI);
-	shader.setUniform("m_fInnerRadius", m_fInnerRadius);
-	shader.setUniform("m_fScale", m_fScale);
-	shader.setUniform("m_fOuterRadius", m_fOuterRadius);
-	shader.setUniform("m_nSamples", m_nSamples);
+void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, ShaderProgram& sprogram)
+{
+	sprogram.use();
 
-	shader.setUniform("depthTex",0);
-	shader.setUniform("phaseTex",1);
+	sprogram.setUniform("cameraPosition", c.getPosition());
+	sprogram.setUniform("lightDirection", lightDirection);
+	sprogram.setUniform("m_fWavelength4", m_fWavelength4);
+	sprogram.setUniform("m_g", m_g);
+	sprogram.setUniform("m_ESun", m_ESun);
+	sprogram.setUniform("m_Kr", m_Kr);
+	sprogram.setUniform("m_Km", m_Km);
+	sprogram.setUniform("m_Kr4PI", m_Kr4PI);
+	sprogram.setUniform("m_Km4PI", m_Km4PI);
+	sprogram.setUniform("m_fInnerRadius", m_fInnerRadius);
+	sprogram.setUniform("m_fScale", m_fScale);
+	sprogram.setUniform("m_fOuterRadius", m_fOuterRadius);
+	sprogram.setUniform("m_nSamples", m_nSamples);
+
+	sprogram.setUniform("depthTex",0);
+	sprogram.setUniform("phaseTex",1);
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_1D, phaseTexture);

@@ -322,6 +322,7 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 	planetFace(pf),
 	maxSize(ms),
 	shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface")),
+	// shader(ShaderProgram::loadFromFile("shader/planetface_atmosphere/planetface_atmosphere.vert", "shader/planetface_atmosphere/planetface_atmosphere.frag", "shader/planetface_atmosphere/planetface_atmosphere.geom", "planetface_atmosphere")),
 	curSize(0),
 	v1(glm::normalize(v1)),
 	v2(glm::normalize(v2))
@@ -396,13 +397,15 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 
 void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 {
-
 	shader.use();
 	c.updateCamera(shader);
 
 	shader.setUniform("v1", v1);
 	shader.setUniform("v2", v2);
 	shader.setUniform("lightdir", lightdir);
+
+	// //planetface_atmosphere test
+	// planetFace.planet->atmosphere.bind(c,lightdir,shader);
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
