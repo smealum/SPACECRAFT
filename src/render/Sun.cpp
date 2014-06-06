@@ -2,7 +2,6 @@
 #include "Application.h"
 #include "utils/SphereManager.h"
 #include "utils/glm.h"
-#include "utils/dbg.h"
 
 #define SunWidth (108.0f)
 
@@ -30,13 +29,12 @@ void Sun::draw(Camera& c)
 	glm::vec3 p=c.getPosition();
 	
 	double l = length(p-position)/SunWidth;
-	lod=clamp(400/log(l),3.0,4.0);
+	lod=clamp(40.0/log(l),3.0,4.0);
 
 	// update time
     float delta = Application::getInstance().getFrameDeltaTime();
 	time+=delta;
 
-	log_info("time=%f",time);
 
 	// sun inner
 		// rotation et animation
@@ -70,7 +68,7 @@ void Sun::drawGlow(Camera& c)
 
 		// draw
 		glFrontFace(GL_CW);
-		SphereManager::getInstance().draw(c,shaderGlow,lod-1);
+		SphereManager::getInstance().draw(c,shaderGlow,lod);
 		glFrontFace(GL_CCW);
 }
 
