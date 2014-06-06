@@ -173,7 +173,6 @@ int testTextureArray;
 
 void Application::run()
 {
-    BlockType::getInstance(); // TODO can be deleted when used
     state = appInLoop;
     camera = new Camera(0.0000001f, 2.0*EARTH_SUN);
     camera->view = glm::lookAt(
@@ -212,7 +211,6 @@ void Application::run()
                 sprintf(titleBuff, "%s FPS: %.1f", WIN_TITLE, fps);
                 glfwSetWindowTitle(window, titleBuff);
             }
-			BlockAnimated::animation(deltaTime);
         }
     }
 
