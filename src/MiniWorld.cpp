@@ -59,7 +59,9 @@ void MiniWorld::draw(Camera& c)
 
 void MiniWorld::destroyMiniWorld(void)
 {
-    tptr->release();
+    planet->handler.requestContent(new MiniWorldDeletionRequest(*this),false);
+    	tptr->release();
+    planet->handler.manualReleaseInput();
 }
 
 TrackerPointer<MiniWorld>* MiniWorld::getTptr(void)
