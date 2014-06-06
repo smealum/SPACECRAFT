@@ -36,6 +36,7 @@ namespace blockTypes
 		maxTypeValue
 	};
 }
+
 namespace blockPlane {
 	enum T : uint8_t {
 		top,
@@ -51,7 +52,8 @@ namespace blockTransparency
 		// for some pixel...
 		opaque = 0, // alpha == 1
 		seeThrough = 1, // alpha > 0.01 && < 1
-		transparent = 2 // alpha == 0
+		transparent = 2, // alpha == 0
+		invisible = 3 // nothing to draw
 	};
 }
 
@@ -117,6 +119,8 @@ class BlockType : public Singleton<BlockType> {
 		{
 			return *blocks[type];
 		}
+
+		bool shouldBeFace(blockTypes::T type1, blockTypes::T type2);
 
 		~BlockType();
 	private:

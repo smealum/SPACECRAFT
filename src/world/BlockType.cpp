@@ -43,7 +43,7 @@ BlockType::BlockType() :
 			blockTypes::air,
 			blockTypes::air
 			});
-	blocks[0]->setTransparency(blockTransparency::transparent);
+	blocks[0]->setTransparency(blockTransparency::invisible);
 	texCoords[0] = glm::vec2(0.f);
 	for (uint32_t i = 1; i < blockTypes::maxTypeValue; i++)
 	{
@@ -151,7 +151,15 @@ texCoord BlockAnimated::getSide(blockPlane::T) const
 {
 	return btype->getTexcoord(frames[current]);
 }
+
 texCoord BlockStatic::getSide(blockPlane::T p) const
 {
 	return btype->getTexcoord(sides[p]);
 }
+
+bool BlockType::shouldBeFace(blockTypes::T type1, blockTypes::T type2)
+{
+	return type1!=type2
+		&& (blocks[type1]->getTransparency()<=blockTransparency::transparent && blocks[type2]->getTransparency()>=blockTransparency::seeThrough);
+}
+
