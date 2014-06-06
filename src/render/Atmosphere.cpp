@@ -16,7 +16,6 @@ Atmosphere::Atmosphere():
 	shader.use();
 }
 
-
 void Atmosphere::initLightConstants(void)
 {
 	m_nSamples = NUMSAMPLES;
@@ -119,12 +118,8 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 			opticalBuffer[nIndex++] = fRayleighDepth;
 			opticalBuffer[nIndex++] = fMieDensityRatio;
 			opticalBuffer[nIndex++] = fMieDepth;
-			// fprintf(fout,"%f %f %f %f\n",floor(fRayleighDensityRatio*1000),floor(fRayleighDepth*1000),floor(fMieDensityRatio*1000),floor(fMieDepth*1000));
 		}
 	}
-
-	// printf("test\n");
-	// fclose(fout);
 
 	glGenTextures(1, &depthTexture);
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
@@ -144,6 +139,7 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 	free(opticalBuffer);
 }
 
+//TODO : idem
 void Atmosphere::makePhaseBuffer(void)
 {
 	const int nSize = 4096; //on est en 1D, on peut se le permettre
@@ -155,16 +151,14 @@ void Atmosphere::makePhaseBuffer(void)
 		float fAngle2=fAngle*fAngle;
 		float g2 =m_g*m_g;
 		glm::vec2 fPhase;
-		fPhase.x = 0.75 * (1.0 + fAngle2);
-		fPhase.y = 1.5 * ((1 - g2) / (2 + g2)) * (1.0 + fAngle2) / pow(1 + g2 - 2*m_g*fAngle, 1.5);
+		fPhase.x = 0.75f * (1.0f + fAngle2);
+		fPhase.y = 1.5f * ((1.0f - g2) / (2.0f + g2)) * (1.0f + fAngle2) / pow(1.0f + g2 - 2*m_g*fAngle, 1.5f);
 		fPhase.x *= m_Kr * m_ESun;
 		fPhase.y *= m_Km * m_ESun;
 		phaseBuffer[k++]=fPhase.x;
 		phaseBuffer[k++]=fPhase.y;
-		// phaseBuffer[k++]=1.0;
-		// phaseBuffer[k++]=1.0;
-		phaseBuffer[k++]=1.0;
-		phaseBuffer[k++]=1.0;
+		phaseBuffer[k++]=1.0f;
+		phaseBuffer[k++]=1.0f;
 	}
 
 	glGenTextures(1, &phaseTexture);
