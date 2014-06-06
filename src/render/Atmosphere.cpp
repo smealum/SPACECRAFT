@@ -5,7 +5,7 @@
 Atmosphere::Atmosphere():
 	shader(ShaderProgram::loadFromFile("shader/atmosphere/atmosphere.vert", "shader/atmosphere/atmosphere.frag", "atmosphere")),
 	m_fInnerRadius(1.0f),
-	m_fOuterRadius(1.05f),
+	m_fOuterRadius(1.025f),
 	opticalBuffer(NULL),
 	lod(6)
 {
@@ -37,12 +37,16 @@ void Atmosphere::initLightConstants(void)
 	m_fMieScaleDepth = MIEDEPTH;
 }
 
+#include <cstdio>
+
 //TODO : passer sur producer
 //(attention aux appels GL)
 void Atmosphere::makeOpticalDepthBuffer(void)
 {
-	// const int nSize = 128;
-	const int nSize = 256;
+	// FILE* fout=fopen("test.txt","w");
+	// printf("%p\n",fout);
+	const int nSize = 128;
+	// const int nSize = 256;
 	const int nSamples = 50;
 	const float fScale = 1.0f / (m_fOuterRadius - m_fInnerRadius);
 	const int m_nChannels=4;
@@ -117,12 +121,18 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 			opticalBuffer[nIndex++] = fRayleighDepth;
 			opticalBuffer[nIndex++] = fMieDensityRatio;
 			opticalBuffer[nIndex++] = fMieDepth;
+			// fprintf(fout,"%f %f %f %f\n",floor(fRayleighDensityRatio*1000),floor(fRayleighDepth*1000),floor(fMieDensityRatio*1000),floor(fMieDepth*1000));
 		}
 	}
+
+	// printf("test\n");
+	// fclose(fout);
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, nSize, nSize, 0, GL_RGBA, GL_FLOAT, opticalBuffer);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	glBindTexture(GL_TEXTURE_2D, texture);

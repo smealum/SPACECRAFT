@@ -7,7 +7,7 @@
 #define NUMSAMPLES 4
 #define KR 0.0025f
 #define KM 0.0015f
-#define ESUN 30.0f
+#define ESUN 15.0f
 #define G -0.85f
 #define WAVELENGTH0 0.650f
 #define WAVELENGTH1 0.570f
