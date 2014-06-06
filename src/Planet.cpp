@@ -6,7 +6,6 @@
 
 
 using namespace std;
-using namespace glm;
 
 //0-5-1
 //|\ /|
@@ -17,7 +16,7 @@ using namespace glm;
 //[0][1]
 //[2][3]
 
-PlanetFace::PlanetFace(Planet* planet, vec3 v[4]):
+PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	planet(planet),
 	father(NULL),
 	sons{NULL, NULL, NULL, NULL},
@@ -128,7 +127,7 @@ void PlanetFace::finalize(void)
 	uvertex[7]=(uvertex[2]+uvertex[3])*0.5f;
 	uvertex[8]=(uvertex[3]+uvertex[0])*0.5f;
 
-	for(int i=0;i<9;i++)vertex[i]=normalize(uvertex[i]);
+	for(int i=0;i<9;i++)vertex[i]=glm::normalize(uvertex[i]);
 
 	planet->handler.requestContent(new PlanetElevationRequest(*planet, *this, vertex[4]));
 }
@@ -151,8 +150,8 @@ bool PlanetFace::shouldHaveMiniworld(Camera& c)
 	{
 		if (miniworld)
 		{
-			vec3 p=c.getPosition();
-			return length(vertex[4]*elevation-p)*(2<<(depth))<20.0f;
+			glm::vec3 p=c.getPosition();
+			return glm::length(vertex[4]*elevation-p)*(2<<(depth))<20.0f;
 		}
 		else
 		{
@@ -167,12 +166,12 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	if(depth>MINIWORLD_DETAIL+PLANET_ADDED_DETAIL+1)return true;
 	if(depth<4)return false;
 
-	vec3 p=c.getPosition();
-	if(dot(vertex[0]*0.99f-p,vertex[0])>0.0f
-	&& dot(vertex[1]*0.99f-p,vertex[1])>0.0f
-	&& dot(vertex[2]*0.99f-p,vertex[2])>0.0f
-	&& dot(vertex[3]*0.99f-p,vertex[3])>0.0f
-	&& dot(vertex[4]*0.99f-p,vertex[4])>0.0f)return true; //backface culling
+	glm::vec3 p=c.getPosition();
+	if(glm::dot(vertex[0]*0.99f-p,vertex[0])>0.0f
+	&& glm::dot(vertex[1]*0.99f-p,vertex[1])>0.0f
+	&& glm::dot(vertex[2]*0.99f-p,vertex[2])>0.0f
+	&& glm::dot(vertex[3]*0.99f-p,vertex[3])>0.0f
+	&& glm::dot(vertex[4]*0.99f-p,vertex[4])>0.0f)return true; //backface culling
 	
 	//if (!sons[0])
 		//if(!c.isPointInFrustum(vertex[4]))
@@ -186,7 +185,7 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 		// TODO Fix, pourquoi cette valeur est reset à 0
 		detailsPower = 40.0;
 	}
-	if(length(vertex[4]*elevation-p)*(2<<(depth-1))<detailsPower) return false;
+	if(glm::length(vertex[4]*elevation-p)*(2<<(depth-1))<detailsPower) return false;
 	return true;
 }
 
@@ -269,13 +268,13 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 	}
 }
 
-vec3 cubeArray[6][4]=
-		{{vec3(-1.0,-1.0,-1.0),vec3(-1.0,-1.0,1.0),vec3(1.0,-1.0,1.0),vec3(1.0,-1.0,-1.0)}, //bottom
-		{vec3(1.0,1.0,1.0),vec3(-1.0,1.0,1.0),vec3(-1.0,1.0,-1.0),vec3(1.0,1.0,-1.0)}, //top
-		{vec3(-1.0,1.0,1.0),vec3(-1.0,-1.0,1.0),vec3(-1.0,-1.0,-1.0),vec3(-1.0,1.0,-1.0)}, //left
-		{vec3(1.0,-1.0,-1.0),vec3(1.0,-1.0,1.0),vec3(1.0,1.0,1.0),vec3(1.0,1.0,-1.0)}, //right
-		{vec3(1.0,1.0,-1.0),vec3(-1.0,1.0,-1.0),vec3(-1.0,-1.0,-1.0),vec3(1.0,-1.0,-1.0)}, //near
-		{vec3(-1.0,-1.0,1.0),vec3(-1.0,1.0,1.0),vec3(1.0,1.0,1.0),vec3(1.0,-1.0,1.0)}}; //far
+glm::vec3 cubeArray[6][4]=
+		{{glm::vec3(-1.0,-1.0,-1.0),glm::vec3(-1.0,-1.0,1.0),glm::vec3(1.0,-1.0,1.0),glm::vec3(1.0,-1.0,-1.0)}, //bottom
+		{glm::vec3(1.0,1.0,1.0),glm::vec3(-1.0,1.0,1.0),glm::vec3(-1.0,1.0,-1.0),glm::vec3(1.0,1.0,-1.0)}, //top
+		{glm::vec3(-1.0,1.0,1.0),glm::vec3(-1.0,-1.0,1.0),glm::vec3(-1.0,-1.0,-1.0),glm::vec3(-1.0,1.0,-1.0)}, //left
+		{glm::vec3(1.0,-1.0,-1.0),glm::vec3(1.0,-1.0,1.0),glm::vec3(1.0,1.0,1.0),glm::vec3(1.0,1.0,-1.0)}, //right
+		{glm::vec3(1.0,1.0,-1.0),glm::vec3(-1.0,1.0,-1.0),glm::vec3(-1.0,-1.0,-1.0),glm::vec3(1.0,-1.0,-1.0)}, //near
+		{glm::vec3(-1.0,-1.0,1.0),glm::vec3(-1.0,1.0,1.0),glm::vec3(1.0,1.0,1.0),glm::vec3(1.0,-1.0,1.0)}}; //far
 
 static GLfloat vertices[] = {
     //     POSITION    |      COLOR           |     NORMAL
@@ -329,13 +328,13 @@ void Planet::processLevelOfDetail(Camera& c)
 	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, faceBuffers[i]);
 }
 
-PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, vec3 v1, vec3 v2):
+PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::vec3 v1, glm::vec3 v2):
 	planetFace(pf),
 	maxSize(ms),
 	shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface")),
 	curSize(0),
-	v1(normalize(v1)),
-	v2(normalize(v2))
+	v1(glm::normalize(v1)),
+	v2(glm::normalize(v2))
 {
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -355,7 +354,7 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, vec3 v1
 	shader.setAttribute("minElevation", 1, GL_FALSE, 6, 4);
 	shader.setAttribute("size", 1, GL_FALSE, 6, 5);
 
-	shader.setUniform("model", mat4(1.0f));
+	shader.setUniform("model", glm::mat4(1.0f));
 }
 
 PlanetFaceBufferHandler::~PlanetFaceBufferHandler()
@@ -369,7 +368,7 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 {
 	if(i>=maxSize)return;
 	faces.push_back(pf);
-	const vec3 n=pf->uvertex[4];
+	const glm::vec3 n=pf->uvertex[4];
 	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->minElevation,1.0f/(1<<pf->depth)};
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -405,7 +404,7 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 	curSize--;
 }
 
-void PlanetFaceBufferHandler::draw(Camera& c, vec3 lightdir)
+void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 {
 
 	shader.use();
@@ -426,7 +425,7 @@ void PlanetFaceBufferHandler::draw(Camera& c, vec3 lightdir)
 void Planet::draw(Camera& c)
 {
 	// TODO position de la planete
-	lightdir=normalize(sunPosition); // - position planete
+	lightdir=glm::normalize(sunPosition); // - position planete
 
 	for(int i=0;i<6;i++)faceBuffers[i]->draw(c, lightdir);
 
@@ -457,7 +456,7 @@ int Planet::numMiniWorlds(void)
 	return miniWorldList.size();
 }
 
-bool Planet::collidePoint(dvec3 p, dvec3 v, dvec3& out)
+bool Planet::collidePoint(glm::dvec3 p, glm::dvec3 v, glm::dvec3& out)
 {
 	bool ret=false;
 	for(auto it(miniWorldList.begin());it!=miniWorldList.end();++it)ret=ret||(*it)->collidePoint(p,v);
@@ -480,7 +479,7 @@ glm::dvec3 Planet::getGravityVector(glm::dvec3 p)
 	return glm::normalize(p);
 }
 
-void Planet::setSunPosition(vec3 position)
+void Planet::setSunPosition(glm::vec3 position)
 {
 	sunPosition = position;
 }
