@@ -155,3 +155,29 @@ texCoord BlockStatic::getSide(blockPlane::T p) const
 {
 	return btype->getTexcoord(sides[p]);
 }
+
+// ajout par arthur
+int blockTileID[blockTypes::maxTypeValue][blockPlane::maxPlanes];
+uint8_t blockTrans[blockTypes::maxTypeValue];
+void blockTypeLoadValues()
+{
+	//////////////////////////
+	// valeurs par défaut  //
+	////////////////////////
+	
+	for(uint32_t i = 1; i < blockTypes::maxTypeValue; i++)
+	for(uint8_t j = 0 ; j<blockPlane::maxPlanes; j++)
+		blockTileID[i][j] = i;
+	
+	for (uint32_t i = 1; i < blockTypes::maxTypeValue; i++)
+		blockTrans[i] = blockTransparency::opaque;
+
+	////////////////////
+	// modifications //
+	//////////////////
+	
+	// grass
+	blockTileID[blockTypes::grass][blockPlane::side]   = blockTypes::grass_side;
+	blockTileID[blockTypes::grass][blockPlane::bottom] = blockTypes::dirt;
+	
+}

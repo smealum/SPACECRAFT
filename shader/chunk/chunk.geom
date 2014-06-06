@@ -15,11 +15,12 @@ uniform float numBlocks;
 uniform vec3 lightdir;
 
 in vec3 pos[];
-in vec2 gtexcoord[];
+in int gtile[];
 in vec4 gcolor[];
 in int dir[];
 
 out vec4 fcolor;
+out flat int ftile;
 out vec2 texcoord;
 
 const vec3 o[]=vec3[](vec3(0.0,0.0,0.0), //bottom
@@ -56,6 +57,8 @@ const vec3 n[]=vec3[](vec3(0.0,-1.0,0.0), //bottom
 
 void main()
 {
+	ftile = gtile[0];
+
 	vec4 r;
 	vec3 pos1, pos2;
 	float y;
@@ -73,7 +76,7 @@ void main()
 	r = proj * view * vec4(rn,1.0);
 	gl_Position = logDepth(r);
 	// gl_Position = r;
-	texcoord=gtexcoord[0]+vec2(1,1)/16;
+	texcoord=vec2(1.0,1.0);
 	EmitVertex();
 
 
@@ -85,7 +88,7 @@ void main()
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = logDepth(r);
 	// gl_Position = r;
-	texcoord=gtexcoord[0]+vec2(0,1)/16;
+	texcoord=vec2(0.0,1.0);
 	EmitVertex();
 
 
@@ -97,7 +100,7 @@ void main()
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = logDepth(r);
 	// gl_Position = r;
-	texcoord=gtexcoord[0]+vec2(1,0)/16;
+	texcoord=vec2(1.0,0.0);
 	EmitVertex();
 
 
@@ -109,7 +112,7 @@ void main()
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = logDepth(r);
 	// gl_Position = r;
-	texcoord=gtexcoord[0];
+	texcoord=vec2(0,0.0);
 	EmitVertex();
 	EndPrimitive();
 }

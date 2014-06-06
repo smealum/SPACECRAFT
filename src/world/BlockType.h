@@ -12,6 +12,7 @@
 // x, y in [0..1]
 typedef glm::vec2 texCoord;
 
+
 namespace blockTypes
 {
 	// 1D index for a 2D array
@@ -38,12 +39,13 @@ namespace blockTypes
 }
 namespace blockPlane {
 	enum T : uint8_t {
-		top,
+		top = 0,
 		side,
 		bottom,
 		maxPlanes
 	};
 }
+
 
 namespace blockTransparency
 {
@@ -54,6 +56,21 @@ namespace blockTransparency
 		transparent = 2 // alpha == 0
 	};
 }
+
+// XXX XXX
+// J'ai eut un peu de mal à m'intégré au code.
+// Pourquoi c'est si compliqué ?
+// Si quelqu'un veut bien m'intégré.
+extern int blockTileID[blockTypes::maxTypeValue][blockPlane::maxPlanes];
+extern uint8_t blockTrans[blockTypes::maxTypeValue];
+
+inline int getBlockID(int blockType, int plane)
+{
+	return blockTileID[blockType][plane]-1;
+}
+
+void blockTypeLoadValues();
+// fin ajout Arthur
 
 class BlockType;
 
@@ -117,6 +134,7 @@ class BlockType : public Singleton<BlockType> {
 		{
 			return *blocks[type];
 		}
+
 
 		~BlockType();
 	private:

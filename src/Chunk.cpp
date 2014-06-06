@@ -81,10 +81,9 @@ void Chunk::draw(Camera& cam, glm::mat4 model)
 
     //glBindTexture(GL_TEXTURE_2D, testTexture);
 	// On n'a pas besoin de bind un textureArray (uniquement utilisable dans un shader)
-	// glActiveTexture(GL_TEXTURE#N);
-	// glBindTexture(GL_TEXTURE_2D, tex);
-	// glUniform1i(samplernLoc, #N); 
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY,testTextureArray);
+	glUniform1i(program["Texture"], 0);
 
     glDrawArrays(GL_POINTS, 0 ,  vArray.size());
 }
@@ -317,9 +316,9 @@ void Chunk::initGLObjects()
         program.setBuffers(vao, vbo, 0);
         program.use();
         glBindFragDataLocation(program.getHandle(), 0, "outColor");
-        program.setAttribute("position", 3, GL_FALSE, 6, 0);
-        program.setAttribute("texcoord", 2, GL_FALSE, 6, 3);
-        program.setAttribute("facedir", 1, GL_FALSE, 6, 5);
+        program.setAttribute("position", 3, GL_FALSE, 5, 0);
+        program.setAttribute("tile", 1, GL_FALSE, 5, 3);
+        program.setAttribute("facedir", 1, GL_FALSE, 5, 4);
     }else{
         vbo=vao=0;
     }

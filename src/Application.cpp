@@ -127,6 +127,8 @@ Application::Application() :
         glfwTerminate();
         std::exit(1);
     }
+
+	blockTypeLoadValues();
 }
 
 void Application::glfwWindowHints()
@@ -285,4 +287,3 @@ Application::~Application()
     #endif
     glfwTerminate();
 }
-
