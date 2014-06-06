@@ -70,13 +70,20 @@ BlockType::BlockType() :
 						});
 				break;
 			default:
-				block = new BlockStatic({
-						t,
-						t,
-						t
-						});
+				block = new BlockStatic({t,t,t});
 				break;
 		}
+		
+		//pour set le style indépendament
+		switch (t) {
+			case blockTypes::flower_red:
+				block->setStyle(blockStyle::sprite);
+				break;
+			default:
+				block->setStyle(blockStyle::normal);
+				break;
+		}
+
 		if (block)
 			block->setTransparency(
 					getTextureTransparency(img,
@@ -159,7 +166,9 @@ texCoord BlockStatic::getSide(blockPlane::T p) const
 
 bool BlockType::shouldBeFace(blockTypes::T type1, blockTypes::T type2)
 {
-	return type1!=type2
-		&& (blocks[type1]->getTransparency()<=blockTransparency::transparent && blocks[type2]->getTransparency()>=blockTransparency::seeThrough);
+	const BlockTexCoord* b1=blocks[type1];
+	const BlockTexCoord* b2=blocks[type2];
+
+	return b1->getStyle()==blockStyle::normal && type1!=type2 && (b1->getTransparency()<=blockTransparency::transparent && b2->getTransparency()>=blockTransparency::seeThrough);
 }
 

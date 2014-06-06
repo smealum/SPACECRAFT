@@ -57,17 +57,28 @@ namespace blockTransparency
 	};
 }
 
+namespace blockStyle
+{
+	enum T : uint8_t {
+		normal = 0, // => box
+		sprite = 1 // => flower style
+	};
+}
+
 class BlockType;
 
 // bass class for texcoord
 class BlockTexCoord {
 	protected:
 		blockTransparency::T trans;
+		blockStyle::T style;
 		static BlockType *btype;
 	public:
 		virtual texCoord getSide(blockPlane::T t) const = 0;
 		inline blockTransparency::T getTransparency() const { return trans; }
+		inline blockStyle::T getStyle() const { return style; }
 		inline void setTransparency(blockTransparency::T type) { trans = type; }
+		inline void setStyle(blockStyle::T type) { style = type; }
 		BlockTexCoord() {}
 		virtual ~BlockTexCoord() {}
 		static void setStaticInstance(BlockType *bt); // this need to be called after the creation of OGL context

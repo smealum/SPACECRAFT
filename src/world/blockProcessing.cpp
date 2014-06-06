@@ -123,4 +123,48 @@ void computeChunkFaces(chunkVal* data,
 			previous=current;
 		}
 	}
+
+	//sprites
+	for(int x=0;x<CHUNK_N;++x)
+	for(int y=0;y<CHUNK_N;++y)
+	for(int z=0;z<CHUNK_N;++z)
+	{
+		current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
+		const BlockTexCoord &bCur = blockType.getBlockTexcoord((blockTypes::T)current);
+		if(bCur.getStyle()==blockStyle::sprite)
+		{
+			GL_Vertex v;
+			v.facedir=6;
+			v.texcoord=blockType.getTexcoord(
+				(blockTypes::T)int(current),
+				blockPlane::top
+				);
+			v.position=vec3(px+x,py+y,pz+z);
+			vArray.push_back(v);
+
+			v.facedir=7;
+			v.texcoord=blockType.getTexcoord(
+				(blockTypes::T)int(current),
+				blockPlane::top
+				);
+			v.position=vec3(px+x,py+y,pz+z);
+			vArray.push_back(v);
+
+			v.facedir=8;
+			v.texcoord=blockType.getTexcoord(
+				(blockTypes::T)int(current),
+				blockPlane::top
+				);
+			v.position=vec3(px+x,py+y,pz+z);
+			vArray.push_back(v);
+
+			v.facedir=9;
+			v.texcoord=blockType.getTexcoord(
+				(blockTypes::T)int(current),
+				blockPlane::top
+				);
+			v.position=vec3(px+x,py+y,pz+z);
+			vArray.push_back(v);
+		}
+	}
 }

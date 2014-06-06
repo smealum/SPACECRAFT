@@ -27,7 +27,11 @@ const vec3 o[]=vec3[](vec3(0.0,0.0,0.0), //bottom
 						vec3(0.0,0.0,0.0), //left
 						vec3(1.0,0.0,1.0), //right
 						vec3(1.0,0.0,0.0), //near
-						vec3(0.0,0.0,1.0) //far
+						vec3(0.0,0.0,1.0), //far
+						vec3(0.0,0.0,0.0), //diag11
+						vec3(1.0,0.0,1.0), //diag12
+						vec3(1.0,0.0,0.0), //diag21
+						vec3(0.0,0.0,1.0) //diag22
 						);
 
 const vec3 d1[]=vec3[](vec3(1.0,0.0,0.0), //bottom
@@ -35,7 +39,11 @@ const vec3 d1[]=vec3[](vec3(1.0,0.0,0.0), //bottom
 						vec3(0.0,0.0,1.0), //left
 						vec3(0.0,0.0,-1.0), //right
 						vec3(-1.0,0.0,0.0), //near
-						vec3(1.0,0.0,0.0) //far
+						vec3(1.0,0.0,0.0), //far
+						vec3(1.0,0.0,1.0), //diag11
+						vec3(-1.0,0.0,-1.0), //diag12
+						vec3(-1.0,0.0,1.0), //diag21
+						vec3(1.0,0.0,-1.0) //diag22
 						);
 
 const vec3 d2[]=vec3[](vec3(0.0,0.0,1.0), //bottom
@@ -43,7 +51,11 @@ const vec3 d2[]=vec3[](vec3(0.0,0.0,1.0), //bottom
 						vec3(0.0,1.0,0.0), //left
 						vec3(0.0,1.0,0.0), //right
 						vec3(0.0,1.0,0.0), //near
-						vec3(0.0,1.0,0.0) //far
+						vec3(0.0,1.0,0.0), //far
+						vec3(0.0,1.0,0.0), //diag11
+						vec3(0.0,1.0,0.0), //diag12
+						vec3(0.0,1.0,0.0), //diag21
+						vec3(0.0,1.0,0.0) //diag22
 						);
 
 const vec3 n[]=vec3[](vec3(0.0,-1.0,0.0), //bottom
@@ -51,7 +63,11 @@ const vec3 n[]=vec3[](vec3(0.0,-1.0,0.0), //bottom
 						vec3(-1.0,0.0,0.0), //left
 						vec3(1.0,0.0,1.0), //right
 						vec3(0.0,0.0,-1.0), //near
-						vec3(0.0,0.0,1.0) //far
+						vec3(0.0,0.0,1.0), //far
+						normalize(vec3(1.0,0.0,-1.0)), //diag11
+						normalize(vec3(-1.0,0.0,1.0)), //diag12
+						normalize(vec3(1.0,0.0,1.0)), //diag21
+						normalize(vec3(-1.0,0.0,-1.0)) //diag22
 						);
 
 void main()
