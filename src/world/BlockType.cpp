@@ -128,8 +128,9 @@ void BlockAnimated::animate(float delta)
 	timer += delta;
 	while (timer > frameTime)
 		timer -= frameTime, current++;
-	if (current >= size)
-		current -= size;
+	if (current >= frames.size())
+		current -= frames.size();
+	//debug("current: %u, blocktype: %u", current, frames[current]);
 }
 
 BlockAnimated::~BlockAnimated()

@@ -29,10 +29,10 @@ namespace blockTypes
 		grass_blaze = 2*TEXCOLS+8,
 		sponge = 3*TEXCOLS+1,
 		water = 12*TEXCOLS+14,
-		water_1 = water+2,
-		water_2 = water+3,
-		water_3 = water+TEXCOLS+2,
-		water_4 = water+TEXCOLS+3,
+		water_1 = water+1,
+		water_2 = water+2,
+		water_3 = water+TEXCOLS+1,
+		water_4 = water+TEXCOLS+2,
 		maxTypeValue
 	};
 }
@@ -90,15 +90,14 @@ class BlockAnimated : public BlockTexCoord {
 		static const float frameTime; // in seconds
 		static std::list<BlockAnimated*> list;
 		std::vector<blockTypes::T> frames;
-		uint32_t current,
-				 size;
+		uint32_t current;
 		float timer;
 		void animate(float delta);
+	public:
 		inline blockTypes::T getCurrent() const
 		{
 			return frames[current];
 		}
-	public:
 		static void animation(float delta);
 		BlockAnimated(std::initializer_list<blockTypes::T> frames);
 		~BlockAnimated();
