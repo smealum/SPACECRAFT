@@ -83,10 +83,6 @@ class PlanetFace
 		//TEMP
 		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
 
-
-
-		void setLodPower(double detailsPower);
-
 	private:
 		void finalize(void);
 
@@ -110,8 +106,6 @@ class PlanetFace
 		uint8_t id;
 		int depth;
 		int childrenDepth;
-
-		float detailsPower;
 };
 
 class Planet
@@ -147,8 +141,6 @@ class Planet
 
 		//TEMP
 		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
-
-		void setLodPower(double detailsPower);
 
 	private:
 		std::vector<PlanetGenerator*> generators;

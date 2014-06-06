@@ -16,6 +16,8 @@ using namespace std;
 //[0][1]
 //[2][3]
 
+extern float PlanetFaceDetailsPower;
+
 PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	planet(planet),
 	father(NULL),
@@ -31,13 +33,10 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	x(0),
 	z(0),
 	depth(0),
-	childrenDepth(0),
-	detailsPower(30.0f)
+	childrenDepth(0)
 {
 	uvertex[0]=v[0]; uvertex[1]=v[1];
 	uvertex[2]=v[2]; uvertex[3]=v[3];
-	detailsPower = 30.0;
-	this->detailsPower = 30.0;
 	finalize();
 }
 
@@ -180,12 +179,7 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	//float d=2.0f/(1<<(depth-2));
 	//if(length(vertex[4]*elevation-p)/d<1.2f)return false;
 	// if(length(vertex[4]*elevation-p)*(2<<(depth))<40.0f) return false;
-	if (detailsPower < 10.0)
-	{
-		// TODO Fix, pourquoi cette valeur est reset à 0
-		detailsPower = 40.0;
-	}
-	if(glm::length(vertex[4]*elevation-p)*(2<<(depth-1))<detailsPower) return false;
+	if(glm::length(vertex[4]*elevation-p)*(2<<(depth-1))<PlanetFaceDetailsPower) return false;
 	return true;
 }
 
@@ -318,10 +312,6 @@ void Planet::testFullGeneration(int depth, PlanetFaceBufferHandler* b)
 	// faces[0]->deletePlanetFace();
 }
 
-void PlanetFace::setLodPower(double detailsPower)
-{
-	this->detailsPower=detailsPower;
-}
 
 void Planet::processLevelOfDetail(Camera& c)
 {
@@ -484,13 +474,6 @@ void Planet::setSunPosition(glm::vec3 position)
 	sunPosition = position;
 }
 
-void Planet::setLodPower(double detailsPower)
-{
-	for(int i=0;i<6;++i)
-	{
-		faces[i]->setLodPower(detailsPower);
-	}
-}
 
 //TODO : filtrer par toplevel (en pratique devrait pas être nécessaire, mais on sait jamais)
 void Planet::changeBlock(glm::i32vec3 p, blockTypes::T v)
