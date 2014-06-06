@@ -27,6 +27,7 @@ class Atmosphere
 
 		void initLightConstants(void);
 		void makeOpticalDepthBuffer(void);
+		void makePhaseBuffer(void);
 		void generateVBO(void);
 
 		void bind(Camera& c, glm::vec3 lightDirection);
@@ -47,10 +48,8 @@ class Atmosphere
 		glm::vec3 m_fWavelength4;
 		float m_fRayleighScaleDepth;
 		float m_fMieScaleDepth;
-
-		float* opticalBuffer;
 		
-		GLuint texture;
+		GLuint depthTexture, phaseTexture;
 		GLuint vao, vbo, ebo;
 
 		int lod;

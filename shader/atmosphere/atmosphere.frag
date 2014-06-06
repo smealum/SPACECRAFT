@@ -9,7 +9,8 @@ out vec4 outColor;
 
 const float PI=3.14159265;
 
-uniform sampler2D tex;
+uniform sampler2D depthTex;
+uniform sampler1D phaseTex;
 
 uniform float m_fOuterRadius;
 uniform float m_fScale;
@@ -52,7 +53,6 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 	float fDet = max(0.0, B*B-4.0*C);
 	float fNear = 0.5 * (-B-sqrt(fDet));
 
-	bool bCameraInAtmosphere = false;
 	bool bCameraAbove = true;
 	vec4 fCameraDepth=vec4(0.0);
 	vec4 fLightDepth;
@@ -60,17 +60,14 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 	if(fNear <= 0)
 	{
 		// If the near point is behind the camera, it means the camera is inside the atmosphere
-		bCameraInAtmosphere = true;
 		fNear = 0;
 		float fCameraHeight = length(vCamera);
 		float fCameraAltitude = (fCameraHeight - m_fInnerRadius) * m_fScale;
 		bCameraAbove = fCameraHeight >= length(v);
 		float fCameraAngle = dot((bCameraAbove ? (-vRay) : (vRay)), vCamera) / fCameraHeight;
 		// fCameraDepth=Interpolate((vec2(fCameraAltitude, 0.5 - fCameraAngle * 0.5)));
-		fCameraDepth=texture(tex, (vec2(fCameraAltitude, 0.5 - fCameraAngle * 0.5)));
-	}
-	else
-	{
+		fCameraDepth=texture(depthTex, (vec2(fCameraAltitude, 0.5 - fCameraAngle * 0.5)));
+	}else{
 		// Otherwise, move the camera up to the near intersection point
 		vCamera = (vCamera+(vRay*fNear));
 		fFar -= fNear;
@@ -97,7 +94,7 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 		float fLightAngle = dot(lightDir, v) / fHeight;
 		float fAltitude = (fHeight - m_fInnerRadius) * m_fScale;
 		// fLightDepth=Interpolate((vec2(fAltitude, 0.5 - fLightAngle * 0.5)));
-		fLightDepth=texture(tex, (vec2(fAltitude, 0.5 - fLightAngle * 0.5)));
+		fLightDepth=texture(depthTex, (vec2(fAltitude, 0.5 - fLightAngle * 0.5)));
 
 		// If no light light reaches this part of the atmosphere, no light is scattered in at this point
 		if(fLightDepth.x < DELTA)continue;
@@ -114,15 +111,13 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 		{
 			float fSampleAngle = -dot(vRay, v) / fHeight;
 			// fSampleDepth=Interpolate((vec2(fAltitude, 0.5 - fSampleAngle * 0.5)));
-			fSampleDepth=texture(tex, (vec2(fAltitude, 0.5 - fSampleAngle * 0.5)));
+			fSampleDepth=texture(depthTex, (vec2(fAltitude, 0.5 - fSampleAngle * 0.5)));
 			fRayleighDepth += fSampleDepth.y - fCameraDepth.y;
 			fMieDepth += fSampleDepth.w - fCameraDepth.w;
-		}
-		else
-		{
+		}else{
 			float fSampleAngle = dot(vRay, v) / fHeight;
 			// fSampleDepth=Interpolate((vec2(fAltitude, 0.5 - fSampleAngle * 0.5)));
-			fSampleDepth=texture(tex, (vec2(fAltitude, 0.5 - fSampleAngle * 0.5)));
+			fSampleDepth=texture(depthTex, (vec2(fAltitude, 0.5 - fSampleAngle * 0.5)));
 			fRayleighDepth += fCameraDepth.y - fSampleDepth.y;
 			fMieDepth += fCameraDepth.w - fSampleDepth.w;
 		}
@@ -142,15 +137,9 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 		v = (v+vSampleRay);
 	}
 
-	// Calculate the angle and phase values (this block of code could be handled by a small 1D lookup table, or a 1D texture lookup in a pixel shader)
+	// Calculate the angle and phase values
 	float fAngle = -dot(vRay, lightDir);
-	float fAngle2 = fAngle*fAngle;
-	float g2 = m_g*m_g;
-	vec2 fPhase;
-	fPhase.x = 0.75 * (1.0 + fAngle2);
-	fPhase.y = 1.5 * ((1 - g2) / (2 + g2)) * (1.0 + fAngle2) / pow(1 + g2 - 2*m_g*fAngle, 1.5);
-	fPhase.x *= m_Kr * m_ESun;
-	fPhase.y *= m_Km * m_ESun;
+	vec2 fPhase = vec2(texture(phaseTex,(fAngle+1.0)/2.0));
 
 	// Calculate the in-scattering color and clamp it to the max color value
 	vec3 fColor=fRayleighSum*fPhase.x/m_fWavelength4+fMieSum*fPhase.y;
@@ -176,7 +165,7 @@ void main()
 	//color=texelFetch(tex, ivec2((int(gl_FragCoord[0])%texSize),(int(gl_FragCoord[1])%texSize)), 0);
 	// if(!sky)color*=gl_Color;
 	outColor = color;
-	// outColor = texture(tex,vec2(gl_FragCoord)/800);
+	// outColor = texture(depthTex,vec2(gl_FragCoord)/800);
 	// outColor = vec4(color.xyz,1.0);
 	// outColor = vec4(normalize(vt),1.0);
 	// outColor = vec4(vPos+vec3(0.5,0,0),1.0);

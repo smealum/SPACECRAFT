@@ -6,11 +6,12 @@ Atmosphere::Atmosphere():
 	shader(ShaderProgram::loadFromFile("shader/atmosphere/atmosphere.vert", "shader/atmosphere/atmosphere.frag", "atmosphere")),
 	m_fInnerRadius(1.0f),
 	m_fOuterRadius(1.05f),
-	opticalBuffer(NULL),
 	lod(6)
 {
 	initLightConstants();
+
 	makeOpticalDepthBuffer();
+	makePhaseBuffer();
 
 	shader.use();
 }
@@ -48,7 +49,7 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 	const float fScale = 1.0f / (m_fOuterRadius - m_fInnerRadius);
 	const int m_nChannels=4;
 	
-	opticalBuffer=(float*)malloc(sizeof(float)*m_nChannels*nSize*nSize);
+	float* opticalBuffer=(float*)malloc(sizeof(float)*m_nChannels*nSize*nSize);
 
 	int nIndex = 0;
 	for(int nAngle=0; nAngle<nSize; nAngle++)
@@ -125,8 +126,8 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 	// printf("test\n");
 	// fclose(fout);
 
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glGenTextures(1, &depthTexture);
+	glBindTexture(GL_TEXTURE_2D, depthTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, nSize, nSize, 0, GL_RGBA, GL_FLOAT, opticalBuffer);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
@@ -140,7 +141,48 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	
-	glBindTexture(GL_TEXTURE_2D, texture);
+	free(opticalBuffer);
+}
+
+void Atmosphere::makePhaseBuffer(void)
+{
+	const int nSize = 4096; //on est en 1D, on peut se le permettre
+	float* phaseBuffer=(float*)malloc(sizeof(float)*nSize*4);
+	int k=0;
+	for(int i=0;i<nSize;i++)
+	{
+		float fAngle=float(2*i)/(nSize)-1.0f;
+		float fAngle2=fAngle*fAngle;
+		float g2 =m_g*m_g;
+		glm::vec2 fPhase;
+		fPhase.x = 0.75 * (1.0 + fAngle2);
+		fPhase.y = 1.5 * ((1 - g2) / (2 + g2)) * (1.0 + fAngle2) / pow(1 + g2 - 2*m_g*fAngle, 1.5);
+		fPhase.x *= m_Kr * m_ESun;
+		fPhase.y *= m_Km * m_ESun;
+		phaseBuffer[k++]=fPhase.x;
+		phaseBuffer[k++]=fPhase.y;
+		// phaseBuffer[k++]=1.0;
+		// phaseBuffer[k++]=1.0;
+		phaseBuffer[k++]=1.0;
+		phaseBuffer[k++]=1.0;
+	}
+
+	glGenTextures(1, &phaseTexture);
+	glBindTexture(GL_TEXTURE_1D, phaseTexture);
+	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA32F, nSize, 0, GL_RGBA, GL_FLOAT, phaseBuffer);
+
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAX_LEVEL, 0);
+
+	//important
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	
+	//important
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+	free(phaseBuffer);
 }
 
 extern float testAngle;
@@ -163,7 +205,14 @@ void Atmosphere::bind(Camera& c, glm::vec3 lightDirection)
 	shader.setUniform("m_fOuterRadius", m_fOuterRadius);
 	shader.setUniform("m_nSamples", m_nSamples);
 
-	glBindTexture(GL_TEXTURE_2D, texture);
+	shader.setUniform("depthTex",0);
+	shader.setUniform("phaseTex",1);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, depthTexture);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_1D, phaseTexture);
 }
 
 void Atmosphere::draw(Camera& c, glm::vec3 lightDirection)
@@ -183,5 +232,4 @@ void Atmosphere::draw(Camera& c, glm::vec3 lightDirection)
 
 Atmosphere::~Atmosphere()
 {
-	free(opticalBuffer);
 }
