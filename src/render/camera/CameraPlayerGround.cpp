@@ -91,14 +91,15 @@ void CameraPlayerGround::update(Camera& camera)
 			else if(Input::isKeyPressed(GLFW_KEY_C))
 			{
 				//TODO : check que player n'intersecte pas avec le nouveau bloc...
+				blockTypes::T t=blockTypes::water;
 				switch(dir)
 				{
-					case 0: testPlanet->changeBlock(out-glm::i32vec3(1,0,0),blockTypes::dirt); break;
-					case 1: testPlanet->changeBlock(out+glm::i32vec3(1,0,0),blockTypes::dirt); break;
-					case 2: testPlanet->changeBlock(out-glm::i32vec3(0,1,0),blockTypes::dirt); break;
-					case 3: testPlanet->changeBlock(out+glm::i32vec3(0,1,0),blockTypes::dirt); break;
-					case 4: testPlanet->changeBlock(out-glm::i32vec3(0,0,1),blockTypes::dirt); break;
-					case 5: testPlanet->changeBlock(out+glm::i32vec3(0,0,1),blockTypes::dirt); break;
+					case 0: testPlanet->changeBlock(out-glm::i32vec3(1,0,0),t); break;
+					case 1: testPlanet->changeBlock(out+glm::i32vec3(1,0,0),t); break;
+					case 2: testPlanet->changeBlock(out-glm::i32vec3(0,1,0),t); break;
+					case 3: testPlanet->changeBlock(out+glm::i32vec3(0,1,0),t); break;
+					case 4: testPlanet->changeBlock(out-glm::i32vec3(0,0,1),t); break;
+					case 5: testPlanet->changeBlock(out+glm::i32vec3(0,0,1),t); break;
 				}
 			}
 			testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2);
