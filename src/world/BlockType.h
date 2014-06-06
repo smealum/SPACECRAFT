@@ -63,7 +63,7 @@ class BlockTexCoord {
 		blockTransparency::T trans;
 		static BlockType *btype;
 	public:
-		virtual inline texCoord getSide(blockPlane::T t) const = 0;
+		virtual texCoord getSide(blockPlane::T t) const = 0;
 		inline blockTransparency::T getTransparency() const { return trans; }
 		inline void setTransparency(blockTransparency::T type) { trans = type; }
 		BlockTexCoord() {}
@@ -89,7 +89,7 @@ class BlockAnimated : public BlockTexCoord {
 		static void animation(float delta);
 		BlockAnimated(std::initializer_list<blockTypes::T> frames);
 		~BlockAnimated();
-		virtual inline texCoord getSide(blockPlane::T p) const; // unused parameter of side because all sides are equal :D
+		virtual texCoord getSide(blockPlane::T p) const; // unused parameter of side because all sides are equal :D
 };
 
 class BlockStatic : public BlockTexCoord {
@@ -97,7 +97,7 @@ class BlockStatic : public BlockTexCoord {
 		std::vector<blockTypes::T> sides;
 	public:
 		BlockStatic(std::initializer_list<blockTypes::T> sdes);
-		virtual inline texCoord getSide(blockPlane::T p) const;
+		virtual texCoord getSide(blockPlane::T p) const;
 };
 
 class BlockType : public Singleton<BlockType> {
@@ -126,14 +126,5 @@ class BlockType : public Singleton<BlockType> {
 		int texWidth, texHeight, texCols;
 		BlockType();
 };
-
-texCoord BlockAnimated::getSide(blockPlane::T) const
-{
-	return btype->getTexcoord(frames[current]);
-}
-texCoord BlockStatic::getSide(blockPlane::T p) const
-{
-	return btype->getTexcoord(sides[p]);
-}
 
 #endif

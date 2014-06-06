@@ -147,3 +147,11 @@ void BlockAnimated::animation(float delta)
 		(*it)->animate(delta);
 }
 
+texCoord BlockAnimated::getSide(blockPlane::T) const
+{
+	return btype->getTexcoord(frames[current]);
+}
+texCoord BlockStatic::getSide(blockPlane::T p) const
+{
+	return btype->getTexcoord(sides[p]);
+}
