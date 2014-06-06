@@ -110,6 +110,7 @@ class PlanetFace
 
 class Planet
 {
+	friend class PlanetFaceBufferHandler;
 	friend class Chunk;
 	public:
 		Planet(PlanetInfo &pi, class ContentHandler& ch);
