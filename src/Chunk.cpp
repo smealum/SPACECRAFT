@@ -53,6 +53,7 @@ void Chunk::destroyChunk(void)
 
 //TEMP
 extern int testTexture;
+extern int testTextureArray;
 extern int testVal;
 
 void Chunk::draw(Camera& cam, glm::mat4 model)
@@ -78,7 +79,12 @@ void Chunk::draw(Camera& cam, glm::mat4 model)
     program.setUniform("numBlocks",float(PLANETFACE_BLOCKS));
     program.setUniform("lightdir",planet->lightdir);
 
-    glBindTexture(GL_TEXTURE_2D, testTexture);
+    //glBindTexture(GL_TEXTURE_2D, testTexture);
+	// On n'a pas besoin de bind un textureArray (uniquement utilisable dans un shader)
+	// glActiveTexture(GL_TEXTURE#N);
+	// glBindTexture(GL_TEXTURE_2D, tex);
+	// glUniform1i(samplernLoc, #N); 
+	glBindTexture(GL_TEXTURE_2D_ARRAY,testTextureArray);
 
     glDrawArrays(GL_POINTS, 0 ,  vArray.size());
 }

@@ -166,6 +166,7 @@ Planet* testPlanet;
 Cursor* testCursor;
 Sun* sun;
 int testTexture;
+int testTextureArray;
 
 void Application::run()
 {
@@ -185,7 +186,8 @@ void Application::run()
 	sun=new Sun();
     testCursor=new Cursor();
 
-    testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
+	testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
+    testTextureArray=TextureManager::getInstance().loadTextureArray("data/blocksPackArray.png",16,16);
 
     float timeA;
     char titleBuff[512];

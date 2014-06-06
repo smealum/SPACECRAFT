@@ -87,8 +87,8 @@ GLuint TextureManager::loadTextureArray(const std::string& filename, int tileW, 
 
 
 	// changement de l'ordre des pixels dans la texture pour pouvoir utiliser les fonctions opengl
-	unsigned char * dataGL = new unsigned char[nTile * tileSize];
-	// for each tile
+	unsigned char * dataGL = new unsigned char[4 * nTile * tileSize];
+	//for each tile
 	unsigned char * pixelGL = dataGL;
 	for(int ty=0;ty<nyTile;++ty)
 	for(int tx=0;tx<nxTile;++tx)
@@ -104,6 +104,8 @@ GLuint TextureManager::loadTextureArray(const std::string& filename, int tileW, 
 		}
 	}
 	
+	log_info("TextureArray2D %d %d", nxTile,nyTile);
+	log_info("TextureArray2D %dx%d", tileW, tileH);
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
@@ -121,12 +123,14 @@ GLuint TextureManager::loadTextureArray(const std::string& filename, int tileW, 
 			GL_UNSIGNED_BYTE,
 			dataGL
 	);
+	
+	log_info("----");
 
 	// texture interpolation
 	glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_S,GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_T,GL_REPEAT);
 
 
 	free(data);
