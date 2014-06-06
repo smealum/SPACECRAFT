@@ -36,23 +36,16 @@ void computeChunkFaces(chunkVal* data,
 			//BlockTexCoord &bCur = blockType.getBlockTexcoord((blockTypes::T)current),
 						  //&bPrev = blockType.getBlockTexcoord((blockTypes::T)previous);
 			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
-			if(blockType.shouldBeFace((blockTypes::T)current, (blockTypes::T)previous))
-			{
+			if (blockShouldBeFace(current,previous)) {
 				GL_Vertex v;
 				v.facedir=2;
-				v.texcoord= blockType.getTexcoord(
-					(blockTypes::T)int(current),
-					blockPlane::side
-					);
+				v.tile = getBlockID(current,blockPlane::side);
 				v.position=vec3(px+x,py+y,pz+z);
 				vArray.push_back(v);
-			}else if(blockType.shouldBeFace((blockTypes::T)previous, (blockTypes::T)current)){
+			}else if (blockShouldBeFace(previous,current)) {
 				GL_Vertex v;
 				v.facedir=3;
-				v.texcoord=blockType.getTexcoord(
-					(blockTypes::T)int(previous),
-					blockPlane::side
-					);
+				v.tile = getBlockID(previous,blockPlane::side);
 				v.position=vec3(px+x-1,py+y,pz+z);
 				vArray.push_back(v);
 			}
@@ -68,25 +61,18 @@ void computeChunkFaces(chunkVal* data,
 		for(int y=0;y<CHUNK_N+1;++y)
 		{
 			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
-			if(blockType.shouldBeFace((blockTypes::T)current, (blockTypes::T)previous))
-			{
+			if (blockShouldBeFace(current,previous)) {
 				GL_Vertex v;
 				v.facedir=0;
-				v.texcoord=blockType.getTexcoord(
-					(blockTypes::T)int(current),
-					blockPlane::top
-					);
+				v.tile = getBlockID(current,blockPlane::bottom);
 				v.position=vec3(px+x,py+y,pz+z);
 				vArray.push_back(v);
-			}else if(blockType.shouldBeFace((blockTypes::T)previous, (blockTypes::T)current)){
-				GL_Vertex v;
-				v.facedir=1;
-				v.texcoord=blockType.getTexcoord(
-					(blockTypes::T)int(previous),
-					blockPlane::top
-					);
-				v.position=vec3(px+x,py+y-1,pz+z);
-				vArray.push_back(v);
+			} else if (blockShouldBeFace(previous,current)) {
+					GL_Vertex v;
+					v.facedir=1;
+					v.tile = getBlockID(previous,blockPlane::top);
+					v.position=vec3(px+x,py+y-1,pz+z);
+					vArray.push_back(v);
 			}
 			previous=current;
 		}
@@ -100,23 +86,16 @@ void computeChunkFaces(chunkVal* data,
 		for(int z=0;z<CHUNK_N+1;++z)
 		{
 			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
-			if(blockType.shouldBeFace((blockTypes::T)current, (blockTypes::T)previous))
-			{
+			if (blockShouldBeFace(current,previous)) {
 				GL_Vertex v;
 				v.facedir=4;
-				v.texcoord=blockType.getTexcoord(
-					(blockTypes::T)int(current),
-					blockPlane::side
-					);
+				v.tile = getBlockID(current,blockPlane::side);
 				v.position=vec3(px+x,py+y,pz+z);
 				vArray.push_back(v);
-			}else if(blockType.shouldBeFace((blockTypes::T)previous, (blockTypes::T)current)){
+			}else if (blockShouldBeFace(previous,current)) {
 				GL_Vertex v;
 				v.facedir=5;
-				v.texcoord=blockType.getTexcoord(
-					(blockTypes::T)int(previous),
-					blockPlane::side
-					);
+				v.tile = getBlockID(previous,blockPlane::side);
 				v.position=vec3(px+x,py+y,pz-1+z);
 				vArray.push_back(v);
 			}
@@ -130,39 +109,26 @@ void computeChunkFaces(chunkVal* data,
 	for(int z=0;z<CHUNK_N;++z)
 	{
 		current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
-		const BlockTexCoord &bCur = blockType.getBlockTexcoord((blockTypes::T)current);
-		if(bCur.getStyle()==blockStyle::sprite)
+		if (blockStyleID[current] == blockStyle::sprite)
 		{
 			GL_Vertex v;
 			v.facedir=6;
-			v.texcoord=blockType.getTexcoord(
-				(blockTypes::T)int(current),
-				blockPlane::top
-				);
+			v.tile=getBlockID(current,blockPlane::top);
 			v.position=vec3(px+x,py+y,pz+z);
 			vArray.push_back(v);
 
 			v.facedir=7;
-			v.texcoord=blockType.getTexcoord(
-				(blockTypes::T)int(current),
-				blockPlane::top
-				);
+			v.tile=getBlockID(current,blockPlane::top);
 			v.position=vec3(px+x,py+y,pz+z);
 			vArray.push_back(v);
 
 			v.facedir=8;
-			v.texcoord=blockType.getTexcoord(
-				(blockTypes::T)int(current),
-				blockPlane::top
-				);
+			v.tile=getBlockID(current,blockPlane::top);
 			v.position=vec3(px+x,py+y,pz+z);
 			vArray.push_back(v);
 
 			v.facedir=9;
-			v.texcoord=blockType.getTexcoord(
-				(blockTypes::T)int(current),
-				blockPlane::top
-				);
+			v.tile=getBlockID(current,blockPlane::top);
 			v.position=vec3(px+x,py+y,pz+z);
 			vArray.push_back(v);
 		}

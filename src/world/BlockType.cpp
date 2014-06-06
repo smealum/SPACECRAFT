@@ -36,7 +36,7 @@ BlockType::BlockType() :
 	int blockSize = texWidth / texCols,
 		texRows = texHeight / blockSize;
 
-	debug("%u texcoord will be generated", blockTypes::maxTypeValue);
+	debug("%u texcoord will be generated", blockTypes::max);
 	// special air:
 	blocks[0] =  new BlockStatic({
 			blockTypes::air,
@@ -45,7 +45,7 @@ BlockType::BlockType() :
 			});
 	blocks[0]->setTransparency(blockTransparency::invisible);
 	texCoords[0] = glm::vec2(0.f);
-	for (uint32_t i = 1; i < blockTypes::maxTypeValue; i++)
+	for (uint32_t i = 1; i < blockTypes::max; i++)
 	{
 		blockTypes::T t = (blockTypes::T)i;
 		auto &coord = texCoords[t];
@@ -109,7 +109,7 @@ BlockType::BlockType() :
 BlockType::~BlockType()
 {
 	// free the blocktypes
-	for (uint32_t i = 1; i < blockTypes::maxTypeValue; ++i)
+	for (uint32_t i = 1; i < blockTypes::max; ++i)
 		delete blocks[i];
 }
 
@@ -173,3 +173,56 @@ bool BlockType::shouldBeFace(blockTypes::T type1, blockTypes::T type2)
 	return b1->getStyle()==blockStyle::normal && type1!=type2 && (b1->getTransparency()<=blockTransparency::transparent && b2->getTransparency()>=blockTransparency::seeThrough);
 }
 
+
+
+///////////////////////////////////////////////////////////////////
+//
+// ajout par arthur
+int blockTileID[blockTypes::max][blockPlane::max];
+uint8_t blockTransparencyID[blockTypes::max];
+uint8_t blockStyleID[blockTypes::max];
+void blockTypeLoadValues()
+{
+	//////////////////////////
+	// valeurs par défaut  //
+	////////////////////////
+	
+	for(uint32_t i = 1; i < blockTypes::max; i++)
+	for(uint8_t j = 0 ; j<blockPlane::max; j++)
+		blockTileID[i][j] = i;
+	
+	for (uint32_t i = 1; i < blockTypes::max; i++)
+		blockTransparencyID[i] = blockTransparency::opaque;
+
+	for (uint32_t i = 1; i < blockStyle::max; i++)
+		blockStyleID[i] = blockStyle::normal;
+
+
+	////////////////////
+	// modifications //
+	//////////////////
+	
+	// air
+	blockTransparencyID[blockTypes::air] = blockTransparency::invisible;
+	
+	// grass
+	blockTileID[blockTypes::grass][blockPlane::side]   = blockTypes::grass_side;
+	blockTileID[blockTypes::grass][blockPlane::bottom] = blockTypes::dirt;
+	
+	// flower yellow
+	blockTransparencyID[blockTypes::flower_yellow] = blockTransparency::seeThrough;
+	blockStyleID[blockTypes::flower_yellow] = blockStyle::sprite;
+
+	// flower_red
+	blockTransparencyID[blockTypes::flower_red] = blockTransparency::seeThrough;
+	blockStyleID[blockTypes::flower_red] = blockStyle::sprite;
+}
+
+bool blockShouldBeFace(int type1, int type2)
+{
+	return
+		type1 != type2 &&
+		blockStyleID[type1] == blockStyle::normal &&
+		blockTransparencyID[type1] <= blockTransparency::transparent &&
+		blockTransparencyID[type2] >= blockTransparency::seeThrough;
+}
