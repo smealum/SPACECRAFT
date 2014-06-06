@@ -202,11 +202,11 @@ void Atmosphere::bind(Camera& c, glm::vec3 lightDirection)
 	shader.setUniform("depthTex",0);
 	shader.setUniform("phaseTex",1);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, depthTexture);
-
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_1D, phaseTexture);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, depthTexture);
 }
 
 void Atmosphere::draw(Camera& c, glm::vec3 lightDirection)
