@@ -2,6 +2,7 @@
 #include "Application.h"
 #include "utils/SphereManager.h"
 #include "utils/glm.h"
+#include "utils/dbg.h"
 
 #define SunWidth (108.0f)
 
@@ -17,7 +18,8 @@ Sun::Sun():
 				"shader/sun/sunGlow.vert",
 				"shader/sun/sunGlow.frag",
 				"sunGlow")),
-	position(8.0,0.0,0.0)
+	position(8.0,0.0,0.0),
+	time(0.0)
 {
 
 }
@@ -33,6 +35,8 @@ void Sun::draw(Camera& c)
 	// update time
     float delta = Application::getInstance().getFrameDeltaTime();
 	time+=delta;
+
+	log_info("time=%f",time);
 
 	// sun inner
 		// rotation et animation

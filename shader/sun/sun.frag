@@ -172,13 +172,14 @@ void main()
 	outColor = vec4(1.0,1.0,1.0,alpha);
 }
 */
-#define SunWidth (108.f)
+#define SunWidth (1.f)
+//define SunWidth (108.f)
+
 // version 3D cartésienne
 void main()
 {
 
 	float noise1  = snoise(vec4(vPos*1.0/SunWidth,time))*1.0;
-	noise1+=snoise(vec4(vPos*10.0,time))*0.1;
 	float noise2  = snoise(vec4(vPos*2.0/SunWidth,time))*1.0;
 
 	float c1 = min(abs(noise1),0.5)+0.5;
