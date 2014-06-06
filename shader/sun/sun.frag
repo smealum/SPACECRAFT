@@ -113,7 +113,7 @@ float snoise(vec3 v)
 
 
 #define SunWidth (1.f)
-//define SunWidth (108.f)
+//#define SunWidth (108.f)
 
 // version 3D cartésienne
 void main()

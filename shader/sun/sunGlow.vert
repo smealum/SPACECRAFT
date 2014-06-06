@@ -127,7 +127,7 @@ void main()
 	vec3 posi = SunWidth * 1.5 * position;
 	c2p = (view * model * vec4(posi,0.0) ).xyz;
 	e2p = (view * model * vec4(posi,1.0) ).xyz;
-	posi *= (1.0+0.08*snoise(posi.xyz+time));
+	posi *= (1.0+0.05*snoise(posi.xyz+time));
 	vec4 pos = proj * view * model * vec4(posi, 1.0);
 
     gl_Position = logDepth(pos);

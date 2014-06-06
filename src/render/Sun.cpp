@@ -4,6 +4,7 @@
 #include "utils/glm.h"
 
 #define SunWidth (108.0f)
+//#define SunWidth (1.0f)
 
 using namespace std;
 using namespace glm;
@@ -29,7 +30,7 @@ void Sun::draw(Camera& c)
 	glm::vec3 p=c.getPosition();
 	
 	double l = length(p-position)/SunWidth;
-	lod=clamp(40.0/log(l),3.0,4.0);
+	lod=clamp(4.f/log(glm::max(l,1.1)),3.0,4.0);
 
 	// update time
     float delta = Application::getInstance().getFrameDeltaTime();
@@ -50,6 +51,7 @@ void Sun::draw(Camera& c)
 		// draw
 		SphereManager::getInstance().draw(c,shader,lod);
 		//glEnable(GL_CULL_FACE);
+	
 
 
 }

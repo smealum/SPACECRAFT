@@ -16,6 +16,7 @@
 #define EARTH_SUN (8.0)
 // real value
 //#define EARTH_SUN (23400.0)
+//#define EARTH_SUN (110)
 
 float PlanetFaceDetailsPower = 35.0;
 
@@ -272,6 +273,7 @@ void Application::loop()
 
     glfwSwapBuffers(window);
     glfwPollEvents();
+
 }
 
 Application::~Application()
