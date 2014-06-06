@@ -177,3 +177,24 @@ void MiniWorldDataRequest::update(void)
 	miniworld->getPointer()->updateChunks(data, vArray);
 	miniworld->release();
 }
+
+//MiniWorldDeletionRequest stuff
+MiniWorldDeletionRequest::MiniWorldDeletionRequest(MiniWorld& mw)
+{
+	miniworld=mw.getTptr();
+	miniworld->grab();
+}
+
+MiniWorldDeletionRequest::~MiniWorldDeletionRequest()
+{}
+
+void MiniWorldDeletionRequest::process(int id)
+{
+	if(miniworld->getNumRef()>1)return;
+	miniworld->release();
+}
+
+void MiniWorldDeletionRequest::update(void)
+{
+
+}

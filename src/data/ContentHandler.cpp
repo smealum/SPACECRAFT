@@ -6,9 +6,14 @@ ContentHandler::ContentHandler(int numProducers)
 	for(int i=0;i<numProducers;i++)producers.push_back(new Producer(i, inputQueue, outputQueue));
 }
 
-void ContentHandler::requestContent(ContentRequest* req)
+void ContentHandler::requestContent(ContentRequest* req, bool release)
 {
-	inputQueue.push(req);
+	inputQueue.push(req,release);
+}
+
+void ContentHandler::manualReleaseInput(void)
+{
+	inputQueue.manualRelease();
 }
 
 void ContentHandler::handleNewContent(void)

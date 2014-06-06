@@ -32,16 +32,32 @@ void main()
 	vec3 v2=gv2[0]*gsize[0];
 
 	vec4 v[8];
+	float c[5];
 
+	v[0]=vec4(gminElevation[0]*normalize(pos[0]-v1-v2),1.0);
+	v[1]=vec4(gminElevation[0]*normalize(pos[0]+v1-v2),1.0);
+	v[2]=vec4(gminElevation[0]*normalize(pos[0]-v1+v2),1.0);
+	v[3]=vec4(gminElevation[0]*normalize(pos[0]+v1+v2),1.0);
+	v[4]=vec4(gelevation[0]*normalize(pos[0]-v1-v2),1.0);
+	v[5]=vec4(gelevation[0]*normalize(pos[0]+v1-v2),1.0);
+	v[6]=vec4(gelevation[0]*normalize(pos[0]-v1+v2),1.0);
+	v[7]=vec4(gelevation[0]*normalize(pos[0]+v1+v2),1.0);
+
+	c[0]=((dot(lightdir,normalize(vec3(v[0])))+1.0)/2.0)/255.0;
+	c[1]=((dot(lightdir,normalize(vec3(v[1]-v[0])))+1.0)/2.0)/255.0;
+	c[2]=((dot(lightdir,normalize(vec3(v[0]-v[1])))+1.0)/2.0)/255.0;
+	c[3]=((dot(lightdir,normalize(vec3(v[0]-v[2])))+1.0)/2.0)/255.0;
+	c[4]=((dot(lightdir,normalize(vec3(v[2]-v[0])))+1.0)/2.0)/255.0;
+	
 	mat4 projViewModel = proj*view*model;
-	v[0]= projViewModel * vec4(gminElevation[0]*normalize(pos[0]-v1-v2),1.0);
-	v[1]= projViewModel * vec4(gminElevation[0]*normalize(pos[0]+v1-v2),1.0);
-	v[2]= projViewModel * vec4(gminElevation[0]*normalize(pos[0]-v1+v2),1.0);
-	v[3]= projViewModel * vec4(gminElevation[0]*normalize(pos[0]+v1+v2),1.0);
-	v[4]= projViewModel * vec4(gelevation[0]*normalize(pos[0]-v1-v2),1.0);
-	v[5]= projViewModel * vec4(gelevation[0]*normalize(pos[0]+v1-v2),1.0);
-	v[6]= projViewModel * vec4(gelevation[0]*normalize(pos[0]-v1+v2),1.0);
-	v[7]= projViewModel * vec4(gelevation[0]*normalize(pos[0]+v1+v2),1.0);
+	v[0]=projViewModel*v[0];
+	v[1]=projViewModel*v[1];
+	v[2]=projViewModel*v[2];
+	v[3]=projViewModel*v[3];
+	v[4]=projViewModel*v[4];
+	v[5]=projViewModel*v[5];
+	v[6]=projViewModel*v[6];
+	v[7]=projViewModel*v[7];
 
 	/*
 
@@ -57,8 +73,7 @@ void main()
 
 	fcolor.a = 1.0;
 
-	float lightcoef=((dot(lightdir,normalize(vec3(v[0])))+1.0)/2.0)/255.0;
-	fcolor.rgb = gcolor[0].rgb * vec3(84,124,60) * lightcoef;
+	fcolor.rgb = gcolor[0].rgb * vec3(84,124,60) * c[0];
 	
 	// TOP FACE
 	gl_Position = logDepth(v[5]); EmitVertex();
@@ -67,8 +82,7 @@ void main()
 	gl_Position = logDepth(v[6]); EmitVertex();
 	EndPrimitive();
 
-	lightcoef=((dot(lightdir,normalize(vec3(v[1]-v[0])))+1.0)/2.0)/255.0;
-	fcolor.rgb = gcolor[0].rgb * vec3(161,103,88) * lightcoef;
+	fcolor.rgb = gcolor[0].rgb * vec3(161,103,88) * c[1];
 
 	// LEFT FACE
 	gl_Position = logDepth(v[0]); EmitVertex();
@@ -77,8 +91,7 @@ void main()
 	gl_Position = logDepth(v[6]); EmitVertex();
 	EndPrimitive();
 
-	lightcoef=((dot(lightdir,normalize(vec3(v[0]-v[1])))+1.0)/2.0)/255.0;
-	fcolor.rgb = gcolor[0].rgb * vec3(161,103,88) * lightcoef;
+	fcolor.rgb = gcolor[0].rgb * vec3(161,103,88) * c[2];
 
 	// RIGHT FACE
 	gl_Position = logDepth(v[3]); EmitVertex();
@@ -87,8 +100,7 @@ void main()
 	gl_Position = logDepth(v[5]); EmitVertex();
 	EndPrimitive();
 
-	lightcoef=((dot(lightdir,normalize(vec3(v[0]-v[2])))+1.0)/2.0)/255.0;
-	fcolor.rgb = gcolor[0].rgb * vec3(161,103,88) * lightcoef;
+	fcolor.rgb = gcolor[0].rgb * vec3(161,103,88) * c[3];
 
 	// FRONT FACE
 	gl_Position = logDepth(v[1]); EmitVertex();
@@ -97,8 +109,7 @@ void main()
 	gl_Position = logDepth(v[4]); EmitVertex();
 	EndPrimitive();
 
-	lightcoef=((dot(lightdir,normalize(vec3(v[2]-v[0])))+1.0)/2.0)/255.0;
-	fcolor.rgb = gcolor[0].rgb * vec3(161,103,88) * lightcoef;
+	fcolor.rgb = gcolor[0].rgb * vec3(161,103,88) * c[4];
 
 	// BACK FACE
 	gl_Position = logDepth(v[2]); EmitVertex();

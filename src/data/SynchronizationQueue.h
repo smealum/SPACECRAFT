@@ -11,7 +11,8 @@ class SynchronizationQueue
 	public:
 		SynchronizationQueue(void);
 		void popAll(std::queue<T>& ret);
-		void push(T t);
+		void push(T t, bool release=true);
+		void manualRelease(void);
 		T pop(void);
 	private:
 		sf::Mutex mutex;
@@ -25,10 +26,16 @@ SynchronizationQueue<T>::SynchronizationQueue(void)
 }
 
 template<class T>
-void SynchronizationQueue<T>::push(T t)
+void SynchronizationQueue<T>::push(T t, bool release)
 {
 	mutex.lock();
 		queue.push(t);
+	if(release)mutex.unlock();
+}
+
+template<class T>
+void SynchronizationQueue<T>::manualRelease(void)
+{
 	mutex.unlock();
 }
 

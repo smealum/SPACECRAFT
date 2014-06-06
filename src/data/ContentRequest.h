@@ -12,7 +12,7 @@ class ContentRequest
 		virtual void process(int id)=0;
 		virtual void update()=0;
 		virtual ~ContentRequest() {}
-	private:		
+	private:
 };
 
 #include "Planet.h"
@@ -43,13 +43,13 @@ class WorldChunkRequest : public ContentRequest
 		virtual ~WorldChunkRequest();
 		
 	private:
-        chunkVal data[(CHUNK_N+2)][(CHUNK_N+2)][(CHUNK_N+2)];
-        int px, py, pz;
-        float elevation;
+		chunkVal data[(CHUNK_N+2)][(CHUNK_N+2)][(CHUNK_N+2)];
+		int px, py, pz;
+		float elevation;
 		glm::vec3 origin, v1, v2;
 		Planet& planet;
 		TrackerPointer<Chunk>* chunk;
-        std::vector<GL_Vertex> vArray;
+		std::vector<GL_Vertex> vArray;
 };
 
 #include "MiniWorld.h"
@@ -63,12 +63,24 @@ class MiniWorldDataRequest : public ContentRequest
 		virtual ~MiniWorldDataRequest();
 		
 	private:
-        chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)];
-        int px, py, pz;
+		chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)];
+		int px, py, pz;
 		glm::vec3 origin, v1, v2;
 		Planet& planet;
 		TrackerPointer<MiniWorld>* miniworld;
-        std::vector<GL_Vertex> vArray[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];
+		std::vector<GL_Vertex> vArray[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];
+};
+
+class MiniWorldDeletionRequest : public ContentRequest
+{
+	public:
+		MiniWorldDeletionRequest(MiniWorld& mw);
+		void process(int id);
+		void update(void);
+		virtual ~MiniWorldDeletionRequest();
+		
+	private:
+		TrackerPointer<MiniWorld>* miniworld;
 };
 
 typedef SynchronizationQueue<ContentRequest*> ContentInputQueue;
