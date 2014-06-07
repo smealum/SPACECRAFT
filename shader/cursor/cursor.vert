@@ -4,7 +4,7 @@
 
 in vec3 offset;
 
-uniform mat4 model, view, proj;
+uniform mat4 planetModel, model, view, proj;
 uniform float logconst, zfar;
 uniform vec3 position;
 uniform vec3 origin, v1, v2;
@@ -23,6 +23,6 @@ void main()
 	vec3 pos2=v1*pos1.x+v2*pos1.z;
 	float y=1.0+pos1.y/numBlocks;
 
-	vec4 r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
+	vec4 r = proj * view * planetModel * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = logDepth(r);
 }

@@ -149,11 +149,9 @@ bool PlanetFace::shouldHaveMiniworld(Camera& c)
 	{
 		if (miniworld)
 		{
-			glm::vec3 p=c.getPosition();
+			glm::vec3 p=c.getPosition(planet->getPosition());
 			return glm::length(vertex[4]*elevation-p)*(2<<(depth))<20.0f;
-		}
-		else
-		{
+		}else{
 			return (childrenDepth >= PLANET_ADDED_DETAIL);
 		}
 	}
@@ -165,7 +163,7 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	if(depth>MINIWORLD_DETAIL+PLANET_ADDED_DETAIL+1)return true;
 	if(depth<4)return false;
 
-	glm::vec3 p=c.getPosition();
+	glm::vec3 p=c.getPosition(planet->getPosition());
 	if(glm::dot(vertex[0]*0.99f-p,vertex[0])>0.0f
 	&& glm::dot(vertex[1]*0.99f-p,vertex[1])>0.0f
 	&& glm::dot(vertex[2]*0.99f-p,vertex[2])>0.0f
@@ -287,7 +285,9 @@ Planet::Planet(PlanetInfo &pi, ContentHandler& ch):
 	planetInfo(pi),
 	handler(ch),
 	generators(ch.getMaxProducers()),
-	sunPosition(8.0,0.0,0.0)
+	sunPosition(8.0,0.0,0.0),
+	position(0.0,0.0,-2.0), //TEMP
+	atmosphere(position)
 {
 	for(int i=0;i<ch.getMaxProducers();i++)generators[i] = new PlanetGenerator(planetInfo);
 	
@@ -403,6 +403,7 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 	shader.setUniform("v1", v1);
 	shader.setUniform("v2", v2);
 	shader.setUniform("lightdir", lightdir);
+	shader.setUniform("planetPos", planetFace.planet->position);
 
 	// //planetface_atmosphere test
 	// planetFace.planet->atmosphere.bind(c,lightdir,shader);
@@ -418,7 +419,7 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 void Planet::draw(Camera& c)
 {
 	// TODO position de la planete
-	lightdir=glm::normalize(sunPosition); // - position planete
+	lightdir=glm::normalize(sunPosition-position);
 
 	for(int i=0;i<6;i++)faceBuffers[i]->draw(c, lightdir);
 
@@ -469,14 +470,18 @@ Chunk* Planet::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& d
 
 glm::dvec3 Planet::getGravityVector(glm::dvec3 p)
 {
-	return glm::normalize(p);
+	return glm::normalize(p-glm::dvec3(position));
 }
 
-void Planet::setSunPosition(glm::vec3 position)
+glm::vec3 Planet::getPosition(void)
 {
-	sunPosition = position;
+	return position;
 }
 
+void Planet::setSunPosition(glm::vec3 p)
+{
+	sunPosition=p;
+}
 
 //TODO : filtrer par toplevel (en pratique devrait pas être nécessaire, mais on sait jamais)
 void Planet::changeBlock(glm::i32vec3 p, blockTypes::T v)

@@ -11,7 +11,8 @@ static GLfloat vertices[] =
 
 Cursor::Cursor():
 	affected(false),
-	shader(ShaderProgram::loadFromFile("shader/cursor/cursor.vert", "shader/cursor/cursor.frag", "cursor"))
+	shader(ShaderProgram::loadFromFile("shader/cursor/cursor.vert", "shader/cursor/cursor.frag", "cursor")),
+	planetModel(glm::mat4(1.0f))
 {
 	//generate VBO
 	glGenBuffers(1, &vbo);
@@ -76,6 +77,7 @@ void Cursor::draw(Camera& c)
 	}
 
 	shader.setUniform("model", model);
+	shader.setUniform("planetModel", planetModel);
 	
 	shader.setUniform("origin", origin);
 	shader.setUniform("v1", v1);
@@ -86,7 +88,7 @@ void Cursor::draw(Camera& c)
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 12);
 }
 
-void Cursor::setPosition(glm::i32vec3 pos, int dir, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2)
+void Cursor::setPosition(glm::i32vec3 pos, int dir, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2, glm::mat4 planetModel)
 {
 	affected=true;
 	this->dir=dir;
@@ -94,6 +96,7 @@ void Cursor::setPosition(glm::i32vec3 pos, int dir, glm::vec3 origin, glm::vec3 
 	this->origin=origin;
 	this->v1=v1;
 	this->v2=v2;
+	this->planetModel=planetModel;
 }
 
 void Cursor::unaffect(void)

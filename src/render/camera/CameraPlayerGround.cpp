@@ -57,7 +57,7 @@ void CameraPlayerGround::update(Camera& camera)
 
 		speedVect+=localSpeedVect+g*gS; //gravité
 
-		glm::dvec3 tp=camera.getPositionDouble()-g*(1.0/PLANETFACE_BLOCKS);
+		glm::dvec3 tp=camera.getPositionDouble(glm::dvec3(testPlanet->getPosition()))-g*(1.0/PLANETFACE_BLOCKS);
 		glm::dvec3 out;
 		bool ret=testPlanet->collidePoint(tp,-speedVect,out);
 		speedVect=tp-out;
@@ -77,11 +77,11 @@ void CameraPlayerGround::update(Camera& camera)
 	//selection
 	{
 		const double range=1e-5; //~3 blocks
-		glm::dvec3 g=testPlanet->getGravityVector(camera.pos);
+		glm::dvec3 g=testPlanet->getGravityVector(camera.getPositionDouble(glm::dvec3(0.0)));
 		glm::i32vec3 out;
 		glm::dvec3 v(-glm::transpose(camera.view3)[2]);
 		int dir;
-		Chunk* ret=testPlanet->selectBlock(camera.pos, v*range, out, dir);
+		Chunk* ret=testPlanet->selectBlock(camera.getPositionDouble(glm::dvec3(testPlanet->getPosition())), v*range, out, dir);
 
 		// printf("v %f %f %f (%f)\n",v.x,v.y,v.z,glm::dot(v,g));
 		if(ret)
@@ -91,7 +91,8 @@ void CameraPlayerGround::update(Camera& camera)
 			else if(Input::isKeyPressed(GLFW_KEY_C))
 			{
 				//TODO : check que player n'intersecte pas avec le nouveau bloc...
-				blockTypes::T t=blockTypes::water;
+				blockTypes::T t=blockTypes::dirt;
+				// blockTypes::T t=blockTypes::water;
 				switch(dir)
 				{
 					case 0: testPlanet->changeBlock(out-glm::i32vec3(1,0,0),t); break;
@@ -102,7 +103,7 @@ void CameraPlayerGround::update(Camera& camera)
 					case 5: testPlanet->changeBlock(out+glm::i32vec3(0,0,1),t); break;
 				}
 			}
-			testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2);
+			testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2,glm::translate(glm::mat4(1.0f),testPlanet->getPosition()));
 		}else{
 			// printf("no block !\n");
 			testCursor->unaffect();

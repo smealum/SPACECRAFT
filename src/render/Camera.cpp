@@ -25,14 +25,14 @@ void Camera::updateCamera(ShaderProgram &prog)
 	prog.setUniform("logconst", 2.0f/log2(zfar+1.0f));
 }
 
-glm::vec3 Camera::getPosition(void)
+glm::vec3 Camera::getPosition(glm::vec3 ref)
 {
-	return vec3(pos);
+	return vec3(pos)-ref;
 }
 
-glm::dvec3 Camera::getPositionDouble(void)
+glm::dvec3 Camera::getPositionDouble(glm::dvec3 ref)
 {
-	return pos;
+	return pos-ref;
 }
 
 void Camera::updateFrustum(void)
@@ -93,14 +93,14 @@ bool Camera::isBoxInFrustum(vec3 o, vec3 v1, vec3 v2, vec3 v3)
 }
 
 //idem, mais pas forcément une vraie boite, juste un ensemble de n points
-bool Camera::isBoxInFrustum(vec3 p[], int n)
+bool Camera::isBoxInFrustum(vec3 p[], int n, glm::mat4 model)
 {
     for(int i=0;i<6;i++)
     {
         int in=0, out=0;
         for(int j=0;j<n && (!in || !out);j++)
         {
-            if(dot(vec4(p[j],1.0f),frustumPlane[i])<0.0f)out++;
+            if(dot(model*vec4(p[j],1.0f),frustumPlane[i])<0.0f)out++;
             else in++;
         }
         if(!in)return false;

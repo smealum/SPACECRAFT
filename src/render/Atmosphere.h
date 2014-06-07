@@ -22,7 +22,7 @@
 class Atmosphere
 {
 	public:
-		Atmosphere();
+		Atmosphere(glm::vec3 position);
 		~Atmosphere();
 
 		void initLightConstants(void);
@@ -36,6 +36,8 @@ class Atmosphere
 
 	private:
 		ShaderProgram& shader;
+
+		glm::vec3 position;
 
 		int m_nSamples;
 		float m_Kr, m_Kr4PI;

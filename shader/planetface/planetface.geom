@@ -8,6 +8,7 @@ layout(triangle_strip, max_vertices = 20) out;
 uniform mat4 model, view, proj;
 uniform float logconst, zfar;
 uniform vec3 lightdir;
+uniform vec3 planetPos;
 
 in vec3 pos[];
 in vec4 gcolor[];
@@ -22,8 +23,8 @@ out vec4 fcolor;
 void main()
 {
 	// on n'affiche plus les blocs qui sont de l'autre côté de la planete
-	vec4 PlanetCenter = view*model*vec4(0.0,0.0,0.0,1.0);
-	vec4 BlocPosition = view*model*vec4(pos[0],1.0);
+	vec4 PlanetCenter = view*model*vec4(planetPos,1.0);
+	vec4 BlocPosition = view*model*vec4(pos[0]+planetPos,1.0);
 	if ( dot(BlocPosition,normalize(PlanetCenter)) > length(PlanetCenter) )
 		return;
 
@@ -51,14 +52,14 @@ void main()
 	c[4]=(max(dot(lightdir,normalize(vec3(v[2]-v[0]))),0.0)+ambient)/255.0;
 	
 	mat4 projViewModel = proj*view*model;
-	v[0]=projViewModel*v[0];
-	v[1]=projViewModel*v[1];
-	v[2]=projViewModel*v[2];
-	v[3]=projViewModel*v[3];
-	v[4]=projViewModel*v[4];
-	v[5]=projViewModel*v[5];
-	v[6]=projViewModel*v[6];
-	v[7]=projViewModel*v[7];
+	v[0]=projViewModel*(planetPos+v[0]);
+	v[1]=projViewModel*(planetPos+v[1]);
+	v[2]=projViewModel*(planetPos+v[2]);
+	v[3]=projViewModel*(planetPos+v[3]);
+	v[4]=projViewModel*(planetPos+v[4]);
+	v[5]=projViewModel*(planetPos+v[5]);
+	v[6]=projViewModel*(planetPos+v[6]);
+	v[7]=projViewModel*(planetPos+v[7]);
 
 	/*
 

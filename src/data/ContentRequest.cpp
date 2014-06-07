@@ -90,7 +90,8 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 
 					//TEMP (pour tester)
 
-					if(height<CHUNK_N*MINIWORLD_H/2.f+12)
+					const int waterHeight=CHUNK_N*MINIWORLD_H/2.f+12;
+					if(height<waterHeight)
 					{
 						//UNDER THE SEAAAAAA
 						for(int cy=0;cy<h;cy++)
@@ -100,6 +101,7 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 							for(int j=0;j<(CHUNK_N+2);j++)
 							{
 								if (vy+py+j <= height) data[yPos]=blockTypes::sand;
+								else if (vy+py+j <= waterHeight) data[yPos]=blockTypes::water;
 								else data[yPos]=blockTypes::air;
 								yPos+=(CHUNK_N+2);
 							}

@@ -133,12 +133,13 @@ class Planet
 		class ContentHandler& handler;
 
 		glm::dvec3 getGravityVector(glm::dvec3 p);
+		glm::vec3 getPosition(void);
 		inline float getElevation(int id, const glm::vec3 &coord)
 		{
 			return generators[id]->getElevation(coord);
 		}
 		
-		void setSunPosition(glm::vec3 position);
+		void setSunPosition(glm::vec3 p);
 
 		//TEMP
 		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
@@ -152,6 +153,7 @@ class Planet
 
 		glm::vec3 lightdir;
 		glm::vec3 sunPosition;
+		glm::vec3 position;
 
 		Cloud cloud;
 		Atmosphere atmosphere;

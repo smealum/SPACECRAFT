@@ -27,9 +27,9 @@ Sun::Sun():
 void Sun::draw(Camera& c)
 {
 	// mise a jour du levelOfDetails
-	glm::vec3 p=c.getPosition();
+	glm::vec3 p=c.getPosition(position);
 	
-	double l = length(p-position)/SunWidth;
+	double l = length(p)/SunWidth;
 	lod=clamp(4.f/log(glm::max(l,1.1)),3.0,4.0);
 
 	// update time

@@ -3,7 +3,7 @@
 
 MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 	planet(p),
-	model(glm::mat4(1.0f)),
+	model(glm::translate(glm::mat4(1.0f),planet->getPosition())),
     tptr(new TrackerPointer<MiniWorld>(this, true)),
 	face(pf),
 	origin(face->toplevel->uvertex[0]),

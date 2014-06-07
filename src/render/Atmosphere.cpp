@@ -2,11 +2,12 @@
 #include "Atmosphere.h"
 #include "utils/SphereManager.h"
 
-Atmosphere::Atmosphere():
+Atmosphere::Atmosphere(glm::vec3 position):
 	shader(ShaderProgram::loadFromFile("shader/atmosphere/atmosphere.vert", "shader/atmosphere/atmosphere.frag", "atmosphere")),
 	m_fInnerRadius(1.0f),
 	m_fOuterRadius(1.05f),
-	lod(6)
+	lod(6),
+	position(position)
 {
 	initLightConstants();
 
@@ -190,7 +191,7 @@ void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, ShaderProgram& sprogr
 {
 	sprogram.use();
 
-	sprogram.setUniform("cameraPosition", c.getPosition());
+	sprogram.setUniform("cameraPosition", c.getPosition(position));
 	sprogram.setUniform("lightDirection", lightDirection);
 	sprogram.setUniform("m_fWavelength4", m_fWavelength4);
 	sprogram.setUniform("m_g", m_g);
@@ -219,7 +220,7 @@ void Atmosphere::draw(Camera& c, glm::vec3 lightDirection)
 	bind(c, lightDirection);
 	
 	shader.setUniform("sky", true);
-	shader.setUniform("model", glm::mat4(1.f));
+	shader.setUniform("model", glm::translate(glm::mat4(1.f),position));
 
 	c.updateCamera(shader);
 
