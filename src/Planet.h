@@ -107,7 +107,7 @@ class PlanetFace
 		uint8_t id;
 		int depth;
 		int childrenDepth;
-		bool isDrawingFace;
+		inline bool isDrawingFace() {return bufferID>=0;}
 		bool isDisplayOk;
 };
 

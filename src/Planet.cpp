@@ -34,7 +34,6 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	z(0),
 	depth(0),
 	childrenDepth(0),
-	isDrawingFace(false),
 	isDisplayOk(false)
 {
 	uvertex[0]=v[0]; uvertex[1]=v[1];
@@ -219,7 +218,7 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 	// update isDisplayOk
 	// isDisplayOk est vrai si on affiche une face ou bien un miniworld ou que tout les enfants 
 	// sont présents et on isDisplayOk.
-	isDisplayOk = isDrawingFace || (miniworld && miniworld->isGenerated());
+	isDisplayOk = isDrawingFace() || (miniworld && miniworld->isGenerated());
 	if (!isDisplayOk)
 	{
 		isDisplayOk = true;
@@ -404,7 +403,6 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 	pf->bufferID=curSize;
 	curSize++;
 
-	pf->isDrawingFace = true;
 	pf->isDisplayOk = true;
 }
 
@@ -427,7 +425,6 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 	pf->bufferID=-1;
 	faces.pop_back();
 	curSize--;
-	pf->isDrawingFace = false;
 	pf->isDisplayOk = false;
 }
 
