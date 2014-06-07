@@ -93,6 +93,7 @@ class PlanetFace
 
 		class MiniWorld* miniworld;
 
+
 		glm::vec3 vertex[9];
 		glm::vec3 uvertex[9];
 
@@ -106,6 +107,8 @@ class PlanetFace
 		uint8_t id;
 		int depth;
 		int childrenDepth;
+		bool isDrawingFace;
+		bool isDisplayOk;
 };
 
 class Planet

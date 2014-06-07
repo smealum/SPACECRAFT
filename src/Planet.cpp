@@ -33,7 +33,9 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	x(0),
 	z(0),
 	depth(0),
-	childrenDepth(0)
+	childrenDepth(0),
+	isDrawingFace(false),
+	isDisplayOk(false)
 {
 	uvertex[0]=v[0]; uvertex[1]=v[1];
 	uvertex[2]=v[2]; uvertex[3]=v[3];
@@ -212,24 +214,47 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 		if(sons[i])
 			childrenDepth = max(childrenDepth,(sons[i]->childrenDepth + 1));
 
+	// update isDisplayOk
+	// isDisplayOk est vrai si on affiche une face ou bien un miniworld ou que tout les enfants 
+	// sont présents et on isDisplayOk.
+	isDisplayOk = isDrawingFace || (miniworld && miniworld->isGenerated());
+	if (!isDisplayOk)
+	{
+		isDisplayOk = true;
+		for(int i=0;i<4;i++)
+			if(!sons[i] || !sons[i]->isDisplayOk)
+			{
+				isDisplayOk = false;
+				break;
+			}
+		
+	}
+
 	// face assez détaillé, on l'affiche
 	if(isDetailedEnough(c))
 	{
-		// suppression des éventuels enfants
-		for(int i=0;i<4;i++)
-			if(sons[i])
-				sons[i]->deletePlanetFace(b);
-
-		// suppresion des éventuels miniWorld
-		removeMiniWorld();
 
 		// dessin de la face
 		if (elevated)
-			b->addFace(this);
+		{
+			b->addFace(this); 
+
+			// suppresion des éventuels miniWorlds si on a la face qui s'affiche
+			removeMiniWorld();
+
+			// suppression des éventuels enfants
+			for(int i=0;i<4;i++)
+				if(sons[i])
+					sons[i]->deletePlanetFace(b);
+		}
 	}else{
 		// creation/destruction du miniWorld
 		if(shouldHaveMiniworld(c))
 		{
+			// creation du miniworld
+			createMiniWorld();
+
+			// effacement des enfants et de l'affichage de la face
 			if(miniworld && miniworld->isGenerated())
 			{
 				b->deleteFace(this);
@@ -239,10 +264,8 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 						sons[i]->deletePlanetFace(b);
 			}
 			
-			// creation du miniworld
-			createMiniWorld();
 		}else{
-			// suppresion du MiniWorld
+			// suppresion des éventuels miniWorlds si on a la face qui s'affiche
 			removeMiniWorld();
 
 			// ajout des éventuels enfants
@@ -253,10 +276,13 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 					sons[i]->processLevelOfDetail(c, b);
 				else
 					sons[i]=new PlanetFace(planet,this,i);
-				if(!sons[i]->elevated)
-					done=false;
+				done &= sons[i]->elevated;
+				done &= sons[i]->isDisplayOk;
 			}
-			if(done)b->deleteFace(this);
+
+			// on peux ne plus afficher la face si les enfants sont là et affichent.
+			if (done)
+				b->deleteFace(this);
 		}
 
 	}
@@ -369,6 +395,7 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 {
 	if(curSize>=maxSize || pf->bufferID>=0)return;
+	pf->isDrawingFace = true;
 	changeFace(pf, curSize);
 	pf->bufferID=curSize;
 	curSize++;
@@ -378,6 +405,7 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 {
 	const int i=pf->bufferID;
 	if(i>=curSize || i<0)return;
+	pf->isDrawingFace = false;
 
 	if(faces.size()>1)
 	{

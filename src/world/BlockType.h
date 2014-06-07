@@ -66,8 +66,13 @@ namespace blockStyle
 	};
 }
 
+// donne l'ID de tile pour un bloc et une orientation
 extern int blockTileID[blockTypes::max][blockPlane::max];
+
+// donne l'ID de transparence d'un bloc
 extern uint8_t blockTransparencyID[blockTypes::max];
+
+// donne l'ID de style d'un bloc
 extern uint8_t blockStyleID[blockTypes::max];
 
 bool blockShouldBeFace(int type1, int type2);
