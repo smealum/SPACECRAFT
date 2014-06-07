@@ -105,11 +105,13 @@ PlanetFace::~PlanetFace()
 void PlanetFace::deletePlanetFace(PlanetFaceBufferHandler* b)
 {
 	b->deleteFace(this);
-	if(!father)
+
+	// delete children
+	for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
+
+	// inform father
+	if(father)
 	{
-		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
-	}else{
-		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
 		father->sons[id]=NULL;
 		tptr->release();
 	}
@@ -222,18 +224,19 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 	{
 		isDisplayOk = true;
 		for(int i=0;i<4;i++)
-			if(!sons[i] || !sons[i]->isDisplayOk)
+		{
+			if( (!sons[i]) || !(sons[i]->isDisplayOk))
 			{
 				isDisplayOk = false;
 				break;
 			}
-		
+		}
 	}
+
 
 	// face assez détaillé, on l'affiche
 	if(isDetailedEnough(c))
 	{
-
 		// dessin de la face
 		if (elevated)
 		{
@@ -257,6 +260,7 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 			// effacement des enfants et de l'affichage de la face
 			if(miniworld && miniworld->isGenerated())
 			{
+				// suppresion de la face
 				b->deleteFace(this);
 				// suppression des éventuels enfants
 				for(int i=0;i<4;i++)
@@ -265,24 +269,25 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 			}
 			
 		}else{
-			// suppresion des éventuels miniWorlds si on a la face qui s'affiche
-			removeMiniWorld();
 
 			// ajout des éventuels enfants
 			bool done=true;
 			for(int i=0;i<4;i++)
 			{
-				if(sons[i])
-					sons[i]->processLevelOfDetail(c, b);
-				else
+				if(!sons[i])
 					sons[i]=new PlanetFace(planet,this,i);
-				done &= sons[i]->elevated;
-				done &= sons[i]->isDisplayOk;
+
+				sons[i]->processLevelOfDetail(c, b);
+
+				done &= ( sons[i]->isDisplayOk );
 			}
 
-			// on peux ne plus afficher la face si les enfants sont là et affichent.
+			// on peux ne plus afficher la face si les enfants affichent quelque chose.
 			if (done)
+			{
 				b->deleteFace(this);
+				removeMiniWorld();
+			}
 		}
 
 	}
@@ -395,17 +400,18 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 {
 	if(curSize>=maxSize || pf->bufferID>=0)return;
-	pf->isDrawingFace = true;
 	changeFace(pf, curSize);
 	pf->bufferID=curSize;
 	curSize++;
+
+	pf->isDrawingFace = true;
+	pf->isDisplayOk = true;
 }
 
 void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 {
 	const int i=pf->bufferID;
 	if(i>=curSize || i<0)return;
-	pf->isDrawingFace = false;
 
 	if(faces.size()>1)
 	{
@@ -421,6 +427,8 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 	pf->bufferID=-1;
 	faces.pop_back();
 	curSize--;
+	pf->isDrawingFace = false;
+	pf->isDisplayOk = false;
 }
 
 void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)

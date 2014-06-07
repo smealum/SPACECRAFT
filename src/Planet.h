@@ -15,7 +15,7 @@
 
 #define PLANET_ADDED_DETAIL (4)
 // #define PFBH_MAXSIZE (1024*16)
-#define PFBH_MAXSIZE (1024*256)
+#define PFBH_MAXSIZE (1024*512)
 
 typedef struct
 {
