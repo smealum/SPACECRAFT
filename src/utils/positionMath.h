@@ -8,22 +8,22 @@
 
 static inline float elevationToBlockHeight(float e)
 {
-	return (e-1.0f)*PLANETFACE_BLOCKS*2;
+	return (e-1.0f)*PLANETFACE_BLOCKS;
 }
 
 static inline float blockHeightToElevation(float y)
 {
-	return 1.0f+(y/float(PLANETFACE_BLOCKS*2));
+	return 1.0f+(y/float(PLANETFACE_BLOCKS));
 }
 
 static inline double delevationToBlockHeight(double e)
 {
-	return (e-1.0)*PLANETFACE_BLOCKS*2;
+	return (e-1.0)*PLANETFACE_BLOCKS;
 }
 
 static inline double dblockHeightToElevation(double y)
 {
-	return 1.0+(y/float(PLANETFACE_BLOCKS*2));
+	return 1.0+(y/float(PLANETFACE_BLOCKS));
 }
 
 static inline glm::vec3 spaceToBlock(glm::vec3 p, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2, glm::vec3 n)
@@ -52,7 +52,7 @@ static inline glm::dvec3 dspaceToBlock(glm::dvec3 p, glm::dvec3 origin, glm::dve
 {
 	glm::dvec3 blockPos;
 	glm::dvec3 unprojectedPos=(p*(glm::dot(origin,n)/glm::dot(p,n)))-origin;
-
+	
 	//calcul de la position en blocs dans la toplevel
 	blockPos.x=(glm::dot(unprojectedPos,glm::normalize(v1))*PLANETFACE_BLOCKS)/glm::length(v1);
 	blockPos.y=delevationToBlockHeight(glm::length(p));
