@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include "utils/TextureManager.h"
 #include "utils/dbg.h"
+#include "utils/gldbg.h"
 #include <iostream>
 using namespace std;
 
@@ -34,6 +35,8 @@ void imageFree(unsigned char * data)
 // load a 256x256 RGB .RAW file as a texture
 GLuint TextureManager::loadTexture(const std::string& filename)
 {
+	glCheckError("Flush Previous Errors");
+
 	auto it(textures.find(filename));
 	if (it != textures.end())
 		return it->second.id;
@@ -65,11 +68,15 @@ GLuint TextureManager::loadTexture(const std::string& filename)
 	textures[filename].width = width;
 	textures[filename].height = height;
 
+	glCheckError("Image load");
+
 	return texture;
 }
 
 GLuint TextureManager::loadTextureArray(const std::string& filename, int tileW, int tileH)
 {
+	glCheckError("Flush Previous Errors");
+	
 	auto it(textures.find(filename));
 	if (it != textures.end())
 		return it->second.id;
@@ -146,6 +153,13 @@ GLuint TextureManager::loadTextureArray(const std::string& filename, int tileW, 
 	glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_S,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_T,GL_REPEAT);
 
+	GLenum error = glGetError();
+	log_info("%d",error);
+	log_info("%d",GL_INVALID_ENUM);
+	log_info("%d",GL_INVALID_VALUE);
+	log_info("%d",GL_INVALID_FRAMEBUFFER_OPERATION);
+	log_info("%d",GL_OUT_OF_MEMORY);
+
 
 	free(data);
 	delete[] dataGL;
@@ -153,6 +167,8 @@ GLuint TextureManager::loadTextureArray(const std::string& filename, int tileW, 
 	textures[filename].id = texture;
 	textures[filename].width = tileW;
 	textures[filename].height = tileH;
+
+	glCheckError("Image Errors");
 
 	return texture;
 }

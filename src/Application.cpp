@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "utils/dbg.h"
+#include "utils/gldbg.h"
 #include <cstdlib>
 #include "utils/Input.h"
 #include "Planet.h"
@@ -69,6 +70,8 @@ Application::Application() :
     fps(0.f),
     fpsCounter(0)
 {
+	glCheckError("Flush Previous Errors");
+
     if (!glfwInit())
     {
         log_err("Cannot initialize glfw3...");
@@ -86,6 +89,8 @@ Application::Application() :
         TwInit(TW_OPENGL_CORE, NULL);
     #endif
 
+	glCheckError("Context creation Errors");
+
     // transparency
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -93,6 +98,9 @@ Application::Application() :
     glEnable(GL_TEXTURE_1D);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// FIXME (arthur)
+	glCheckError("GL State initialisation");
 
     #ifndef NTWBAR
         bar = TwNewBar("SPACECRAFT");
@@ -119,6 +127,8 @@ Application::Application() :
         glfwSetScrollCallback(window, (GLFWscrollfun)TwEventMouseWheelGLFW3);
         glfwSetKeyCallback(window, (GLFWkeyfun)TwEventKeyGLFW3);
         glfwSetCharCallback(window, (GLFWcharfun)TwEventCharGLFW3);
+	
+		glCheckError("tweak bar");
     #endif
 
     glewExperimental = GL_TRUE;
@@ -128,6 +138,8 @@ Application::Application() :
         glfwTerminate();
         std::exit(1);
     }
+
+	glCheckError("GLEWInit Errors");
 
 	blockTypeLoadValues();
 }
@@ -214,6 +226,13 @@ void Application::run()
             }
 			BlockAnimated::animation(deltaTime);
         }
+
+		// test des ereurs openGL non reporté:
+		{
+			static int i=0;
+			if (i++%30)
+				glCheckError("Unreported Error");
+		}
     }
 
 }
