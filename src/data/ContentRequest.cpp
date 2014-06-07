@@ -2,6 +2,7 @@
 #include "world/BlockType.h"
 #include "world/blockProcessing.h"
 #include "MiniWorld.h"
+#include "utils/positionMath.h"
 #include "utils/dbg.h"
 
 #include <cstdio>
@@ -22,12 +23,12 @@ PlanetElevationRequest::~PlanetElevationRequest()
 
 static inline float getElevation(int prod_id, Planet& planet, glm::vec3 v)
 {
-	return (planet.getElevation(prod_id, glm::normalize(v))+2.0f)/4.0f; //faut que ça nous sorte une valeur entre 0 et 1
+	return (planet.getElevation(prod_id, glm::normalize(v))+1.0f)/2.0f; //faut que ça nous sorte une valeur entre 0 et 1
 }
 
 void PlanetElevationRequest::process(int id)
 {
-	elevation=1.0f+(getElevation(id, planet, glm::normalize(coord))*CHUNK_N*MINIWORLD_H)/PLANETFACE_BLOCKS; //faudra passer par le helper hypothétique à terme, au cas où on aurait envie de changer les dimensions des blocs...
+	elevation=blockHeightToElevation(getElevation(id, planet, glm::normalize(coord))*CHUNK_N*MINIWORLD_H);
 }
 
 void PlanetElevationRequest::update(void)

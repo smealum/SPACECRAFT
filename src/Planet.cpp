@@ -202,6 +202,7 @@ static inline int max(int a, int b)
 {
 	return (a>b)?a:b;
 }
+
 void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 {
 	// update childrenDepth
