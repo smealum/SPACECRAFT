@@ -114,7 +114,7 @@ GLuint TextureManager::loadTextureArray(const std::string& filename, int tileW, 
 	glTexImage3D(
 			GL_TEXTURE_2D_ARRAY,
 			0, // mipmap level
-			GL_RGBA8, // format
+			GL_RGBA, // format
 			tileW, // tile width
 			tileH, // tile height
 			nTile, // number of tiles
