@@ -109,7 +109,21 @@ GLuint TextureManager::loadTextureArray(const std::string& filename, int tileW, 
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, texture);
-	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, tileW, tileH, nTile);
+	// XXX review
+	// J'ai remplacé glTexStorage3D par glTexImage3D
+	glTexImage3D(
+			GL_TEXTURE_2D_ARRAY,
+			0, // mipmap level
+			GL_RGBA8, // format
+			tileW, // tile width
+			tileH, // tile height
+			nTile, // number of tiles
+			0,	   // border, must be zero
+			GL_RGBA,
+			GL_UNSIGNED_BYTE,
+			NULL
+	);
+	//glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, tileW, tileH, nTile);
 	glTexSubImage3D(
 			GL_TEXTURE_2D_ARRAY,
 			0, // mipmap level
