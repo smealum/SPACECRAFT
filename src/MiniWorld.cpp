@@ -3,7 +3,7 @@
 
 MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 	planet(p),
-	model(glm::translate(glm::mat4(1.0f),planet->getPosition())),
+	model(1.0f),
     tptr(new TrackerPointer<MiniWorld>(this, true)),
 	face(pf),
 	origin(face->toplevel->uvertex[0]),
@@ -44,6 +44,8 @@ void MiniWorld::draw(Camera& c)
 {
 	//TODO : passer frustum culling en octree ?
 	//TODO : occlusion culling ?
+
+	model=glm::translate(glm::mat4(1.0f),planet->getPosition())*glm::mat4(planet->getModel());
 
 	for(int i=0;i<MINIWORLD_W;i++)
 	{

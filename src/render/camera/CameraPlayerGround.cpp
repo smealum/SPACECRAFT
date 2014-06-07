@@ -57,7 +57,7 @@ void CameraPlayerGround::update(Camera& camera)
 
 		speedVect+=localSpeedVect+g*gS; //gravité
 
-		glm::dvec3 tp=camera.getPositionDouble(glm::dvec3(testPlanet->getPosition()))-g*(1.0/PLANETFACE_BLOCKS);
+		glm::dvec3 tp=testPlanet->getCameraRelativeDoublePosition(camera)-g*(1.0/PLANETFACE_BLOCKS);
 		glm::dvec3 out;
 		bool ret=testPlanet->collidePoint(tp,-speedVect,out);
 		speedVect=tp-out;
@@ -81,7 +81,7 @@ void CameraPlayerGround::update(Camera& camera)
 		glm::i32vec3 out;
 		glm::dvec3 v(-glm::transpose(camera.view3)[2]);
 		int dir;
-		Chunk* ret=testPlanet->selectBlock(camera.getPositionDouble(glm::dvec3(testPlanet->getPosition())), v*range, out, dir);
+		Chunk* ret=testPlanet->selectBlock(testPlanet->getCameraRelativeDoublePosition(camera), v*range, out, dir);
 
 		// printf("v %f %f %f (%f)\n",v.x,v.y,v.z,glm::dot(v,g));
 		if(ret)
@@ -103,7 +103,7 @@ void CameraPlayerGround::update(Camera& camera)
 					case 5: testPlanet->changeBlock(out+glm::i32vec3(0,0,1),t); break;
 				}
 			}
-			testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2,glm::translate(glm::mat4(1.0f),testPlanet->getPosition()));
+			testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2,glm::translate(glm::mat4(1.0f),testPlanet->getPosition())*glm::mat4(testPlanet->getModel()));
 		}else{
 			// printf("no block !\n");
 			testCursor->unaffect();

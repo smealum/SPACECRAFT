@@ -149,7 +149,7 @@ bool PlanetFace::shouldHaveMiniworld(Camera& c)
 	{
 		if (miniworld)
 		{
-			glm::vec3 p=c.getPosition(planet->getPosition());
+			glm::vec3 p=planet->invModel*c.getPosition(planet->getPosition());
 			return glm::length(vertex[4]*elevation-p)*(2<<(depth))<20.0f;
 		}else{
 			return (childrenDepth >= PLANET_ADDED_DETAIL);
@@ -163,7 +163,7 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	if(depth>MINIWORLD_DETAIL+PLANET_ADDED_DETAIL+1)return true;
 	if(depth<4)return false;
 
-	glm::vec3 p=c.getPosition(planet->getPosition());
+	glm::vec3 p=planet->invModel*c.getPosition(planet->getPosition());
 	if(glm::dot(vertex[0]*0.99f-p,vertex[0])>0.0f
 	&& glm::dot(vertex[1]*0.99f-p,vertex[1])>0.0f
 	&& glm::dot(vertex[2]*0.99f-p,vertex[2])>0.0f
@@ -288,6 +288,8 @@ Planet::Planet(PlanetInfo &pi, ContentHandler& ch):
 	generators(ch.getMaxProducers()),
 	sunPosition(8.0,0.0,0.0),
 	position(0.0,0.0,-2.0), //TEMP
+	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
+	angle(0.0),
 	atmosphere(position)
 {
 	for(int i=0;i<ch.getMaxProducers();i++)generators[i] = new PlanetGenerator(planetInfo);
@@ -405,6 +407,7 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 	shader.setUniform("v2", v2);
 	shader.setUniform("lightdir", lightdir);
 	shader.setUniform("planetPos", planetFace.planet->position);
+	shader.setUniform("model", glm::mat4(planetFace.planet->model));
 
 	// //planetface_atmosphere test
 	// planetFace.planet->atmosphere.bind(c,lightdir,shader);
@@ -416,6 +419,8 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 	// printf("%d, %d\n",curSize,faces.size());
 }
 
+//TEMP
+#include "utils/Input.h"
 
 void Planet::draw(Camera& c)
 {
@@ -434,6 +439,29 @@ void Planet::draw(Camera& c)
 	// dessin des nuages
 	// cloud.draw(c);
 
+	//TEMP
+	// angle+=0.001f;
+	// angle+=0.000001f;
+	if (Input::isKeyHold(GLFW_KEY_V))angle+=0.000001f;
+	if (Input::isKeyHold(GLFW_KEY_B))angle-=0.000001f;
+	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,axis));
+	invModel=glm::transpose(model);
+}
+
+glm::vec3 Planet::getCameraRelativePosition(Camera& c)
+{
+	return invModel*c.getPosition(position);
+}
+
+glm::dvec3 Planet::getCameraRelativeDoublePosition(Camera& c)
+{
+	return glm::dmat3(invModel)*c.getPositionDouble(glm::dvec3(position));
+}
+
+
+glm::mat3 Planet::getModel(void)
+{
+	return model;
 }
 
 void Planet::addMiniWorld(MiniWorld* mw)

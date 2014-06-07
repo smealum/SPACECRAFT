@@ -111,6 +111,7 @@ class PlanetFace
 class Planet
 {
 	friend class PlanetFaceBufferHandler;
+	friend class PlanetFace;
 	friend class Chunk;
 	public:
 		Planet(PlanetInfo &pi, class ContentHandler& ch);
@@ -134,6 +135,9 @@ class Planet
 
 		glm::dvec3 getGravityVector(glm::dvec3 p);
 		glm::vec3 getPosition(void);
+		glm::mat3 getModel(void);
+		glm::vec3 getCameraRelativePosition(Camera& c);
+		glm::dvec3 getCameraRelativeDoublePosition(Camera& c);
 		inline float getElevation(int id, const glm::vec3 &coord)
 		{
 			return generators[id]->getElevation(coord);
@@ -154,6 +158,10 @@ class Planet
 		glm::vec3 lightdir;
 		glm::vec3 sunPosition;
 		glm::vec3 position;
+		glm::vec3 axis;
+		glm::mat3 model, invModel;
+
+		float angle;
 
 		Cloud cloud;
 		Atmosphere atmosphere;

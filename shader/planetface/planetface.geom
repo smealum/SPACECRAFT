@@ -23,8 +23,8 @@ out vec4 fcolor;
 void main()
 {
 	// on n'affiche plus les blocs qui sont de l'autre côté de la planete
-	vec4 PlanetCenter = view*model*vec4(planetPos,1.0);
-	vec4 BlocPosition = view*model*vec4(pos[0]+planetPos,1.0);
+	vec4 PlanetCenter = view*vec4(planetPos,1.0);
+	vec4 BlocPosition = view*(model*vec4(pos[0],1.0)+vec4(planetPos,0.0));
 	if ( dot(BlocPosition,normalize(PlanetCenter)) > length(PlanetCenter) )
 		return;
 
@@ -35,14 +35,14 @@ void main()
 	vec4 v[8];
 	float c[5];
 
-	v[0]=vec4(gminElevation[0]*normalize(pos[0]-v1-v2),1.0);
-	v[1]=vec4(gminElevation[0]*normalize(pos[0]+v1-v2),1.0);
-	v[2]=vec4(gminElevation[0]*normalize(pos[0]-v1+v2),1.0);
-	v[3]=vec4(gminElevation[0]*normalize(pos[0]+v1+v2),1.0);
-	v[4]=vec4(gelevation[0]*normalize(pos[0]-v1-v2),1.0);
-	v[5]=vec4(gelevation[0]*normalize(pos[0]+v1-v2),1.0);
-	v[6]=vec4(gelevation[0]*normalize(pos[0]-v1+v2),1.0);
-	v[7]=vec4(gelevation[0]*normalize(pos[0]+v1+v2),1.0);
+	v[0]=model*vec4(gminElevation[0]*normalize(pos[0]-v1-v2),1.0);
+	v[1]=model*vec4(gminElevation[0]*normalize(pos[0]+v1-v2),1.0);
+	v[2]=model*vec4(gminElevation[0]*normalize(pos[0]-v1+v2),1.0);
+	v[3]=model*vec4(gminElevation[0]*normalize(pos[0]+v1+v2),1.0);
+	v[4]=model*vec4(gelevation[0]*normalize(pos[0]-v1-v2),1.0);
+	v[5]=model*vec4(gelevation[0]*normalize(pos[0]+v1-v2),1.0);
+	v[6]=model*vec4(gelevation[0]*normalize(pos[0]-v1+v2),1.0);
+	v[7]=model*vec4(gelevation[0]*normalize(pos[0]+v1+v2),1.0);
 
 	const float ambient=0.0;
 	c[0]=(max(dot(lightdir,normalize(vec3(v[0]))),0.0)+ambient)/255.0;
@@ -51,15 +51,15 @@ void main()
 	c[3]=(max(dot(lightdir,normalize(vec3(v[0]-v[2]))),0.0)+ambient)/255.0;
 	c[4]=(max(dot(lightdir,normalize(vec3(v[2]-v[0]))),0.0)+ambient)/255.0;
 	
-	mat4 projViewModel = proj*view*model;
-	v[0]=projViewModel*(planetPos+v[0]);
-	v[1]=projViewModel*(planetPos+v[1]);
-	v[2]=projViewModel*(planetPos+v[2]);
-	v[3]=projViewModel*(planetPos+v[3]);
-	v[4]=projViewModel*(planetPos+v[4]);
-	v[5]=projViewModel*(planetPos+v[5]);
-	v[6]=projViewModel*(planetPos+v[6]);
-	v[7]=projViewModel*(planetPos+v[7]);
+	mat4 projView = proj*view;
+	v[0]=projView*(planetPos+v[0]);
+	v[1]=projView*(planetPos+v[1]);
+	v[2]=projView*(planetPos+v[2]);
+	v[3]=projView*(planetPos+v[3]);
+	v[4]=projView*(planetPos+v[4]);
+	v[5]=projView*(planetPos+v[5]);
+	v[6]=projView*(planetPos+v[6]);
+	v[7]=projView*(planetPos+v[7]);
 
 	/*
 
