@@ -7,8 +7,11 @@
 #include <vector>
 #include <list>
 #include <cassert>
-
 #define TEXCOLS 16
+
+// x, y in [0..1]
+typedef glm::vec2 texCoord;
+
 
 namespace blockTypes
 {
@@ -66,16 +69,99 @@ namespace blockStyle
 	};
 }
 
+// XXX XXX
+// J'ai eut un peu de mal à m'intégré au code.
+// Pourquoi c'est si compliqué ?
+// Si quelqu'un veut bien m'intégré.
 extern int blockTileID[blockTypes::max][blockPlane::max];
 extern uint8_t blockTransparencyID[blockTypes::max];
 extern uint8_t blockStyleID[blockTypes::max];
-
 bool blockShouldBeFace(int type1, int type2);
 
 inline int getBlockID(int blockType, int plane)
 {
 	return blockTileID[blockType][plane]-1;
 }
+
 void blockTypeLoadValues();
+// On peut supprimer le reste ?????
+// fin ajout Arthur
+//////////////////////////////////////////////////////////
+
+class BlockType;
+
+// bass class for texcoord
+class BlockTexCoord {
+	protected:
+		blockTransparency::T trans;
+		blockStyle::T style;
+		static BlockType *btype;
+	public:
+		virtual texCoord getSide(blockPlane::T t) const = 0;
+		inline blockTransparency::T getTransparency() const { return trans; }
+		inline blockStyle::T getStyle() const { return style; }
+		inline void setTransparency(blockTransparency::T type) { trans = type; }
+		inline void setStyle(blockStyle::T type) { style = type; }
+		BlockTexCoord() {}
+		virtual ~BlockTexCoord() {}
+		static void setStaticInstance(BlockType *bt); // this need to be called after the creation of OGL context
+};
+
+// class to control animation of blocks
+class BlockAnimated : public BlockTexCoord {
+	private:
+		static const float frameTime; // in seconds
+		static std::list<BlockAnimated*> list;
+		std::vector<blockTypes::T> frames;
+		uint32_t current;
+		float timer;
+		void animate(float delta);
+	public:
+		inline blockTypes::T getCurrent() const
+		{
+			return frames[current];
+		}
+		static void animation(float delta);
+		BlockAnimated(std::initializer_list<blockTypes::T> frames);
+		~BlockAnimated();
+		virtual texCoord getSide(blockPlane::T p) const; // unused parameter of side because all sides are equal :D
+};
+
+class BlockStatic : public BlockTexCoord {
+	private:
+		std::vector<blockTypes::T> sides;
+	public:
+		BlockStatic(std::initializer_list<blockTypes::T> sdes);
+		virtual texCoord getSide(blockPlane::T p) const;
+};
+
+class BlockType : public Singleton<BlockType> {
+	public:
+		// get top-left coord
+		inline texCoord getTexcoord(blockTypes::T type) // this refers to a plane
+		{
+			return texCoords[type];
+		}
+
+		inline texCoord getTexcoord(blockTypes::T type, blockPlane::T p) // this refers to a plane
+		{
+			return blocks[type]->getSide(p);
+		}
+
+		inline BlockTexCoord& getBlockTexcoord(blockTypes::T type) // this refers to the block type
+		{
+			return *blocks[type];
+		}
+
+		bool shouldBeFace(blockTypes::T type1, blockTypes::T type2);
+
+		~BlockType();
+	private:
+		BlockTexCoord* blocks[blockTypes::max];
+		texCoord texCoords[blockTypes::max];
+		friend class Singleton<BlockType>;
+		int texWidth, texHeight, texCols;
+		BlockType();
+};
 
 #endif

@@ -23,6 +23,8 @@ void computeChunkFaces(chunkVal* data,
 		std::vector<GL_Vertex>& vArray) //output
 {
 	vArray.clear();
+	auto &blockType = BlockType::getInstance();
+
 	chunkVal previous,current;
 	// X
 	for(int y=0;y<CHUNK_N;++y)
@@ -31,6 +33,8 @@ void computeChunkFaces(chunkVal* data,
 		previous = accessArray(data,w,h,d,sx,sy,sz,-1,y,z);
 		for(int x=0;x<CHUNK_N+1;++x)
 		{
+			//BlockTexCoord &bCur = blockType.getBlockTexcoord((blockTypes::T)current),
+						  //&bPrev = blockType.getBlockTexcoord((blockTypes::T)previous);
 			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
 			if (blockShouldBeFace(current,previous)) {
 				GL_Vertex v;
