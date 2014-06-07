@@ -46,8 +46,8 @@ void main()
 
 	const float ambient=0.0;
 	c[0]=(max(dot(lightdir,normalize(vec3(v[0]))),0.0)+ambient)/255.0;
-	c[1]=(max(dot(lightdir,normalize(vec3(v[1]-v[0]))),0.0)+ambient)/255.0;
-	c[2]=(max(dot(lightdir,normalize(vec3(v[0]-v[1]))),0.0)+ambient)/255.0;
+	c[1]=(max(dot(lightdir,normalize(vec3(v[0]-v[1]))),0.0)+ambient)/255.0;
+	c[2]=(max(dot(lightdir,normalize(vec3(v[1]-v[0]))),0.0)+ambient)/255.0;
 	c[3]=(max(dot(lightdir,normalize(vec3(v[0]-v[2]))),0.0)+ambient)/255.0;
 	c[4]=(max(dot(lightdir,normalize(vec3(v[2]-v[0]))),0.0)+ambient)/255.0;
 	
