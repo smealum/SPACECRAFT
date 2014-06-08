@@ -22,8 +22,6 @@ out float grepeat;
 
 void main()
 {
-	
-
     pos=position;
     gv1=v1;
     gv2=v2;
@@ -31,9 +29,6 @@ void main()
     gsize=size;
     gminElevation=minElevation;
 	grepeat=repeat;
-	
-	// 
 	gtopTile = topTile;
 	gsideTile = sideTile;
-
 }

@@ -41,21 +41,21 @@ void main()
 	vec4 v[8];
 	float c[5];
 
-	v[0]=model*vec4(gminElevation[0]*normalize(pos[0]-v1-v2),1.0);
-	v[1]=model*vec4(gminElevation[0]*normalize(pos[0]+v1-v2),1.0);
-	v[2]=model*vec4(gminElevation[0]*normalize(pos[0]-v1+v2),1.0);
-	v[3]=model*vec4(gminElevation[0]*normalize(pos[0]+v1+v2),1.0);
-	v[4]=model*vec4(gelevation[0]*normalize(pos[0]-v1-v2),1.0);
-	v[5]=model*vec4(gelevation[0]*normalize(pos[0]+v1-v2),1.0);
-	v[6]=model*vec4(gelevation[0]*normalize(pos[0]-v1+v2),1.0);
-	v[7]=model*vec4(gelevation[0]*normalize(pos[0]+v1+v2),1.0);
+	v[0]=proj*view*model*vec4(planetPos+gminElevation[0]*normalize(pos[0]-v1-v2),1.0);
+	v[1]=proj*view*model*vec4(planetPos+gminElevation[0]*normalize(pos[0]+v1-v2),1.0);
+	v[2]=proj*view*model*vec4(planetPos+gminElevation[0]*normalize(pos[0]-v1+v2),1.0);
+	v[3]=proj*view*model*vec4(planetPos+gminElevation[0]*normalize(pos[0]+v1+v2),1.0);
+	v[4]=proj*view*model*vec4(planetPos+gelevation[0]*normalize(pos[0]-v1-v2),1.0);
+	v[5]=proj*view*model*vec4(planetPos+gelevation[0]*normalize(pos[0]+v1-v2),1.0);
+	v[6]=proj*view*model*vec4(planetPos+gelevation[0]*normalize(pos[0]-v1+v2),1.0);
+	v[7]=proj*view*model*vec4(planetPos+gelevation[0]*normalize(pos[0]+v1+v2),1.0);
 
 
 	const float ambient=0.0;
-	c[0]=(max(dot(lightdir,normalize(vec3(v[0]))),0.0)+ambient)/255.0;
-	c[1]=(max(dot(lightdir,normalize(vec3(v[0]-v[1]))),0.0)+ambient)/255.0;
-	c[2]=(max(dot(lightdir,normalize(vec3(v[1]-v[0]))),0.0)+ambient)/255.0;
-	c[3]=(max(dot(lightdir,normalize(vec3(v[0]-v[2]))),0.0)+ambient)/255.0;
+	c[0]=(max(dot(lightdir,normalize(vec3(v[0]))),0.0)+ambient);
+	c[1]=(max(dot(lightdir,normalize(vec3(v[0]-v[1]))),0.0)+ambient);
+	c[2]=(max(dot(lightdir,normalize(vec3(v[1]-v[0]))),0.0)+ambient);
+	c[3]=(max(dot(lightdir,normalize(vec3(v[0]-v[2]))),0.0)+ambient);
 	c[4]=(max(dot(lightdir,normalize(vec3(v[2]-v[0]))),0.0)+ambient)/255.0;
 
 	// XXX temp
@@ -65,18 +65,19 @@ void main()
 	/*c[3] += (gelevation[0]-1.0)*400.0;*/
 	/*c[4] += (gelevation[0]-1.0)*400.0;*/
 	
+    /*
 	mat4 projView = proj*view;
-	v[0]=projView*(planetPos+v[0]);
-	v[1]=projView*(planetPos+v[1]);
-	v[2]=projView*(planetPos+v[2]);
-	v[3]=projView*(planetPos+v[3]);
-	v[4]=projView*(planetPos+v[4]);
-	v[5]=projView*(planetPos+v[5]);
-	v[6]=projView*(planetPos+v[6]);
-	v[7]=projView*(planetPos+v[7]);
+	v[0]=projView*(vec4(planetPos,1.0)+v[0]);
+	v[1]=projView*(vec4(planetPos,1.0)+v[1]);
+	v[2]=projView*(vec4(planetPos,1.0)+v[2]);
+	v[3]=projView*(vec4(planetPos,1.0)+v[3]);
+	v[4]=projView*(vec4(planetPos,1.0)+v[4]);
+	v[5]=projView*(vec4(planetPos,1.0)+v[5]);
+	v[6]=projView*(vec4(planetPos,1.0)+v[6]);
+	v[7]=projView*(vec4(planetPos,1.0)+v[7]);
+    */
 
-	/*
-
+    /*
 	  6-------7
 	 /|      /|
 	4-------5 |
