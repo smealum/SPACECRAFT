@@ -216,6 +216,13 @@ void blockTypeLoadValues()
 	// flower_red
 	blockTransparencyID[blockTypes::flower_red] = blockTransparency::seeThrough;
 	blockStyleID[blockTypes::flower_red] = blockStyle::sprite;
+
+	// water
+	blockTransparencyID[blockTypes::water] = blockTransparency::transparent;
+	blockTransparencyID[blockTypes::water_1] = blockTransparency::transparent;
+	blockTransparencyID[blockTypes::water_2] = blockTransparency::transparent;
+	blockTransparencyID[blockTypes::water_3] = blockTransparency::transparent;
+	blockTransparencyID[blockTypes::water_4] = blockTransparency::transparent;
 }
 
 bool blockShouldBeFace(int type1, int type2)

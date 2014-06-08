@@ -406,12 +406,12 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	else
 	{
 		// water
-		//topTile = 12*16+13;
-		//sideTile = 12*16+13;
+		topTile = 12*16+13;
+		sideTile = 12*16+13;
 
 		// sand
-		topTile = 18;
-		sideTile = 18;
+		//topTile = 18;
+		//sideTile = 18;
 	}
 
 	float repeat = (1<<(MINIWORLD_DETAIL-(pf->depth)) )* MINIWORLD_W * CHUNK_N; 
