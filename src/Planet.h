@@ -125,6 +125,7 @@ class Planet
 		
 		void processLevelOfDetail(Camera& c);
 		void draw(Camera& c);
+		void update(float time);
 
 		int numMiniWorlds(void);
 		void addMiniWorld(MiniWorld* mw);

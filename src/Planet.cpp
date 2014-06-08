@@ -317,10 +317,10 @@ Planet::Planet(PlanetInfo &pi, ContentHandler& ch):
 	handler(ch),
 	generators(ch.getMaxProducers()),
 	sunPosition(8.0,0.0,0.0),
-	position(0.0,0.0,-2.0), //TEMP
+	position(0.0,0.0,0.0),
 	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
 	angle(0.0),
-	atmosphere(position)
+	atmosphere()
 {
 	for(int i=0;i<ch.getMaxProducers();i++)generators[i] = new PlanetGenerator(planetInfo);
 	
@@ -515,7 +515,7 @@ void Planet::draw(Camera& c)
 	// printf("%d\n",miniWorldList.size());
 	
 	// dessin de l'athmosphere
-	atmosphere.draw(c, lightdir);
+	atmosphere.draw(c, lightdir, position);
 
 	// dessin des nuages
 	// cloud.draw(c);
@@ -602,4 +602,9 @@ void Planet::changeBlock(glm::i32vec3 p, blockTypes::T v)
 void Planet::deleteBlock(glm::i32vec3 p)
 {
 	changeBlock(p, blockTypes::air);
+}
+
+void Planet::update(float time)
+{
+	if(planetInfo.trajectory)position=planetInfo.trajectory->getPosition(time);
 }

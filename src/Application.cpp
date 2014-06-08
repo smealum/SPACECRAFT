@@ -171,7 +171,6 @@ void Application::createWindowInFullscreen(bool fs)
 
 SolarSystem* testSolarSystem;
 Cursor* testCursor;
-Sun* sun;
 int testTexture;
 int testTextureArray;
 
@@ -188,9 +187,7 @@ void Application::run()
     camera->setCameraManager(new CameraKeyboardMouse());
 
     tt=new testShaders;
-    PlanetInfo planetInfo;
     testSolarSystem=new SolarSystem(contentHandler);
-	sun=new Sun();
     testCursor=new Cursor();
 
 	testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
@@ -230,6 +227,7 @@ void Application::run()
 }
 
 int testVal;
+float globalTime=0.0f;
 
 void Application::loop()
 {
@@ -246,19 +244,15 @@ void Application::loop()
     glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    testSolarSystem->update(getFrameDeltaTime());
+    testSolarSystem->update(globalTime);
 
     glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
     testSolarSystem->draw(*camera);
-    //tt->draw();
-	// sun->draw(*camera);
-	// sun->drawGlow(*camera);
-    // testChunk->draw(*camera);
-    // testMiniWorld->draw(*camera);
-    // testBuffer->draw(*camera);
     testCursor->draw(*camera);
 
-    if (Input::isKeyHold(GLFW_KEY_N))	reloadAllShaders(NULL);
+    if(Input::isKeyHold(GLFW_KEY_N))reloadAllShaders(NULL);
+    if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.001f;
+    if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.001f;
 
     // printf("test %d\n",testVal);
     testVal=0;

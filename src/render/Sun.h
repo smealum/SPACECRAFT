@@ -14,16 +14,21 @@
 class Sun
 {
 	public:
-		Sun();
+		Sun(glm::vec3 position);
+
 		void draw(Camera& c);
 		void drawGlow(Camera& c);
 		void setPosition(glm::vec3 position);
+		glm::vec3 getPosition(void);
+
 	private:
 		ShaderProgram &shader;
 		ShaderProgram &shaderGlow;
+		
 		float time;
 		glm::vec3 position;
 		int lod;
+
 };
 
 #endif /* end of include guard: SUN_Z7QDXCRK */

@@ -1,7 +1,7 @@
 #include "PlanetInfo.h"
 
 
-PlanetInfo::PlanetInfo():
+PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t):
 	seed(0),
 	gridWidth(200),
 	gridHeight(gridWidth / 2),
@@ -22,6 +22,12 @@ PlanetInfo::PlanetInfo():
 	terrainOffset(1.f),
 	mountainGlaciation(1.375f),
 	continentHeightScale((1.f - seaLevel) / 4.f),
-	riverDepth(0.0223f)
+	riverDepth(0.0223f),
+	trajectory(t)
+{
+}
+
+//la suppression de trajectory n'est PAS la responsabilité de planetInfo
+PlanetInfo::~PlanetInfo()
 {
 }
