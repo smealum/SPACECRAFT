@@ -69,11 +69,11 @@ void main()
     v[7] = projview * v[7];
 
 	// XXX temp
-	/*c[0] += (gelevation[0]-1.0)*400.0;*/
-	/*c[1] += (gelevation[0]-1.0)*400.0;*/
-	/*c[2] += (gelevation[0]-1.0)*400.0;*/
-	/*c[3] += (gelevation[0]-1.0)*400.0;*/
-	/*c[4] += (gelevation[0]-1.0)*400.0;*/
+    c[0] += (gelevation[0]-1.001)*400.0;
+    c[1] += (gelevation[0]-1.001)*400.0;
+    c[2] += (gelevation[0]-1.001)*400.0;
+    c[3] += (gelevation[0]-1.001)*400.0;
+    c[4] += (gelevation[0]-1.001)*400.0;
 	
     /*
 	mat4 projView = proj*view;
@@ -97,6 +97,7 @@ void main()
 	0-------1
 
 	*/
+    
 
 	ftile = gtopTile[0];
 
