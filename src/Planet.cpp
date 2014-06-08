@@ -317,10 +317,10 @@ Planet::Planet(PlanetInfo &pi, ContentHandler& ch):
 	handler(ch),
 	generators(ch.getMaxProducers()),
 	sunPosition(8.0,0.0,0.0),
-	position(0.0,0.0,-2.0), //TEMP
+	position(0.0,0.0,0.0),
 	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
 	angle(0.0),
-	atmosphere(position)
+	atmosphere()
 {
 	for(int i=0;i<ch.getMaxProducers();i++)generators[i] = new PlanetGenerator(planetInfo);
 	
@@ -500,8 +500,6 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 	// printf("%d, %d\n",curSize,faces.size());
 }
 
-//TEMP
-#include "utils/Input.h"
 
 void Planet::draw(Camera& c)
 {
@@ -515,18 +513,10 @@ void Planet::draw(Camera& c)
 	// printf("%d\n",miniWorldList.size());
 	
 	// dessin de l'athmosphere
-	atmosphere.draw(c, lightdir);
+	atmosphere.draw(c, lightdir, position);
 
 	// dessin des nuages
 	// cloud.draw(c);
-
-	//TEMP
-	// angle+=0.001f;
-	// angle+=0.000001f;
-	if (Input::isKeyHold(GLFW_KEY_V))angle+=0.000001f;
-	if (Input::isKeyHold(GLFW_KEY_B))angle-=0.000001f;
-	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,axis));
-	invModel=glm::transpose(model);
 }
 
 glm::vec3 Planet::getCameraRelativePosition(Camera& c)
@@ -538,7 +528,6 @@ glm::dvec3 Planet::getCameraRelativeDoublePosition(Camera& c)
 {
 	return glm::dmat3(invModel)*c.getPositionDouble(glm::dvec3(position));
 }
-
 
 glm::mat3 Planet::getModel(void)
 {
@@ -602,4 +591,13 @@ void Planet::changeBlock(glm::i32vec3 p, blockTypes::T v)
 void Planet::deleteBlock(glm::i32vec3 p)
 {
 	changeBlock(p, blockTypes::air);
+}
+
+void Planet::update(float time)
+{
+	if(planetInfo.trajectory)position=planetInfo.trajectory->getPosition(time);
+	angle=time*2*PI/planetInfo.period;
+
+	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,axis));
+	invModel=glm::transpose(model);
 }

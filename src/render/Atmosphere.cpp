@@ -2,12 +2,11 @@
 #include "Atmosphere.h"
 #include "utils/SphereManager.h"
 
-Atmosphere::Atmosphere(glm::vec3 position):
+Atmosphere::Atmosphere():
 	shader(ShaderProgram::loadFromFile("shader/atmosphere/atmosphere.vert", "shader/atmosphere/atmosphere.frag", "atmosphere")),
 	m_fInnerRadius(1.0f),
 	m_fOuterRadius(1.05f),
-	lod(6),
-	position(position)
+	lod(6)
 {
 	initLightConstants();
 
@@ -182,12 +181,12 @@ void Atmosphere::makePhaseBuffer(void)
 
 extern float testAngle;
 
-void Atmosphere::bind(Camera& c, glm::vec3 lightDirection)
+void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position)
 {
-	bind(c,lightDirection,shader);
+	bind(c,lightDirection,position,shader);
 }
 
-void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, ShaderProgram& sprogram)
+void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, ShaderProgram& sprogram)
 {
 	sprogram.use();
 
@@ -215,9 +214,9 @@ void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, ShaderProgram& sprogr
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
 }
 
-void Atmosphere::draw(Camera& c, glm::vec3 lightDirection)
+void Atmosphere::draw(Camera& c, glm::vec3 lightDirection, glm::vec3 position)
 {
-	bind(c, lightDirection);
+	bind(c, lightDirection, position);
 	
 	shader.setUniform("sky", true);
 	shader.setUniform("model", glm::translate(glm::mat4(1.f),position));

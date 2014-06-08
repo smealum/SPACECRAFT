@@ -32,8 +32,9 @@ Les libraries à installer sont:
 ```
 cmake -G "MinGW Makefiles" .
 mingw32-make
-cp extlibs\dll\AntTweakBar.dll bin
 ```
+
+Finalement il faut copier les dll correspondantes dans le dossier bin
 
 ##Exécution
 

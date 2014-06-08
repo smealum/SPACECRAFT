@@ -22,7 +22,7 @@
 class Atmosphere
 {
 	public:
-		Atmosphere(glm::vec3 position);
+		Atmosphere();
 		~Atmosphere();
 
 		void initLightConstants(void);
@@ -30,14 +30,12 @@ class Atmosphere
 		void makePhaseBuffer(void);
 		void generateVBO(void);
 
-		void bind(Camera& c, glm::vec3 lightDirection, ShaderProgram& sprogram);
-		void bind(Camera& c, glm::vec3 lightDirection);
-		void draw(Camera& c, glm::vec3 lightDirection);
+		void bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, ShaderProgram& sprogram);
+		void bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position);
+		void draw(Camera& c, glm::vec3 lightDirection, glm::vec3 position);
 
 	private:
 		ShaderProgram& shader;
-
-		glm::vec3 position;
 
 		int m_nSamples;
 		float m_Kr, m_Kr4PI;

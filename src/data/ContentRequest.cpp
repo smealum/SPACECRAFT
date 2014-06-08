@@ -225,10 +225,10 @@ void SolarSystemDataRequest::update(void)
 {
 	for(int i=0;i<numPlanets;i++)
 	{
-		PlanetInfo pitest;
+		PlanetInfo pitest(new EllipticalTrajectory(glm::vec3(0.0f), glm::mat3(10.0f), 100.0f));
 		planets[i]=new Planet(pitest, contentHandler);
 	}
-	sun=new Sun();
+	sun=new Sun(glm::vec3(0.0f));
 
 	solarSystem->getPointer()->numPlanets=numPlanets;
 	solarSystem->getPointer()->planets=planets;

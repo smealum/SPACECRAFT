@@ -34,25 +34,14 @@ void SolarSystem::draw(Camera& c)
 	sun->drawGlow(c);
 }
 
-#include "utils/Input.h" //TEMP
-
-void SolarSystem::update(float delta)
+void SolarSystem::update(float time)
 {
 	if(!generated)return;
 
-	// sunPosition
+	for(int i=0;i<numPlanets;i++)
 	{
-		static float testAngle = 0.0;
-		if (Input::isKeyHold(GLFW_KEY_P))	testAngle+=0.8f*delta;
-		if (Input::isKeyHold(GLFW_KEY_M))	testAngle-=0.8f*delta;
-		glm::vec4 sunPosition(EARTH_SUN,0.0,0.0,1.0);
-		sunPosition = glm::rotate(glm::mat4(1.0),testAngle,glm::vec3(0.0,1.0,0.0)) * sunPosition;
-		sun->setPosition(glm::vec3(sunPosition));
-
-		for(int i=0;i<numPlanets;i++)
-		{
-			planets[i]->setSunPosition(glm::vec3(sunPosition));
-		}
+		planets[i]->update(time);
+		planets[i]->setSunPosition(sun->getPosition());
 	}
 }
 

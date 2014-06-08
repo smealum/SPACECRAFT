@@ -13,7 +13,7 @@ class SolarSystem
 		~SolarSystem();
 
 		void draw(Camera& c);
-		void update(float delta);
+		void update(float time);
 
 		Planet* getClosestPlanet(glm::vec3 p);
 		
