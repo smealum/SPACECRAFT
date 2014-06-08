@@ -14,6 +14,8 @@ class SolarSystem
 
 		void draw(Camera& c);
 		void update(float delta);
+
+		Planet* getClosestPlanet(glm::vec3 p);
 		
 		void deleteSolarSystem(void);
 

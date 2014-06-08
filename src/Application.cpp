@@ -14,12 +14,6 @@
 #include "utils/glm.h"
 #define WIN_TITLE "SPACECRAFT"
 
-// false value
-#define EARTH_SUN (8.0)
-// real value
-//#define EARTH_SUN (23400.0)
-//#define EARTH_SUN (110)
-
 float PlanetFaceDetailsPower = 35.0;
 
 using namespace std;
@@ -175,7 +169,6 @@ void Application::createWindowInFullscreen(bool fs)
     }
 }
 
-Planet* testPlanet;
 SolarSystem* testSolarSystem;
 Cursor* testCursor;
 Sun* sun;
@@ -196,7 +189,6 @@ void Application::run()
 
     tt=new testShaders;
     PlanetInfo planetInfo;
-    testPlanet=new Planet(planetInfo, contentHandler);
     testSolarSystem=new SolarSystem(contentHandler);
 	sun=new Sun();
     testCursor=new Cursor();
@@ -254,31 +246,19 @@ void Application::loop()
     glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    testPlanet->processLevelOfDetail(*camera);
+    testSolarSystem->update(getFrameDeltaTime());
 
     glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
+    testSolarSystem->draw(*camera);
     //tt->draw();
-    // testPlanet->drawDirect();
-	sun->draw(*camera);
-    testPlanet->draw(*camera);
-	sun->drawGlow(*camera);
+	// sun->draw(*camera);
+	// sun->drawGlow(*camera);
     // testChunk->draw(*camera);
     // testMiniWorld->draw(*camera);
     // testBuffer->draw(*camera);
     testCursor->draw(*camera);
 
     if (Input::isKeyHold(GLFW_KEY_N))	reloadAllShaders(NULL);
-	// sunPosition
-	{
-		static float testAngle = 0.0;
-    	float d=getFrameDeltaTime();
-		if (Input::isKeyHold(GLFW_KEY_P))	testAngle+=0.8f*d;
-		if (Input::isKeyHold(GLFW_KEY_M))	testAngle-=0.8f*d;
-		vec4 sunPosition(EARTH_SUN,0.0,0.0,1.0);
-		sunPosition = rotate(mat4(1.0),testAngle,vec3(0.0,1.0,0.0)) * sunPosition;
-		sun->setPosition(vec3(sunPosition));
-		testPlanet->setSunPosition(vec3(sunPosition));
-	}
 
     // printf("test %d\n",testVal);
     testVal=0;

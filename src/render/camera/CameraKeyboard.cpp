@@ -15,7 +15,6 @@ CameraKeyboard::CameraKeyboard():
 }
 
 float testAngle=0.0f;
-extern Planet* testPlanet;
 
 void CameraKeyboard::update(Camera& camera)
 {
@@ -71,9 +70,6 @@ void CameraKeyboard::update(Camera& camera)
 
     speedVect=(speedVect*glm::dmat3(camera.view3));
 
-    // //TEMP
-    // speedVect=camera.getPositionDouble()-testPlanet->collidePoint(camera.getPositionDouble(),-speedVect);
-    
     camera.pos-=speedVect;
     
     camera.updateView();

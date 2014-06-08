@@ -7,11 +7,11 @@
 #include "MiniWorld.h"
 
 //TEMP
-extern Planet* testPlanet;
 extern Cursor* testCursor;
 
-CameraPlayerGround::CameraPlayerGround():
-	speedVect(0.0)
+CameraPlayerGround::CameraPlayerGround(Planet* p):
+	speedVect(0.0),
+	planet(p)
 {
 
 }
@@ -23,6 +23,8 @@ void CameraPlayerGround::update(Camera& camera)
 		float delta = Application::getInstance().getFrameDeltaTime();
 
 		if(Input::isKeyPressed(GLFW_KEY_R))camera.setCameraManager(new CameraKeyboardMouse()); //TODO : méga fuite à virer
+
+		if(!planet)return;
 
 		const double tS=1e-5*delta;
 		const double gS=2e-6*delta;
@@ -45,7 +47,7 @@ void CameraPlayerGround::update(Camera& camera)
 
 		localSpeedVect=(localSpeedVect*glm::dmat3(camera.view3));
 
-		glm::dvec3 g=testPlanet->getGravityVector(camera.pos);
+		glm::dvec3 g=planet->getGravityVector(camera.pos);
 
 		//on ajuste l'orientation pour s'aligner sur g
 		float val=glm::dot(glm::dvec3(glm::transpose(camera.view3)[0]),g);
@@ -57,9 +59,9 @@ void CameraPlayerGround::update(Camera& camera)
 
 		speedVect+=localSpeedVect+g*gS; //gravité
 
-		glm::dvec3 tp=testPlanet->getCameraRelativeDoublePosition(camera)-g*(1.0/PLANETFACE_BLOCKS);
+		glm::dvec3 tp=planet->getCameraRelativeDoublePosition(camera)-g*(1.0/PLANETFACE_BLOCKS);
 		glm::dvec3 out;
-		bool ret=testPlanet->collidePoint(tp,-speedVect,out);
+		bool ret=planet->collidePoint(tp,-speedVect,out);
 		speedVect=tp-out;
 
 		camera.pos-=speedVect;
@@ -77,17 +79,17 @@ void CameraPlayerGround::update(Camera& camera)
 	//selection
 	{
 		const double range=1e-5; //~3 blocks
-		glm::dvec3 g=testPlanet->getGravityVector(camera.getPositionDouble(glm::dvec3(0.0)));
+		glm::dvec3 g=planet->getGravityVector(camera.getPositionDouble(glm::dvec3(0.0)));
 		glm::i32vec3 out;
 		glm::dvec3 v(-glm::transpose(camera.view3)[2]);
 		int dir;
-		Chunk* ret=testPlanet->selectBlock(testPlanet->getCameraRelativeDoublePosition(camera), v*range, out, dir);
+		Chunk* ret=planet->selectBlock(planet->getCameraRelativeDoublePosition(camera), v*range, out, dir);
 
 		// printf("v %f %f %f (%f)\n",v.x,v.y,v.z,glm::dot(v,g));
 		if(ret)
 		{
 			// printf("%d block %d %d %d\n",dir,out.x,out.y,out.z);
-			if(Input::isKeyPressed(GLFW_KEY_X))testPlanet->deleteBlock(out);
+			if(Input::isKeyPressed(GLFW_KEY_X))planet->deleteBlock(out);
 			else if(Input::isKeyPressed(GLFW_KEY_C))
 			{
 				//TODO : check que player n'intersecte pas avec le nouveau bloc...
@@ -95,15 +97,15 @@ void CameraPlayerGround::update(Camera& camera)
 				// blockTypes::T t=blockTypes::water;
 				switch(dir)
 				{
-					case 0: testPlanet->changeBlock(out-glm::i32vec3(1,0,0),t); break;
-					case 1: testPlanet->changeBlock(out+glm::i32vec3(1,0,0),t); break;
-					case 2: testPlanet->changeBlock(out-glm::i32vec3(0,1,0),t); break;
-					case 3: testPlanet->changeBlock(out+glm::i32vec3(0,1,0),t); break;
-					case 4: testPlanet->changeBlock(out-glm::i32vec3(0,0,1),t); break;
-					case 5: testPlanet->changeBlock(out+glm::i32vec3(0,0,1),t); break;
+					case 0: planet->changeBlock(out-glm::i32vec3(1,0,0),t); break;
+					case 1: planet->changeBlock(out+glm::i32vec3(1,0,0),t); break;
+					case 2: planet->changeBlock(out-glm::i32vec3(0,1,0),t); break;
+					case 3: planet->changeBlock(out+glm::i32vec3(0,1,0),t); break;
+					case 4: planet->changeBlock(out-glm::i32vec3(0,0,1),t); break;
+					case 5: planet->changeBlock(out+glm::i32vec3(0,0,1),t); break;
 				}
 			}
-			testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2,glm::translate(glm::mat4(1.0f),testPlanet->getPosition())*glm::mat4(testPlanet->getModel()));
+			testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2,glm::translate(glm::mat4(1.0f),planet->getPosition())*glm::mat4(planet->getModel()));
 		}else{
 			// printf("no block !\n");
 			testCursor->unaffect();
