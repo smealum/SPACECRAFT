@@ -414,7 +414,23 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 		//sideTile = 18;
 	}
 
-	float repeat = (1<<(MINIWORLD_DETAIL-(pf->depth)) )* MINIWORLD_W * CHUNK_N; 
+	double repeat;
+	if (pf->depth < MINIWORLD_DETAIL)
+	{
+		repeat = 1<<(MINIWORLD_DETAIL-(pf->depth));
+	}
+	else
+	{
+		repeat = 1;
+		int depth = pf->depth;
+		while(depth<MINIWORLD_DETAIL)
+		{
+			repeat*=0.5;
+			depth++;
+		}
+	}
+	repeat *= MINIWORLD_W * CHUNK_N;
+	
 
 	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->minElevation,1.0f/(1<<pf->depth),topTile,sideTile,repeat};
 
