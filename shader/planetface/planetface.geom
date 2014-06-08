@@ -58,14 +58,14 @@ void main()
 	c[4]=max(dot(lightdir,normalize(vec3(v[2]-v[0]))),0.0)+ambient;
 
     mat4 projview = proj * view;
-    v[0] = projview * (planetPos+v[0]);
-    v[1] = projview * (planetPos+v[1]);
-    v[2] = projview * (planetPos+v[2]);
-    v[3] = projview * (planetPos+v[3]);
-    v[4] = projview * (planetPos+v[4]);
-    v[5] = projview * (planetPos+v[5]);
-    v[6] = projview * (planetPos+v[6]);
-    v[7] = projview * (planetPos+v[7]);
+    v[0] = projview * (vec4(planetPos,0.0)+v[0]);
+    v[1] = projview * (vec4(planetPos,0.0)+v[1]);
+    v[2] = projview * (vec4(planetPos,0.0)+v[2]);
+    v[3] = projview * (vec4(planetPos,0.0)+v[3]);
+    v[4] = projview * (vec4(planetPos,0.0)+v[4]);
+    v[5] = projview * (vec4(planetPos,0.0)+v[5]);
+    v[6] = projview * (vec4(planetPos,0.0)+v[6]);
+    v[7] = projview * (vec4(planetPos,0.0)+v[7]);
 
 	// XXX temp
     c[0] += (gelevation[0]-1.001)*400.0;
