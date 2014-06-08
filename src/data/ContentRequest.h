@@ -27,6 +27,7 @@ class PlanetElevationRequest : public ContentRequest
 		void process(int id);
 		void update(void);
 		virtual ~PlanetElevationRequest();
+		virtual bool isRelevant(int id);
 		
 	private:
 		float elevation;
@@ -43,8 +44,8 @@ class WorldChunkRequest : public ContentRequest
 		WorldChunkRequest(Planet& p, Chunk& c, float elevation, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z);
 		void process(int id);
 		void update(void);
-		bool isRelevant(int id);
 		virtual ~WorldChunkRequest();
+		virtual bool isRelevant(int id);
 		
 	private:
 		chunkVal data[(CHUNK_N+2)][(CHUNK_N+2)][(CHUNK_N+2)];
@@ -65,6 +66,7 @@ class MiniWorldDataRequest : public ContentRequest
 		void process(int id);
 		void update(void);
 		virtual ~MiniWorldDataRequest();
+		virtual bool isRelevant(int id);
 		
 	private:
 		chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)];
@@ -82,6 +84,7 @@ class MiniWorldDeletionRequest : public ContentRequest
 		void process(int id);
 		void update(void);
 		virtual ~MiniWorldDeletionRequest();
+		virtual bool isRelevant(int id);
 		
 	private:
 		TrackerPointer<MiniWorld>* miniworld;
@@ -96,6 +99,7 @@ class SolarSystemDataRequest : public ContentRequest
 		void process(int id);
 		void update(void);
 		virtual ~SolarSystemDataRequest();
+		virtual bool isRelevant(int id);
 		
 	private:
 		TrackerPointer<SolarSystem>* solarSystem;

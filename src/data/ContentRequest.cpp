@@ -48,6 +48,11 @@ void PlanetElevationRequest::update(void)
 	face->release();
 }
 
+bool PlanetElevationRequest::isRelevant(int id)
+{
+	return true;
+}
+
 //WorldChunkRequest stuff
 WorldChunkRequest::WorldChunkRequest(Planet& p, Chunk& c, float elevation, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z):
 	px(x),
@@ -151,6 +156,7 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 bool WorldChunkRequest::isRelevant(int id)
 {
 	return not chunk->getPointer()->isConstructionCanceled();
+	//return true;
 }
 void WorldChunkRequest::process(int id)
 {
@@ -184,6 +190,12 @@ MiniWorldDataRequest::MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o
 MiniWorldDataRequest::~MiniWorldDataRequest()
 {}
 
+
+bool MiniWorldDataRequest::isRelevant(int id)
+{
+	return not miniworld->getPointer()->isConstructionCanceled();
+}
+
 void MiniWorldDataRequest::process(int id)
 {
 	generateWorldData(id, planet, (chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, px, py, pz, origin, v1, v2);
@@ -196,6 +208,7 @@ void MiniWorldDataRequest::process(int id)
 
 void MiniWorldDataRequest::update(void)
 {
+	//if (not isCanceled)
 	miniworld->getPointer()->updateChunks(data, vArray);
 	miniworld->release();
 }
@@ -209,6 +222,11 @@ MiniWorldDeletionRequest::MiniWorldDeletionRequest(MiniWorld& mw)
 
 MiniWorldDeletionRequest::~MiniWorldDeletionRequest()
 {}
+
+bool MiniWorldDeletionRequest::isRelevant(int id)
+{
+	return true;
+}
 
 void MiniWorldDeletionRequest::process(int id)
 {
@@ -231,6 +249,11 @@ SolarSystemDataRequest::SolarSystemDataRequest(SolarSystem& ss, ContentHandler& 
 
 SolarSystemDataRequest::~SolarSystemDataRequest()
 {}
+
+bool SolarSystemDataRequest::isRelevant(int id)
+{
+	return true;
+}
 
 //idée ici c'est de générer les planetInfo côté producer (ie process) puis de faire l'initialisation des objets côté consumer (ie update)
 void SolarSystemDataRequest::process(int id)
@@ -255,3 +278,4 @@ void SolarSystemDataRequest::update(void)
 	solarSystem->getPointer()->generated=true;
 	solarSystem->release();
 }
+

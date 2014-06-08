@@ -47,7 +47,9 @@ class MiniWorld
 
 		TrackerPointer<MiniWorld>* getTptr(void);
 
+		bool isConstructionCanceled();
 	private:
+		bool constructionCanceled;
 		Planet* planet;
 		PlanetFace* face;
 		Chunk* chunks[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];
