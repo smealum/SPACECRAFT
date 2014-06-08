@@ -529,6 +529,16 @@ glm::dvec3 Planet::getCameraRelativeDoublePosition(Camera& c)
 	return glm::dmat3(invModel)*c.getPositionDouble(glm::dvec3(position));
 }
 
+PlanetFace& Planet::getTopLevelForCamera(Camera& c)
+{
+	return *faces[0];
+	// glm::vec3 p=getCameraRelativePosition(c);
+	// for(int i=0;i<6;i++)
+	// {
+
+	// }
+}
+
 glm::mat3 Planet::getModel(void)
 {
 	return model;
@@ -600,4 +610,24 @@ void Planet::update(float time)
 
 	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,axis));
 	invModel=glm::transpose(model);
+}
+
+glm::vec3 PlanetFace::getOrigin(void)
+{
+	return uvertex[0];
+}
+
+glm::vec3 PlanetFace::getV1(void)
+{
+	return uvertex[1]-uvertex[0];
+}
+
+glm::vec3 PlanetFace::getV2(void)
+{
+	return uvertex[3]-uvertex[0];
+}
+
+glm::vec3 PlanetFace::getN(void)
+{
+	return vertex[4];
 }

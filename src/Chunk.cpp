@@ -171,8 +171,8 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
     while(glm::length(v)>1e-12)
     {
         // TODO : optimiser en ne la calculant qu'une fois par toplevel (max) par frame ?
-        glm::dvec3 blockPos=dspaceToBlock(glm::dvec3(p),glm::dvec3(origin),glm::dvec3(v1),glm::dvec3(v2),glm::dvec3(n));
-        glm::dvec3 blockPos2=dspaceToBlock(glm::dvec3(p+v),glm::dvec3(origin),glm::dvec3(v1),glm::dvec3(v2),glm::dvec3(n));
+        glm::dvec3 blockPos=p;
+        glm::dvec3 blockPos2=p+v;
         
         glm::dvec3 localBlockPosf=glm::dvec3(blockPos.x-px,blockPos.y-py,blockPos.z-pz);
         glm::dvec3 localBlockPosf2=glm::dvec3(blockPos2.x-px,blockPos2.y-py,blockPos2.z-pz);
@@ -206,7 +206,6 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
                     double r=(targetX-blockPos.x)/u.x;
                     blockPos+=u*r;
                     blockPos.x=targetX;
-                    p=dblockToSpace(blockPos, dvec3(origin), dvec3(v1), dvec3(v2));
                     u.x=0;v=u*(d-r);
                 }
                 break;
@@ -220,7 +219,6 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
                     double r=(targetY-blockPos.y)/u.y;
                     blockPos+=u*r;
                     blockPos.y=targetY;
-                    p=dblockToSpace(blockPos, dvec3(origin), dvec3(v1), dvec3(v2));
                     u.y=0;v=u*(d-r);
                 }
                 break;
@@ -233,12 +231,11 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
                     double r=(targetZ-blockPos.z)/u.z;
                     blockPos+=u*r;
                     blockPos.z=targetZ;
-                    p=dblockToSpace(blockPos, dvec3(origin), dvec3(v1), dvec3(v2));
                     u.z=0;v=u*(d-r);
                 }
                 break;
         }
-        v=dblockToSpace(blockPos+v, dvec3(origin), dvec3(v1), dvec3(v2))-p;
+        p=blockPos;
     }
     return ret;
 }

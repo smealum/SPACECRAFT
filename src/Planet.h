@@ -81,6 +81,11 @@ class PlanetFace
 		void createMiniWorld(void);
 		void removeMiniWorld(void);
 
+		glm::vec3 getOrigin(void);
+		glm::vec3 getV1(void);
+		glm::vec3 getV2(void);
+		glm::vec3 getN(void);
+
 		TrackerPointer<PlanetFace>* getTptr(void);
 
 		//TEMP
@@ -95,7 +100,6 @@ class PlanetFace
 		PlanetFace* sons[4];
 
 		class MiniWorld* miniworld;
-
 
 		glm::vec3 vertex[9];
 		glm::vec3 uvertex[9];
@@ -145,6 +149,7 @@ class Planet
 		glm::mat3 getModel(void);
 		glm::vec3 getCameraRelativePosition(Camera& c);
 		glm::dvec3 getCameraRelativeDoublePosition(Camera& c);
+		PlanetFace& getTopLevelForCamera(Camera& c);
 		inline float getElevation(int id, const glm::vec3 &coord)
 		{
 			return generators[id]->getElevation(coord);
