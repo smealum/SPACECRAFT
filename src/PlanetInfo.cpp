@@ -23,7 +23,8 @@ PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t):
 	mountainGlaciation(1.375f),
 	continentHeightScale((1.f - seaLevel) / 4.f),
 	riverDepth(0.0223f),
-	trajectory(t)
+	trajectory(t),
+	period(1.0f)
 {
 }
 

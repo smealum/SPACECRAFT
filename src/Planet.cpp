@@ -500,8 +500,6 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 	// printf("%d, %d\n",curSize,faces.size());
 }
 
-//TEMP
-#include "utils/Input.h"
 
 void Planet::draw(Camera& c)
 {
@@ -520,11 +518,6 @@ void Planet::draw(Camera& c)
 	// dessin des nuages
 	// cloud.draw(c);
 
-	//TEMP
-	// angle+=0.001f;
-	// angle+=0.000001f;
-	if (Input::isKeyHold(GLFW_KEY_V))angle+=0.000001f;
-	if (Input::isKeyHold(GLFW_KEY_B))angle-=0.000001f;
 	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,axis));
 	invModel=glm::transpose(model);
 }
@@ -607,4 +600,5 @@ void Planet::deleteBlock(glm::i32vec3 p)
 void Planet::update(float time)
 {
 	if(planetInfo.trajectory)position=planetInfo.trajectory->getPosition(time);
+	angle=time*2*PI/planetInfo.period;
 }

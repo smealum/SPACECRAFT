@@ -32,6 +32,7 @@ class PlanetInfo
 				riverDepth;
 
 		SpaceObjectTrajectory* trajectory;
+		float period; //rotation propre
 };
 
 #endif
