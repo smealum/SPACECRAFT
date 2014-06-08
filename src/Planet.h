@@ -25,6 +25,7 @@ typedef struct
 	float size;
 	int topTile;
 	int sideTile;
+	float repeat;
 }faceBufferEntry_s;
 
 class Planet;

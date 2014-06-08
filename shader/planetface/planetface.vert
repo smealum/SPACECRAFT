@@ -6,6 +6,7 @@ in float minElevation;
 in float size;
 in int topTile;
 in int sideTile;
+in float repeat;
 
 uniform mat4 model, view, proj;
 uniform vec3 v1, v2;
@@ -17,6 +18,7 @@ out float gminElevation;
 out float gsize;
 out int gtopTile;
 out int gsideTile;
+out float grepeat;
 
 void main()
 {
@@ -28,19 +30,10 @@ void main()
     gelevation=elevation;
     gsize=size;
     gminElevation=minElevation;
+	grepeat=repeat;
 	
 	// 
-	// gtopTile = topTile;
-	// gsideTile = sideTile;
+	gtopTile = topTile;
+	gsideTile = sideTile;
 
-	if (elevation >1.001)
-	{
-		gtopTile = 0;
-		gsideTile = 2;
-	}
-	else
-	{
-		gtopTile = 12*16+13;
-		gsideTile = 12*16+13;
-	}
 }

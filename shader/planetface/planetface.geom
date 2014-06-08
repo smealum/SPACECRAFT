@@ -17,10 +17,12 @@ in vec3 gv2[];
 in float gelevation[];
 in float gminElevation[];
 in float gsize[];
+in float grepeat[];
 
 out float fluminosity;
 out int ftile;
 out vec2 ftexCoords;
+out float frepeat;
 
 void main()
 {
@@ -30,6 +32,7 @@ void main()
 	if ( dot(BlocPosition,normalize(PlanetCenter)) > length(PlanetCenter) )
 		return;
 
+	frepeat = grepeat[0];
 	
 	vec3 v1=gv1[0]*gsize[0];
 	vec3 v2=gv2[0]*gsize[0];
