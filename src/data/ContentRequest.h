@@ -83,6 +83,26 @@ class MiniWorldDeletionRequest : public ContentRequest
 		TrackerPointer<MiniWorld>* miniworld;
 };
 
+#include "SolarSystem.h"
+
+class SolarSystemDataRequest : public ContentRequest
+{
+	public:
+		SolarSystemDataRequest(SolarSystem& ss, ContentHandler& ch);
+		void process(int id);
+		void update(void);
+		virtual ~SolarSystemDataRequest();
+		
+	private:
+		TrackerPointer<SolarSystem>* solarSystem;
+		ContentHandler& contentHandler;
+
+		int numPlanets;
+
+		Sun* sun;
+		Planet** planets;
+};
+
 typedef SynchronizationQueue<ContentRequest*> ContentInputQueue;
 
 #endif

@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include "utils/Input.h"
 #include "Planet.h"
+#include "SolarSystem.h"
 #include "render/Sun.h"
 #include "MiniWorld.h"
 #include "render/Atmosphere.h"
@@ -175,6 +176,7 @@ void Application::createWindowInFullscreen(bool fs)
 }
 
 Planet* testPlanet;
+SolarSystem* testSolarSystem;
 Cursor* testCursor;
 Sun* sun;
 int testTexture;
@@ -195,6 +197,7 @@ void Application::run()
     tt=new testShaders;
     PlanetInfo planetInfo;
     testPlanet=new Planet(planetInfo, contentHandler);
+    testSolarSystem=new SolarSystem(contentHandler);
 	sun=new Sun();
     testCursor=new Cursor();
 
