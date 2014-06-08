@@ -20,7 +20,7 @@ in vec4 gcolor[];
 in int dir[];
 
 out vec4 fcolor;
-out flat int ftile;
+flat out int ftile;
 out vec2 texcoord;
 
 const vec3 o[]=vec3[](vec3(0.0,0.0,0.0), //bottom

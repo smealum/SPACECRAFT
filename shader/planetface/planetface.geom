@@ -11,8 +11,8 @@ uniform vec3 lightdir;
 uniform vec3 planetPos;
 
 in vec3 pos[];
-in int gtopTile[];
-in int gsideTile[];
+flat in int gtopTile[];
+flat in int gsideTile[];
 in vec3 gv1[];
 in vec3 gv2[];
 in float gelevation[];
@@ -21,7 +21,7 @@ in float gsize[];
 in float grepeat[];
 
 out float fluminosity;
-out flat int ftile;
+out int ftile;
 out vec2 ftexCoords;
 out float frepeat;
 

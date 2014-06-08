@@ -4,7 +4,7 @@ uniform sampler2DArray Texture;
 
 in vec2 texcoord;
 in vec4 fcolor;
-in flat int ftile;
+flat in int ftile;
 
 out vec4 outColor;
 
