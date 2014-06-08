@@ -8,7 +8,7 @@ using namespace glm;
 Camera::Camera(float znear, float zfar):
 	view(1.f),
 	pos(0.0,0.0,5.0),
-	proj(perspective(DEG2RAD(90.f), Application::getInstance().getWindowRatio(), znear, zfar)),
+	proj(perspective(DEG2RAD(70.f), Application::getInstance().getWindowRatio(), znear, zfar)),
 	cameraManager(NULL),
 	znear(znear),
 	zfar(zfar)
