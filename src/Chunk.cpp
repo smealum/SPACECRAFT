@@ -183,7 +183,7 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
             localBlockPosf.x>=CHUNK_N || localBlockPosf.y>=CHUNK_N || localBlockPosf.z>=CHUNK_N)
             return ret;
 
-        // printf("LENGTH1 %f\n",glm::length(v));
+        // printf("LENGTH1 %f (%d %d %d)\n",glm::length(v),localBlockPosi.z+1,localBlockPosi.y+1,localBlockPosi.x+1);
 
         if(value[localBlockPosi.z+1][localBlockPosi.y+1][localBlockPosi.x+1]!=blockTypes::air){return ret;}
 
@@ -194,7 +194,7 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
         glm::dvec3 u=glm::normalize(localBlockPosf2-localBlockPosf);
         const double d=glm::length(localBlockPosf2-localBlockPosf);
 
-        // printf("collision %d %d %d (%f %f %f) %f (%f %f %f)\n",cur.x,cur.y,cur.z,localBlockPosf.x,localBlockPosf.y,localBlockPosf.z,d,tMaxX,tMaxY,tMaxZ);
+        // printf("collision %d %d %d (%f %f %f) %f (%f %f %f)\n",cur.x,cur.y,cur.z,localBlockPosf.x,localBlockPosf.y,localBlockPosf.z,d);
         switch(dir)
         {
             case 0:

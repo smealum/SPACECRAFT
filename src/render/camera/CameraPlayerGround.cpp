@@ -59,10 +59,13 @@ void CameraPlayerGround::update(Camera& camera)
 
 		speedVect+=localSpeedVect+g*gS; //gravité
 
+		//c'est immonde, mais c'est aussi TEMP
 		glm::dvec3 tp=planet->getCameraRelativeDoublePosition(camera)-g*(1.0/PLANETFACE_BLOCKS);
+		speedVect=glm::dmat3(glm::transpose(planet->getModel()))*speedVect;
 		glm::dvec3 out;
 		bool ret=planet->collidePoint(tp,-speedVect,out);
 		speedVect=tp-out;
+		speedVect=glm::dmat3(planet->getModel())*speedVect;
 
 		camera.pos-=speedVect;
 

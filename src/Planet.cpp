@@ -517,9 +517,6 @@ void Planet::draw(Camera& c)
 
 	// dessin des nuages
 	// cloud.draw(c);
-
-	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,axis));
-	invModel=glm::transpose(model);
 }
 
 glm::vec3 Planet::getCameraRelativePosition(Camera& c)
@@ -531,7 +528,6 @@ glm::dvec3 Planet::getCameraRelativeDoublePosition(Camera& c)
 {
 	return glm::dmat3(invModel)*c.getPositionDouble(glm::dvec3(position));
 }
-
 
 glm::mat3 Planet::getModel(void)
 {
@@ -601,4 +597,7 @@ void Planet::update(float time)
 {
 	if(planetInfo.trajectory)position=planetInfo.trajectory->getPosition(time);
 	angle=time*2*PI/planetInfo.period;
+
+	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,axis));
+	invModel=glm::transpose(model);
 }
