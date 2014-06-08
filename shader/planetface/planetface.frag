@@ -14,6 +14,6 @@ void main()
     outColor = texture(Texture,vec3(ftexCoords.xy*frepeat,ftile));
 	// XXX
 	outColor.xyz-=2.0*(1.0-outColor.a);
-	outColor.xyz *= fluminosity;
+	outColor.xyz*=fluminosity;
 	outColor.a = 1.0;
 }
