@@ -531,12 +531,16 @@ glm::dvec3 Planet::getCameraRelativeDoublePosition(Camera& c)
 
 PlanetFace& Planet::getTopLevelForCamera(Camera& c)
 {
+	glm::vec3 p=getCameraRelativePosition(c);
+	for(int i=0;i<6;i++)
+	{
+		glm::vec3 p2=(p/glm::dot(faces[i]->getN(),p))-faces[i]->getOrigin();
+		float vv1=glm::dot(p2,faces[i]->getV1());
+		float vv2=glm::dot(p2,faces[i]->getV2());
+		if(vv1>=0.0f && vv1<=4.0f && vv2>=0.0f && vv2<=4.0f)return *faces[i];
+	}
+	printf("ERROR ERROR\n");
 	return *faces[0];
-	// glm::vec3 p=getCameraRelativePosition(c);
-	// for(int i=0;i<6;i++)
-	// {
-
-	// }
 }
 
 glm::mat3 Planet::getModel(void)

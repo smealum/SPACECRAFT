@@ -15,7 +15,8 @@ CameraPlayerGround::CameraPlayerGround(Planet* p, Camera& c, PlanetFace& pf):
 	planet(p),
 	face(pf)
 {
-	localPosition=dspaceToBlock(c.pos,glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()),glm::dvec3(face.getN()));
+	//TODO : invmodel
+	localPosition=dspaceToBlock(c.getPositionDouble(glm::dvec3(planet->getPosition())),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()),glm::dvec3(face.getN()));
 }
 
 void CameraPlayerGround::update(Camera& camera)
@@ -26,11 +27,13 @@ void CameraPlayerGround::update(Camera& camera)
 
 		if(Input::isKeyPressed(GLFW_KEY_R))camera.setCameraManager(new CameraKeyboardMouse()); //TODO : méga fuite à virer
 
-		if(!planet)return;
-
-		const double tS=1e-5*delta;
-		const double gS=2e-6*delta;
-		const double jS=4e-7;
+		// const double tS=1e-5*delta;
+		// const double gS=2e-6*delta;
+		// const double jS=4e-7;
+		// const float rS=1.5*delta;
+		const double tS=5.0*delta;
+		const double gS=5.0*delta;
+		const double jS=1.0;
 		const float rS=1.5*delta;
 
 		// rotation
@@ -49,29 +52,30 @@ void CameraPlayerGround::update(Camera& camera)
 
 		// // localSpeedVect=(localSpeedVect*glm::dmat3(camera.view3));
 
-		// // glm::dvec3 g=planet->getGravityVector(camera.pos);
+		glm::dvec3 g(0.0,1.0,0.0);
 
 		// // //on ajuste l'orientation pour s'aligner sur g
 		// // float val=glm::dot(glm::dvec3(glm::transpose(camera.view3)[0]),g);
 		// // if(fabs(val)>1e-6)camera.view3=glm::mat3(glm::rotate(glm::mat4(1.0),5.0f*val*delta,glm::vec3(0.0,0.0,1.0)))*camera.view3;
 
-		// // localSpeedVect-=g*glm::dot(g,localSpeedVect); //déplacements horizontaux uniquement
+		if(Input::isKeyPressed(GLFW_KEY_SPACE))localSpeedVect-=g*jS; //saut
 
-		// // if(Input::isKeyPressed(GLFW_KEY_SPACE))localSpeedVect-=g*jS; //saut
+		speedVect+=localSpeedVect+g*gS; //gravité
 
-		// // speedVect+=localSpeedVect+g*gS; //gravité
-		// speedVect+=localSpeedVect;
+		glm::dvec3 out;
+		bool ret=planet->collidePoint(localPosition,-speedVect,out);
 
-		// glm::dvec3 out;
-		// bool ret=planet->collidePoint(localPosition,-speedVect,out);
+		localPosition=out;
+		// localPosition+=localSpeedVect;
 
+		//TODO : passer dans une methode de planet ?
 		camera.pos=glm::dmat3(planet->getModel())*dblockToSpace(localPosition,glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))+glm::dvec3(planet->getPosition());
 
-		// if(ret)speedVect/=2.0; //frottements sol
-		// // else{
-		// // 	double gval=glm::dot(g,speedVect);
-		// // 	speedVect=(speedVect-gval*g)*0.7+gval*g;
-		// // }
+		if(ret)speedVect/=2.0; //frottements sol
+		else{
+			double gval=glm::dot(g,speedVect);
+			speedVect=(speedVect-gval*g)*0.7+gval*g;
+		}
 
 		camera.updateView();
 		camera.updateFrustum();
