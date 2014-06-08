@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "utils/dbg.h"
+#include "utils/gldbg.h"
 #include <cstdlib>
 #include "utils/Input.h"
 #include "Planet.h"
@@ -69,6 +70,8 @@ Application::Application() :
     fps(0.f),
     fpsCounter(0)
 {
+	glCheckError("Flush Previous Errors");
+
     if (!glfwInit())
     {
         log_err("Cannot initialize glfw3...");
@@ -86,13 +89,15 @@ Application::Application() :
         TwInit(TW_OPENGL_CORE, NULL);
     #endif
 
+	glCheckError("Context creation Errors");
+
     // transparency
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
-    glEnable(GL_TEXTURE_1D);
-    glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glCheckError("GL State initialisation");
 
     #ifndef NTWBAR
         bar = TwNewBar("SPACECRAFT");
@@ -119,6 +124,8 @@ Application::Application() :
         glfwSetScrollCallback(window, (GLFWscrollfun)TwEventMouseWheelGLFW3);
         glfwSetKeyCallback(window, (GLFWkeyfun)TwEventKeyGLFW3);
         glfwSetCharCallback(window, (GLFWcharfun)TwEventCharGLFW3);
+	
+		glCheckError("tweak bar");
     #endif
 
     glewExperimental = GL_TRUE;
@@ -128,6 +135,10 @@ Application::Application() :
         glfwTerminate();
         std::exit(1);
     }
+
+	glCheckError("GLEWInit Errors");
+
+	blockTypeLoadValues();
 }
 
 void Application::glfwWindowHints()
@@ -167,6 +178,7 @@ Planet* testPlanet;
 Cursor* testCursor;
 Sun* sun;
 int testTexture;
+int testTextureArray;
 
 void Application::run()
 {
@@ -186,7 +198,8 @@ void Application::run()
 	sun=new Sun();
     testCursor=new Cursor();
 
-    testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
+	testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
+    testTextureArray=TextureManager::getInstance().loadTextureArray("data/blocksPackArray.png",16,16);
 
     float timeA;
     char titleBuff[512];
@@ -210,6 +223,13 @@ void Application::run()
             }
 			BlockAnimated::animation(deltaTime);
         }
+
+		// test des ereurs openGL non reporté:
+		{
+			static int i=0;
+			if (i++%30)
+				glCheckError("Unreported Error");
+		}
     }
 
 }
@@ -269,7 +289,7 @@ void Application::loop()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		// TwDraw();
+		TwDraw();
     #endif
 
     glfwSwapBuffers(window);
@@ -284,4 +304,3 @@ Application::~Application()
     #endif
     glfwTerminate();
 }
-

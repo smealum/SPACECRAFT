@@ -15,7 +15,7 @@
 
 #define PLANET_ADDED_DETAIL (4)
 // #define PFBH_MAXSIZE (1024*16)
-#define PFBH_MAXSIZE (1024*256)
+#define PFBH_MAXSIZE (1024*512)
 
 typedef struct
 {
@@ -23,6 +23,9 @@ typedef struct
 	float elevation;
 	float minElevation;
 	float size;
+	int topTile;
+	int sideTile;
+	float repeat;
 }faceBufferEntry_s;
 
 class Planet;
@@ -93,6 +96,7 @@ class PlanetFace
 
 		class MiniWorld* miniworld;
 
+
 		glm::vec3 vertex[9];
 		glm::vec3 uvertex[9];
 
@@ -106,6 +110,8 @@ class PlanetFace
 		uint8_t id;
 		int depth;
 		int childrenDepth;
+		inline bool isDrawingFace() {return bufferID>=0;}
+		bool isDisplayOk;
 };
 
 class Planet

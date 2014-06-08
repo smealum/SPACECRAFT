@@ -12,6 +12,7 @@
 // x, y in [0..1]
 typedef glm::vec2 texCoord;
 
+
 namespace blockTypes
 {
 	// 1D index for a 2D array
@@ -33,18 +34,19 @@ namespace blockTypes
 		water_2 = water+2,
 		water_3 = water+TEXCOLS+1,
 		water_4 = water+TEXCOLS+2,
-		maxTypeValue
+		max
 	};
 }
 
 namespace blockPlane {
 	enum T : uint8_t {
-		top,
+		top = 0,
 		side,
 		bottom,
-		maxPlanes
+		max
 	};
 }
+
 
 namespace blockTransparency
 {
@@ -53,7 +55,8 @@ namespace blockTransparency
 		opaque = 0, // alpha == 1
 		seeThrough = 1, // alpha > 0.01 && < 1
 		transparent = 2, // alpha == 0
-		invisible = 3 // nothing to draw
+		invisible = 3, // nothing to draw
+		max
 	};
 }
 
@@ -61,9 +64,33 @@ namespace blockStyle
 {
 	enum T : uint8_t {
 		normal = 0, // => box
-		sprite = 1 // => flower style
+		sprite = 1, // => flower style
+		max
 	};
 }
+
+// XXX XXX
+// J'ai eut un peu de mal à m'intégré au code.
+// Pourquoi c'est si compliqué ?
+// Si quelqu'un veut bien m'intégré.
+extern int blockTileID[blockTypes::max][blockPlane::max];
+
+// donne l'ID de transparence d'un bloc
+extern uint8_t blockTransparencyID[blockTypes::max];
+
+// donne l'ID de style d'un bloc
+extern uint8_t blockStyleID[blockTypes::max];
+bool blockShouldBeFace(int type1, int type2);
+
+inline int getBlockID(int blockType, int plane)
+{
+	return blockTileID[blockType][plane]-1;
+}
+
+void blockTypeLoadValues();
+// On peut supprimer le reste ?????
+// fin ajout Arthur
+//////////////////////////////////////////////////////////
 
 class BlockType;
 
@@ -134,8 +161,8 @@ class BlockType : public Singleton<BlockType> {
 
 		~BlockType();
 	private:
-		BlockTexCoord* blocks[blockTypes::maxTypeValue];
-		texCoord texCoords[blockTypes::maxTypeValue];
+		BlockTexCoord* blocks[blockTypes::max];
+		texCoord texCoords[blockTypes::max];
 		friend class Singleton<BlockType>;
 		int texWidth, texHeight, texCols;
 		BlockType();

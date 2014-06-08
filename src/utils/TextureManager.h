@@ -20,10 +20,13 @@ class TextureManager : public Singleton<TextureManager> {
 		};
 		std::map<std::string, tex> textures;
 		friend class Singleton<TextureManager>;
+		
+		
 	public:
 		~TextureManager();
 
 		GLuint loadTexture(const std::string& filename);
+		GLuint loadTextureArray(const std::string& filename, int tileW, int tileH);
 		void getTextureSize(const std::string& filename, int *width, int *height);
 		inline void bind(const std::string& filename, GLuint activetexture = GL_TEXTURE0)
 		{

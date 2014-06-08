@@ -33,7 +33,8 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	x(0),
 	z(0),
 	depth(0),
-	childrenDepth(0)
+	childrenDepth(0),
+	isDisplayOk(false)
 {
 	uvertex[0]=v[0]; uvertex[1]=v[1];
 	uvertex[2]=v[2]; uvertex[3]=v[3];
@@ -103,11 +104,13 @@ PlanetFace::~PlanetFace()
 void PlanetFace::deletePlanetFace(PlanetFaceBufferHandler* b)
 {
 	b->deleteFace(this);
-	if(!father)
+
+	// delete children
+	for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
+
+	// inform father
+	if(father)
 	{
-		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
-	}else{
-		for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
 		father->sons[id]=NULL;
 		tptr->release();
 	}
@@ -211,26 +214,51 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 		if(sons[i])
 			childrenDepth = max(childrenDepth,(sons[i]->childrenDepth + 1));
 
+	// update isDisplayOk
+	// isDisplayOk est vrai si on affiche une face ou bien un miniworld ou que tout les enfants 
+	// sont présents et on isDisplayOk.
+	isDisplayOk = isDrawingFace() || (miniworld && miniworld->isGenerated());
+	if (!isDisplayOk)
+	{
+		isDisplayOk = true;
+		for(int i=0;i<4;i++)
+		{
+			if( (!sons[i]) || !(sons[i]->isDisplayOk))
+			{
+				isDisplayOk = false;
+				break;
+			}
+		}
+	}
+
+
 	// face assez détaillé, on l'affiche
 	if(isDetailedEnough(c))
 	{
-		// suppression des éventuels enfants
-		for(int i=0;i<4;i++)
-			if(sons[i])
-				sons[i]->deletePlanetFace(b);
-
-		// suppresion des éventuels miniWorld
-		removeMiniWorld();
-
 		// dessin de la face
 		if (elevated)
-			b->addFace(this);
+		{
+			b->addFace(this); 
+
+			// suppresion des éventuels miniWorlds si on a la face qui s'affiche
+			removeMiniWorld();
+
+			// suppression des éventuels enfants
+			for(int i=0;i<4;i++)
+				if(sons[i])
+					sons[i]->deletePlanetFace(b);
+		}
 	}else{
 		// creation/destruction du miniWorld
 		if(shouldHaveMiniworld(c))
 		{
+			// creation du miniworld
+			createMiniWorld();
+
+			// effacement des enfants et de l'affichage de la face
 			if(miniworld && miniworld->isGenerated())
 			{
+				// suppresion de la face
 				b->deleteFace(this);
 				// suppression des éventuels enfants
 				for(int i=0;i<4;i++)
@@ -238,24 +266,26 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 						sons[i]->deletePlanetFace(b);
 			}
 			
-			// creation du miniworld
-			createMiniWorld();
 		}else{
-			// suppresion du MiniWorld
-			removeMiniWorld();
 
 			// ajout des éventuels enfants
 			bool done=true;
 			for(int i=0;i<4;i++)
 			{
-				if(sons[i])
-					sons[i]->processLevelOfDetail(c, b);
-				else
+				if(!sons[i])
 					sons[i]=new PlanetFace(planet,this,i);
-				if(!sons[i]->elevated)
-					done=false;
+
+				sons[i]->processLevelOfDetail(c, b);
+
+				done &= ( sons[i]->isDisplayOk );
 			}
-			if(done)b->deleteFace(this);
+
+			// on peux ne plus afficher la face si les enfants affichent quelque chose.
+			if (done)
+			{
+				b->deleteFace(this);
+				removeMiniWorld();
+			}
 		}
 
 	}
@@ -343,10 +373,13 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 	shader.use();
 	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
 
-	shader.setAttribute("position", 3, GL_FALSE, 6, 0);
-	shader.setAttribute("elevation", 1, GL_FALSE, 6, 3);
-	shader.setAttribute("minElevation", 1, GL_FALSE, 6, 4);
-	shader.setAttribute("size", 1, GL_FALSE, 6, 5);
+	shader.setAttribute("position", 3, GL_FALSE, 9, 0);
+	shader.setAttribute("elevation", 1, GL_FALSE, 9, 3);
+	shader.setAttribute("minElevation", 1, GL_FALSE, 9, 4);
+	shader.setAttribute("size", 1, GL_FALSE, 9, 5);
+	shader.setAttribute("topTile", 1, GL_FALSE, 9, 6);
+	shader.setAttribute("sideTile", 1, GL_FALSE, 9, 7);
+	shader.setAttribute("repeat", 1, GL_FALSE, 9, 8);
 
 	shader.setUniform("model", glm::mat4(1.0f));
 }
@@ -363,7 +396,27 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	if(i>=maxSize)return;
 	faces.push_back(pf);
 	const glm::vec3 n=pf->uvertex[4];
-	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->minElevation,1.0f/(1<<pf->depth)};
+
+	int topTile,sideTile;
+	if (pf->elevation >1.001)
+	{
+		topTile = 0;
+		sideTile = 2;
+	}
+	else
+	{
+		// water
+		//topTile = 12*16+13;
+		//sideTile = 12*16+13;
+
+		// sand
+		topTile = 18;
+		sideTile = 18;
+	}
+
+	float repeat = (1<<(MINIWORLD_DETAIL-(pf->depth)) )* MINIWORLD_W * CHUNK_N; 
+
+	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->minElevation,1.0f/(1<<pf->depth),topTile,sideTile,repeat};
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, i*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[i]);
@@ -375,6 +428,8 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 	changeFace(pf, curSize);
 	pf->bufferID=curSize;
 	curSize++;
+
+	pf->isDisplayOk = true;
 }
 
 void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
@@ -396,7 +451,11 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 	pf->bufferID=-1;
 	faces.pop_back();
 	curSize--;
+	pf->isDisplayOk = false;
 }
+
+// XXX TMP
+extern int testTextureArray;
 
 void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 {
@@ -414,7 +473,13 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	
+
+
+	// bind la texture
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY,testTextureArray);
+	shader.setUniform("Texture",0);
+
 	glDrawArrays(GL_POINTS, 0, curSize);
 	// printf("%d, %d\n",curSize,faces.size());
 }
