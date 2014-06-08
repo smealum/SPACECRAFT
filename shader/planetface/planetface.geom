@@ -10,14 +10,17 @@ uniform float logconst, zfar;
 uniform vec3 lightdir;
 
 in vec3 pos[];
-in vec4 gcolor[];
+in int gtopTile[];
+in int gsideTile[];
 in vec3 gv1[];
 in vec3 gv2[];
 in float gelevation[];
 in float gminElevation[];
 in float gsize[];
 
-out vec4 fcolor;
+out float fluminosity;
+out int ftile;
+out vec2 ftexCoords;
 
 void main()
 {
@@ -43,12 +46,20 @@ void main()
 	v[6]=vec4(gelevation[0]*normalize(pos[0]-v1+v2),1.0);
 	v[7]=vec4(gelevation[0]*normalize(pos[0]+v1+v2),1.0);
 
+
 	const float ambient=0.0;
-	c[0]=(max(dot(lightdir,normalize(vec3(v[0]))),0.0)+ambient)/255.0;
-	c[1]=(max(dot(lightdir,normalize(vec3(v[1]-v[0]))),0.0)+ambient)/255.0;
-	c[2]=(max(dot(lightdir,normalize(vec3(v[0]-v[1]))),0.0)+ambient)/255.0;
-	c[3]=(max(dot(lightdir,normalize(vec3(v[0]-v[2]))),0.0)+ambient)/255.0;
-	c[4]=(max(dot(lightdir,normalize(vec3(v[2]-v[0]))),0.0)+ambient)/255.0;
+	c[0]=(max(dot(lightdir,normalize(vec3(v[0]))),0.0)+ambient);
+	c[1]=(max(dot(lightdir,normalize(vec3(v[1]-v[0]))),0.0)+ambient);
+	c[2]=(max(dot(lightdir,normalize(vec3(v[0]-v[1]))),0.0)+ambient);
+	c[3]=(max(dot(lightdir,normalize(vec3(v[0]-v[2]))),0.0)+ambient);
+	c[4]=(max(dot(lightdir,normalize(vec3(v[2]-v[0]))),0.0)+ambient);
+
+	// XXX temp
+	/*c[0] += (gelevation[0]-1.0)*400.0;*/
+	/*c[1] += (gelevation[0]-1.0)*400.0;*/
+	/*c[2] += (gelevation[0]-1.0)*400.0;*/
+	/*c[3] += (gelevation[0]-1.0)*400.0;*/
+	/*c[4] += (gelevation[0]-1.0)*400.0;*/
 	
 	mat4 projViewModel = proj*view*model;
 	v[0]=projViewModel*v[0];
@@ -72,51 +83,50 @@ void main()
 
 	*/
 
-	fcolor.a = 1.0;
+	ftile = gtopTile[0];
 
-	fcolor.rgb = gcolor[0].rgb * vec3(84,124,60) * c[0];
-	
 	// TOP FACE
-	gl_Position = logDepth(v[5]); EmitVertex();
-	gl_Position = logDepth(v[4]); EmitVertex();
-	gl_Position = logDepth(v[7]); EmitVertex();
-	gl_Position = logDepth(v[6]); EmitVertex();
+	fluminosity = c[0];
+	gl_Position = logDepth(v[5]); ftexCoords = vec2(1.0,1.0); EmitVertex();
+	gl_Position = logDepth(v[4]); ftexCoords = vec2(0.0,1.0); EmitVertex();
+	gl_Position = logDepth(v[7]); ftexCoords = vec2(1.0,0.0); EmitVertex();
+	gl_Position = logDepth(v[6]); ftexCoords = vec2(0.0,0.0); EmitVertex();
 	EndPrimitive();
 
-	fcolor.rgb = gcolor[0].rgb * vec3(161,103,88) * c[1];
+	ftile = gsideTile[0];
 
 	// LEFT FACE
-	gl_Position = logDepth(v[0]); EmitVertex();
-	gl_Position = logDepth(v[2]); EmitVertex();
-	gl_Position = logDepth(v[4]); EmitVertex();
-	gl_Position = logDepth(v[6]); EmitVertex();
+	fluminosity = c[1];
+	gl_Position = logDepth(v[0]); ftexCoords = vec2(1.0,1.0); EmitVertex();
+	gl_Position = logDepth(v[2]); ftexCoords = vec2(0.0,1.0); EmitVertex();
+	gl_Position = logDepth(v[4]); ftexCoords = vec2(1.0,0.0); EmitVertex();
+	gl_Position = logDepth(v[6]); ftexCoords = vec2(0.0,0.0); EmitVertex();
 	EndPrimitive();
 
-	fcolor.rgb = gcolor[0].rgb * vec3(161,103,88) * c[2];
 
 	// RIGHT FACE
-	gl_Position = logDepth(v[3]); EmitVertex();
-	gl_Position = logDepth(v[1]); EmitVertex();
-	gl_Position = logDepth(v[7]); EmitVertex();
-	gl_Position = logDepth(v[5]); EmitVertex();
+	fluminosity = c[2];
+	gl_Position = logDepth(v[3]); ftexCoords = vec2(1.0,1.0); EmitVertex();
+	gl_Position = logDepth(v[1]); ftexCoords = vec2(0.0,1.0); EmitVertex();
+	gl_Position = logDepth(v[7]); ftexCoords = vec2(1.0,0.0); EmitVertex();
+	gl_Position = logDepth(v[5]); ftexCoords = vec2(0.0,0.0); EmitVertex();
 	EndPrimitive();
-
-	fcolor.rgb = gcolor[0].rgb * vec3(161,103,88) * c[3];
 
 	// FRONT FACE
-	gl_Position = logDepth(v[1]); EmitVertex();
-	gl_Position = logDepth(v[0]); EmitVertex();
-	gl_Position = logDepth(v[5]); EmitVertex();
-	gl_Position = logDepth(v[4]); EmitVertex();
+	fluminosity = c[3];
+	gl_Position = logDepth(v[1]); ftexCoords = vec2(1.0,1.0); EmitVertex();
+	gl_Position = logDepth(v[0]); ftexCoords = vec2(0.0,1.0); EmitVertex();
+	gl_Position = logDepth(v[5]); ftexCoords = vec2(1.0,0.0); EmitVertex();
+	gl_Position = logDepth(v[4]); ftexCoords = vec2(0.0,0.0); EmitVertex();
 	EndPrimitive();
 
-	fcolor.rgb = gcolor[0].rgb * vec3(161,103,88) * c[4];
 
 	// BACK FACE
-	gl_Position = logDepth(v[2]); EmitVertex();
-	gl_Position = logDepth(v[3]); EmitVertex();
-	gl_Position = logDepth(v[6]); EmitVertex();
-	gl_Position = logDepth(v[7]); EmitVertex();
+	fluminosity = c[4];
+	gl_Position = logDepth(v[2]); ftexCoords = vec2(1.0,1.0); EmitVertex();
+	gl_Position = logDepth(v[3]); ftexCoords = vec2(0.0,1.0); EmitVertex();
+	gl_Position = logDepth(v[6]); ftexCoords = vec2(1.0,0.0); EmitVertex();
+	gl_Position = logDepth(v[7]); ftexCoords = vec2(0.0,0.0); EmitVertex();
 	EndPrimitive();
 	
 }

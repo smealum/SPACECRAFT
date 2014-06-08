@@ -80,10 +80,10 @@ void Chunk::draw(Camera& cam, glm::mat4 model)
     program.setUniform("lightdir",planet->lightdir);
 
     //glBindTexture(GL_TEXTURE_2D, testTexture);
-	// On n'a pas besoin de bind un textureArray (uniquement utilisable dans un shader)
+	// On n'a pas besoin de bind un textureArray? (uniquement utilisable dans un shader)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY,testTextureArray);
-	glUniform1i(program["Texture"], 0);
+	program.setUniform("Texture",0);
 
     glDrawArrays(GL_POINTS, 0 ,  vArray.size());
 }

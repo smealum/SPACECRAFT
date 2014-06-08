@@ -145,21 +145,12 @@ GLuint TextureManager::loadTextureArray(const std::string& filename, int tileW, 
 			dataGL
 	);
 	
-	log_info("----");
 
 	// texture interpolation
 	glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_S,GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY,GL_TEXTURE_WRAP_T,GL_REPEAT);
-
-	GLenum error = glGetError();
-	log_info("%d",error);
-	log_info("%d",GL_INVALID_ENUM);
-	log_info("%d",GL_INVALID_VALUE);
-	log_info("%d",GL_INVALID_FRAMEBUFFER_OPERATION);
-	log_info("%d",GL_OUT_OF_MEMORY);
-
 
 	free(data);
 	delete[] dataGL;

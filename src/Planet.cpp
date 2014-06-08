@@ -370,10 +370,12 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 	shader.use();
 	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
 
-	shader.setAttribute("position", 3, GL_FALSE, 6, 0);
-	shader.setAttribute("elevation", 1, GL_FALSE, 6, 3);
-	shader.setAttribute("minElevation", 1, GL_FALSE, 6, 4);
-	shader.setAttribute("size", 1, GL_FALSE, 6, 5);
+	shader.setAttribute("position", 3, GL_FALSE, 8, 0);
+	shader.setAttribute("elevation", 1, GL_FALSE, 8, 3);
+	shader.setAttribute("minElevation", 1, GL_FALSE, 8, 4);
+	shader.setAttribute("size", 1, GL_FALSE, 8, 5);
+	shader.setAttribute("topTile", 1, GL_FALSE, 8, 6);
+	shader.setAttribute("sideTile", 1, GL_FALSE, 8, 7);
 
 	shader.setUniform("model", glm::mat4(1.0f));
 }
@@ -390,7 +392,7 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	if(i>=maxSize)return;
 	faces.push_back(pf);
 	const glm::vec3 n=pf->uvertex[4];
-	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->minElevation,1.0f/(1<<pf->depth)};
+	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->minElevation,1.0f/(1<<pf->depth),0,0};
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, i*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[i]);
@@ -428,6 +430,9 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 	pf->isDisplayOk = false;
 }
 
+// XXX TMP
+extern int testTextureArray;
+
 void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 {
 	shader.use();
@@ -442,7 +447,13 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	
+
+
+	// bind la texture
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY,testTextureArray);
+	shader.setUniform("Texture",0);
+
 	glDrawArrays(GL_POINTS, 0, curSize);
 	// printf("%d, %d\n",curSize,faces.size());
 }

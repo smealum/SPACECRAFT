@@ -23,6 +23,8 @@ typedef struct
 	float elevation;
 	float minElevation;
 	float size;
+	int topTile;
+	int sideTile;
 }faceBufferEntry_s;
 
 class Planet;

@@ -92,7 +92,6 @@ void main()
 	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4(rn,1.0);
 	gl_Position = logDepth(r);
-	// gl_Position = r;
 	texcoord=vec2(1.0,1.0);
 	EmitVertex();
 
@@ -101,10 +100,8 @@ void main()
 	pos2=v1*pos1.x+v2*pos1.z;
 	y=1.0+pos1.y/numBlocks;
 
-	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = logDepth(r);
-	// gl_Position = r;
 	texcoord=vec2(0.0,1.0);
 	EmitVertex();
 
@@ -113,10 +110,8 @@ void main()
 	pos2=v1*pos1.x+v2*pos1.z;
 	y=1.0+pos1.y/numBlocks;
 
-	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = logDepth(r);
-	// gl_Position = r;
 	texcoord=vec2(1.0,0.0);
 	EmitVertex();
 
@@ -125,10 +120,8 @@ void main()
 	pos2=v1*pos1.x+v2*pos1.z;
 	y=1.0+pos1.y/numBlocks;
 
-	fcolor = vec4(vec3(col),1.0);
 	r = proj * view * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = logDepth(r);
-	// gl_Position = r;
 	texcoord=vec2(0,0.0);
 	EmitVertex();
 	EndPrimitive();
