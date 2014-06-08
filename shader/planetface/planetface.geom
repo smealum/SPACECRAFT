@@ -21,7 +21,7 @@ in float gsize[];
 in float grepeat[];
 
 out float fluminosity;
-out int ftile;
+flat out int ftile;
 out vec2 ftexCoords;
 out float frepeat;
 

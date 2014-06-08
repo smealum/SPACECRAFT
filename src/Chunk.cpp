@@ -18,7 +18,8 @@ Chunk::Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, 
     pz(z),
     v1(v1),
     v2(v2),
-    origin(origin)
+    origin(origin),
+	constructionCanceled(false)
 {
     //fait dans miniworld maintenant
     // planet->handler.requestContent(new WorldChunkRequest(*planet, *this, mw->face->elevation, origin, v1, v2, x, y, z));
@@ -48,7 +49,13 @@ void Chunk::updateData(chunkVal* data, std::vector<GL_Vertex> va)
 
 void Chunk::destroyChunk(void)
 {
+	constructionCanceled = true;
     tptr->release();
+}
+
+bool Chunk::isConstructionCanceled()
+{
+	return constructionCanceled;
 }
 
 //TEMP

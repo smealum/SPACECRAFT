@@ -33,7 +33,10 @@ void Producer::producerMain()
 		ContentRequest* cr=inputQueue.pop();
 		if(cr)
 		{
-			cr->process(id);
+			if (cr->isRelevant(id))
+				cr->process(id);
+			else
+				cr->isCanceled = true;
 			outputQueue.push(cr);
 		}else{
 			sf::sleep(sf::milliseconds(10));

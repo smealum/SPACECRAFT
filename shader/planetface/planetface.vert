@@ -16,8 +16,8 @@ out vec3 gv1, gv2;
 out float gelevation;
 out float gminElevation;
 out float gsize;
-out int gtopTile;
-out int gsideTile;
+flat out int gtopTile;
+flat out int gsideTile;
 out float grepeat;
 
 void main()

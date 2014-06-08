@@ -47,7 +47,9 @@ class Chunk
 		Chunk* neighbour[4] ; // NULL <=> nothing
 		chunkVal value[CHUNK_N+2][CHUNK_N+2][CHUNK_N+2];
 
+		bool isConstructionCanceled();
 	private:
+		bool constructionCanceled;
 		void initGLObjects();
 		void destroyGLObjects();
 

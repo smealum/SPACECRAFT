@@ -9,9 +9,12 @@
 class ContentRequest
 {
 	public:
+		ContentRequest();
+		virtual bool isRelevant(int id);
 		virtual void process(int id)=0;
 		virtual void update()=0;
 		virtual ~ContentRequest() {}
+		bool isCanceled;
 	private:
 };
 
@@ -40,6 +43,7 @@ class WorldChunkRequest : public ContentRequest
 		WorldChunkRequest(Planet& p, Chunk& c, float elevation, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z);
 		void process(int id);
 		void update(void);
+		bool isRelevant(int id);
 		virtual ~WorldChunkRequest();
 		
 	private:
