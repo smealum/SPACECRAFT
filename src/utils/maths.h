@@ -6,3 +6,5 @@
 
 #define RAD2DEG(X) (float)(360.0*(X)/(2.0*M_PI))
 #define DEG2RAD(X) (float)(2.0*M_PI*(X)/360.0)
+
+#define ABS(X) ((X) < 0 ? -(X) : (X))
