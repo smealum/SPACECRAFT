@@ -413,16 +413,16 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 		// e > 0
 		float e = (pf->elevation - 1.001) * 1000.f ;
 
-		float sandCoef = 2.0*pf->temperature + e;
+		float sandCoef = 2.0*pf->temperature + 1.4*e;
 		float snowCoef = -2.0*pf->temperature+ 1.4*e;
 		float stoneCoef = snowCoef+0.01;
 		float grassCoef = 0.05;
 
 		// inihibition
 		// (pas de sable près de l'eau)
-		if (e<0.1) sandCoef = 0.0;
+		if (e<0.05) sandCoef = 0.0;
 		// (A partir d'un moment la neige recouvre les cailloux
-		stoneCoef = max(stoneCoef,0.5);
+		stoneCoef = max(stoneCoef,0.8);
 
 	
 		// on choisit le plus grand
