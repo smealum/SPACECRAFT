@@ -15,8 +15,7 @@ CameraPlayerGround::CameraPlayerGround(Planet* p, Camera& c, PlanetFace& pf):
 	planet(p),
 	face(pf)
 {
-	//TODO : invmodel
-	localPosition=dspaceToBlock(c.getPositionDouble(glm::dvec3(planet->getPosition())),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()),glm::dvec3(face.getN()));
+	localPosition=dspaceToBlock(glm::transpose(glm::dmat3(planet->getModel()))*c.getPositionDouble(glm::dvec3(planet->getPosition())),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()),glm::dvec3(face.getN()));
 	localView=glm::dmat3(1.0f);
 }
 
