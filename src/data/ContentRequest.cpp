@@ -39,12 +39,15 @@ static inline float getElevation(int prod_id, Planet& planet, glm::vec3 v)
 
 void PlanetElevationRequest::process(int id)
 {
-	elevation=blockHeightToElevation(getElevation(id, planet, glm::normalize(coord))*CHUNK_N*MINIWORLD_H);
+	glm::vec3 pos = glm::normalize(coord);
+	elevation=blockHeightToElevation(getElevation(id, planet, pos)*float(CHUNK_N*MINIWORLD_H));
+	temperature=planet.getTemperature(pos);
+	humidity=planet.getHumidity(pos);
 }
 
 void PlanetElevationRequest::update(void)
 {
-	face->getPointer()->updateElevation(elevation);
+	face->getPointer()->updateElevation(elevation,temperature,humidity);
 	face->release();
 }
 

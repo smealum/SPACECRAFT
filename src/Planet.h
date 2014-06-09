@@ -74,7 +74,8 @@ class PlanetFace
 		~PlanetFace();
 		
 		void deletePlanetFace(PlanetFaceBufferHandler* b);
-		void updateElevation(float e);
+		// mise a jour de l'elevation, de la température et de l'humidité
+		void updateElevation(float e, float t, float h);
 		bool shouldHaveMiniworld(Camera& c);
 		bool isDetailedEnough(Camera& c);
 		void processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b);
@@ -106,7 +107,10 @@ class PlanetFace
 		int x, z;
 		int bufferID;
 		float elevation;
+		float temperature;
+		float humidity;
 		float minElevation;
+		
 		uint8_t id;
 		int depth;
 		int childrenDepth;
@@ -155,6 +159,23 @@ class Planet
 		//TEMP
 		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
 
+		// Donne la température en fonction de la position
+		// Prend en compte
+		// 		-l'axe de rotation de la planete
+		//		-perturbation local par un bruit.
+		// 		-la distance de la planete par rapport au soleil (TODO)
+		//		-valeur intrinsèque de la planete (composition) (TODO)
+		// Le résultat est à valeur dans [-1,1]
+		// La position est une position dans le référentiel de la planète.
+		float getTemperature(const glm::vec3& pos);
+
+		// Donne l'humidité en fonction de la position
+		// Prend en compte:
+		//		-perturbation local par un bruit
+		//		-valeur intrinsèque de la planete (composition) (TODO)
+		// Le résultat est à valeur dans [-1,1]
+		// La position est une position dans le référentiel de la planète.
+		float getHumidity(const glm::vec3& pos);
 	private:
 		std::vector<PlanetGenerator*> generators;
 		std::list<MiniWorld*> miniWorldList;

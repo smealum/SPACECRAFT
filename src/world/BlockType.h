@@ -34,6 +34,7 @@ namespace blockTypes
 		water_2 = water+2,
 		water_3 = water+TEXCOLS+1,
 		water_4 = water+TEXCOLS+2,
+		snow = 3 + 4*TEXCOLS,
 		max
 	};
 }

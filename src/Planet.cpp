@@ -3,6 +3,8 @@
 #include "data/ContentHandler.h"
 #include "Application.h"
 #include "utils/dbg.h"
+#include "glm/gtc/noise.hpp"
+#include "world/BlockType.h"
 
 
 using namespace std;
@@ -24,6 +26,8 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
+	temperature(0.0f),
+	humidity(0.0f),
 	minElevation(elevation-0.01f),
 	elevated(false),
 	id(5),
@@ -47,12 +51,15 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
+	temperature(0.0f),
+	humidity(0.0f),
 	elevated(false),
 	id(id),
 	bufferID(-1),
 	miniworld(NULL),
 	toplevel(father->toplevel),
-	childrenDepth(0)
+	childrenDepth(0),
+	isDisplayOk(false)
 {
 	//TODO : exception ?
 	// if(!father);
@@ -134,10 +141,13 @@ void PlanetFace::finalize(void)
 	planet->handler.requestContent(new PlanetElevationRequest(*planet, *this, vertex[4]));
 }
 
-void PlanetFace::updateElevation(float e)
+// mise a jour de l'elevation, de la température et de l'humidité
+void PlanetFace::updateElevation(float e, float t, float h)
 {
 	elevation=e;
 	minElevation=e-2.0f/(1<<depth);
+	temperature=t;
+	humidity=h;
 	elevated=true;
 }
 
@@ -398,38 +408,68 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	const glm::vec3 n=pf->uvertex[4];
 
 	int topTile,sideTile;
-	if (pf->elevation >1.001)
+	if (pf->elevation >1.001) //  terre
 	{
-		topTile = 0;
-		sideTile = 2;
+		if (pf->temperature>0.65 and pf->elevation>1.00101) // trop chaud : désert
+		{
+			topTile = blockTypes::sand-1;
+			sideTile = blockTypes::sand-1;
+		}
+		else if (pf->temperature<-0.5) // trop froid
+		{
+			topTile = blockTypes::snow-1;
+			sideTile = blockTypes::snow-1;
+		}
+		else if (pf->temperature<-0.4) // presque trop froid
+		{
+			topTile = blockTypes::stone-1;
+			sideTile = blockTypes::stone-1;
+		}
+		else // bonne température
+		{
+			topTile = blockTypes::grass-1;
+			sideTile = blockTypes::grass_side-1;
+		}
 	}
-	else
+	else // mer
 	{
 		// water
-		topTile = 12*16+13;
-		sideTile = 12*16+13;
+		topTile = blockTypes::water-1;
+		sideTile = blockTypes::water-1;
 
 		// sand
 		//topTile = 18;
 		//sideTile = 18;
 	}
 
-	double repeat;
-	if (pf->depth < MINIWORLD_DETAIL)
-	{
-		repeat = 1<<(MINIWORLD_DETAIL-(pf->depth));
-	}
-	else
-	{
-		repeat = 1;
-		int depth = pf->depth;
-		while(depth<MINIWORLD_DETAIL)
-		{
-			repeat*=0.5;
-			depth++;
-		}
-	}
-	repeat *= MINIWORLD_W * CHUNK_N;
+	float repeat;
+	//if (pf->depth < MINIWORLD_DETAIL)
+	//{
+		//repeat = 1<<(MINIWORLD_DETAIL-(pf->depth));
+	//}
+	//else
+	//{
+		// // version 1
+		//repeat = 1;
+
+		// // version 2
+		//int depth = pf->depth;
+		//while(depth<MINIWORLD_DETAIL)
+		//{
+			//repeat*=0.5;
+			//depth++;
+		//}
+	//}
+	//repeat *= MINIWORLD_W * CHUNK_N;
+	
+	// peut-être que c'est mieux ainsi ?
+	// j'attend des feedback (si quelqu'un passe par là)
+	//==================================================
+	// 
+	//
+	//
+	//
+	repeat = 2.0;
 	
 
 	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->minElevation,1.0f/(1<<pf->depth),topTile,sideTile,repeat};
@@ -600,4 +640,24 @@ void Planet::update(float time)
 
 	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,axis));
 	invModel=glm::transpose(model);
+}
+
+float Planet::getTemperature(const glm::vec3& pos)
+{
+	float distanceToEquatorFactor = 1.0-2.0*abs(
+			glm::dot(
+				glm::normalize(pos),
+				glm::normalize(axis)
+		 ));
+	float noise1 = glm::simplex(pos*10.f) * 0.5;
+	float noise2 = glm::simplex(pos*100.f) * 0.05;
+
+	return glm::clamp(distanceToEquatorFactor+noise1+noise2,-1.f,1.f);
+}
+
+float Planet::getHumidity(const glm::vec3& pos)
+{
+	float noise = glm::simplex(pos) *  1.4;
+	
+	return glm::clamp(noise,-1.f,1.f);
 }
