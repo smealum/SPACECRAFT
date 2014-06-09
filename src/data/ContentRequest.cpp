@@ -9,6 +9,17 @@
 
 using namespace glm;
 
+// ContentRequest
+ContentRequest::ContentRequest():
+	isCanceled(false)
+{
+}
+
+bool ContentRequest::isRelevant(int id)
+{
+	return true;
+}
+
 //PlanetElevationRequest stuff
 PlanetElevationRequest::PlanetElevationRequest(Planet& p, PlanetFace& pf, glm::vec3 c):
 	coord(c),
@@ -35,6 +46,11 @@ void PlanetElevationRequest::update(void)
 {
 	face->getPointer()->updateElevation(elevation);
 	face->release();
+}
+
+bool PlanetElevationRequest::isRelevant(int id)
+{
+	return true;
 }
 
 //WorldChunkRequest stuff
@@ -136,6 +152,12 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 	}
 }
 
+
+bool WorldChunkRequest::isRelevant(int id)
+{
+	return not chunk->getPointer()->isConstructionCanceled();
+	//return true;
+}
 void WorldChunkRequest::process(int id)
 {
 	generateWorldData(id, planet, (chunkVal*)data, 1, 1, 1, px, py, pz, origin, v1, v2);
@@ -144,7 +166,10 @@ void WorldChunkRequest::process(int id)
 
 void WorldChunkRequest::update(void)
 {
-	chunk->getPointer()->updateData((chunkVal*)data, vArray);
+	if (not isCanceled)
+	{
+		chunk->getPointer()->updateData((chunkVal*)data, vArray);
+	}
 	chunk->release();
 }
 
@@ -165,6 +190,12 @@ MiniWorldDataRequest::MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o
 MiniWorldDataRequest::~MiniWorldDataRequest()
 {}
 
+
+bool MiniWorldDataRequest::isRelevant(int id)
+{
+	return not miniworld->getPointer()->isConstructionCanceled();
+}
+
 void MiniWorldDataRequest::process(int id)
 {
 	generateWorldData(id, planet, (chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, px, py, pz, origin, v1, v2);
@@ -177,6 +208,7 @@ void MiniWorldDataRequest::process(int id)
 
 void MiniWorldDataRequest::update(void)
 {
+	//if (not isCanceled)
 	miniworld->getPointer()->updateChunks(data, vArray);
 	miniworld->release();
 }
@@ -190,6 +222,11 @@ MiniWorldDeletionRequest::MiniWorldDeletionRequest(MiniWorld& mw)
 
 MiniWorldDeletionRequest::~MiniWorldDeletionRequest()
 {}
+
+bool MiniWorldDeletionRequest::isRelevant(int id)
+{
+	return true;
+}
 
 void MiniWorldDeletionRequest::process(int id)
 {
@@ -212,6 +249,11 @@ SolarSystemDataRequest::SolarSystemDataRequest(SolarSystem& ss, ContentHandler& 
 
 SolarSystemDataRequest::~SolarSystemDataRequest()
 {}
+
+bool SolarSystemDataRequest::isRelevant(int id)
+{
+	return true;
+}
 
 //idée ici c'est de générer les planetInfo côté producer (ie process) puis de faire l'initialisation des objets côté consumer (ie update)
 void SolarSystemDataRequest::process(int id)
@@ -236,3 +278,4 @@ void SolarSystemDataRequest::update(void)
 	solarSystem->getPointer()->generated=true;
 	solarSystem->release();
 }
+

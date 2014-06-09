@@ -3,7 +3,7 @@
 uniform sampler2DArray Texture;
 
 in float fluminosity;
-in flat int ftile;
+flat in int ftile;
 in vec2 ftexCoords;
 in float frepeat;
 

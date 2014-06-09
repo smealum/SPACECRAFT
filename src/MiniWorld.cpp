@@ -1,5 +1,6 @@
 #include "MiniWorld.h"
 #include "data/ContentHandler.h"
+#include "utils/dbg.h"
 
 MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 	planet(p),
@@ -11,7 +12,8 @@ MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 	v2(face->toplevel->uvertex[3]-face->toplevel->uvertex[0]),
 	x(pf->x*MINIWORLD_W*CHUNK_N),
 	z(pf->z*MINIWORLD_D*CHUNK_N),
-	generated(false)
+	generated(false),
+	constructionCanceled(false)
 {
 	for(int i=0;i<MINIWORLD_W;i++)
 	{
@@ -59,8 +61,14 @@ void MiniWorld::draw(Camera& c)
 	}
 }
 
+bool MiniWorld::isConstructionCanceled()
+{
+	return constructionCanceled;
+}
+
 void MiniWorld::destroyMiniWorld(void)
 {
+	constructionCanceled = true;
 	planet->handler.requestContent(new MiniWorldDeletionRequest(*this),false);
 		tptr->release();
 	planet->handler.manualReleaseInput();

@@ -274,8 +274,8 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 			{
 				if(!sons[i])
 					sons[i]=new PlanetFace(planet,this,i);
-
-				sons[i]->processLevelOfDetail(c, b);
+				else
+					sons[i]->processLevelOfDetail(c, b);
 
 				done &= ( sons[i]->isDisplayOk );
 			}
