@@ -239,12 +239,12 @@ void Application::loop()
 	
 
     Input::update(window);
+
+    testSolarSystem->update(globalTime);
     camera->update();
 
     glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    testSolarSystem->update(globalTime);
 
     glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
     testSolarSystem->draw(*camera);

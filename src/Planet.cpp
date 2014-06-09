@@ -410,26 +410,44 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	int topTile,sideTile;
 	if (pf->elevation >1.001) //  terre
 	{
-		if (pf->temperature>0.65 and pf->elevation>1.00101) // trop chaud : désert
+		// e > 0
+		float e = (pf->elevation - 1.001) * 1000.f ;
+
+		float sandCoef = 2.0*pf->temperature + e;
+		float snowCoef = -2.0*pf->temperature+ 1.4*e;
+		float stoneCoef = snowCoef+0.01;
+		float grassCoef = 0.05;
+
+		// inihibition
+		// (pas de sable près de l'eau)
+		if (e<0.1) sandCoef = 0.0;
+		// (A partir d'un moment la neige recouvre les cailloux
+		stoneCoef = max(stoneCoef,0.5);
+
+	
+		// on choisit le plus grand
+		int imax=0;int vmax=sandCoef;
+		if (vmax<snowCoef) {vmax=snowCoef;imax=1;}
+		if (vmax<stoneCoef) {vmax=stoneCoef;imax=2;}
+		if (vmax<grassCoef) {vmax=grassCoef;imax=3;}
+		
+		
+		switch(imax)
 		{
-			topTile = blockTypes::sand-1;
-			sideTile = blockTypes::sand-1;
+			case 0:  topTile = blockTypes::sand-1;
+			        sideTile = blockTypes::sand-1;
+					break;
+			case 1:  topTile = blockTypes::snow-1;
+			        sideTile = blockTypes::snow-1;
+					break;
+			case 2:  topTile = blockTypes::stone-1;
+			        sideTile = blockTypes::stone-1;
+					break;
+			case 3:  topTile = blockTypes::grass-1;
+			        sideTile = blockTypes::grass-1;
+					break;
 		}
-		else if (pf->temperature<-0.5) // trop froid
-		{
-			topTile = blockTypes::snow-1;
-			sideTile = blockTypes::snow-1;
-		}
-		else if (pf->temperature<-0.4) // presque trop froid
-		{
-			topTile = blockTypes::stone-1;
-			sideTile = blockTypes::stone-1;
-		}
-		else // bonne température
-		{
-			topTile = blockTypes::grass-1;
-			sideTile = blockTypes::grass_side-1;
-		}
+
 	}
 	else // mer
 	{
@@ -569,6 +587,20 @@ glm::dvec3 Planet::getCameraRelativeDoublePosition(Camera& c)
 	return glm::dmat3(invModel)*c.getPositionDouble(glm::dvec3(position));
 }
 
+PlanetFace& Planet::getTopLevelForCamera(Camera& c)
+{
+	glm::vec3 p=getCameraRelativePosition(c);
+	for(int i=0;i<6;i++)
+	{
+		glm::vec3 p2=(p/glm::dot(faces[i]->getN(),p))-faces[i]->getOrigin();
+		float vv1=glm::dot(p2,faces[i]->getV1());
+		float vv2=glm::dot(p2,faces[i]->getV2());
+		if(vv1>=0.0f && vv1<=4.0f && vv2>=0.0f && vv2<=4.0f)return *faces[i];
+	}
+	printf("ERROR ERROR\n");
+	return *faces[0];
+}
+
 glm::mat3 Planet::getModel(void)
 {
 	return model;
@@ -660,4 +692,23 @@ float Planet::getHumidity(const glm::vec3& pos)
 	float noise = glm::simplex(pos) *  1.4;
 	
 	return glm::clamp(noise,-1.f,1.f);
+}
+glm::vec3 PlanetFace::getOrigin(void)
+{
+	return uvertex[0];
+}
+
+glm::vec3 PlanetFace::getV1(void)
+{
+	return uvertex[1]-uvertex[0];
+}
+
+glm::vec3 PlanetFace::getV2(void)
+{
+	return uvertex[3]-uvertex[0];
+}
+
+glm::vec3 PlanetFace::getN(void)
+{
+	return vertex[4];
 }
