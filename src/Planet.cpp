@@ -413,10 +413,10 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 		// e > 0
 		float e = (pf->elevation - 1.001) * 1000.f ;
 
-		float sandCoef = 2.0*pf->temperature + 1.4*e;
-		float snowCoef = -2.0*pf->temperature+ 1.4*e;
-		float stoneCoef = snowCoef+0.01;
-		float grassCoef = 0.05;
+		float sandCoef = 4.0*pf->temperature + 1.4*e - pf->humidity;
+		float snowCoef = -2.0*pf->temperature+ 1.4*e + 0.3*pf->humidity;
+		float stoneCoef = snowCoef+0.01 - 0.1*pf->humidity;
+		float grassCoef = 0.05 + 2.0*abs(pf->humidity);
 
 		// inihibition
 		// (pas de sable près de l'eau)
@@ -482,7 +482,8 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	
 	// peut-être que c'est mieux ainsi ?
 	// j'attend des feedback (si quelqu'un passe par là)
-	//==================================================
+	//-------------------------------------------------
+	//
 	// 
 	//
 	//
@@ -689,7 +690,7 @@ float Planet::getTemperature(const glm::vec3& pos)
 
 float Planet::getHumidity(const glm::vec3& pos)
 {
-	float noise = glm::simplex(pos) *  1.4;
+	float noise = glm::simplex(pos*2.f) *  1.4;
 	
 	return glm::clamp(noise,-1.f,1.f);
 }
