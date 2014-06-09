@@ -17,7 +17,22 @@ CameraPlayerGround::CameraPlayerGround(Planet* p, Camera& c, PlanetFace& pf):
 {
 	//TODO : invmodel
 	localPosition=dspaceToBlock(c.getPositionDouble(glm::dvec3(planet->getPosition())),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()),glm::dvec3(face.getN()));
+	localView=glm::dmat3(1.0f);
 }
+
+const glm::dvec3 playerBoundingBoxSize(0.4,2.0,0.4);
+
+const glm::dvec3 playerBoundingBox[]=
+{
+	glm::dvec3(-1.0,-1.0,-1.0)*playerBoundingBoxSize,
+	glm::dvec3(1.0,-1.0,-1.0)*playerBoundingBoxSize,
+	glm::dvec3(1.0,-1.0,1.0)*playerBoundingBoxSize,
+	glm::dvec3(-1.0,-1.0,1.0)*playerBoundingBoxSize,
+	glm::dvec3(-1.0,0.20,-1.0)*playerBoundingBoxSize,
+	glm::dvec3(1.0,0.20,-1.0)*playerBoundingBoxSize,
+	glm::dvec3(1.0,0.20,1.0)*playerBoundingBoxSize,
+	glm::dvec3(-1.0,0.20,1.0)*playerBoundingBoxSize
+};
 
 void CameraPlayerGround::update(Camera& camera)
 {
@@ -27,20 +42,16 @@ void CameraPlayerGround::update(Camera& camera)
 
 		if(Input::isKeyPressed(GLFW_KEY_R))camera.setCameraManager(new CameraKeyboardMouse()); //TODO : méga fuite à virer
 
-		// const double tS=1e-5*delta;
-		// const double gS=2e-6*delta;
-		// const double jS=4e-7;
-		// const float rS=1.5*delta;
-		const double tS=5.0*delta;
-		const double gS=5.0*delta;
-		const double jS=1.0;
+		const double tS=1.0*delta;
+		const double gS=0.5*delta;
+		const double jS=0.1;
 		const float rS=1.5*delta;
 
 		// rotation
-		if (Input::isKeyHold(GLFW_KEY_K))camera.view3 = glm::mat3(glm::rotate(glm::mat4(1.0),rS,glm::vec3(1.0,0.0,0.0)))*camera.view3;
-		if (Input::isKeyHold(GLFW_KEY_I))camera.view3 = glm::mat3(glm::rotate(glm::mat4(1.0),rS,glm::vec3(-1.0,0.0,0.0)))*camera.view3;
-		if (Input::isKeyHold(GLFW_KEY_J))camera.view3 = glm::mat3(glm::rotate(glm::mat4(1.0),rS,glm::vec3(0.0,-1.0,0.0)))*camera.view3;
-		if (Input::isKeyHold(GLFW_KEY_L))camera.view3 = glm::mat3(glm::rotate(glm::mat4(1.0),rS,glm::vec3(0.0,+1.0,0.0)))*camera.view3;
+		if (Input::isKeyHold(GLFW_KEY_K))localView = glm::dmat3(glm::mat3(glm::rotate(glm::mat4(1.0f),rS,glm::vec3(1.0,0.0,0.0))))*localView;
+		if (Input::isKeyHold(GLFW_KEY_I))localView = glm::dmat3(glm::mat3(glm::rotate(glm::mat4(1.0f),rS,glm::vec3(-1.0,0.0,0.0))))*localView;
+		if (Input::isKeyHold(GLFW_KEY_J))localView = glm::dmat3(glm::mat3(glm::rotate(glm::mat4(glm::mat3(localView)),rS,glm::vec3(0.0,-1.0,0.0))));
+		if (Input::isKeyHold(GLFW_KEY_L))localView = glm::dmat3(glm::mat3(glm::rotate(glm::mat4(glm::mat3(localView)),rS,glm::vec3(0.0,+1.0,0.0))));
 
 		glm::dvec3 localSpeedVect;
 
@@ -50,26 +61,32 @@ void CameraPlayerGround::update(Camera& camera)
 		if(Input::isKeyHold(GLFW_KEY_W))localSpeedVect+=glm::dvec3(0,0.0,+tS);
 		if(Input::isKeyHold(GLFW_KEY_S))localSpeedVect+=glm::dvec3(0,0,-tS);
 
-		// // localSpeedVect=(localSpeedVect*glm::dmat3(camera.view3));
+		localSpeedVect=(localSpeedVect*localView);
 
 		glm::dvec3 g(0.0,1.0,0.0);
-
-		// // //on ajuste l'orientation pour s'aligner sur g
-		// // float val=glm::dot(glm::dvec3(glm::transpose(camera.view3)[0]),g);
-		// // if(fabs(val)>1e-6)camera.view3=glm::mat3(glm::rotate(glm::mat4(1.0),5.0f*val*delta,glm::vec3(0.0,0.0,1.0)))*camera.view3;
+		localSpeedVect-=g*glm::dot(g,localSpeedVect); //déplacements horizontaux uniquement
 
 		if(Input::isKeyPressed(GLFW_KEY_SPACE))localSpeedVect-=g*jS; //saut
 
 		speedVect+=localSpeedVect+g*gS; //gravité
 
-		glm::dvec3 out;
-		bool ret=planet->collidePoint(localPosition,-speedVect,out);
-
-		localPosition=out;
-		// localPosition+=localSpeedVect;
+		bool ret=false;
+		for(int i=0;i<8;i++)
+		{
+			glm::dvec3 out;
+			glm::dvec3 tempPos=localPosition+playerBoundingBox[0];
+			ret=planet->collidePoint(tempPos,-speedVect,out)||ret;
+			localPosition+=out-tempPos;
+		}
 
 		//TODO : passer dans une methode de planet ?
-		camera.pos=glm::dmat3(planet->getModel())*dblockToSpace(localPosition,glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))+glm::dvec3(planet->getPosition());
+		glm::dvec3 uPos=dblockToSpace(localPosition,glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()));
+		camera.pos=glm::dmat3(planet->getModel())*uPos+glm::dvec3(planet->getPosition());
+		
+		glm::dvec3 mx=glm::normalize(dblockToSpace(localPosition+glm::dvec3(1.0,0.0,0.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))-uPos);
+		glm::dvec3 my=glm::normalize(dblockToSpace(localPosition+glm::dvec3(0.0,1.0,0.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))-uPos);
+		glm::dvec3 mz=glm::normalize(dblockToSpace(localPosition+glm::dvec3(0.0,0.0,1.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))-uPos);
+		camera.view3=glm::mat3(localView*glm::dmat3(planet->getModel())*glm::dmat3(mx,my,mz));
 
 		if(ret)speedVect/=2.0; //frottements sol
 		else{
@@ -81,39 +98,38 @@ void CameraPlayerGround::update(Camera& camera)
 		camera.updateFrustum();
 	}
 
-	// //selection
-	// {
-	// 	const double range=1e-5; //~3 blocks
-	// 	glm::dvec3 g=planet->getGravityVector(camera.getPositionDouble(glm::dvec3(0.0)));
-	// 	glm::i32vec3 out;
-	// 	glm::dvec3 v(-glm::transpose(camera.view3)[2]);
-	// 	int dir;
-	// 	Chunk* ret=planet->selectBlock(planet->getCameraRelativeDoublePosition(camera), v*range, out, dir);
+	//selection
+	{
+		const double range=5.0;
+		glm::i32vec3 out;
+		glm::dvec3 v(-glm::transpose(localView)[2]);
+		int dir;
+		Chunk* ret=planet->selectBlock(localPosition, v*range, out, dir);
 
-	// 	// printf("v %f %f %f (%f)\n",v.x,v.y,v.z,glm::dot(v,g));
-	// 	if(ret)
-	// 	{
-	// 		// printf("%d block %d %d %d\n",dir,out.x,out.y,out.z);
-	// 		if(Input::isKeyPressed(GLFW_KEY_X))planet->deleteBlock(out);
-	// 		else if(Input::isKeyPressed(GLFW_KEY_C))
-	// 		{
-	// 			//TODO : check que player n'intersecte pas avec le nouveau bloc...
-	// 			blockTypes::T t=blockTypes::dirt;
-	// 			// blockTypes::T t=blockTypes::water;
-	// 			switch(dir)
-	// 			{
-	// 				case 0: planet->changeBlock(out-glm::i32vec3(1,0,0),t); break;
-	// 				case 1: planet->changeBlock(out+glm::i32vec3(1,0,0),t); break;
-	// 				case 2: planet->changeBlock(out-glm::i32vec3(0,1,0),t); break;
-	// 				case 3: planet->changeBlock(out+glm::i32vec3(0,1,0),t); break;
-	// 				case 4: planet->changeBlock(out-glm::i32vec3(0,0,1),t); break;
-	// 				case 5: planet->changeBlock(out+glm::i32vec3(0,0,1),t); break;
-	// 			}
-	// 		}
-	// 		testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2,glm::translate(glm::mat4(1.0f),planet->getPosition())*glm::mat4(planet->getModel()));
-	// 	}else{
-	// 		// printf("no block !\n");
-	// 		testCursor->unaffect();
-	// 	}
-	// }
+		// printf("v %f %f %f (%f)\n",v.x,v.y,v.z,glm::dot(v,g));
+		if(ret)
+		{
+			// printf("%d block %d %d %d\n",dir,out.x,out.y,out.z);
+			if(Input::isKeyPressed(GLFW_KEY_X))planet->deleteBlock(out);
+			else if(Input::isKeyPressed(GLFW_KEY_C))
+			{
+				//TODO : check que player n'intersecte pas avec le nouveau bloc...
+				blockTypes::T t=blockTypes::dirt;
+				// blockTypes::T t=blockTypes::water;
+				switch(dir)
+				{
+					case 0: planet->changeBlock(out-glm::i32vec3(1,0,0),t); break;
+					case 1: planet->changeBlock(out+glm::i32vec3(1,0,0),t); break;
+					case 2: planet->changeBlock(out-glm::i32vec3(0,1,0),t); break;
+					case 3: planet->changeBlock(out+glm::i32vec3(0,1,0),t); break;
+					case 4: planet->changeBlock(out-glm::i32vec3(0,0,1),t); break;
+					case 5: planet->changeBlock(out+glm::i32vec3(0,0,1),t); break;
+				}
+			}
+			testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2,glm::translate(glm::mat4(1.0f),planet->getPosition())*glm::mat4(planet->getModel()));
+		}else{
+			// printf("no block !\n");
+			testCursor->unaffect();
+		}
+	}
 }

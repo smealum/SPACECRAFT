@@ -242,9 +242,8 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
 
 bool Chunk::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir)
 {
-    // TODO : optimiser en ne la calculant qu'une fois par toplevel (max) par frame ?
-    glm::dvec3 blockPos=dspaceToBlock(glm::dvec3(p),glm::dvec3(origin),glm::dvec3(v1),glm::dvec3(v2),glm::dvec3(n));
-    glm::dvec3 blockPos2=dspaceToBlock(glm::dvec3(p+v),glm::dvec3(origin),glm::dvec3(v1),glm::dvec3(v2),glm::dvec3(n));
+    glm::dvec3 blockPos=p;
+    glm::dvec3 blockPos2=p+v;
     
     glm::dvec3 localBlockPosf=glm::dvec3(blockPos.x-px,blockPos.y-py,blockPos.z-pz);
     glm::dvec3 localBlockPosf2=glm::dvec3(blockPos2.x-px,blockPos2.y-py,blockPos2.z-pz);

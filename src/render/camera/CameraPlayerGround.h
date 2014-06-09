@@ -14,6 +14,7 @@ class CameraPlayerGround : public CameraManager
         virtual void update(Camera& camera);
 
 	private:
+		glm::dmat3 localView;
 		glm::dvec3 localPosition;
 		glm::dvec3 speedVect;
 		Planet* planet;
