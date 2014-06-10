@@ -286,7 +286,7 @@ bool SolarSystemDataRequest::isRelevant(int id)
 void SolarSystemDataRequest::process(int id)
 {
 	//TEMP
-	numPlanets=1;
+	numPlanets=2;
 	planets=new Planet*[numPlanets];
 }
 
@@ -294,7 +294,7 @@ void SolarSystemDataRequest::update(void)
 {
 	for(int i=0;i<numPlanets;i++)
 	{
-		PlanetInfo pitest(new EllipticalTrajectory(glm::vec3(0.0f), glm::mat3(10.0f), 100.0f));
+		PlanetInfo pitest(new EllipticalTrajectory(glm::vec3(0.0f), glm::mat3(10.0f*(i+1)), i*1.037f, 100.0f*(i+1)));
 		planets[i]=new Planet(pitest, contentHandler);
 	}
 	sun=new Sun(glm::vec3(0.0f));
