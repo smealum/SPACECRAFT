@@ -43,9 +43,9 @@ void CameraPlayerGround::update(Camera& camera)
 
 		if(Input::isKeyPressed(GLFW_KEY_R))camera.setCameraManager(new CameraKeyboardMouse()); //TODO : méga fuite à virer
 
-		const double tS=1.0*delta;
+		const double tS=3.0*delta;
 		const double gS=0.5*delta;
-		const double jS=0.1;
+		const double jS=0.3;
 		const float rS=1.5*delta;
 
 		// rotation
@@ -57,14 +57,14 @@ void CameraPlayerGround::update(Camera& camera)
 		glm::dvec3 localSpeedVect;
 
 		// translation
-		if(Input::isKeyHold(GLFW_KEY_A))localSpeedVect+=glm::dvec3(+tS,0.0,0.0);
-		if(Input::isKeyHold(GLFW_KEY_D))localSpeedVect+=glm::dvec3(-tS,0.0,0.0);
-		if(Input::isKeyHold(GLFW_KEY_W))localSpeedVect+=glm::dvec3(0,0.0,+tS);
-		if(Input::isKeyHold(GLFW_KEY_S))localSpeedVect+=glm::dvec3(0,0,-tS);
+		if(Input::isKeyHold(GLFW_KEY_A))localSpeedVect+=glm::dvec3(-tS,0,0);
+		if(Input::isKeyHold(GLFW_KEY_D))localSpeedVect+=glm::dvec3(tS,0,0);
+		if(Input::isKeyHold(GLFW_KEY_W))localSpeedVect+=glm::dvec3(0,0.0,-tS);
+		if(Input::isKeyHold(GLFW_KEY_S))localSpeedVect+=glm::dvec3(0,0,tS);
 
 		localSpeedVect=(localSpeedVect*localView);
 
-		glm::dvec3 g(0.0,1.0,0.0);
+		glm::dvec3 g(0.0,-1.0,0.0);
 		localSpeedVect-=g*glm::dot(g,localSpeedVect); //déplacements horizontaux uniquement
 
 		if(Input::isKeyPressed(GLFW_KEY_SPACE))localSpeedVect-=g*jS; //saut
@@ -76,10 +76,11 @@ void CameraPlayerGround::update(Camera& camera)
 		for(int i=0;i<8;i++)
 		{
 			glm::dvec3 out;
-			glm::dvec3 tempPos=localPosition+playerBoundingBox[0];
-			ret=planet->collidePoint(tempPos,-speedVect,out)||ret;
-			localPosition+=out-tempPos;
+			glm::dvec3 tempPos=localPosition+playerBoundingBox[i];
+			ret=planet->collidePoint(tempPos,speedVect,out)||ret;
+			speedVect=out-tempPos;
 		}
+		localPosition+=speedVect;
 
 		//TODO : passer dans une methode de planet ?
 		glm::dvec3 uPos=dblockToSpace(localPosition,glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()));
@@ -93,8 +94,12 @@ void CameraPlayerGround::update(Camera& camera)
 		mz=glm::normalize(mz-my*glm::dot(mz,my)-mx*glm::dot(mz,mx));
 		camera.view3=glm::mat3(localView)*glm::transpose(planet->getModel()*glm::mat3(mx,my,mz));
 
-		if(ret)speedVect/=2.0; //frottements sol
-		else{
+		if(ret)
+		{
+			//frottements sol
+			double gval=glm::dot(g,speedVect);
+			speedVect=(speedVect-gval*g)*0.5+gval*g;
+		}else{
 			double gval=glm::dot(g,speedVect);
 			speedVect=(speedVect-gval*g)*0.7+gval*g;
 		}
@@ -131,7 +136,7 @@ void CameraPlayerGround::update(Camera& camera)
 					case 5: planet->changeBlock(out+glm::i32vec3(0,0,1),t); break;
 				}
 			}
-			testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2,glm::translate(glm::mat4(1.0f),planet->getPosition())*glm::mat4(planet->getModel()));
+			testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2,glm::translate(glm::mat4(1.0f),planet->getPosition()-camera.getReference())*glm::mat4(planet->getModel()));
 		}else{
 			// printf("no block !\n");
 			testCursor->unaffect();
