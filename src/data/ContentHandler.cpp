@@ -32,11 +32,4 @@ void ContentHandler::handleNewContent(void)
 
 ContentHandler::~ContentHandler()
 {
-	while(q.size()>0)
-	{
-		ContentRequest* r=q.front();
-		r->update();
-		q.pop();
-		delete r;
-	}
 }
