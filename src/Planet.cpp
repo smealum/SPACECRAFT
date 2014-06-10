@@ -5,6 +5,7 @@
 #include "utils/dbg.h"
 #include "glm/gtc/noise.hpp"
 #include "world/BlockType.h"
+#include "utils/positionMath.h"
 
 
 using namespace std;
@@ -407,8 +408,10 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	faces.push_back(pf);
 	const glm::vec3 n=pf->uvertex[4];
 
+	double block_height=delevationToBlockHeight(pf->elevation);
+
 	int topTile,sideTile;
-	if (pf->elevation >1.001) //  terre
+	if (block_height>double(CHUNK_N*MINIWORLD_H)*0.5) //  terre
 	{
 		// e > 0
 		float e = (pf->elevation - 1.001) * 1000.f ;

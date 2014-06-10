@@ -6,7 +6,7 @@
 
 CaveGenerator::CaveGenerator() :
 	seed(0),
-	segmentCount(7),
+	segmentCount(50),
 	segmentLength(3),
 	twistiness(4.f/256.f)
 {
@@ -42,8 +42,11 @@ void CaveGenerator::generate()
 	// first generate the points where the worms start
 	// we are gong to push back every control point
 	// that means there's at max segmentCount points in each vector
-	std::vector<std::vector<glm::vec3> > conPoints(1); // XXX size must be changed
-	conPoints[0].push_back(glm::vec3(5, 5, 5));
+	std::vector<std::vector<glm::vec3> > conPoints(4); // XXX size must be changed
+	conPoints[0].push_back(glm::vec3(16, 16+32*30, 16));
+	conPoints[1].push_back(glm::vec3(16, 16+32*20, 16));
+	conPoints[2].push_back(glm::vec3(16, 16+32*10, 16));
+	conPoints[3].push_back(glm::vec3(16, 16+32*0, 16));
 	float scale = 0.03;
 	float yy = 0.f,
 		  zz = 0.f; // used to get the noise
@@ -80,11 +83,23 @@ void CaveGenerator::generate()
 			glm::vec3 v = (*points)[i] - (*points)[i-1]; // this is the direction at point i-1
 			glm::vec3 normal(-v.z, 0.f, v.x); // here is the normal
 			digDisk((*points)[i-1], normal, glm::cross(normal, v));
+			glm::i32vec3 p1 = glm::i32vec3((*points)[i+1]);
+			glm::i32vec3 p2 = glm::i32vec3((*points)[i]);
+			for(int i=-4;i<=4;++i)
+			for(int j=-4;j<=4;++j)
+			for(int k=-4;k<=4;++k)
+			{
+				glm::i32vec3 decal(i,j,k);
+				digLine(p1+decal,p2+decal);
+			}
 		}
 	}
 
 	// XXX test
-	digLine(glm::i32vec3(0, 0, 0), glm::i32vec3(0, CAVE_CHUNK_SIZE_Y-1, 0));
+	//for(int i=0;i<3;++i)
+	//for(int j=0;j<3;++j)
+	//for(int k=0;k<3;++k)
+	//digLine(glm::i32vec3(0+i, 0+j, 0+k), glm::i32vec3(CAVE_CHUNK_SIZE_X-10+i, CAVE_CHUNK_SIZE_Y-10+j, CAVE_CHUNK_SIZE_Y-10+k));
 }
 
 // helper to get the 1D index in a flattened 3D array, using a vec3

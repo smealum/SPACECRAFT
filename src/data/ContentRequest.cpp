@@ -37,7 +37,7 @@ PlanetElevationRequest::~PlanetElevationRequest()
 
 static inline float getElevation(int prod_id, Planet& planet, glm::vec3 v)
 {
-	return (planet.getElevation(prod_id, glm::normalize(v))+1.0f)/2.0f; //faut que ça nous sorte une valeur entre 0 et 1
+	return (planet.getElevation(prod_id, glm::normalize(v))+1.0)/2.0f; //faut que ça nous sorte une valeur entre 0 et 1
 }
 
 void PlanetElevationRequest::process(int id)
@@ -96,7 +96,7 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 	pxPos=0;
 
 	CaveGenerator caves;
-	//caves.generate(); XXX
+	caves.generate(); //XXX
 
 	for(int cx=0;cx<w;cx++)
 	{
@@ -116,7 +116,7 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 					const int height=int(getElevation(prod_id, planet, pos)*CHUNK_N*MINIWORLD_H);
 
 					//TEMP (pour tester)
-					const int waterHeight=CHUNK_N*MINIWORLD_H/2.f+12;
+					const int waterHeight=CHUNK_N*MINIWORLD_H/2.f;
 					if(height<waterHeight)
 					{
 						//UNDER THE SEAAAAAA
@@ -141,16 +141,14 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 							for(int j=0;j<(CHUNK_N+2);j++)
 							{
 								if (vy+py+j == height) data[yPos]=blockTypes::grass;
-								else if (vy+py+j < height)
-								{
-									// TODO je ne change pas les bons blocks >.<
-									//if (j < CAVE_CHUNK_SIZE_Y && !caves.getBlock(i, j, k))
-										//data[yPos] = blockTypes::air;
-									//else
-										data[yPos]=blockTypes::dirt;
-								}
+								else if (vy+py+j < height) data[yPos] = blockTypes::dirt;
 								else if (vy+py+j == height+1 && rand()%100 == 1) data[yPos]=blockTypes::flower_red;
 								else data[yPos]=blockTypes::air;
+
+								// cave
+								if (!caves.getBlock(i, j+cy*(CHUNK_N), k))
+									data[yPos] = blockTypes::air;
+
 								yPos+=(CHUNK_N+2);
 							}
 							pyPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w;
