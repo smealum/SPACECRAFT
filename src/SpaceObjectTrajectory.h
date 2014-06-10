@@ -19,11 +19,12 @@ class EllipticalTrajectory : public SpaceObjectTrajectory
 
 	private:
 		bool isFinal;
-		union
-		{
+        // TODO fix this
+		//union
+		//{
 			glm::vec3 center;
 			SpaceObjectTrajectory* superTrajectory;
-		};
+		//};
 
 		glm::mat3 caracteristic;
 		float period;
