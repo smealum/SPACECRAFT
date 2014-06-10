@@ -202,6 +202,7 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
         const double d=glm::length(localBlockPosf2-localBlockPosf);
 
         // printf("collision %d %d %d (%f %f %f) %f (%f %f %f)\n",cur.x,cur.y,cur.z,localBlockPosf.x,localBlockPosf.y,localBlockPosf.z,d);
+        ret=true;
         switch(dir)
         {
             case 0:
@@ -220,7 +221,6 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
                 {
                     const int stepY=(localBlockPosf2.y>localBlockPosf.y)?1:-1;
                     double targetY=(cur.y+py)*1.0;
-                    ret=true;
                     if(stepY<0)targetY+=1.0;
                     targetY-=0.01*stepY; //marge de 1cm
                     double r=(targetY-blockPos.y)/u.y;

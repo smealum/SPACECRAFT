@@ -627,10 +627,17 @@ int Planet::numMiniWorlds(void)
 
 bool Planet::collidePoint(glm::dvec3 p, glm::dvec3 v, glm::dvec3& out)
 {
-	bool ret=false;
-	for(auto it(miniWorldList.begin());it!=miniWorldList.end();++it)ret=ret||(*it)->collidePoint(p,v);
+	//TODO : vrai raymarching sur les miniworlds/chunks.
+	//(mais en attendant, ça ça marche et bouffe pas tant que ça pour des faibles vitesses vu que de toute façon on cull les miniworlds)
+	//(parce qu'on n'est pas complètement débile quand même, juste un peu flemmard)
+	bool gret=false, ret;
+	do{
+		ret=false;
+		for(auto it(miniWorldList.begin());it!=miniWorldList.end();++it)ret=ret||(*it)->collidePoint(p,v);
+		gret=ret||gret;
+	}while(ret && glm::length(v)>1e-6);
 	out=p+v;
-	return ret;
+	return gret;
 }
 
 Chunk* Planet::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir)
