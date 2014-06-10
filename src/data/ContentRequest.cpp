@@ -5,6 +5,8 @@
 #include "utils/positionMath.h"
 #include "utils/dbg.h"
 
+#include "noise/CaveGenerator.h" // XXX debug
+
 #include <cstdio>
 
 using namespace glm;
@@ -91,6 +93,10 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 	*/
 	int pxPos,pzPos,xPos,zPos,pyPos,yPos;
 	pxPos=0;
+
+	CaveGenerator caves;
+	//caves.generate(); XXX
+
 	for(int cx=0;cx<w;cx++)
 	{
 		pzPos=pxPos;
@@ -135,7 +141,14 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 							for(int j=0;j<(CHUNK_N+2);j++)
 							{
 								if (vy+py+j == height) data[yPos]=blockTypes::grass;
-								else if (vy+py+j < height) data[yPos]=blockTypes::dirt;
+								else if (vy+py+j < height)
+								{
+									// TODO je ne change pas les bons blocks >.<
+									//if (j < CAVE_CHUNK_SIZE_Y && !caves.getBlock(i, j, k))
+										//data[yPos] = blockTypes::air;
+									//else
+										data[yPos]=blockTypes::dirt;
+								}
 								else if (vy+py+j == height+1 && rand()%100 == 1) data[yPos]=blockTypes::flower_red;
 								else data[yPos]=blockTypes::air;
 								yPos+=(CHUNK_N+2);
