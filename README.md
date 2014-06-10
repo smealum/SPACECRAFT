@@ -1,14 +1,27 @@
 SpaceCraft
 ===
 
-Short desc
+Génération procédurale d'univers. Chaque planète représente un voxel:
+
+* [X] Planète avec relief
+* [ ] Grottes
+* [ ] Système de climats/Biômes
+* [ ] Systèmes solaire
+* [ ] Collision avec le monde
 
 ##Description
 
 ##Dépendances
 
-##Compilation
 Les libs fournis dans extlibs sont x64 sauf pour celles de windows car 
+Les libraries à installer sont:
+
+- glfw3
+- AntTweakBar
+- libnoise
+- SFML 2.1
+
+##Compilation
 
 - UNIX
 ```
@@ -23,11 +36,6 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} C:/CodeBlocks/MinGW/lib ${PROJECT_S
   set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} C:/CodeBlocks/MinGW/include )
 ```
 
-Les libraries à installer sont:
-
-- glfw3
-- AntTweakBar
-- libnoise
 
 ```
 cmake -G "MinGW Makefiles" .
@@ -42,4 +50,18 @@ Finalement il faut copier les dll correspondantes dans le dossier bin
 - Linux: `./bin/spacecraft`
 - OS X: `./bin/spacecraft`
 
+##Tests
+
+Les tests unitaires sont lancés avec `make test` il faut cepedant avoir fait `make all` avant car CTest ne compile pas les test (c'est un bug qui sera sûrement corrigé). En résumé
+
+```
+cmake .
+make
+make test
+```
+
+Ces tests permettent de vérifier les focntionalités des différentes classes/modules et ainsi aassurent le développement par incréments.
+
 ##Licence
+
+TODO
