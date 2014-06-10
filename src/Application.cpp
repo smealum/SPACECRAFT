@@ -14,7 +14,7 @@
 #include "utils/glm.h"
 #define WIN_TITLE "SPACECRAFT"
 
-float PlanetFaceDetailsPower = 35.0;
+float PlanetFaceDetailsPower = 28.0;
 
 using namespace std;
 using namespace glm;

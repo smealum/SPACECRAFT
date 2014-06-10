@@ -29,3 +29,7 @@ void ContentHandler::handleNewContent(void)
 		delete r;
 	}
 }
+
+ContentHandler::~ContentHandler()
+{
+}

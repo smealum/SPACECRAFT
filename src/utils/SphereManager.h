@@ -8,7 +8,6 @@
 
 class SphereManager : public Singleton<SphereManager>
 {
-
 	public:
 		void draw(Camera& c,ShaderProgram& shader, int levelOfDetails);
 	private:
