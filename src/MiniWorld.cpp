@@ -47,7 +47,7 @@ void MiniWorld::draw(Camera& c)
 	//TODO : passer frustum culling en octree ?
 	//TODO : occlusion culling ?
 
-	model=glm::translate(glm::mat4(1.0f),planet->getPosition())*glm::mat4(planet->getModel());
+	model=glm::translate(glm::mat4(1.0f),planet->getPosition()-c.getReference())*glm::mat4(planet->getModel());
 
 	for(int i=0;i<MINIWORLD_W;i++)
 	{

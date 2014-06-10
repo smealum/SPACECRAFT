@@ -17,6 +17,8 @@ CameraPlayerGround::CameraPlayerGround(Planet* p, Camera& c, PlanetFace& pf):
 {
 	localPosition=dspaceToBlock(glm::transpose(glm::dmat3(planet->getModel()))*c.getPositionDouble(glm::dvec3(planet->getPosition())),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()),glm::dvec3(face.getN()));
 	localView=glm::dmat3(1.0f);
+
+    c.moveReference(glm::dvec3(planet->getPosition()));
 }
 
 const glm::dvec3 playerBoundingBoxSize(0.4,2.0,0.4);
@@ -68,6 +70,7 @@ void CameraPlayerGround::update(Camera& camera)
 		if(Input::isKeyPressed(GLFW_KEY_SPACE))localSpeedVect-=g*jS; //saut
 
 		speedVect+=localSpeedVect+g*gS; //gravité
+		// speedVect+=localSpeedVect; //pas de gravité
 
 		bool ret=false;
 		for(int i=0;i<8;i++)
@@ -80,7 +83,7 @@ void CameraPlayerGround::update(Camera& camera)
 
 		//TODO : passer dans une methode de planet ?
 		glm::dvec3 uPos=dblockToSpace(localPosition,glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()));
-		camera.pos=glm::dmat3(planet->getModel())*uPos+glm::dvec3(planet->getPosition());
+		camera.setPosition(glm::dmat3(planet->getModel())*uPos+glm::dvec3(planet->getPosition()));
 		
 		glm::dvec3 mx=(dblockToSpace(localPosition+glm::dvec3(1.0,0.0,0.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))-uPos);
 		glm::dvec3 my=(dblockToSpace(localPosition+glm::dvec3(0.0,1.0,0.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))-uPos);

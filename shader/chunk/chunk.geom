@@ -90,6 +90,7 @@ void main()
 	float col=max(dot(vec3(normalize(n[dir[0]].x*v1+n[dir[0]].z*v2+n[dir[0]].y*rn)),lightdir),0.0)+ambient; //suit pas parfaitement la rotondité mais devrait suffire
 
 	fcolor = vec4(vec3(col),1.0);
+	// r = proj * view * model * vec4(rn,1.0);
 	r = proj * view * model * vec4(rn,1.0);
 	gl_Position = logDepth(r);
 	texcoord=vec2(1.0,1.0);
@@ -101,6 +102,7 @@ void main()
 	y=1.0+pos1.y/numBlocks;
 
 	fcolor = vec4(vec3(col),1.0);
+	// r = proj * view * model * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	r = proj * view * model * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = logDepth(r);
 	texcoord=vec2(0.0,1.0);
@@ -112,6 +114,7 @@ void main()
 	y=1.0+pos1.y/numBlocks;
 
 	fcolor = vec4(vec3(col),1.0);
+	// r = proj * view * model * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	r = proj * view * model * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = logDepth(r);
 	texcoord=vec2(1.0,0.0);
@@ -123,6 +126,7 @@ void main()
 	y=1.0+pos1.y/numBlocks;
 
 	fcolor = vec4(vec3(col),1.0);
+	// r = proj * view * model * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	r = proj * view * model * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = logDepth(r);
 	texcoord=vec2(0,0.0);

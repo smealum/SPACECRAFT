@@ -193,7 +193,7 @@ void WorldChunkRequest::process(int id)
 
 void WorldChunkRequest::update(void)
 {
-	if (not isCanceled)
+	if(!isCanceled)
 	{
 		chunk->getPointer()->updateData((chunkVal*)data, vArray);
 	}
@@ -286,7 +286,7 @@ bool SolarSystemDataRequest::isRelevant(int id)
 void SolarSystemDataRequest::process(int id)
 {
 	//TEMP
-	numPlanets=2;
+	numPlanets=1;
 	planets=new Planet*[numPlanets];
 }
 

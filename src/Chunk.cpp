@@ -83,7 +83,7 @@ void Chunk::draw(Camera& cam, glm::mat4 model)
     program.setUniform("v2",v2);
     program.setUniform("numBlocks",float(PLANETFACE_BLOCKS));
     program.setUniform("lightdir",planet->lightdir);
-    program.setUniform("model",model);
+    program.setUniform("model",(model));
 
     //glBindTexture(GL_TEXTURE_2D, testTexture);
 	// On n'a pas besoin de bind un textureArray? (uniquement utilisable dans un shader)
