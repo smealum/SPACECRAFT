@@ -6,7 +6,7 @@
 #include "utils/dbg.h"
 #include "glm/gtc/noise.hpp"
 
-//#include "noise/CaveGenerator.h" // XXX debug
+#include "noise/CaveGenerator.h" // XXX debug
 
 #include <cstdio>
 
@@ -95,8 +95,8 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 	int pxPos,pzPos,xPos,zPos,pyPos,yPos;
 	pxPos=0;
 
-	//CaveGenerator caves;
-	//caves.generate(); //XXX
+	CaveGenerator caves;
+	caves.generate(); //XXX
 
 	for(int cx=0;cx<w;cx++)
 	{
@@ -146,8 +146,9 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 								else data[yPos]=blockTypes::air;
 
 								// cave
-								//if (!caves.getBlock(i, j+cy*(CHUNK_N), k))
-									//data[yPos] = blockTypes::air;
+								if (py+j+cy*(CHUNK_N)>(MINIWORLD_H*CHUNK_N)/2 and not
+									caves.getBlock(px+i+cx*(CHUNK_N),py+j+cy*(CHUNK_N),pz+ k+ pz*(CHUNK_N)))
+									data[yPos] = blockTypes::air;
 
 								yPos+=(CHUNK_N+2);
 							}
@@ -286,7 +287,7 @@ bool SolarSystemDataRequest::isRelevant(int id)
 void SolarSystemDataRequest::process(int id)
 {
 	//TEMP
-	numPlanets=10;
+	numPlanets=3;
 	planets=new Planet*[numPlanets];
 }
 

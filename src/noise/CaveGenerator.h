@@ -9,9 +9,9 @@
 
 typedef bool caveBlock; // easier to change in the future
 
-#define CAVE_CHUNK_SIZE_X 34 // size of the block where the worms can travel
-#define CAVE_CHUNK_SIZE_Y 34*32
-#define CAVE_CHUNK_SIZE_Z 34
+#define CAVE_CHUNK_SIZE_X 64 // size of the block where the worms can travel
+#define CAVE_CHUNK_SIZE_Y 64
+#define CAVE_CHUNK_SIZE_Z 64
 // if vertically the value is larger do it here
 #define CAVE_BLOCK_SIZE CAVE_CHUNK_SIZE_X * CAVE_CHUNK_SIZE_Y * CAVE_CHUNK_SIZE_Z
 
@@ -31,18 +31,25 @@ class CaveGenerator {
 		// dig a line, checks if position are valid
 		void digLine(const glm::i32vec3 &a, const glm::i32vec3 &b);
 
+		bool isGenerated;
 	public:
 		CaveGenerator();
 		~CaveGenerator();
 
-		// must be called manyally to generate the cave using current seed and given conf
+		// must be called manually to generate the cave using current seed and given conf
 		void generate();
 
 		caveBlock getBlock(const glm::i32vec3 &p);
 
 		inline caveBlock getBlock(int x, int y, int z)
 		{
-			return blocks[x + CAVE_CHUNK_SIZE_X * (y + z * CAVE_CHUNK_SIZE_Y)];
+			int xx = (x%(2*CAVE_CHUNK_SIZE_X)); if (xx>=CAVE_CHUNK_SIZE_X) xx=2*CAVE_CHUNK_SIZE_X-xx-1;
+			int yy = (y%(2*CAVE_CHUNK_SIZE_Y)); if (yy>=CAVE_CHUNK_SIZE_Y) yy=2*CAVE_CHUNK_SIZE_Y-yy-1;
+			int zz = (z%(2*CAVE_CHUNK_SIZE_Z)); if (zz>=CAVE_CHUNK_SIZE_Z) zz=2*CAVE_CHUNK_SIZE_Z-zz-1;
+			return blocks[
+				xx + CAVE_CHUNK_SIZE_X * (
+				yy + CAVE_CHUNK_SIZE_Y * (
+				zz ))];
 		}
 };
 
