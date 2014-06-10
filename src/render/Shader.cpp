@@ -130,7 +130,7 @@ void Shader::load()
         log_err("Impossible de compiler le shader : %s",file.c_str());
         log_err("\n[Erreur log]\n%s\n_________", log);
         
-        //exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE);
     }
     else
     {
@@ -331,9 +331,21 @@ void ShaderProgram::setUniform(const char *name, const vec3 & v)
 {
     glUniform3fv(uniform(name), 1, value_ptr(v));
 }
+void ShaderProgram::setUniform(const char *name, const dvec3 & v)
+{
+    glUniform3dv(uniform(name), 1, value_ptr(v));
+}
 void ShaderProgram::setUniform(const char *name, const vec4 & v)
 {
     glUniform4fv(uniform(name), 1, value_ptr(v));
+}
+void ShaderProgram::setUniform(const char *name, const dvec4 & v)
+{
+    glUniform4dv(uniform(name), 1, value_ptr(v));
+}
+void ShaderProgram::setUniform(const char *name, const dmat4 & m)
+{
+    glUniformMatrix4dv(uniform(name), 1, GL_FALSE, value_ptr(m));
 }
 void ShaderProgram::setUniform(const char *name, const mat4 & m)
 {

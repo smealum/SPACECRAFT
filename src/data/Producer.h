@@ -3,7 +3,8 @@
 
 #include <SFML/System/Thread.hpp>
 #include "data/ContentRequest.h"
-#include "data/ContentReply.h"
+
+typedef SynchronizationQueue<ContentRequest*> ContentOutputQueue;
 
 class Producer
 {

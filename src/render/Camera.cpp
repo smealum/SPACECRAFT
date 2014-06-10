@@ -7,8 +7,9 @@ using namespace glm;
 
 Camera::Camera(float znear, float zfar):
 	view(1.f),
-	pos(0.0,0.0,5.0),
-	proj(perspective(DEG2RAD(90.f), Application::getInstance().getWindowRatio(), znear, zfar)),
+    pos(0.0,0.0,5.0),
+	refPos(0.0,0.0,0.0),
+	proj(perspective(DEG2RAD(70.f), Application::getInstance().getWindowRatio(), znear, zfar)),
 	cameraManager(NULL),
 	znear(znear),
 	zfar(zfar)
@@ -27,12 +28,27 @@ void Camera::updateCamera(ShaderProgram &prog)
 
 glm::vec3 Camera::getPosition(glm::vec3 ref)
 {
-	return vec3(pos)-ref;
+	return vec3(pos+refPos)-ref;
 }
 
 glm::dvec3 Camera::getPositionDouble(glm::dvec3 ref)
 {
-	return pos-ref;
+    return pos-ref+refPos;
+}
+
+void Camera::setPosition(glm::dvec3 p)
+{
+    pos=p-refPos;
+}
+
+glm::vec3 Camera::getReference(void)
+{
+    return glm::vec3(refPos);
+}
+
+glm::dvec3 Camera::getReferenceDouble(void)
+{
+	return refPos;
 }
 
 void Camera::updateFrustum(void)
@@ -61,6 +77,12 @@ bool Camera::isPointInFrustum(vec3 p)
 {
     for(int i=0;i<6;i++)if(dot(vec4(p,1.0f),frustumPlane[i])<0.0f)return false;
     return true;
+}
+
+void Camera::moveReference(glm::dvec3 r)
+{
+    pos+=refPos-r;
+    refPos=r;
 }
 
 vec3 box[]={vec3(0.f,0.f,0.f),

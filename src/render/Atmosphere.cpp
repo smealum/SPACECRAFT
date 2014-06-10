@@ -219,7 +219,7 @@ void Atmosphere::draw(Camera& c, glm::vec3 lightDirection, glm::vec3 position)
 	bind(c, lightDirection, position);
 	
 	shader.setUniform("sky", true);
-	shader.setUniform("model", glm::translate(glm::mat4(1.f),position));
+	shader.setUniform("model", glm::translate(glm::mat4(1.f),position-c.getReference()));
 
 	c.updateCamera(shader);
 

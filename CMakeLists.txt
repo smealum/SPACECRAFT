@@ -119,8 +119,27 @@ add_custom_target(valgrind
   )
 
 # tests
-#enable_testing()
-#add_test(test ${PROJECT_SOURCE_DIR}/tests/test.sh)
+enable_testing()
+SET(OBJ_FILES ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${EXEC}.dir/src)
+#message("OBJ: ${OBJ_FILES}")
+file(GLOB_RECURSE all_obj ${OBJ_FILES}/*.o)
+list(REMOVE_ITEM all_obj ${OBJ_FILES}/main.cpp.o)
+#STRING(REPLACE ; " " all_obj "${all_obj}")
+file(GLOB_RECURSE all_tests ${PROJECT_SOURCE_DIR}/tests/*.cpp)
+#message("tests: ${all_tests}")
+
+foreach(t ${all_tests})
+	GET_FILENAME_COMPONENT(f_base ${t} NAME_WE)
+	add_executable(${f_base} ${t} ${all_obj})
+	add_dependencies(${f_base} ${EXEC})
+	target_link_libraries(${f_base} ${GLEW_LIBRARY} ${GLFW_LIBRARIES} ${OPENGL_LIBRARIES} ${ANTTWEAKBAR_LIBRARY} ${NOISE_LIBRARY} ${SFML_LIBRARIES})
+	add_test(NAME ${f_base}
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		COMMAND ${EXECUTABLE_OUTPUT_PATH}/${f_base})
+	#add_test(NAME ${EXEC}
+	#WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+	#COMMAND ${EXECUTABLE_OUTPUT_PATH}/${EXEC})
+endforeach(t)
 
 # Doc
 

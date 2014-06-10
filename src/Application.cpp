@@ -14,7 +14,7 @@
 #include "utils/glm.h"
 #define WIN_TITLE "SPACECRAFT"
 
-float PlanetFaceDetailsPower = 35.0;
+float PlanetFaceDetailsPower = 28.0;
 
 using namespace std;
 using namespace glm;
@@ -178,7 +178,7 @@ void Application::run()
 {
     BlockType::getInstance(); // TODO can be deleted when used
     state = appInLoop;
-    camera = new Camera(0.0000001f, 2.0*EARTH_SUN);
+    camera = new Camera(0.0000001f, 100.0f);
     camera->view = glm::lookAt(
             glm::vec3(1.5, 1.5f, 1.5f),
             glm::vec3(0.f),
@@ -239,12 +239,12 @@ void Application::loop()
 	
 
     Input::update(window);
+
+    testSolarSystem->update(globalTime);
     camera->update();
 
     glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    testSolarSystem->update(globalTime);
 
     glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
     testSolarSystem->draw(*camera);

@@ -125,7 +125,7 @@ void main()
 	float noise2  = snoise(vec3(vPos*2.0/SunWidth)-time*0.1)*1.0 +
 					snoise(vec3(vPos*20.0/SunWidth)-time*0.1)*0.1 ;
 
-	float c1 = min(abs(noise1),0.5)+0.5;
+	float c1 = min(abs(noise1),0.5)+0.42;
 	float c2 = min(abs(noise2),0.5)+0.5;
 
 	outColor = vec4(c1+c2*2.0,c1+c2*0.5,c1,1.0);

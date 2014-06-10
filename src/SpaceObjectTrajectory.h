@@ -12,14 +12,22 @@ class SpaceObjectTrajectory
 class EllipticalTrajectory : public SpaceObjectTrajectory
 {
 	public:
-		EllipticalTrajectory(glm::vec3 center, glm::mat3 caracteristic, float period);
+		EllipticalTrajectory(glm::vec3 center, glm::mat3 caracteristic, float phase, float period);
+		EllipticalTrajectory(SpaceObjectTrajectory& e, glm::mat3 caracteristic, float phase, float period);
 
 		virtual glm::vec3 getPosition(float time);
 
 	private:
-		glm::vec3 center;
+		bool isFinal;
+        // TODO fix this
+		//union
+		//{
+			glm::vec3 center;
+			SpaceObjectTrajectory* superTrajectory;
+		//};
+
 		glm::mat3 caracteristic;
-		float period;
+		float phase, period;
 };
 
 #endif

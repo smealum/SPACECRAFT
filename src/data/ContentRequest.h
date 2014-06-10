@@ -31,6 +31,8 @@ class PlanetElevationRequest : public ContentRequest
 		
 	private:
 		float elevation;
+		float temperature;
+		float humidity;
 		glm::vec3 coord;
 		Planet& planet;
 		TrackerPointer<PlanetFace>* face;

@@ -4,6 +4,9 @@
 #include "MiniWorld.h"
 #include "utils/positionMath.h"
 #include "utils/dbg.h"
+#include "glm/gtc/noise.hpp"
+
+#include "noise/CaveGenerator.h" // XXX debug
 
 #include <cstdio>
 
@@ -34,17 +37,20 @@ PlanetElevationRequest::~PlanetElevationRequest()
 
 static inline float getElevation(int prod_id, Planet& planet, glm::vec3 v)
 {
-	return (planet.getElevation(prod_id, glm::normalize(v))+1.0f)/2.0f; //faut que ça nous sorte une valeur entre 0 et 1
+	return (planet.getElevation(prod_id, glm::normalize(v))+1.0)/2.0f; //faut que ça nous sorte une valeur entre 0 et 1
 }
 
 void PlanetElevationRequest::process(int id)
 {
-	elevation=blockHeightToElevation(getElevation(id, planet, glm::normalize(coord))*CHUNK_N*MINIWORLD_H);
+	glm::vec3 pos = glm::normalize(coord);
+	elevation=blockHeightToElevation(getElevation(id, planet, pos)*float(CHUNK_N*MINIWORLD_H));
+	temperature=planet.getTemperature(pos);
+	humidity=planet.getHumidity(pos);
 }
 
 void PlanetElevationRequest::update(void)
 {
-	face->getPointer()->updateElevation(elevation);
+	face->getPointer()->updateElevation(elevation,temperature,humidity);
 	face->release();
 }
 
@@ -55,7 +61,7 @@ bool PlanetElevationRequest::isRelevant(int id)
 
 //WorldChunkRequest stuff
 WorldChunkRequest::WorldChunkRequest(Planet& p, Chunk& c, float elevation, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z):
-	px(x),
+px(x),
 	py(y),
 	pz(z),
 	elevation(elevation),
@@ -88,6 +94,10 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 	*/
 	int pxPos,pzPos,xPos,zPos,pyPos,yPos;
 	pxPos=0;
+
+	CaveGenerator caves;
+	caves.generate(); //XXX
+
 	for(int cx=0;cx<w;cx++)
 	{
 		pzPos=pxPos;
@@ -106,8 +116,7 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 					const int height=int(getElevation(prod_id, planet, pos)*CHUNK_N*MINIWORLD_H);
 
 					//TEMP (pour tester)
-
-					const int waterHeight=CHUNK_N*MINIWORLD_H/2.f+12;
+					const int waterHeight=CHUNK_N*MINIWORLD_H/2.f;
 					if(height<waterHeight)
 					{
 						//UNDER THE SEAAAAAA
@@ -132,15 +141,34 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 							for(int j=0;j<(CHUNK_N+2);j++)
 							{
 								if (vy+py+j == height) data[yPos]=blockTypes::grass;
-								else if (vy+py+j < height) data[yPos]=blockTypes::dirt;
+								else if (vy+py+j < height) data[yPos] = blockTypes::dirt;
 								else if (vy+py+j == height+1 && rand()%100 == 1) data[yPos]=blockTypes::flower_red;
 								else data[yPos]=blockTypes::air;
+
+								// cave
+								if (py+j+cy*(CHUNK_N)>(MINIWORLD_H*CHUNK_N)/2 and not
+									caves.getBlock(px+i+cx*(CHUNK_N),py+j+cy*(CHUNK_N),pz+ k+ pz*(CHUNK_N)))
+									data[yPos] = blockTypes::air;
+
 								yPos+=(CHUNK_N+2);
 							}
 							pyPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w;
 						}
 					}
 
+					// grotte
+					//pyPos=zPos;
+					//for(int cy=0;cy<h;cy++)
+					//{
+						//yPos=pyPos;
+						//for(int j=0;j<(CHUNK_N+2);j++)
+						//{
+							//if (glm::simplex(pos*float(PLANETFACE_BLOCKS)*0.05f+vec3(cy*(CHUNK_N+2)+j)*0.05f)>0.5f)
+								//data[yPos]=blockTypes::air;
+							//yPos+=(CHUNK_N+2);
+						//}
+						//pyPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w;
+					//}
 
 					zPos+=(CHUNK_N+2)*(CHUNK_N+2);
 				}
@@ -166,7 +194,7 @@ void WorldChunkRequest::process(int id)
 
 void WorldChunkRequest::update(void)
 {
-	if (not isCanceled)
+	if(!isCanceled)
 	{
 		chunk->getPointer()->updateData((chunkVal*)data, vArray);
 	}
@@ -267,7 +295,7 @@ void SolarSystemDataRequest::update(void)
 {
 	for(int i=0;i<numPlanets;i++)
 	{
-		PlanetInfo pitest(new EllipticalTrajectory(glm::vec3(0.0f), glm::mat3(10.0f), 100.0f));
+		PlanetInfo pitest(new EllipticalTrajectory(glm::vec3(0.0f), glm::mat3(10.0f*(i+1)), i*1.037f, 100.0f*(i+1)));
 		planets[i]=new Planet(pitest, contentHandler);
 	}
 	sun=new Sun(glm::vec3(0.0f));

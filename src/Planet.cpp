@@ -3,6 +3,9 @@
 #include "data/ContentHandler.h"
 #include "Application.h"
 #include "utils/dbg.h"
+#include "glm/gtc/noise.hpp"
+#include "world/BlockType.h"
+#include "utils/positionMath.h"
 
 
 using namespace std;
@@ -24,6 +27,8 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
+	temperature(0.0f),
+	humidity(0.0f),
 	minElevation(elevation-0.01f),
 	elevated(false),
 	id(5),
@@ -47,12 +52,15 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
+	temperature(0.0f),
+	humidity(0.0f),
 	elevated(false),
 	id(id),
 	bufferID(-1),
 	miniworld(NULL),
 	toplevel(father->toplevel),
-	childrenDepth(0)
+	childrenDepth(0),
+	isDisplayOk(false)
 {
 	//TODO : exception ?
 	// if(!father);
@@ -134,10 +142,13 @@ void PlanetFace::finalize(void)
 	planet->handler.requestContent(new PlanetElevationRequest(*planet, *this, vertex[4]));
 }
 
-void PlanetFace::updateElevation(float e)
+// mise a jour de l'elevation, de la température et de l'humidité
+void PlanetFace::updateElevation(float e, float t, float h)
 {
 	elevation=e;
 	minElevation=e-2.0f/(1<<depth);
+	temperature=t;
+	humidity=h;
 	elevated=true;
 }
 
@@ -274,8 +285,8 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 			{
 				if(!sons[i])
 					sons[i]=new PlanetFace(planet,this,i);
-
-				sons[i]->processLevelOfDetail(c, b);
+				else
+					sons[i]->processLevelOfDetail(c, b);
 
 				done &= ( sons[i]->isDisplayOk );
 			}
@@ -397,39 +408,90 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	faces.push_back(pf);
 	const glm::vec3 n=pf->uvertex[4];
 
+	double block_height=delevationToBlockHeight(pf->elevation);
+
 	int topTile,sideTile;
-	if (pf->elevation >1.001)
+	if (block_height>double(CHUNK_N*MINIWORLD_H)*0.5) //  terre
 	{
-		topTile = 0;
-		sideTile = 2;
+		// e > 0
+		float e = (pf->elevation - 1.001) * 1000.f ;
+
+		float sandCoef = 4.0*pf->temperature + 1.4*e - pf->humidity;
+		float snowCoef = -2.0*pf->temperature+ 1.4*e + 0.3*pf->humidity;
+		float stoneCoef = snowCoef+0.01 - 0.1*pf->humidity;
+		float grassCoef = 0.05 + 2.0*abs(pf->humidity);
+
+		// inihibition
+		// (pas de sable près de l'eau)
+		if (e<0.05) sandCoef = 0.0;
+		// (A partir d'un moment la neige recouvre les cailloux
+		stoneCoef = max(stoneCoef,0.8);
+
+	
+		// on choisit le plus grand
+		int imax=0;int vmax=sandCoef;
+		if (vmax<snowCoef) {vmax=snowCoef;imax=1;}
+		if (vmax<stoneCoef) {vmax=stoneCoef;imax=2;}
+		if (vmax<grassCoef) {vmax=grassCoef;imax=3;}
+		
+		
+		switch(imax)
+		{
+			case 0:  topTile = blockTypes::sand-1;
+			        sideTile = blockTypes::sand-1;
+					break;
+			case 1:  topTile = blockTypes::snow-1;
+			        sideTile = blockTypes::snow-1;
+					break;
+			case 2:  topTile = blockTypes::stone-1;
+			        sideTile = blockTypes::stone-1;
+					break;
+			case 3:  topTile = blockTypes::grass-1;
+			        sideTile = blockTypes::grass-1;
+					break;
+		}
+
 	}
-	else
+	else // mer
 	{
 		// water
-		topTile = 12*16+13;
-		sideTile = 12*16+13;
+		topTile = blockTypes::water-1;
+		sideTile = blockTypes::water-1;
 
 		// sand
 		//topTile = 18;
 		//sideTile = 18;
 	}
 
-	double repeat;
-	if (pf->depth < MINIWORLD_DETAIL)
-	{
-		repeat = 1<<(MINIWORLD_DETAIL-(pf->depth));
-	}
-	else
-	{
-		repeat = 1;
-		int depth = pf->depth;
-		while(depth<MINIWORLD_DETAIL)
-		{
-			repeat*=0.5;
-			depth++;
-		}
-	}
-	repeat *= MINIWORLD_W * CHUNK_N;
+	float repeat;
+	//if (pf->depth < MINIWORLD_DETAIL)
+	//{
+		//repeat = 1<<(MINIWORLD_DETAIL-(pf->depth));
+	//}
+	//else
+	//{
+		// // version 1
+		//repeat = 1;
+
+		// // version 2
+		//int depth = pf->depth;
+		//while(depth<MINIWORLD_DETAIL)
+		//{
+			//repeat*=0.5;
+			//depth++;
+		//}
+	//}
+	//repeat *= MINIWORLD_W * CHUNK_N;
+	
+	// peut-être que c'est mieux ainsi ?
+	// j'attend des feedback (si quelqu'un passe par là)
+	//-------------------------------------------------
+	//
+	// 
+	//
+	//
+	//
+	repeat = 2.0;
 	
 
 	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->minElevation,1.0f/(1<<pf->depth),topTile,sideTile,repeat};
@@ -481,7 +543,7 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 	shader.setUniform("v1", v1);
 	shader.setUniform("v2", v2);
 	shader.setUniform("lightdir", lightdir);
-	shader.setUniform("planetPos", planetFace.planet->position);
+	shader.setUniform("planetPos", planetFace.planet->position-c.getReference());
 	shader.setUniform("model", glm::mat4(planetFace.planet->model));
 
 	// //planetface_atmosphere test
@@ -529,6 +591,20 @@ glm::dvec3 Planet::getCameraRelativeDoublePosition(Camera& c)
 	return glm::dmat3(invModel)*c.getPositionDouble(glm::dvec3(position));
 }
 
+PlanetFace& Planet::getTopLevelForCamera(Camera& c)
+{
+	glm::vec3 p=getCameraRelativePosition(c);
+	for(int i=0;i<6;i++)
+	{
+		glm::vec3 p2=(p/fabs(glm::dot(faces[i]->getN(),p)))-faces[i]->getOrigin();
+		float vv1=glm::dot(p2,faces[i]->getV1());
+		float vv2=glm::dot(p2,faces[i]->getV2());
+		if(fabs(glm::dot(faces[i]->getN(),p2))<=1e-6 && vv1>=0.0f && vv1<=4.0f && vv2>=0.0f && vv2<=4.0f)return *faces[i];
+	}
+	printf("ERROR ERROR\n");
+	return *faces[0];
+}
+
 glm::mat3 Planet::getModel(void)
 {
 	return model;
@@ -551,10 +627,17 @@ int Planet::numMiniWorlds(void)
 
 bool Planet::collidePoint(glm::dvec3 p, glm::dvec3 v, glm::dvec3& out)
 {
-	bool ret=false;
-	for(auto it(miniWorldList.begin());it!=miniWorldList.end();++it)ret=ret||(*it)->collidePoint(p,v);
+	//TODO : vrai raymarching sur les miniworlds/chunks.
+	//(mais en attendant, ça ça marche et bouffe pas tant que ça pour des faibles vitesses vu que de toute façon on cull les miniworlds)
+	//(parce qu'on n'est pas complètement débile quand même, juste un peu flemmard)
+	bool gret=false, ret;
+	do{
+		ret=false;
+		for(auto it(miniWorldList.begin());it!=miniWorldList.end();++it)ret=ret||(*it)->collidePoint(p,v);
+		gret=ret||gret;
+	}while(ret && glm::length(v)>1e-6);
 	out=p+v;
-	return ret;
+	return gret;
 }
 
 Chunk* Planet::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir)
@@ -600,4 +683,43 @@ void Planet::update(float time)
 
 	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,axis));
 	invModel=glm::transpose(model);
+}
+
+float Planet::getTemperature(const glm::vec3& pos)
+{
+	float distanceToEquatorFactor = 1.0-2.0*abs(
+			glm::dot(
+				glm::normalize(pos),
+				glm::normalize(axis)
+		 ));
+	float noise1 = glm::simplex(pos*10.f) * 0.5;
+	float noise2 = glm::simplex(pos*100.f) * 0.05;
+
+	return glm::clamp(distanceToEquatorFactor+noise1+noise2,-1.f,1.f);
+}
+
+float Planet::getHumidity(const glm::vec3& pos)
+{
+	float noise = glm::simplex(pos*2.f) *  1.4;
+	
+	return glm::clamp(noise,-1.f,1.f);
+}
+glm::vec3 PlanetFace::getOrigin(void)
+{
+	return uvertex[0];
+}
+
+glm::vec3 PlanetFace::getV1(void)
+{
+	return uvertex[1]-uvertex[0];
+}
+
+glm::vec3 PlanetFace::getV2(void)
+{
+	return uvertex[3]-uvertex[0];
+}
+
+glm::vec3 PlanetFace::getN(void)
+{
+	return vertex[4];
 }

@@ -43,7 +43,7 @@ void Sun::draw(Camera& c)
 	shader.setUniform("model",
 			translate(
 				mat4(1.0),
-				position
+				position-c.getReference()
 			)
 	);
 
@@ -60,7 +60,7 @@ void Sun::drawGlow(Camera& c)
 	shaderGlow.setUniform("model",
 			translate(
 				mat4(1.0),
-				position
+				position-c.getReference()
 			)
 	);
 

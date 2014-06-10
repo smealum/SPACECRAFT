@@ -8,6 +8,7 @@ class ContentHandler
 {
 	public:
 		ContentHandler(int numProducers);
+        ~ContentHandler();
 
 		void requestContent(ContentRequest* req, bool release=true);
 		void manualReleaseInput(void);
