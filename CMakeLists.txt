@@ -26,7 +26,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   set(OS_WINDOWS 1)
   set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} C:/MinGW/lib C:/CodeBlocks/MinGW/lib ${PROJECT_SOURCE_DIR}/extlibs/libs-win32)
   set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} C:/MinGW/include C:/CodeBlocks/MinGW/include )
-  add_definitions(-DGLEW_NO_GLU -DGLEW_BUILD)
+  add_definitions(-DGLEW_NO_GLU -DGLEW_BUILD -DGLEW_STATIC)
   # create the bin dir and copy the dlls
   file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
   file(GLOB_RECURSE dll_files extlibs/dll/*)
