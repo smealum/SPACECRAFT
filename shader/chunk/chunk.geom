@@ -86,7 +86,7 @@ void main()
 
 	vec3 rn=(normalize(origin+(pos2)/numBlocks)*y);
 
-	const float ambient=0.0;
+	const float ambient=0.3;
 	float col=max(dot(vec3(normalize(n[dir[0]].x*v1+n[dir[0]].z*v2+n[dir[0]].y*rn)),lightdir),0.0)+ambient; //suit pas parfaitement la rotondité mais devrait suffire
 
 	fcolor = vec4(vec3(col),1.0);

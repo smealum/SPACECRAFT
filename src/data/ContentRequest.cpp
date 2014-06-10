@@ -146,7 +146,8 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 								else data[yPos]=blockTypes::air;
 
 								// cave
-								if (!caves.getBlock(i, j+cy*(CHUNK_N), k))
+								if (py+j+cy*(CHUNK_N)>(MINIWORLD_H*CHUNK_N)/2 and not
+									caves.getBlock(px+i+cx*(CHUNK_N),py+j+cy*(CHUNK_N),pz+ k+ pz*(CHUNK_N)))
 									data[yPos] = blockTypes::air;
 
 								yPos+=(CHUNK_N+2);
@@ -286,7 +287,7 @@ bool SolarSystemDataRequest::isRelevant(int id)
 void SolarSystemDataRequest::process(int id)
 {
 	//TEMP
-	numPlanets=1;
+	numPlanets=2;
 	planets=new Planet*[numPlanets];
 }
 

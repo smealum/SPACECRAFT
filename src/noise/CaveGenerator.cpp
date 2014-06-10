@@ -6,9 +6,10 @@
 
 CaveGenerator::CaveGenerator() :
 	seed(0),
-	segmentCount(50),
-	segmentLength(3),
-	twistiness(4.f/256.f)
+	segmentCount(30),
+	segmentLength(4),
+	twistiness(9.f/256.f),
+	isGenerated(false)
 {
 	posNoise.SetSeed(seed);
 	// TODO noise for positions
@@ -39,14 +40,20 @@ static const glm::vec3 axes[] = {
 
 void CaveGenerator::generate()
 {
+	if (isGenerated) return;
+	isGenerated=true;
+
 	// first generate the points where the worms start
 	// we are gong to push back every control point
 	// that means there's at max segmentCount points in each vector
-	std::vector<std::vector<glm::vec3> > conPoints(4); // XXX size must be changed
-	conPoints[0].push_back(glm::vec3(16, 16+32*30, 16));
-	conPoints[1].push_back(glm::vec3(16, 16+32*20, 16));
-	conPoints[2].push_back(glm::vec3(16, 16+32*10, 16));
-	conPoints[3].push_back(glm::vec3(16, 16+32*0, 16));
+	std::vector<std::vector<glm::vec3> > conPoints(7); // XXX size must be changed
+	conPoints[0].push_back(glm::vec3(CAVE_CHUNK_SIZE_X/2,CAVE_CHUNK_SIZE_Y/2,CAVE_CHUNK_SIZE_Z/2));
+	conPoints[1].push_back(glm::vec3(CAVE_CHUNK_SIZE_X/4,CAVE_CHUNK_SIZE_Y/2,CAVE_CHUNK_SIZE_Z/2));
+	conPoints[2].push_back(glm::vec3(CAVE_CHUNK_SIZE_X/2,CAVE_CHUNK_SIZE_Y/2,CAVE_CHUNK_SIZE_Z/2));
+	conPoints[3].push_back(glm::vec3(CAVE_CHUNK_SIZE_X/2,CAVE_CHUNK_SIZE_Y/2,CAVE_CHUNK_SIZE_Z/4));
+	conPoints[4].push_back(glm::vec3(3*CAVE_CHUNK_SIZE_X/4,CAVE_CHUNK_SIZE_Y/2,CAVE_CHUNK_SIZE_Z/2));
+	conPoints[5].push_back(glm::vec3(CAVE_CHUNK_SIZE_X/2,3*CAVE_CHUNK_SIZE_Y/2,CAVE_CHUNK_SIZE_Z/2));
+	conPoints[6].push_back(glm::vec3(CAVE_CHUNK_SIZE_X/2,CAVE_CHUNK_SIZE_Y/2,3*CAVE_CHUNK_SIZE_Z/4));
 	float scale = 0.03;
 	float yy = 0.f,
 		  zz = 0.f; // used to get the noise
@@ -85,21 +92,16 @@ void CaveGenerator::generate()
 			digDisk((*points)[i-1], normal, glm::cross(normal, v));
 			glm::i32vec3 p1 = glm::i32vec3((*points)[i+1]);
 			glm::i32vec3 p2 = glm::i32vec3((*points)[i]);
-			for(int i=-4;i<=4;++i)
-			for(int j=-4;j<=4;++j)
-			for(int k=-4;k<=4;++k)
+			for(int i=-8;i<=8;++i)
+			for(int j=-8;j<=8;++j)
+			for(int k=-8;k<=8;++k)
 			{
+				if (k*k+j*j+i*i>4*4) continue;
 				glm::i32vec3 decal(i,j,k);
 				digLine(p1+decal,p2+decal);
 			}
 		}
 	}
-
-	// XXX test
-	//for(int i=0;i<3;++i)
-	//for(int j=0;j<3;++j)
-	//for(int k=0;k<3;++k)
-	//digLine(glm::i32vec3(0+i, 0+j, 0+k), glm::i32vec3(CAVE_CHUNK_SIZE_X-10+i, CAVE_CHUNK_SIZE_Y-10+j, CAVE_CHUNK_SIZE_Y-10+k));
 }
 
 // helper to get the 1D index in a flattened 3D array, using a vec3
