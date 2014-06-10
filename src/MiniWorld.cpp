@@ -22,9 +22,9 @@ MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 			for(int k=0;k<MINIWORLD_D;k++)
 			{
 				chunks[i][j][k]=new Chunk(p,this,
-						(pf->x*MINIWORLD_W+i)*CHUNK_N,
+						x+i*CHUNK_N,
 						j*CHUNK_N,
-						(pf->z*MINIWORLD_D+k)*CHUNK_N,
+						z+k*CHUNK_N,
 						face->toplevel->uvertex[1]-face->toplevel->uvertex[0],
 						face->toplevel->uvertex[3]-face->toplevel->uvertex[0],
 						face->toplevel->uvertex[0]);
@@ -96,6 +96,7 @@ void MiniWorld::updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D
 
 bool MiniWorld::collidePoint(glm::dvec3& p, glm::dvec3& v)
 {
+	if(p.x<x-1 || p.z<z-1 || p.x>x+CHUNK_N*MINIWORLD_W+1 || p.z>z+CHUNK_N*MINIWORLD_D+1)return false;
 	bool ret=false;
 	//TODO : culling dès ici
 	for(int i=0;i<MINIWORLD_W;i++)
@@ -113,7 +114,7 @@ bool MiniWorld::collidePoint(glm::dvec3& p, glm::dvec3& v)
 
 Chunk* MiniWorld::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir)
 {
-	//TODO : culling dès ici
+	if(p.x<x-1 || p.z<z-1 || p.x>x+CHUNK_N*MINIWORLD_W+1 || p.z>z+CHUNK_N*MINIWORLD_D+1)return NULL;
 	for(int i=0;i<MINIWORLD_W;i++)
 	{
 		for(int j=0;j<MINIWORLD_H;j++)
