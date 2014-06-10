@@ -9,10 +9,13 @@
 class ContentRequest
 {
 	public:
+		ContentRequest();
+		virtual bool isRelevant(int id);
 		virtual void process(int id)=0;
 		virtual void update()=0;
 		virtual ~ContentRequest() {}
-	private:		
+		bool isCanceled;
+	private:
 };
 
 #include "Planet.h"
@@ -24,9 +27,12 @@ class PlanetElevationRequest : public ContentRequest
 		void process(int id);
 		void update(void);
 		virtual ~PlanetElevationRequest();
+		virtual bool isRelevant(int id);
 		
 	private:
 		float elevation;
+		float temperature;
+		float humidity;
 		glm::vec3 coord;
 		Planet& planet;
 		TrackerPointer<PlanetFace>* face;
@@ -41,15 +47,16 @@ class WorldChunkRequest : public ContentRequest
 		void process(int id);
 		void update(void);
 		virtual ~WorldChunkRequest();
+		virtual bool isRelevant(int id);
 		
 	private:
-        chunkVal data[(CHUNK_N+2)][(CHUNK_N+2)][(CHUNK_N+2)];
-        int px, py, pz;
-        float elevation;
+		chunkVal data[(CHUNK_N+2)][(CHUNK_N+2)][(CHUNK_N+2)];
+		int px, py, pz;
+		float elevation;
 		glm::vec3 origin, v1, v2;
 		Planet& planet;
 		TrackerPointer<Chunk>* chunk;
-        std::vector<GL_Vertex> vArray;
+		std::vector<GL_Vertex> vArray;
 };
 
 #include "MiniWorld.h"
@@ -61,14 +68,49 @@ class MiniWorldDataRequest : public ContentRequest
 		void process(int id);
 		void update(void);
 		virtual ~MiniWorldDataRequest();
+		virtual bool isRelevant(int id);
 		
 	private:
-        chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)];
-        int px, py, pz;
+		chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)];
+		int px, py, pz;
 		glm::vec3 origin, v1, v2;
 		Planet& planet;
 		TrackerPointer<MiniWorld>* miniworld;
-        std::vector<GL_Vertex> vArray[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];
+		std::vector<GL_Vertex> vArray[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];
+};
+
+class MiniWorldDeletionRequest : public ContentRequest
+{
+	public:
+		MiniWorldDeletionRequest(MiniWorld& mw);
+		void process(int id);
+		void update(void);
+		virtual ~MiniWorldDeletionRequest();
+		virtual bool isRelevant(int id);
+		
+	private:
+		TrackerPointer<MiniWorld>* miniworld;
+};
+
+#include "SolarSystem.h"
+
+class SolarSystemDataRequest : public ContentRequest
+{
+	public:
+		SolarSystemDataRequest(SolarSystem& ss, ContentHandler& ch);
+		void process(int id);
+		void update(void);
+		virtual ~SolarSystemDataRequest();
+		virtual bool isRelevant(int id);
+		
+	private:
+		TrackerPointer<SolarSystem>* solarSystem;
+		ContentHandler& contentHandler;
+
+		int numPlanets;
+
+		Sun* sun;
+		Planet** planets;
 };
 
 typedef SynchronizationQueue<ContentRequest*> ContentInputQueue;

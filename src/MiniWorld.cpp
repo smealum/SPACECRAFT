@@ -1,9 +1,10 @@
 #include "MiniWorld.h"
 #include "data/ContentHandler.h"
+#include "utils/dbg.h"
 
 MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 	planet(p),
-	model(glm::mat4(1.0f)),
+	model(1.0f),
     tptr(new TrackerPointer<MiniWorld>(this, true)),
 	face(pf),
 	origin(face->toplevel->uvertex[0]),
@@ -11,7 +12,8 @@ MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 	v2(face->toplevel->uvertex[3]-face->toplevel->uvertex[0]),
 	x(pf->x*MINIWORLD_W*CHUNK_N),
 	z(pf->z*MINIWORLD_D*CHUNK_N),
-	generated(false)
+	generated(false),
+	constructionCanceled(false)
 {
 	for(int i=0;i<MINIWORLD_W;i++)
 	{
@@ -45,6 +47,8 @@ void MiniWorld::draw(Camera& c)
 	//TODO : passer frustum culling en octree ?
 	//TODO : occlusion culling ?
 
+	model=glm::translate(glm::mat4(1.0f),planet->getPosition())*glm::mat4(planet->getModel());
+
 	for(int i=0;i<MINIWORLD_W;i++)
 	{
 		for(int j=0;j<MINIWORLD_H;j++)
@@ -57,14 +61,22 @@ void MiniWorld::draw(Camera& c)
 	}
 }
 
+bool MiniWorld::isConstructionCanceled()
+{
+	return constructionCanceled;
+}
+
 void MiniWorld::destroyMiniWorld(void)
 {
-    tptr->release();
+	constructionCanceled = true;
+	planet->handler.requestContent(new MiniWorldDeletionRequest(*this),false);
+		tptr->release();
+	planet->handler.manualReleaseInput();
 }
 
 TrackerPointer<MiniWorld>* MiniWorld::getTptr(void)
 {
-    return tptr;
+	return tptr;
 }
 
 void MiniWorld::updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D])
@@ -82,7 +94,24 @@ void MiniWorld::updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D
 	}
 }
 
-void MiniWorld::collidePoint(glm::dvec3& p, glm::dvec3& v)
+bool MiniWorld::collidePoint(glm::dvec3& p, glm::dvec3& v)
+{
+	bool ret=false;
+	//TODO : culling dès ici
+	for(int i=0;i<MINIWORLD_W;i++)
+	{
+		for(int j=0;j<MINIWORLD_H;j++)
+		{
+			for(int k=0;k<MINIWORLD_D;k++)
+			{
+				ret=ret||chunks[i][j][k]->collidePoint(p,v);
+			}
+		}
+	}
+	return ret;
+}
+
+Chunk* MiniWorld::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir)
 {
 	//TODO : culling dès ici
 	for(int i=0;i<MINIWORLD_W;i++)
@@ -91,8 +120,29 @@ void MiniWorld::collidePoint(glm::dvec3& p, glm::dvec3& v)
 		{
 			for(int k=0;k<MINIWORLD_D;k++)
 			{
-				chunks[i][j][k]->collidePoint(p,v);
+				if(chunks[i][j][k]->selectBlock(p,v,out,dir))return chunks[i][j][k];
 			}
 		}
 	}
+	return NULL;
+}
+
+void MiniWorld::changeBlock(glm::i32vec3 p, blockTypes::T v)
+{
+	//TODO : culling dès ici
+	for(int i=0;i<MINIWORLD_W;i++)
+	{
+		for(int j=0;j<MINIWORLD_H;j++)
+		{
+			for(int k=0;k<MINIWORLD_D;k++)
+			{
+				chunks[i][j][k]->changeBlock(p,v);
+			}
+		}
+	}
+}
+
+void MiniWorld::deleteBlock(glm::i32vec3 p)
+{
+	changeBlock(p,blockTypes::air);
 }

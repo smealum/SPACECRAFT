@@ -8,6 +8,7 @@
 #include "utils/glm.h"
 #include "render/Camera.h"
 #include "utils/TrackerPointer.h"
+#include "world/BlockType.h"
 #include "Planet.h"
 
 #include <vector>
@@ -16,7 +17,7 @@ typedef uint8_t chunkVal;
 struct GL_Vertex
 {
 	glm::vec3 position;
-	glm::vec2 texcoord;
+	int tile;
 	float facedir;
 };
 
@@ -26,6 +27,7 @@ struct GL_Vertex
 //	use destroyChunk
 class Chunk
 {
+	friend class CameraPlayerGround;
 	public:
 		Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, glm::vec3 v2, glm::vec3 n);
 
@@ -33,14 +35,21 @@ class Chunk
 		void updateData(chunkVal* data, std::vector<GL_Vertex> va);
 		void destroyChunk(void);
 
-		void collidePoint(glm::dvec3& p, glm::dvec3& v);
+		glm::i32vec3 performRayMarch(glm::dvec3 localBlockPosf, glm::dvec3 localBlockPosf2, int* dir);
+		bool collidePoint(glm::dvec3& p, glm::dvec3& v);
+		bool selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir);
+
+		void changeBlock(glm::i32vec3 p, blockTypes::T v);
+		void deleteBlock(glm::i32vec3 p);
 
 		TrackerPointer<Chunk>* getTptr(void);
 
 		Chunk* neighbour[4] ; // NULL <=> nothing
 		chunkVal value[CHUNK_N+2][CHUNK_N+2][CHUNK_N+2];
 
+		bool isConstructionCanceled();
 	private:
+		bool constructionCanceled;
 		void initGLObjects();
 		void destroyGLObjects();
 

@@ -5,6 +5,7 @@
 #include <cerrno>
 #include <cstring>
 
+
 // colored printing for unixes
 #ifdef __WIN32__
 	#define ERROR_TEXT "[ERROR]"

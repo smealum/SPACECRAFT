@@ -1,11 +1,15 @@
 #include "../Camera.h"
 #include "utils/Input.h"
-#include "CameraKeyboardMouse.h"
 #include <GLFW/glfw3.h>
+#include "render/camera/CameraKeyboardMouse.h"
+#include "render/camera/CameraPlayerGround.h"
 #include "utils/maths.h"
+#include "SolarSystem.h"
 
 using namespace std;
 using namespace glm;
+
+extern SolarSystem* testSolarSystem;
 
 CameraKeyboardMouse::CameraKeyboardMouse()
 {
@@ -26,4 +30,15 @@ void CameraKeyboardMouse::update(Camera& camera)
     }else if (Input::isKeyPressed(GLFW_KEY_SPACE))Input::fixMouse();
 
     CameraKeyboard::update(camera);
+    
+    if(Input::isKeyPressed(GLFW_KEY_R))
+   	{
+   		//TODO : méga fuite à virer
+   		Planet* planet=testSolarSystem->getClosestPlanet(camera.getPosition(glm::vec3(0)));
+   		if(planet)
+   		{
+   			PlanetFace& pf=planet->getTopLevelForCamera(camera);
+   			camera.setCameraManager(new CameraPlayerGround(planet, camera, pf));
+   		}
+   	}
 }

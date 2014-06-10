@@ -10,7 +10,9 @@ class ContentHandler
 		ContentHandler(int numProducers);
         ~ContentHandler();
 
-		void requestContent(ContentRequest* req);
+		void requestContent(ContentRequest* req, bool release=true);
+		void manualReleaseInput(void);
+
 		void handleNewContent();
 
 		inline int getMaxProducers() const { return int(producers.size()); }

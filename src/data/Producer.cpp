@@ -4,6 +4,7 @@
 // waiting function
 #include <SFML/System/Sleep.hpp>
 #include <SFML/System/Time.hpp>
+#include "utils/dbg.h"
 
 void fakeProducerMain(Producer* p)
 {
@@ -17,6 +18,7 @@ Producer::Producer(int id, ContentInputQueue& iq, ContentOutputQueue& oq):
 	id(id)
 {
     thread->launch();
+	debug("Thread lauched");
 }
 
 Producer::~Producer()
@@ -30,10 +32,16 @@ void Producer::producerMain()
 	//TODO : mieux qu'avec un sleep.
 	while(1)
 	{
+		
 		ContentRequest* cr=inputQueue.pop();
 		if(cr)
 		{
-			cr->process(id);
+			if (cr->isRelevant(id))
+				cr->process(id);
+			else
+			{
+				cr->isCanceled = true;
+			}
 			outputQueue.push(cr);
 		}else{
 			sf::sleep(sf::milliseconds(10));

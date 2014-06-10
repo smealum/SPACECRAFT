@@ -34,7 +34,11 @@ class MiniWorld
 		void destroyMiniWorld(void);
 		void updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D]);
 
-		void collidePoint(glm::dvec3& p, glm::dvec3& v);
+		bool collidePoint(glm::dvec3& p, glm::dvec3& v);
+		Chunk* selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir);
+
+		void changeBlock(glm::i32vec3 p, blockTypes::T v);
+		void deleteBlock(glm::i32vec3 p);
 
 		inline bool isGenerated(void)
 		{
@@ -43,7 +47,9 @@ class MiniWorld
 
 		TrackerPointer<MiniWorld>* getTptr(void);
 
+		bool isConstructionCanceled();
 	private:
+		bool constructionCanceled;
 		Planet* planet;
 		PlanetFace* face;
 		Chunk* chunks[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];

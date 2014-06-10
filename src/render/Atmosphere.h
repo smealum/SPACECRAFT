@@ -1,13 +1,13 @@
 #ifndef ATMOSPHERE_H
 #define ATMOSPHERE_H
 
-#define PI 3.14159265
+#define PI 3.14159265f
 #define DELTA 1e-6f
 
 #define NUMSAMPLES 4
 #define KR 0.0025f
 #define KM 0.0015f
-#define ESUN 30.0f
+#define ESUN 15.0f
 #define G -0.85f
 #define WAVELENGTH0 0.650f
 #define WAVELENGTH1 0.570f
@@ -27,10 +27,12 @@ class Atmosphere
 
 		void initLightConstants(void);
 		void makeOpticalDepthBuffer(void);
+		void makePhaseBuffer(void);
 		void generateVBO(void);
 
-		void bind(Camera& c, glm::vec3 lightDirection);
-		void draw(Camera& c, glm::vec3 lightDirection);
+		void bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, ShaderProgram& sprogram);
+		void bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position);
+		void draw(Camera& c, glm::vec3 lightDirection, glm::vec3 position);
 
 	private:
 		ShaderProgram& shader;
@@ -47,10 +49,8 @@ class Atmosphere
 		glm::vec3 m_fWavelength4;
 		float m_fRayleighScaleDepth;
 		float m_fMieScaleDepth;
-
-		float* opticalBuffer;
 		
-		GLuint texture;
+		GLuint depthTexture, phaseTexture;
 		GLuint vao, vbo, ebo;
 
 		int lod;

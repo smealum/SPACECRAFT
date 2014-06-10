@@ -5,16 +5,17 @@
 #include <list>
 #include "utils/glm.h"
 #include "utils/TrackerPointer.h"
+#include "noise/PlanetGenerator.h"
 #include "render/Shader.h"
 #include "render/Camera.h"
-#include "PlanetInfo.h"
-#include "noise/PlanetGenerator.h"
 #include "render/Cloud.h"
 #include "render/Atmosphere.h"
+#include "world/BlockType.h"
+#include "PlanetInfo.h"
 
 #define PLANET_ADDED_DETAIL (4)
 // #define PFBH_MAXSIZE (1024*16)
-#define PFBH_MAXSIZE (1024*256)
+#define PFBH_MAXSIZE (1024*512)
 
 typedef struct
 {
@@ -22,6 +23,9 @@ typedef struct
 	float elevation;
 	float minElevation;
 	float size;
+	int topTile;
+	int sideTile;
+	float repeat;
 }faceBufferEntry_s;
 
 class Planet;
@@ -70,17 +74,22 @@ class PlanetFace
 		~PlanetFace();
 		
 		void deletePlanetFace(PlanetFaceBufferHandler* b);
-		void updateElevation(float e);
+		// mise a jour de l'elevation, de la température et de l'humidité
+		void updateElevation(float e, float t, float h);
 		bool shouldHaveMiniworld(Camera& c);
 		bool isDetailedEnough(Camera& c);
 		void processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b);
 		void createMiniWorld(void);
 		void removeMiniWorld(void);
 
+		glm::vec3 getOrigin(void);
+		glm::vec3 getV1(void);
+		glm::vec3 getV2(void);
+		glm::vec3 getN(void);
+
 		TrackerPointer<PlanetFace>* getTptr(void);
 
 		//TEMP
-		void drawDirect(void);
 		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
 
 	private:
@@ -102,14 +111,21 @@ class PlanetFace
 		int x, z;
 		int bufferID;
 		float elevation;
+		float temperature;
+		float humidity;
 		float minElevation;
+		
 		uint8_t id;
 		int depth;
 		int childrenDepth;
+		inline bool isDrawingFace() {return bufferID>=0;}
+		bool isDisplayOk;
 };
 
 class Planet
 {
+	friend class PlanetFaceBufferHandler;
+	friend class PlanetFace;
 	friend class Chunk;
 	public:
 		Planet(PlanetInfo &pi, class ContentHandler& ch);
@@ -117,26 +133,54 @@ class Planet
 		
 		void processLevelOfDetail(Camera& c);
 		void draw(Camera& c);
+		void update(float time);
 
 		int numMiniWorlds(void);
 		void addMiniWorld(MiniWorld* mw);
 		void removeMiniWorld(MiniWorld* mw);
 
-		glm::dvec3 collidePoint(glm::dvec3 p, glm::dvec3 v);
+		bool collidePoint(glm::dvec3 p, glm::dvec3 v, glm::dvec3& out);
+		class Chunk* selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir);
+
+		void changeBlock(glm::i32vec3 p, blockTypes::T v);
+		void deleteBlock(glm::i32vec3 p);
 
 		const PlanetInfo planetInfo; //read only
 		class ContentHandler& handler;
 
+		glm::dvec3 getGravityVector(glm::dvec3 p);
+		glm::vec3 getPosition(void);
+		glm::mat3 getModel(void);
+		glm::vec3 getCameraRelativePosition(Camera& c);
+		glm::dvec3 getCameraRelativeDoublePosition(Camera& c);
+		PlanetFace& getTopLevelForCamera(Camera& c);
 		inline float getElevation(int id, const glm::vec3 &coord)
 		{
 			return generators[id]->getElevation(coord);
 		}
 		
-		//TEMP
-		void drawDirect(void);
-		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
-		ShaderProgram &programBasic;
+		void setSunPosition(glm::vec3 p);
 
+		//TEMP
+		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
+
+		// Donne la température en fonction de la position
+		// Prend en compte
+		// 		-l'axe de rotation de la planete
+		//		-perturbation local par un bruit.
+		// 		-la distance de la planete par rapport au soleil (TODO)
+		//		-valeur intrinsèque de la planete (composition) (TODO)
+		// Le résultat est à valeur dans [-1,1]
+		// La position est une position dans le référentiel de la planète.
+		float getTemperature(const glm::vec3& pos);
+
+		// Donne l'humidité en fonction de la position
+		// Prend en compte:
+		//		-perturbation local par un bruit
+		//		-valeur intrinsèque de la planete (composition) (TODO)
+		// Le résultat est à valeur dans [-1,1]
+		// La position est une position dans le référentiel de la planète.
+		float getHumidity(const glm::vec3& pos);
 	private:
 		std::vector<PlanetGenerator*> generators;
 		std::list<MiniWorld*> miniWorldList;
@@ -145,11 +189,12 @@ class Planet
 		PlanetFaceBufferHandler* faceBuffers[6];
 
 		glm::vec3 lightdir;
+		glm::vec3 sunPosition;
+		glm::vec3 position;
+		glm::vec3 axis;
+		glm::mat3 model, invModel;
 
-		//TEMP
-			GLuint vaoBasic;
-			GLuint vbo;
-			GLuint ebo;
+		float angle;
 
 		Cloud cloud;
 		Atmosphere atmosphere;

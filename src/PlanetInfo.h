@@ -1,10 +1,13 @@
 #ifndef __PLANETINFO_H__
 #define __PLANETINFO_H__
 
+#include "SpaceObjectTrajectory.h"
+
 class PlanetInfo
 {
 	public:
-		PlanetInfo();
+		PlanetInfo(SpaceObjectTrajectory* t);
+		~PlanetInfo();
 
 		int seed;
 		int gridWidth,
@@ -27,6 +30,9 @@ class PlanetInfo
 				mountainGlaciation,
 				continentHeightScale,
 				riverDepth;
+
+		SpaceObjectTrajectory* trajectory;
+		float period; //rotation propre
 };
 
 #endif

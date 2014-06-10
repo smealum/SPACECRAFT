@@ -1,13 +1,23 @@
 #include "Application.h"
 #include "utils/dbg.h"
+#include "utils/gldbg.h"
 #include <cstdlib>
 #include "utils/Input.h"
 #include "Planet.h"
+#include "SolarSystem.h"
+#include "render/Sun.h"
 #include "MiniWorld.h"
 #include "render/Atmosphere.h"
+#include "render/Cursor.h"
 #include "utils/TextureManager.h"
 #include "world/BlockType.h"
+#include "utils/glm.h"
 #define WIN_TITLE "SPACECRAFT"
+
+float PlanetFaceDetailsPower = 28.0;
+
+using namespace std;
+using namespace glm;
 
 #ifndef NTWBAR
 inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
@@ -55,6 +65,8 @@ Application::Application() :
     fps(0.f),
     fpsCounter(0)
 {
+	// glCheckError("Flush Previous Errors");
+
     if (!glfwInit())
     {
         log_err("Cannot initialize glfw3...");
@@ -72,19 +84,23 @@ Application::Application() :
         TwInit(TW_OPENGL_CORE, NULL);
     #endif
 
+	glCheckError("Context creation Errors");
+
     // transparency
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
-    glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glCheckError("GL State initialisation");
 
     #ifndef NTWBAR
         bar = TwNewBar("SPACECRAFT");
         //TwDefine((name+" iconified=true").c_str()); // minimizes
         TwWindowSize(width, height);
         TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
-        TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
+        TwAddVarRW(bar, "Planet LOD Details", TW_TYPE_FLOAT, &PlanetFaceDetailsPower, " label='Planet LOD' min=5.0 max=60.0 step=1");
+		TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
         TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
         TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
         TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
@@ -103,6 +119,8 @@ Application::Application() :
         glfwSetScrollCallback(window, (GLFWscrollfun)TwEventMouseWheelGLFW3);
         glfwSetKeyCallback(window, (GLFWkeyfun)TwEventKeyGLFW3);
         glfwSetCharCallback(window, (GLFWcharfun)TwEventCharGLFW3);
+	
+		glCheckError("tweak bar");
     #endif
 
     glewExperimental = GL_TRUE;
@@ -112,6 +130,10 @@ Application::Application() :
         glfwTerminate();
         std::exit(1);
     }
+
+	glCheckError("GLEWInit Errors");
+
+	blockTypeLoadValues();
 }
 
 void Application::glfwWindowHints()
@@ -147,31 +169,29 @@ void Application::createWindowInFullscreen(bool fs)
     }
 }
 
-Planet* testPlanet;
+SolarSystem* testSolarSystem;
+Cursor* testCursor;
 int testTexture;
+int testTextureArray;
 
 void Application::run()
 {
     BlockType::getInstance(); // TODO can be deleted when used
     state = appInLoop;
-    camera = new Camera(0.0000001f, 10.f);
-    // camera->view = glm::lookAt(
-    //         glm::vec3(1.5, 1.5f, 1.5f),
-    //         glm::vec3(0.f),
-    //         glm::vec3(0, 1.f, 0.f)
-    //         );
+    camera = new Camera(0.0000001f, 2.0*EARTH_SUN);
+    camera->view = glm::lookAt(
+            glm::vec3(1.5, 1.5f, 1.5f),
+            glm::vec3(0.f),
+            glm::vec3(0, 1.f, 0.f)
+            );
     camera->setCameraManager(new CameraKeyboardMouse());
 
-    tt = new testShaders;
-    PlanetInfo planetInfo;
-    testPlanet=new Planet(planetInfo, contentHandler);
-    // testChunk=new Chunk(testPlanet);
-    // testMiniWorld=new MiniWorld(testPlanet, testPlanet->faces[2]);
-    // testBuffer=new PlanetFaceBufferHandler(*testPlanet->faces[0], 1024);
-    // testBuffer->addFace(testPlanet->faces[0]);
-    // testPlanet->testFullGeneration(4, testBuffer);
+    tt=new testShaders;
+    testSolarSystem=new SolarSystem(contentHandler);
+    testCursor=new Cursor();
 
-    testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
+	testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
+    testTextureArray=TextureManager::getInstance().loadTextureArray("data/blocksPackArray.png",16,16);
 
     float timeA;
     char titleBuff[512];
@@ -195,11 +215,19 @@ void Application::run()
             }
 			BlockAnimated::animation(deltaTime);
         }
+
+		// test des ereurs openGL non reporté:
+		{
+			static int i=0;
+			if (i++%30)
+				glCheckError("Unreported Error");
+		}
     }
 
 }
 
 int testVal;
+float globalTime=0.0f;
 
 void Application::loop()
 {
@@ -208,24 +236,23 @@ void Application::loop()
         glfwSetWindowShouldClose(window, GL_TRUE);
         state = appExiting;
     }
+	
 
     Input::update(window);
+
+    testSolarSystem->update(globalTime);
     camera->update();
 
     glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    testPlanet->processLevelOfDetail(*camera);
-
     glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
-    //tt->draw();
-    // testPlanet->drawDirect();
-    testPlanet->draw(*camera);
-    // testChunk->draw(*camera);
-    // testMiniWorld->draw(*camera);
-    // testBuffer->draw(*camera);
+    testSolarSystem->draw(*camera);
+    testCursor->draw(*camera);
 
-    if (Input::isKeyHold(GLFW_KEY_N))reloadAllShaders(NULL);
+    if(Input::isKeyHold(GLFW_KEY_N))reloadAllShaders(NULL);
+    if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.001f;
+    if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.001f;
 
     // printf("test %d\n",testVal);
     testVal=0;
@@ -239,11 +266,12 @@ void Application::loop()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		TwDraw();
+		// TwDraw();
     #endif
 
     glfwSwapBuffers(window);
     glfwPollEvents();
+
 }
 
 Application::~Application()
@@ -253,4 +281,3 @@ Application::~Application()
     #endif
     glfwTerminate();
 }
-

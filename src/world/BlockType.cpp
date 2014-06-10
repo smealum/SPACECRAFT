@@ -5,19 +5,19 @@ const float BlockAnimated::frameTime(0.5f);
 BlockType *BlockTexCoord::btype(NULL);
 std::list<BlockAnimated*> BlockAnimated::list;
 
-blockTransparency::T getTextureTransparency(const unsigned char *img, int xx, int yy, int w, int h)
+blockTransparency::T getTextureTransparency(const unsigned char *img, int xx, int yy, int w, int h, int texWidth)
 {
 	blockTransparency::T t = blockTransparency::opaque;
-	for (int y = yy; y < yy+h; ++y)
+	for (int y = yy; y < yy+h; ++y) {
 		for(int x = xx; x < xx+w; ++x)
 		{
-			unsigned char alpha = img[x + y * w + 3];
+			unsigned char alpha = img[(x + y * texWidth)*4 + 3];
 			if (alpha > 3 && alpha < 255)
 				return blockTransparency::seeThrough;
-			if (t == blockTransparency::opaque)
-				if (alpha < 3)
-					t = blockTransparency::transparent;
+			if (t == blockTransparency::opaque && alpha < 3)
+				t = blockTransparency::transparent;
 		}
+	}
 	return t;
 }
 
@@ -36,8 +36,16 @@ BlockType::BlockType() :
 	int blockSize = texWidth / texCols,
 		texRows = texHeight / blockSize;
 
-	debug("%u texcoord will be generated", blockTypes::maxTypeValue);
-	for (uint32_t i = 1; i < blockTypes::maxTypeValue; i++)
+	debug("%u texcoord will be generated", blockTypes::max);
+	// special air:
+	blocks[0] =  new BlockStatic({
+			blockTypes::air,
+			blockTypes::air,
+			blockTypes::air
+			});
+	blocks[0]->setTransparency(blockTransparency::invisible);
+	texCoords[0] = glm::vec2(0.f);
+	for (uint32_t i = 1; i < blockTypes::max; i++)
 	{
 		blockTypes::T t = (blockTypes::T)i;
 		auto &coord = texCoords[t];
@@ -62,19 +70,26 @@ BlockType::BlockType() :
 						});
 				break;
 			default:
-				block = new BlockStatic({
-						t,
-						t,
-						t
-						});
+				block = new BlockStatic({t,t,t});
 				break;
 		}
+		
+		//pour set le style indépendament
+		switch (t) {
+			case blockTypes::flower_red:
+				block->setStyle(blockStyle::sprite);
+				break;
+			default:
+				block->setStyle(blockStyle::normal);
+				break;
+		}
+
 		if (block)
 			block->setTransparency(
 					getTextureTransparency(img,
 						((i-1) % texCols) * blockSize,
 						((i-1) / texCols) * blockSize,
-						blockSize, blockSize)
+						blockSize, blockSize, texWidth)
 					);
 
 		glm::vec2 v(
@@ -94,7 +109,7 @@ BlockType::BlockType() :
 BlockType::~BlockType()
 {
 	// free the blocktypes
-	for (uint32_t i = 1; i < blockTypes::maxTypeValue; ++i)
+	for (uint32_t i = 1; i < blockTypes::max; ++i)
 		delete blocks[i];
 }
 
@@ -113,8 +128,9 @@ void BlockAnimated::animate(float delta)
 	timer += delta;
 	while (timer > frameTime)
 		timer -= frameTime, current++;
-	if (current >= size)
-		current -= size;
+	if (current >= frames.size())
+		current -= frames.size();
+	//debug("current: %u, blocktype: %u", current, frames[current]);
 }
 
 BlockAnimated::~BlockAnimated()
@@ -139,3 +155,81 @@ void BlockAnimated::animation(float delta)
 		(*it)->animate(delta);
 }
 
+texCoord BlockAnimated::getSide(blockPlane::T) const
+{
+	return btype->getTexcoord(frames[current]);
+}
+
+texCoord BlockStatic::getSide(blockPlane::T p) const
+{
+	return btype->getTexcoord(sides[p]);
+}
+
+bool BlockType::shouldBeFace(blockTypes::T type1, blockTypes::T type2)
+{
+	const BlockTexCoord* b1=blocks[type1];
+	const BlockTexCoord* b2=blocks[type2];
+
+	return b1->getStyle()==blockStyle::normal && type1!=type2 && (b1->getTransparency()<=blockTransparency::transparent && b2->getTransparency()>=blockTransparency::seeThrough);
+}
+
+
+
+///////////////////////////////////////////////////////////////////
+//
+// ajout par arthur
+int blockTileID[blockTypes::max][blockPlane::max];
+uint8_t blockTransparencyID[blockTypes::max];
+uint8_t blockStyleID[blockTypes::max];
+void blockTypeLoadValues()
+{
+	//////////////////////////
+	// valeurs par défaut  //
+	////////////////////////
+	
+	for(uint32_t i = 1; i < blockTypes::max; i++)
+	for(uint8_t j = 0 ; j<blockPlane::max; j++)
+		blockTileID[i][j] = i;
+	
+	for (uint32_t i = 1; i < blockTypes::max; i++)
+		blockTransparencyID[i] = blockTransparency::opaque;
+
+	for (uint32_t i = 1; i < blockStyle::max; i++)
+		blockStyleID[i] = blockStyle::normal;
+
+
+	////////////////////
+	// modifications //
+	//////////////////
+	
+	// air
+	blockTransparencyID[blockTypes::air] = blockTransparency::invisible;
+	
+	// grass
+	blockTileID[blockTypes::grass][blockPlane::side]   = blockTypes::grass_side;
+	blockTileID[blockTypes::grass][blockPlane::bottom] = blockTypes::dirt;
+	
+	// flower yellow
+	blockTransparencyID[blockTypes::flower_yellow] = blockTransparency::seeThrough;
+	blockStyleID[blockTypes::flower_yellow] = blockStyle::sprite;
+
+	// flower_red
+	blockTransparencyID[blockTypes::flower_red] = blockTransparency::seeThrough;
+	blockStyleID[blockTypes::flower_red] = blockStyle::sprite;
+
+	// water
+	blockTransparencyID[blockTypes::water] = blockTransparency::transparent;
+	blockTransparencyID[blockTypes::water_1] = blockTransparency::transparent;
+	blockTransparencyID[blockTypes::water_2] = blockTransparency::transparent;
+	blockTransparencyID[blockTypes::water_3] = blockTransparency::transparent;
+	blockTransparencyID[blockTypes::water_4] = blockTransparency::transparent;
+}
+
+bool blockShouldBeFace(int type1, int type2)
+{
+	return
+		type1 != type2 &&
+		blockStyleID[type1] == blockStyle::normal &&
+		blockTransparencyID[type1] <= blockTransparency::transparent &&
+		blockTransparencyID[type2] >= blockTransparency::seeThrough;
+}
