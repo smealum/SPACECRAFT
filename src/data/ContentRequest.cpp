@@ -4,6 +4,7 @@
 #include "MiniWorld.h"
 #include "utils/positionMath.h"
 #include "utils/dbg.h"
+#include "glm/gtc/noise.hpp"
 
 #include <cstdio>
 
@@ -58,7 +59,7 @@ bool PlanetElevationRequest::isRelevant(int id)
 
 //WorldChunkRequest stuff
 WorldChunkRequest::WorldChunkRequest(Planet& p, Chunk& c, float elevation, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z):
-	px(x),
+px(x),
 	py(y),
 	pz(z),
 	elevation(elevation),
@@ -109,7 +110,6 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 					const int height=int(getElevation(prod_id, planet, pos)*CHUNK_N*MINIWORLD_H);
 
 					//TEMP (pour tester)
-
 					const int waterHeight=CHUNK_N*MINIWORLD_H/2.f+12;
 					if(height<waterHeight)
 					{
@@ -144,6 +144,19 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 						}
 					}
 
+					// grotte
+					//pyPos=zPos;
+					//for(int cy=0;cy<h;cy++)
+					//{
+						//yPos=pyPos;
+						//for(int j=0;j<(CHUNK_N+2);j++)
+						//{
+							//if (glm::simplex(pos*float(PLANETFACE_BLOCKS)*0.05f+vec3(cy*(CHUNK_N+2)+j)*0.05f)>0.5f)
+								//data[yPos]=blockTypes::air;
+							//yPos+=(CHUNK_N+2);
+						//}
+						//pyPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w;
+					//}
 
 					zPos+=(CHUNK_N+2)*(CHUNK_N+2);
 				}
