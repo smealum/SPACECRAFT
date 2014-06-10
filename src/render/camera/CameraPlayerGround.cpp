@@ -88,7 +88,7 @@ void CameraPlayerGround::update(Camera& camera)
 		my=glm::normalize(my);
 		mx=glm::normalize(mx-my*glm::dot(mx,my));
 		mz=glm::normalize(mz-my*glm::dot(mz,my)-mx*glm::dot(mz,mx));
-		camera.view3=glm::mat3(localView)*planet->getModel()*glm::transpose(glm::mat3(mx,my,mz));
+		camera.view3=glm::mat3(localView)*glm::transpose(planet->getModel()*glm::mat3(mx,my,mz));
 
 		if(ret)speedVect/=2.0; //frottements sol
 		else{
