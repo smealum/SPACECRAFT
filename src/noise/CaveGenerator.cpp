@@ -67,7 +67,7 @@ void CaveGenerator::generate()
 			glm::vec3 v(1*i*segmentLength, 0, 0); // basic vector scaled with the segmentCount
 
 			glm::vec3 res = (*points)[0] + glm::mat3_cast(qq)*v;
-			debug("res: %s", glm::to_string(res).c_str());
+			// debug("res: %s", glm::to_string(res).c_str());
 
 			// finally add it to the control points
 			points->push_back(res);

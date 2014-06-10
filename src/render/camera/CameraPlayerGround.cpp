@@ -82,10 +82,13 @@ void CameraPlayerGround::update(Camera& camera)
 		glm::dvec3 uPos=dblockToSpace(localPosition,glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()));
 		camera.pos=glm::dmat3(planet->getModel())*uPos+glm::dvec3(planet->getPosition());
 		
-		glm::dvec3 mx=glm::normalize(dblockToSpace(localPosition+glm::dvec3(1.0,0.0,0.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))-uPos);
-		glm::dvec3 my=glm::normalize(dblockToSpace(localPosition+glm::dvec3(0.0,1.0,0.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))-uPos);
-		glm::dvec3 mz=glm::normalize(dblockToSpace(localPosition+glm::dvec3(0.0,0.0,1.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))-uPos);
-		camera.view3=glm::mat3(localView*glm::dmat3(planet->getModel())*glm::dmat3(mx,my,mz));
+		glm::dvec3 mx=(dblockToSpace(localPosition+glm::dvec3(1.0,0.0,0.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))-uPos);
+		glm::dvec3 my=(dblockToSpace(localPosition+glm::dvec3(0.0,1.0,0.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))-uPos);
+		glm::dvec3 mz=(dblockToSpace(localPosition+glm::dvec3(0.0,0.0,1.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))-uPos);
+		my=glm::normalize(my);
+		mx=glm::normalize(mx-my*glm::dot(mx,my));
+		mz=glm::normalize(mz-my*glm::dot(mz,my)-mx*glm::dot(mz,mx));
+		camera.view3=glm::mat3(localView)*planet->getModel()*glm::transpose(glm::mat3(mx,my,mz));
 
 		if(ret)speedVect/=2.0; //frottements sol
 		else{
