@@ -42,6 +42,11 @@ MiniWorld::~MiniWorld()
 				if(chunks[i][j][k])chunks[i][j][k]->destroyChunk();
 }
 
+std::string MiniWorld::getName(void)
+{
+	return std::string("test");
+}
+
 void MiniWorld::draw(Camera& c)
 {
 	//TODO : passer frustum culling en octree ?
