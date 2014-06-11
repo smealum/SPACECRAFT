@@ -21,7 +21,7 @@ using namespace std;
 
 extern float PlanetFaceDetailsPower;
 
-PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
+PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id):
 	planet(planet),
 	father(NULL),
 	sons{NULL, NULL, NULL, NULL},
@@ -31,7 +31,7 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4]):
 	humidity(0.0f),
 	minElevation(elevation-0.01f),
 	elevated(false),
-	id(5),
+	id(5+id),
 	bufferID(-1),
 	miniworld(NULL),
 	toplevel(this),
@@ -212,6 +212,16 @@ void PlanetFace::removeMiniWorld(void)
 	miniworld=NULL;
 }
 
+PlanetFace* PlanetFace::getTopLevel(void)
+{
+	return toplevel;
+}
+
+int PlanetFace::getID(void)
+{
+	return id;
+}
+
 static inline int max(int a, int b)
 {
 	return (a>b)?a:b;
@@ -323,7 +333,7 @@ static GLuint elements[2*3] = {
     0,1,2,      0,2,3, // face 1
 };
 
-Planet::Planet(PlanetInfo &pi, ContentHandler& ch):
+Planet::Planet(PlanetInfo &pi, ContentHandler& ch, std::string name):
 	planetInfo(pi),
 	handler(ch),
 	generators(ch.getMaxProducers()),
@@ -331,11 +341,12 @@ Planet::Planet(PlanetInfo &pi, ContentHandler& ch):
 	position(0.0,0.0,0.0),
 	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
 	angle(0.0),
+	name(name),
 	atmosphere()
 {
 	for(int i=0;i<ch.getMaxProducers();i++)generators[i] = new PlanetGenerator(planetInfo);
 	
-	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
+	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i], i);
 	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], PFBH_MAXSIZE, cubeArray[i][1]-cubeArray[i][0], cubeArray[i][3]-cubeArray[i][0]);
 }
 
@@ -722,4 +733,9 @@ glm::vec3 PlanetFace::getV2(void)
 glm::vec3 PlanetFace::getN(void)
 {
 	return vertex[4];
+}
+
+std::string Planet::getName(void)
+{
+	return name;
 }

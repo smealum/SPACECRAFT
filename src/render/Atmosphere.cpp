@@ -142,7 +142,7 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 //TODO : idem
 void Atmosphere::makePhaseBuffer(void)
 {
-	const int nSize = 4096; //on est en 1D, on peut se le permettre
+	const int nSize = 8192; //on est en 1D, on peut se le permettre
 	float* phaseBuffer=(float*)malloc(sizeof(float)*nSize*4);
 	int k=0;
 	for(int i=0;i<nSize;i++)
