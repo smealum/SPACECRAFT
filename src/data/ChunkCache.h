@@ -27,6 +27,8 @@ class ChunkCache
 		ChunkCache();
 
 		void save(MiniWorld* mw);
+		ChunkCacheEntry* get(std::string name);
+		void flush(void);
 
 	private:
 		void removeChunk(std::string name);
