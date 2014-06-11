@@ -82,7 +82,7 @@ class MiniWorldDataRequest : public ContentRequest
 class MiniWorldDeletionRequest : public ContentRequest
 {
 	public:
-		MiniWorldDeletionRequest(MiniWorld& mw);
+		MiniWorldDeletionRequest(MiniWorld& mw, ContentHandler& ch);
 		void process(int id);
 		void update(void);
 		virtual ~MiniWorldDeletionRequest();
@@ -90,6 +90,7 @@ class MiniWorldDeletionRequest : public ContentRequest
 		
 	private:
 		TrackerPointer<MiniWorld>* miniworld;
+		ContentHandler& contentHandler;
 };
 
 #include "SolarSystem.h"

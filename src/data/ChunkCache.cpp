@@ -37,27 +37,36 @@ void ChunkCache::save(MiniWorld* mw)
 	if(!mw)return;
 
 	std::string name=mw->getName();
-	removeChunk(name);
 
-	while(map.size()>CACHE_MAXSIZE)removeChunk(map.begin()->first); //TODO : système de prio (maintenir une queue de prio en parallèle ?)
-
-	map.insert(std::pair<std::string,ChunkCacheEntry*>(name,new ChunkCacheEntry(mw)));
+	mutex.lock();
+		removeChunk(name);
+		while(map.size()>CACHE_MAXSIZE)removeChunk(map.begin()->first); //TODO : système de prio (maintenir une queue de prio en parallèle ?)
+		map.insert(std::pair<std::string,ChunkCacheEntry*>(name,new ChunkCacheEntry(mw)));
+	mutex.unlock();
 }
 
 ChunkCacheEntry* ChunkCache::get(std::string name)
 {
-	auto it=map.find(name);
+	mutex.lock();
+		auto it=map.find(name);
+	mutex.unlock();
 	return it->second;
 }
 
 void ChunkCache::flush(void)
 {
-	for(auto it=map.begin(); it!=map.end(); ++it)removeChunk(it->first);
+	mutex.lock();
+		for(auto it=map.begin(); it!=map.end(); ++it)removeChunk(it->first);
+	mutex.unlock();
 }
 
 void ChunkCache::removeChunk(std::string name)
 {
+	//suppose qu'on a déjà lock
 	auto it=map.find(name);
-	delete it->second;
-	map.erase(name);
+	if(it!=map.end())
+	{
+		map.erase(name);
+		delete it->second;
+	}
 }

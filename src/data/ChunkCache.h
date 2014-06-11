@@ -3,6 +3,7 @@
 
 #define CACHE_MAXSIZE (64)
 
+#include <SFML/System/Mutex.hpp>
 #include <map>
 #include <string>
 #include "Chunk.h"
@@ -33,6 +34,7 @@ class ChunkCache
 	private:
 		void removeChunk(std::string name);
 
+		sf::Mutex mutex;
 		std::map<std::string,ChunkCacheEntry*> map;
 
 };

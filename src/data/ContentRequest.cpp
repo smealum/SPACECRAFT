@@ -1,4 +1,5 @@
 #include "data/ContentRequest.h"
+#include "data/ContentHandler.h"
 #include "world/BlockType.h"
 #include "world/blockProcessing.h"
 #include "MiniWorld.h"
@@ -243,7 +244,8 @@ void MiniWorldDataRequest::update(void)
 }
 
 //MiniWorldDeletionRequest stuff
-MiniWorldDeletionRequest::MiniWorldDeletionRequest(MiniWorld& mw)
+MiniWorldDeletionRequest::MiniWorldDeletionRequest(MiniWorld& mw, ContentHandler& ch):
+	contentHandler(ch)
 {
 	miniworld=mw.getTptr();
 	miniworld->grab();
@@ -260,6 +262,7 @@ bool MiniWorldDeletionRequest::isRelevant(int id)
 void MiniWorldDeletionRequest::process(int id)
 {
 	if(miniworld->getNumRef()>1)return;
+	contentHandler.cache.save(miniworld->getPointer());
 	miniworld->release();
 }
 

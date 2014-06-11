@@ -74,7 +74,7 @@ bool MiniWorld::isConstructionCanceled()
 void MiniWorld::destroyMiniWorld(void)
 {
 	constructionCanceled = true;
-	planet->handler.requestContent(new MiniWorldDeletionRequest(*this),false);
+	planet->handler.requestContent(new MiniWorldDeletionRequest(*this, planet->handler),false);
 		tptr->release();
 	planet->handler.manualReleaseInput();
 }
