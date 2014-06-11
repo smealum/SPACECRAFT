@@ -2,6 +2,7 @@
 #define CONTENTREQ_H
 
 #include <vector>
+#include <string>
 #include "data/SynchronizationQueue.h"
 #include "utils/TrackerPointer.h"
 #include "utils/glm.h"
@@ -64,7 +65,7 @@ class WorldChunkRequest : public ContentRequest
 class MiniWorldDataRequest : public ContentRequest
 {
 	public:
-		MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z);
+		MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z, ContentHandler& ch);
 		void process(int id);
 		void update(void);
 		virtual ~MiniWorldDataRequest();
@@ -74,15 +75,17 @@ class MiniWorldDataRequest : public ContentRequest
 		chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)];
 		int px, py, pz;
 		glm::vec3 origin, v1, v2;
+		std::string name;
 		Planet& planet;
 		TrackerPointer<MiniWorld>* miniworld;
 		std::vector<GL_Vertex> vArray[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];
+		ContentHandler& contentHandler;
 };
 
 class MiniWorldDeletionRequest : public ContentRequest
 {
 	public:
-		MiniWorldDeletionRequest(MiniWorld& mw);
+		MiniWorldDeletionRequest(MiniWorld& mw, ContentHandler& ch);
 		void process(int id);
 		void update(void);
 		virtual ~MiniWorldDeletionRequest();
@@ -90,6 +93,7 @@ class MiniWorldDeletionRequest : public ContentRequest
 		
 	private:
 		TrackerPointer<MiniWorld>* miniworld;
+		ContentHandler& contentHandler;
 };
 
 #include "SolarSystem.h"

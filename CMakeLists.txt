@@ -133,9 +133,9 @@ foreach(t ${all_tests})
 	add_executable(${f_base} ${t} ${all_obj})
 	add_dependencies(${f_base} ${EXEC})
 	target_link_libraries(${f_base} ${GLEW_LIBRARY} ${GLFW_LIBRARIES} ${OPENGL_LIBRARIES} ${ANTTWEAKBAR_LIBRARY} ${NOISE_LIBRARY} ${SFML_LIBRARIES})
-	add_test(NAME ${f_base}
-		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-		COMMAND ${EXECUTABLE_OUTPUT_PATH}/${f_base})
+	add_test(${f_base}
+		${EXECUTABLE_OUTPUT_PATH}/${f_base}
+		${PROJECT_SOURCE_DIR})
 	#add_test(NAME ${EXEC}
 	#WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 	#COMMAND ${EXECUTABLE_OUTPUT_PATH}/${EXEC})

@@ -13,6 +13,7 @@ MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 	x(pf->x*MINIWORLD_W*CHUNK_N),
 	z(pf->z*MINIWORLD_D*CHUNK_N),
 	generated(false),
+	modified(false),
 	constructionCanceled(false)
 {
 	for(int i=0;i<MINIWORLD_W;i++)
@@ -31,7 +32,7 @@ MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 			}
 		}
 	}
-    planet->handler.requestContent(new MiniWorldDataRequest(*planet, *this, origin, v1, v2, x, 0, z));
+	planet->handler.requestContent(new MiniWorldDataRequest(*planet, *this, origin, v1, v2, x, 0, z, planet->handler));
 }
 
 MiniWorld::~MiniWorld()
@@ -40,6 +41,15 @@ MiniWorld::~MiniWorld()
 		for(int j=0;j<MINIWORLD_H;j++)
 			for(int k=0;k<MINIWORLD_D;k++)
 				if(chunks[i][j][k])chunks[i][j][k]->destroyChunk();
+}
+
+#include <sstream>
+
+std::string MiniWorld::getName(void)
+{
+	std::ostringstream oss;
+	oss << planet->getName() << "_" << face->getTopLevel()->getID() << "_" << x << "_" << z;
+	return oss.str();
 }
 
 void MiniWorld::draw(Camera& c)
@@ -69,7 +79,7 @@ bool MiniWorld::isConstructionCanceled()
 void MiniWorld::destroyMiniWorld(void)
 {
 	constructionCanceled = true;
-	planet->handler.requestContent(new MiniWorldDeletionRequest(*this),false);
+	planet->handler.requestContent(new MiniWorldDeletionRequest(*this, planet->handler),false);
 		tptr->release();
 	planet->handler.manualReleaseInput();
 }
@@ -98,14 +108,13 @@ bool MiniWorld::collidePoint(glm::dvec3& p, glm::dvec3& v)
 {
 	if(p.x<x-1 || p.z<z-1 || p.x>x+CHUNK_N*MINIWORLD_W+1 || p.z>z+CHUNK_N*MINIWORLD_D+1)return false;
 	bool ret=false;
-	//TODO : culling dès ici
 	for(int i=0;i<MINIWORLD_W;i++)
 	{
 		for(int j=0;j<MINIWORLD_H;j++)
 		{
 			for(int k=0;k<MINIWORLD_D;k++)
 			{
-				ret=ret||chunks[i][j][k]->collidePoint(p,v);
+				ret=chunks[i][j][k]->collidePoint(p,v)||ret;
 			}
 		}
 	}
@@ -130,7 +139,8 @@ Chunk* MiniWorld::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int
 
 void MiniWorld::changeBlock(glm::i32vec3 p, blockTypes::T v)
 {
-	//TODO : culling dès ici
+	if(p.x<x-1 || p.z<z-1 || p.x>x+CHUNK_N*MINIWORLD_W+1 || p.z>z+CHUNK_N*MINIWORLD_D+1)return;
+	modified=true;
 	for(int i=0;i<MINIWORLD_W;i++)
 	{
 		for(int j=0;j<MINIWORLD_H;j++)

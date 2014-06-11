@@ -30,11 +30,13 @@ void CameraKeyboardMouse::update(Camera& camera)
     }else if (Input::isKeyPressed(GLFW_KEY_SPACE))Input::fixMouse();
 
     CameraKeyboard::update(camera);
+
+    Planet* planet=testSolarSystem->getClosestPlanet(camera.getPosition(glm::vec3(0)));
+    if(planet)camera.moveReference(glm::dvec3(planet->getPosition()));
     
     if(Input::isKeyPressed(GLFW_KEY_R))
    	{
    		//TODO : méga fuite à virer
-   		Planet* planet=testSolarSystem->getClosestPlanet(camera.getPosition(glm::vec3(0)));
    		if(planet)
    		{
    			PlanetFace& pf=planet->getTopLevelForCamera(camera);

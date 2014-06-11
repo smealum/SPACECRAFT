@@ -1,6 +1,6 @@
-#include "noise/PlanetGenerator.h"
+#include "noise/PlanetNoiseGenerator.h"
 
-PlanetGenerator::PlanetGenerator(const PlanetInfo & pinfo):
+PlanetNoiseGenerator::PlanetNoiseGenerator(const PlanetInfo & pinfo):
 	pi(pinfo)
 {
     baseContinentDef_pe0.SetSeed (pi.seed + 0);
@@ -563,7 +563,7 @@ PlanetGenerator::PlanetGenerator(const PlanetInfo & pinfo):
     continentsWithRivers.SetSourceModule (0, continentsWithRivers_se);
 }
 
-PlanetGenerator::~PlanetGenerator()
+PlanetNoiseGenerator::~PlanetNoiseGenerator()
 {
 
 }

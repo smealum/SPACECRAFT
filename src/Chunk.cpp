@@ -18,6 +18,7 @@ Chunk::Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, 
     pz(z),
     v1(v1),
     v2(v2),
+    modified(false),
     origin(origin),
 	constructionCanceled(false)
 {
@@ -284,6 +285,7 @@ void Chunk::changeBlock(glm::i32vec3 p, blockTypes::T v)
 {
     p-=glm::i32vec3(px,py,pz);
     if(p.x<-1 || p.y<-1 || p.z<-1 || p.x>CHUNK_N || p.y>CHUNK_N || p.z>CHUNK_N)return;
+    modified=true;
     if(value[p.z+1][p.y+1][p.x+1]==v)return;
     if(v!=blockTypes::air && value[p.z+1][p.y+1][p.x+1]!=blockTypes::air)return; //on peut soit créer soit supprimer, pas remplacer
 

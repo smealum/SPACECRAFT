@@ -6,6 +6,7 @@
 #define MINIWORLD_D MINIWORLD_W
 #define MINIWORLD_H 32
 
+#include <string>
 #include "utils/glm.h"
 #include "render/Camera.h"
 #include "Planet.h"
@@ -26,6 +27,7 @@
 class MiniWorld
 {
     friend class Chunk;
+    friend class ChunkCacheEntry;
 	public:
 		MiniWorld(Planet* p, PlanetFace* pf);
 		~MiniWorld();
@@ -40,6 +42,8 @@ class MiniWorld
 		void changeBlock(glm::i32vec3 p, blockTypes::T v);
 		void deleteBlock(glm::i32vec3 p);
 
+		std::string getName(void);
+
 		inline bool isGenerated(void)
 		{
 			return generated;
@@ -48,6 +52,7 @@ class MiniWorld
 		TrackerPointer<MiniWorld>* getTptr(void);
 
 		bool isConstructionCanceled();
+
 	private:
 		bool constructionCanceled;
 		Planet* planet;
@@ -57,6 +62,7 @@ class MiniWorld
 		glm::vec3 origin, v1, v2;
 		int x, z;
 		bool generated;
+		bool modified;
 
 		TrackerPointer<MiniWorld>* tptr;
 };

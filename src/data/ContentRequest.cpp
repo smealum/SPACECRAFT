@@ -1,4 +1,5 @@
 #include "data/ContentRequest.h"
+#include "data/ContentHandler.h"
 #include "world/BlockType.h"
 #include "world/blockProcessing.h"
 #include "MiniWorld.h"
@@ -77,6 +78,9 @@ px(x),
 WorldChunkRequest::~WorldChunkRequest()
 {}
 
+// XXX temp
+extern CaveGenerator caves;
+
 //TODO : optimiser et proprifier
 //(on peut largement optimiser les accès à data, éviter *énormément* de multiplications)
 void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
@@ -95,8 +99,7 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 	int pxPos,pzPos,xPos,zPos,pyPos,yPos;
 	pxPos=0;
 
-	CaveGenerator caves;
-	caves.generate(); //XXX
+	caves.generate();
 
 	for(int cx=0;cx<w;cx++)
 	{
@@ -145,31 +148,33 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 								else if (vy+py+j == height+1 && rand()%100 == 1) data[yPos]=blockTypes::flower_red;
 								else data[yPos]=blockTypes::air;
 
-								// cave
-								if (py+j+cy*(CHUNK_N)>(MINIWORLD_H*CHUNK_N)/2 and not
-									caves.getBlock(px+i+cx*(CHUNK_N),py+j+cy*(CHUNK_N),pz+ k+ pz*(CHUNK_N)))
-									data[yPos] = blockTypes::air;
-
 								yPos+=(CHUNK_N+2);
 							}
 							pyPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w;
 						}
 					}
-
-					// grotte
-					//pyPos=zPos;
-					//for(int cy=0;cy<h;cy++)
-					//{
-						//yPos=pyPos;
-						//for(int j=0;j<(CHUNK_N+2);j++)
-						//{
-							//if (glm::simplex(pos*float(PLANETFACE_BLOCKS)*0.05f+vec3(cy*(CHUNK_N+2)+j)*0.05f)>0.5f)
-								//data[yPos]=blockTypes::air;
-							//yPos+=(CHUNK_N+2);
-						//}
-						//pyPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w;
-					//}
-
+					// cave
+					auto holes = caves.getHolesList(px+i+cx*(CHUNK_N),pz+k+cz*(CHUNK_N));
+					for(auto it = holes.begin(); it!=holes.end();++it)
+					{
+						if (it->second < height-100) continue;
+						if (it->first > height) break;
+						for(int i=it->first;i<=it->second;++i)
+						{
+							int y = (i % CHUNK_N)+1;
+							int cy = i / CHUNK_N;
+							data[zPos+y*(CHUNK_N+2)+cy*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w] = blockTypes::air;
+							
+							if ( y == (CHUNK_N) and cy != (MINIWORLD_H-1))
+							{
+								data[zPos+(0)*(CHUNK_N+2)+(cy+1)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w] = blockTypes::air;
+							}
+							if ( y==1 and cy!=0)
+							{
+								data[zPos+(CHUNK_N+1)*(CHUNK_N+2)+(cy-1)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w] = blockTypes::air;
+							}
+						}
+					}
 					zPos+=(CHUNK_N+2)*(CHUNK_N+2);
 				}
 				xPos+=1;
@@ -202,14 +207,16 @@ void WorldChunkRequest::update(void)
 }
 
 //MiniWorldDataRequest stuff
-MiniWorldDataRequest::MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z):
+MiniWorldDataRequest::MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z, ContentHandler& ch):
 	px(x),
 	py(y),
 	pz(z),
 	origin(o),
 	v1(v1),
 	v2(v2),
-	planet(p)
+	planet(p),
+	name(mw.getName()),
+	contentHandler(ch)
 {
 	miniworld=mw.getTptr();
 	miniworld->grab();
@@ -226,7 +233,13 @@ bool MiniWorldDataRequest::isRelevant(int id)
 
 void MiniWorldDataRequest::process(int id)
 {
-	generateWorldData(id, planet, (chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, px, py, pz, origin, v1, v2);
+	TrackerPointer<ChunkCacheEntry>* cce=contentHandler.cache.get(name);
+	if(!cce)generateWorldData(id, planet, (chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, px, py, pz, origin, v1, v2);
+	else{
+		printf("LOADING FROM CACHE %s\n",name.c_str());
+		memcpy(data,cce->getPointer()->getData(),sizeof(chunkVal)*MINIWORLD_W*MINIWORLD_H*MINIWORLD_D*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2));
+		cce->release();
+	}
 
 	for(int i=0;i<MINIWORLD_W;i++)
 		for(int j=0;j<MINIWORLD_H;j++)
@@ -242,7 +255,8 @@ void MiniWorldDataRequest::update(void)
 }
 
 //MiniWorldDeletionRequest stuff
-MiniWorldDeletionRequest::MiniWorldDeletionRequest(MiniWorld& mw)
+MiniWorldDeletionRequest::MiniWorldDeletionRequest(MiniWorld& mw, ContentHandler& ch):
+	contentHandler(ch)
 {
 	miniworld=mw.getTptr();
 	miniworld->grab();
@@ -259,6 +273,7 @@ bool MiniWorldDeletionRequest::isRelevant(int id)
 void MiniWorldDeletionRequest::process(int id)
 {
 	if(miniworld->getNumRef()>1)return;
+	contentHandler.cache.save(miniworld->getPointer());
 	miniworld->release();
 }
 
@@ -291,12 +306,16 @@ void SolarSystemDataRequest::process(int id)
 	planets=new Planet*[numPlanets];
 }
 
+#include <sstream>
+
 void SolarSystemDataRequest::update(void)
 {
 	for(int i=0;i<numPlanets;i++)
 	{
 		PlanetInfo pitest(new EllipticalTrajectory(glm::vec3(0.0f), glm::mat3(10.0f*(i+1)), i*1.037f, 100.0f*(i+1)));
-		planets[i]=new Planet(pitest, contentHandler);
+		std::ostringstream oss;
+		oss << i;
+		planets[i]=new Planet(pitest, contentHandler, oss.str());
 	}
 	sun=new Sun(glm::vec3(0.0f));
 
