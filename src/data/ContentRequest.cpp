@@ -233,11 +233,12 @@ bool MiniWorldDataRequest::isRelevant(int id)
 
 void MiniWorldDataRequest::process(int id)
 {
-	ChunkCacheEntry* cce=contentHandler.cache.get(name);
+	TrackerPointer<ChunkCacheEntry>* cce=contentHandler.cache.get(name);
 	if(!cce)generateWorldData(id, planet, (chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, px, py, pz, origin, v1, v2);
 	else{
 		printf("LOADING FROM CACHE %s\n",name.c_str());
-		memcpy(data,cce->getData(),sizeof(chunkVal)*MINIWORLD_W*MINIWORLD_H*MINIWORLD_D*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2));
+		memcpy(data,cce->getPointer()->getData(),sizeof(chunkVal)*MINIWORLD_W*MINIWORLD_H*MINIWORLD_D*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2));
+		cce->release();
 	}
 
 	for(int i=0;i<MINIWORLD_W;i++)
