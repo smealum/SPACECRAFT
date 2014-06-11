@@ -5,7 +5,7 @@
 #include <list>
 #include "utils/glm.h"
 #include "utils/TrackerPointer.h"
-#include "noise/PlanetGenerator.h"
+#include "noise/PlanetNoiseGenerator.h"
 #include "render/Shader.h"
 #include "render/Camera.h"
 #include "render/Cloud.h"
@@ -182,7 +182,7 @@ class Planet
 		// La position est une position dans le référentiel de la planète.
 		float getHumidity(const glm::vec3& pos);
 	private:
-		std::vector<PlanetGenerator*> generators;
+		std::vector<PlanetNoiseGenerator*> generators;
 		std::list<MiniWorld*> miniWorldList;
 
 		PlanetFace* faces[6];

@@ -333,7 +333,7 @@ Planet::Planet(PlanetInfo &pi, ContentHandler& ch):
 	angle(0.0),
 	atmosphere()
 {
-	for(int i=0;i<ch.getMaxProducers();i++)generators[i] = new PlanetGenerator(planetInfo);
+	for(int i=0;i<ch.getMaxProducers();i++)generators[i] = new PlanetNoiseGenerator(planetInfo);
 	
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i]);
 	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], PFBH_MAXSIZE, cubeArray[i][1]-cubeArray[i][0], cubeArray[i][3]-cubeArray[i][0]);
