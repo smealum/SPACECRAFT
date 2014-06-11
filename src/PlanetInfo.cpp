@@ -1,7 +1,8 @@
 #include "PlanetInfo.h"
+#include "planetGenerator/PlanetGenerator.h"
 
 
-PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t):
+PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p):
 	seed(0),
 	gridWidth(200),
 	gridHeight(gridWidth / 2),
@@ -24,11 +25,14 @@ PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t):
 	continentHeightScale((1.f - seaLevel) / 4.f),
 	riverDepth(0.0223f),
 	trajectory(t),
-	period(1.0f)
+	period(1.0f),
+	planetGenerator(p)
 {
+	planetGenerator->setPlanetInfo(this);
 }
 
 //la suppression de trajectory n'est PAS la responsabilité de planetInfo
 PlanetInfo::~PlanetInfo()
 {
+	delete planetGenerator;
 }

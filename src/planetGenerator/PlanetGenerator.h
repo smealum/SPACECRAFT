@@ -11,11 +11,15 @@ struct PlanetGeneratorResponse
 	blockTypes::T blockType;
 };
 
+
+class PlanetInfo;
+
 class PlanetGenerator
 {
 	public:
 
-	PlanetGenerator(Planet& planet);
+	PlanetGenerator();
+	void setPlanetInfo(PlanetInfo* p);
 
 	// genere un miniworld
 	virtual float generateWorldData(const chunkVal* data,
@@ -27,6 +31,7 @@ class PlanetGenerator
 	virtual PlanetGeneratorResponse getCharacteristic(const glm::vec3& pos);
 
 	private:
+	PlanetInfo* planetInfo;
 	// Donne la température en fonction de la position
 	// Prend en compte
 	// 		-l'axe de rotation de la planete

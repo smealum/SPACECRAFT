@@ -3,10 +3,11 @@
 
 #include "SpaceObjectTrajectory.h"
 
+class PlanetGenerator;
 class PlanetInfo
 {
 	public:
-		PlanetInfo(SpaceObjectTrajectory* t);
+		PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* planetGen);
 		~PlanetInfo();
 
 		int seed;
@@ -33,6 +34,8 @@ class PlanetInfo
 
 		SpaceObjectTrajectory* trajectory;
 		float period; //rotation propre
+		
+		PlanetGenerator* planetGenerator;
 };
 
 #endif
