@@ -4,14 +4,17 @@
 #include "utils/glm.h"
 #include <noise/noise.h>
 #include "noise/noiseutils.h"
+#include <vector>
 
 // fill a 3D grid with aire and blocks (bool) and eventually with blocktypes
 
 typedef bool caveBlock; // easier to change in the future
 
-#define CAVE_CHUNK_SIZE_X 64 // size of the block where the worms can travel
-#define CAVE_CHUNK_SIZE_Y 64
-#define CAVE_CHUNK_SIZE_Z 64
+#define CAVE_CHUNK_SIZE_X (512) // size of the block where the worms can travel
+#define CAVE_CHUNK_SIZE_Y (512)
+#define CAVE_CHUNK_SIZE_Z (512)
+#define CAVE_CHUNK_SPACE  (100)
+
 // if vertically the value is larger do it here
 #define CAVE_BLOCK_SIZE CAVE_CHUNK_SIZE_X * CAVE_CHUNK_SIZE_Y * CAVE_CHUNK_SIZE_Z
 
@@ -23,7 +26,7 @@ class CaveGenerator {
 		int segmentCount,
 			segmentLength; // in units (meters?)
 		float twistiness; // how much caves twist their way
-		caveBlock blocks[CAVE_BLOCK_SIZE];
+		std::vector<bool> blocks;
 
 		// dig out a disk in the blocks array
 		// normal is the up vector => sin(∆) and dir is the side one => cos(∆)
