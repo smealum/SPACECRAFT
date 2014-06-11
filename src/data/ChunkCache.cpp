@@ -1,6 +1,5 @@
 #include <cstdio>
-#include <sys/stat.h>
-#include <sys/types.h>
+#include "utils/Tools.h"
 #include "data/ChunkCache.h"
 
 ChunkCacheEntry::ChunkCacheEntry(MiniWorld* mw)
@@ -40,7 +39,7 @@ std::string ChunkCacheEntry::getName(void)
 
 ChunkCache::ChunkCache()
 {
-	mkdir("./worlddata", 0777);
+	createDir(CACHE_DIR);
 }
 
 void ChunkCache::save(MiniWorld* mw)
@@ -71,12 +70,13 @@ TrackerPointer<ChunkCacheEntry>* ChunkCache::get(std::string name)
 		mutex.unlock();
 		{
 			//TEMP
-			char cwd[256];
-			getcwd(cwd,256);
+			//char cwd[256];
+			//getcwd(cwd,256);
 
-			chdir("./worlddata");
-			FILE* f=fopen(name.c_str(), "rb");
-			chdir(cwd);
+			//chdir("./worlddata");
+			std::string file(CACHE_DIR+std::string("/")+name);
+			FILE* f=fopen(file.c_str(), "rb");
+			//chdir(cwd);
 
 			if(f)
 			{
@@ -115,12 +115,13 @@ void ChunkCacheEntry::dump(void)
 	if(!toSave)return;
 
 	//TEMP
-	char cwd[256];
-	getcwd(cwd,256);
+	//char cwd[256];
+	//getcwd(cwd,256);
 
-	chdir("./worlddata");
-	FILE* f=fopen(name.c_str(), "wb");
-	chdir(cwd);
+	//chdir("./worlddata");
+	std::string file(CACHE_DIR+std::string("/")+name);
+	FILE* f=fopen(file.c_str(), "wb");
+	//chdir(cwd);
 
 	printf("SAVING %s (%p)\n",name.c_str(),f);
 	if(!f)return;
