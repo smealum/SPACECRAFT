@@ -9,9 +9,9 @@ using namespace glm;
 
 CaveGenerator::CaveGenerator() :
 	seed(0),
-	segmentCount(20),
-	segmentLength(8),
-	twistiness(0.5/256.f),
+	segmentCount(50),
+	segmentLength(10),
+	twistiness(1.0/256.f),
 	blocks(CAVE_BLOCK_SIZE,true),
 	holes(CAVE_CHUNK_SIZE_X*CAVE_CHUNK_SIZE_Z),
 	isGenerated(false)
@@ -57,11 +57,12 @@ void CaveGenerator::generate()
 		conPoints.push_back(vector<vec3>(1,vec3(x,y,z)));
 	}
 
-	float scale = 0.03;
+	float scale = 0.06;
 	float yy = 0.f,
 		  zz = 0.f; // used to get the noise
 	for (auto points(conPoints.begin()); points != conPoints.end(); ++points) // for every starting point
 	{
+		zz++;
 		for (int i = 1; i < segmentCount; i++, yy += 1.f) // first one is fixed
 		{
 			glm::vec3 rot;
@@ -69,7 +70,7 @@ void CaveGenerator::generate()
 			// z should be almost constant so that the cave goes down to the center of the world
 			for (int k = 0; k < 3; k++)
 			{
-				rot[k] = rotNoise[k].GetValue((i * twistiness), yy*scale, zz);
+				rot[k] = 3.0*rotNoise[k].GetValue((i * twistiness), yy*scale, zz);
 				qq = glm::rotate(qq, NOISE2RAD(rot[k])/i, axes[k]);
 				//debug("rot for %d(%f, %f, %f): %d(%f)", k, i*twistiness, yy*scale, zz, (int)RAD2DEG(rot[k]), rot[k]);
 			}
@@ -90,13 +91,10 @@ void CaveGenerator::generate()
 	{
 		for (int i = 1; i < segmentCount; i++, yy += 1.f) // first one is fixed
 		{
-			glm::vec3 v = (*points)[i] - (*points)[i-1]; // this is the direction at point i-1
-			glm::vec3 normal(-v.z, 0.f, v.x); // here is the normal
-			digDisk((*points)[i-1], normal, glm::cross(normal, v));
 			glm::i32vec3 p1 = glm::i32vec3((*points)[i+1]);
 			glm::i32vec3 p2 = glm::i32vec3((*points)[i]);
 
-			const int radius = 10;
+			const int radius = 6;
 			for(int i=-radius;i<=radius;++i)
 			for(int j=-radius;j<=radius;++j)
 			for(int k=-radius;k<=radius;++k)

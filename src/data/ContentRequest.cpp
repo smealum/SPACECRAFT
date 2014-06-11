@@ -157,18 +157,21 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 					auto holes = caves.getHolesList(px+i+cx*(CHUNK_N),pz+k+cz*(CHUNK_N));
 					for(auto it = holes.begin(); it!=holes.end();++it)
 					{
+						if (it->second < height-100) continue;
+						if (it->first > height) break;
 						for(int i=it->first;i<=it->second;++i)
 						{
 							int y = (i % CHUNK_N)+1;
 							int cy = i / CHUNK_N;
 							data[zPos+y*(CHUNK_N+2)+cy*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w] = blockTypes::air;
+							
 							if ( y == (CHUNK_N) and cy != (MINIWORLD_H-1))
 							{
 								data[zPos+(0)*(CHUNK_N+2)+(cy+1)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w] = blockTypes::air;
 							}
 							if ( y==1 and cy!=0)
 							{
-								data[zPos+(CHUNK_N+1)*(CHUNK_N+2)+(cy-1)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w + 1] = blockTypes::air;
+								data[zPos+(CHUNK_N+1)*(CHUNK_N+2)+(cy-1)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w] = blockTypes::air;
 							}
 						}
 					}
