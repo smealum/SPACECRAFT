@@ -60,6 +60,9 @@ void CaveGenerator::generate()
 	float scale = 0.06;
 	float yy = 0.f,
 		  zz = 0.f; // used to get the noise
+
+	log_info("[Grotte] Constructing path");
+
 	for (auto points(conPoints.begin()); points != conPoints.end(); ++points) // for every starting point
 	{
 		zz++;
@@ -84,6 +87,8 @@ void CaveGenerator::generate()
 			points->push_back(res);
 		}
 	}
+
+	log_info("[Grotte] Digging");
 
 	// cave in circles around the points
 	// We must calculate the normal of the direction
@@ -230,6 +235,7 @@ CaveGenerator::~CaveGenerator()
 
 void CaveGenerator::computeList()
 {
+	log_info("[Grotte] Optimisation");
 	for(int x = 0 ; x<CAVE_CHUNK_SIZE_X; ++x)
 	for(int z = 0 ; z<CAVE_CHUNK_SIZE_Z; ++z)
 	{
@@ -242,7 +248,7 @@ void CaveGenerator::computeList()
 				{
 					yy++;
 				}
-				holes[x+CAVE_CHUNK_SIZE_X*z].push_back(make_pair<int,int>(y,yy-1));
+				holes[x+CAVE_CHUNK_SIZE_X*z].push_back(make_pair<int,int>(y+CAVE_CHUNK_Y_OFFSET,yy-1+CAVE_CHUNK_Y_OFFSET));
 				y=yy;
 			}
 		}
