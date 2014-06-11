@@ -52,6 +52,7 @@ class MiniWorld
 		TrackerPointer<MiniWorld>* getTptr(void);
 
 		bool isConstructionCanceled();
+
 	private:
 		bool constructionCanceled;
 		Planet* planet;
@@ -61,6 +62,7 @@ class MiniWorld
 		glm::vec3 origin, v1, v2;
 		int x, z;
 		bool generated;
+		bool modified;
 
 		TrackerPointer<MiniWorld>* tptr;
 };

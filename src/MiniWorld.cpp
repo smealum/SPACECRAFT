@@ -13,6 +13,7 @@ MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 	x(pf->x*MINIWORLD_W*CHUNK_N),
 	z(pf->z*MINIWORLD_D*CHUNK_N),
 	generated(false),
+	modified(false),
 	constructionCanceled(false)
 {
 	for(int i=0;i<MINIWORLD_W;i++)
@@ -107,14 +108,13 @@ bool MiniWorld::collidePoint(glm::dvec3& p, glm::dvec3& v)
 {
 	if(p.x<x-1 || p.z<z-1 || p.x>x+CHUNK_N*MINIWORLD_W+1 || p.z>z+CHUNK_N*MINIWORLD_D+1)return false;
 	bool ret=false;
-	//TODO : culling dès ici
 	for(int i=0;i<MINIWORLD_W;i++)
 	{
 		for(int j=0;j<MINIWORLD_H;j++)
 		{
 			for(int k=0;k<MINIWORLD_D;k++)
 			{
-				ret=ret||chunks[i][j][k]->collidePoint(p,v);
+				ret=chunks[i][j][k]->collidePoint(p,v)||ret;
 			}
 		}
 	}
@@ -139,7 +139,8 @@ Chunk* MiniWorld::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int
 
 void MiniWorld::changeBlock(glm::i32vec3 p, blockTypes::T v)
 {
-	//TODO : culling dès ici
+	if(p.x<x-1 || p.z<z-1 || p.x>x+CHUNK_N*MINIWORLD_W+1 || p.z>z+CHUNK_N*MINIWORLD_D+1)return;
+	modified=true;
 	for(int i=0;i<MINIWORLD_W;i++)
 	{
 		for(int j=0;j<MINIWORLD_H;j++)

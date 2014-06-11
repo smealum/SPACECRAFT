@@ -50,6 +50,7 @@ class Chunk
 		bool isConstructionCanceled();
 		
 	private:
+		bool modified;
 		bool constructionCanceled;
 		void initGLObjects();
 		void destroyGLObjects();

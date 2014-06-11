@@ -16,6 +16,9 @@ void ContentHandler::manualReleaseInput(void)
 	inputQueue.manualRelease();
 }
 
+//TEMP
+#include "utils/Input.h"
+
 void ContentHandler::handleNewContent(void)
 {
 	std::queue<ContentRequest*> q;
@@ -28,6 +31,8 @@ void ContentHandler::handleNewContent(void)
 		q.pop();
 		delete r;
 	}
+
+	if(Input::isKeyHold(GLFW_KEY_F))cache.flush();
 }
 
 ContentHandler::~ContentHandler()

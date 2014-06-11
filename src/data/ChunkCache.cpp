@@ -3,6 +3,7 @@
 ChunkCacheEntry::ChunkCacheEntry(MiniWorld* mw)
 {
 	name=mw->getName();
+	toSave=mw->modified;
 
 	for(int i=0;i<MINIWORLD_W;i++)
 	{
@@ -37,15 +38,16 @@ void ChunkCache::save(MiniWorld* mw)
 	if(!mw)return;
 
 	std::string name=mw->getName();
+	printf("SAVING %s\n",name.c_str());
 
 	mutex.lock();
 		removeChunk(name);
 		while(map.size()>CACHE_MAXSIZE)removeChunk(map.begin()->first); //TODO : système de prio (maintenir une queue de prio en parallèle ?)
-		map.insert(std::pair<std::string,ChunkCacheEntry*>(name,new ChunkCacheEntry(mw)));
+		map.insert(std::pair<std::string,TrackerPointer<ChunkCacheEntry>*>(name, new TrackerPointer<ChunkCacheEntry>(new ChunkCacheEntry(mw), true)));
 	mutex.unlock();
 }
 
-ChunkCacheEntry* ChunkCache::get(std::string name)
+TrackerPointer<ChunkCacheEntry>* ChunkCache::get(std::string name)
 {
 	mutex.lock();
 	auto it=map.find(name);
@@ -53,6 +55,7 @@ ChunkCacheEntry* ChunkCache::get(std::string name)
 	{
 		map.erase(it);
 		mutex.unlock();
+		it->second->grab();
 		return it->second;
 	}else{
 		mutex.unlock();
@@ -73,7 +76,8 @@ void ChunkCache::removeChunk(std::string name)
 	auto it=map.find(name);
 	if(it!=map.end())
 	{
+		printf("REMOVING %s\n",it->first.c_str());
+		it->second->release();
 		map.erase(name);
-		delete it->second;
 	}
 }
