@@ -6,14 +6,19 @@
 #include <SFML/System/Mutex.hpp>
 #include <map>
 #include <string>
+#include <cstdio>
 #include "utils/TrackerPointer.h"
 #include "Chunk.h"
 #include "MiniWorld.h"
 
 class ChunkCacheEntry
 {
+	friend class ChunkCache;
 	public:
 		ChunkCacheEntry(MiniWorld* mw);
+		ChunkCacheEntry(std::string name, FILE* f);
+
+		void dump(void);
 
 		chunkVal* getData(void);
 		std::string getName(void);
