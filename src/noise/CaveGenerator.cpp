@@ -4,11 +4,15 @@
 #include "utils/dbg.h"
 #include "utils/maths.h"
 
+using namespace std;
+using namespace glm;
+
 CaveGenerator::CaveGenerator() :
 	seed(0),
-	segmentCount(30),
-	segmentLength(4),
-	twistiness(9.f/256.f),
+	segmentCount(20),
+	segmentLength(8),
+	twistiness(10.0/256.f),
+	blocks(CAVE_BLOCK_SIZE,true),
 	isGenerated(false)
 {
 	posNoise.SetSeed(seed);
@@ -23,10 +27,6 @@ CaveGenerator::CaveGenerator() :
 		rotNoise[i].SetPersistence(0.5);
 		rotNoise[i].SetNoiseQuality(noise::QUALITY_STD);
 	}
-
-	// fill every block by default
-	for (uint32_t i = 0; i < CAVE_BLOCK_SIZE; ++i)
-		blocks[i] = true;
 }
 
 // helper to transform angle from [-1, 1] to [-2π, 2π]
@@ -43,17 +43,19 @@ void CaveGenerator::generate()
 	if (isGenerated) return;
 	isGenerated=true;
 
+	log_info("Cave Generation");
+
 	// first generate the points where the worms start
 	// we are gong to push back every control point
 	// that means there's at max segmentCount points in each vector
-	std::vector<std::vector<glm::vec3> > conPoints(7); // XXX size must be changed
-	conPoints[0].push_back(glm::vec3(CAVE_CHUNK_SIZE_X/2,CAVE_CHUNK_SIZE_Y/2,CAVE_CHUNK_SIZE_Z/2));
-	conPoints[1].push_back(glm::vec3(CAVE_CHUNK_SIZE_X/4,CAVE_CHUNK_SIZE_Y/2,CAVE_CHUNK_SIZE_Z/2));
-	conPoints[2].push_back(glm::vec3(CAVE_CHUNK_SIZE_X/2,CAVE_CHUNK_SIZE_Y/2,CAVE_CHUNK_SIZE_Z/2));
-	conPoints[3].push_back(glm::vec3(CAVE_CHUNK_SIZE_X/2,CAVE_CHUNK_SIZE_Y/2,CAVE_CHUNK_SIZE_Z/4));
-	conPoints[4].push_back(glm::vec3(3*CAVE_CHUNK_SIZE_X/4,CAVE_CHUNK_SIZE_Y/2,CAVE_CHUNK_SIZE_Z/2));
-	conPoints[5].push_back(glm::vec3(CAVE_CHUNK_SIZE_X/2,3*CAVE_CHUNK_SIZE_Y/2,CAVE_CHUNK_SIZE_Z/2));
-	conPoints[6].push_back(glm::vec3(CAVE_CHUNK_SIZE_X/2,CAVE_CHUNK_SIZE_Y/2,3*CAVE_CHUNK_SIZE_Z/4));
+	std::vector<std::vector<glm::vec3> > conPoints;
+	for(int x = CAVE_CHUNK_SPACE ; x<CAVE_CHUNK_SIZE_X-CAVE_CHUNK_SPACE; x+=CAVE_CHUNK_SPACE)
+	for(int y = CAVE_CHUNK_SPACE ; y<CAVE_CHUNK_SIZE_Y-CAVE_CHUNK_SPACE; y+=CAVE_CHUNK_SPACE)
+	for(int z = CAVE_CHUNK_SPACE ; z<CAVE_CHUNK_SIZE_Z-CAVE_CHUNK_SPACE; z+=CAVE_CHUNK_SPACE)
+	{
+		conPoints.push_back(vector<vec3>(1,vec3(x,y,z)));
+	}
+
 	float scale = 0.03;
 	float yy = 0.f,
 		  zz = 0.f; // used to get the noise
@@ -92,16 +94,25 @@ void CaveGenerator::generate()
 			digDisk((*points)[i-1], normal, glm::cross(normal, v));
 			glm::i32vec3 p1 = glm::i32vec3((*points)[i+1]);
 			glm::i32vec3 p2 = glm::i32vec3((*points)[i]);
-			for(int i=-8;i<=8;++i)
-			for(int j=-8;j<=8;++j)
-			for(int k=-8;k<=8;++k)
+
+			const int radius = 10;
+			for(int i=-radius;i<=radius;++i)
+			for(int j=-radius;j<=radius;++j)
+			for(int k=-radius;k<=radius;++k)
 			{
-				if (k*k+j*j+i*i>4*4) continue;
-				glm::i32vec3 decal(i,j,k);
-				digLine(p1+decal,p2+decal);
+				int rr = k*k+j*j+i*i;
+				if (
+						(rr<=radius*radius) and
+						(rr>=(radius-2)*(radius-2))
+				)
+				{
+					glm::i32vec3 decal(i,j,k);
+					digLine(p1+decal,p2+decal);
+				}
 			}
 		}
 	}
+	log_info("Cave Generation (fin)");
 }
 
 // helper to get the 1D index in a flattened 3D array, using a vec3

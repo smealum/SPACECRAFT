@@ -77,6 +77,8 @@ px(x),
 WorldChunkRequest::~WorldChunkRequest()
 {}
 
+CaveGenerator caves;
+
 //TODO : optimiser et proprifier
 //(on peut largement optimiser les accès à data, éviter *énormément* de multiplications)
 void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
@@ -95,8 +97,7 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 	int pxPos,pzPos,xPos,zPos,pyPos,yPos;
 	pxPos=0;
 
-	CaveGenerator caves;
-	caves.generate(); //XXX
+	caves.generate();
 
 	for(int cx=0;cx<w;cx++)
 	{
