@@ -12,6 +12,7 @@
 #include "utils/TextureManager.h"
 #include "world/BlockType.h"
 #include "utils/glm.h"
+#include "noise/CaveGenerator.h"
 #define WIN_TITLE "SPACECRAFT"
 
 float PlanetFaceDetailsPower = 28.0;
@@ -169,6 +170,7 @@ void Application::createWindowInFullscreen(bool fs)
     }
 }
 
+CaveGenerator caves;
 SolarSystem* testSolarSystem;
 Cursor* testCursor;
 int testTexture;
@@ -192,6 +194,7 @@ void Application::run()
 
 	testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
     testTextureArray=TextureManager::getInstance().loadTextureArray("data/blocksPackArray.png",16,16);
+	caves.generate();
 
     float timeA;
     char titleBuff[512];

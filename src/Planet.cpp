@@ -458,7 +458,7 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 			        sideTile = blockTypes::stone-1;
 					break;
 			case 3:  topTile = blockTypes::grass-1;
-			        sideTile = blockTypes::grass-1;
+			        sideTile = blockTypes::grass_side-1;
 					break;
 		}
 
