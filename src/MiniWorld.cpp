@@ -42,6 +42,11 @@ MiniWorld::~MiniWorld()
 				if(chunks[i][j][k])chunks[i][j][k]->destroyChunk();
 }
 
+std::string MiniWorld::getName(void)
+{
+	return std::string("test");
+}
+
 void MiniWorld::draw(Camera& c)
 {
 	//TODO : passer frustum culling en octree ?
@@ -69,7 +74,7 @@ bool MiniWorld::isConstructionCanceled()
 void MiniWorld::destroyMiniWorld(void)
 {
 	constructionCanceled = true;
-	planet->handler.requestContent(new MiniWorldDeletionRequest(*this),false);
+	planet->handler.requestContent(new MiniWorldDeletionRequest(*this, planet->handler),false);
 		tptr->release();
 	planet->handler.manualReleaseInput();
 }

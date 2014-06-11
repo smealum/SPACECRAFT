@@ -2,10 +2,12 @@
 #define CONTENTHANDLER_H
 
 #include "data/Producer.h"
+#include "data/ChunkCache.h"
 #include <vector>
 
 class ContentHandler
 {
+	friend class MiniWorldDeletionRequest;
 	public:
 		ContentHandler(int numProducers);
         ~ContentHandler();
@@ -21,6 +23,8 @@ class ContentHandler
 		std::vector<Producer*> producers;
         ContentInputQueue inputQueue;
         ContentOutputQueue outputQueue;
+
+        ChunkCache cache;
 };
 
 #endif
