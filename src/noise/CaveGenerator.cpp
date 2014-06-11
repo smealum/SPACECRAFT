@@ -11,8 +11,9 @@ CaveGenerator::CaveGenerator() :
 	seed(0),
 	segmentCount(20),
 	segmentLength(8),
-	twistiness(10.0/256.f),
+	twistiness(0.5/256.f),
 	blocks(CAVE_BLOCK_SIZE,true),
+	holes(CAVE_CHUNK_SIZE_X*CAVE_CHUNK_SIZE_Z),
 	isGenerated(false)
 {
 	posNoise.SetSeed(seed);
@@ -112,6 +113,7 @@ void CaveGenerator::generate()
 			}
 		}
 	}
+	computeList();
 	log_info("Cave Generation (fin)");
 }
 
@@ -228,3 +230,30 @@ void CaveGenerator::digLine(const glm::i32vec3 &a, const glm::i32vec3 &b)
 CaveGenerator::~CaveGenerator()
 {}
 
+void CaveGenerator::computeList()
+{
+	for(int x = 0 ; x<CAVE_CHUNK_SIZE_X; ++x)
+	for(int z = 0 ; z<CAVE_CHUNK_SIZE_Z; ++z)
+	{
+		for(int y = 0 ; y<CAVE_CHUNK_SIZE_Y; ++y)
+		{
+			if ( not getBlock(x,y,z))
+			{
+				int yy=y;
+				while(not getBlock(x,yy,z) and yy<CAVE_CHUNK_SIZE_Y)
+				{
+					yy++;
+				}
+				holes[x+CAVE_CHUNK_SIZE_X*z].push_back(make_pair<int,int>(y,yy-1));
+				y=yy;
+			}
+		}
+	}
+}
+
+list<pair<int,int> >& CaveGenerator::getHolesList(int x, int z)
+{
+	int xx = (x%(2*CAVE_CHUNK_SIZE_X)); if (xx>=CAVE_CHUNK_SIZE_X) xx=2*CAVE_CHUNK_SIZE_X-xx-1;
+	int zz = (z%(2*CAVE_CHUNK_SIZE_Z)); if (zz>=CAVE_CHUNK_SIZE_Z) zz=2*CAVE_CHUNK_SIZE_Z-zz-1;
+	return holes[xx+CAVE_CHUNK_SIZE_X*zz];
+}

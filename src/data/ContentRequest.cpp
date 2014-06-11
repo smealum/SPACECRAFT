@@ -77,7 +77,8 @@ px(x),
 WorldChunkRequest::~WorldChunkRequest()
 {}
 
-CaveGenerator caves;
+// XXX temp
+extern CaveGenerator caves;
 
 //TODO : optimiser et proprifier
 //(on peut largement optimiser les accès à data, éviter *énormément* de multiplications)
@@ -146,31 +147,30 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 								else if (vy+py+j == height+1 && rand()%100 == 1) data[yPos]=blockTypes::flower_red;
 								else data[yPos]=blockTypes::air;
 
-								// cave
-								if (py+j+cy*(CHUNK_N)>(MINIWORLD_H*CHUNK_N)/2 and not
-									caves.getBlock(px+i+cx*(CHUNK_N),py+j+cy*(CHUNK_N),pz+ k+ pz*(CHUNK_N)))
-									data[yPos] = blockTypes::air;
-
 								yPos+=(CHUNK_N+2);
 							}
 							pyPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w;
 						}
 					}
-
-					// grotte
-					//pyPos=zPos;
-					//for(int cy=0;cy<h;cy++)
-					//{
-						//yPos=pyPos;
-						//for(int j=0;j<(CHUNK_N+2);j++)
-						//{
-							//if (glm::simplex(pos*float(PLANETFACE_BLOCKS)*0.05f+vec3(cy*(CHUNK_N+2)+j)*0.05f)>0.5f)
-								//data[yPos]=blockTypes::air;
-							//yPos+=(CHUNK_N+2);
-						//}
-						//pyPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w;
-					//}
-
+					// cave
+					auto holes = caves.getHolesList(px+i+cx*(CHUNK_N),pz+k+cz*(CHUNK_N));
+					for(auto it = holes.begin(); it!=holes.end();++it)
+					{
+						for(int i=it->first;i<=it->second;++i)
+						{
+							int y = (i % CHUNK_N)+1;
+							int cy = i / CHUNK_N;
+							data[zPos+y*(CHUNK_N+2)+cy*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w] = blockTypes::air;
+							if ( y == (CHUNK_N) and cy != (MINIWORLD_H-1))
+							{
+								data[zPos+(0)*(CHUNK_N+2)+(cy+1)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w] = blockTypes::air;
+							}
+							if ( y==1 and cy!=0)
+							{
+								data[zPos+(CHUNK_N+1)*(CHUNK_N+2)+(cy-1)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w + 1] = blockTypes::air;
+							}
+						}
+					}
 					zPos+=(CHUNK_N+2)*(CHUNK_N+2);
 				}
 				xPos+=1;
