@@ -1,7 +1,13 @@
 #include "PlanetGenerator.h"
 #include "PlanetInfo.h" 
+#include "utils/dbg.h"
 
 PlanetGenerator::PlanetGenerator()
+{
+
+}
+
+PlanetGenerator::~PlanetGenerator()
 {
 
 }

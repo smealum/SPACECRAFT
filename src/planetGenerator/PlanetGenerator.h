@@ -19,6 +19,7 @@ class PlanetGenerator
 	public:
 
 	PlanetGenerator();
+	virtual ~PlanetGenerator();
 	void setPlanetInfo(PlanetInfo* p);
 
 	// genere un miniworld

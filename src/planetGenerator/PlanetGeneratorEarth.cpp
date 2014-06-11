@@ -7,6 +7,11 @@ PlanetGeneratorEarth::PlanetGeneratorEarth()
 
 }
 
+PlanetGeneratorEarth::~PlanetGeneratorEarth()
+{
+
+}
+
 void PlanetGeneratorEarth::setPlanetInfo(PlanetInfo* p)
 {
 	planetInfo = p;
@@ -78,7 +83,8 @@ float PlanetGeneratorEarth::getTemperature(const glm::vec3& pos) const
 	float distanceToEquatorFactor = 1.0-2.0*abs(
 			glm::dot(
 				glm::normalize(pos),
-				glm::normalize(planetInfo->axis)
+				//glm::normalize(planetInfo->axis)
+				glm::normalize(glm::vec3(1.0,0.0,0.0))
 		 ));
 	float noise1 = glm::simplex(pos*10.f) * 0.5;
 	float noise2 = glm::simplex(pos*100.f) * 0.05;

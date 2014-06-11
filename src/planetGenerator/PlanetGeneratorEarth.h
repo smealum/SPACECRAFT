@@ -9,6 +9,7 @@ class PlanetGeneratorEarth : public PlanetGenerator
 	public:
 	PlanetGeneratorEarth();
 	void setPlanetInfo(PlanetInfo* p);
+	virtual ~PlanetGeneratorEarth();
 
 	virtual float generateWorldData(const chunkVal* data,
 				int w, int h, int d, // array sizes (in chunks)
