@@ -25,6 +25,7 @@ PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p):
 	continentHeightScale((1.f - seaLevel) / 4.f),
 	riverDepth(0.0223f),
 	trajectory(t),
+	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
 	period(1.0f),
 	planetGenerator(p)
 {

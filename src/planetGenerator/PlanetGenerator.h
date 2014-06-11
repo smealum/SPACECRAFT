@@ -8,7 +8,7 @@
 struct PlanetGeneratorResponse
 {
 	float elevation;	
-	blockTypes::T blockType;
+	blockTypes::T tile;
 };
 
 
@@ -25,10 +25,10 @@ class PlanetGenerator
 	virtual float generateWorldData(const chunkVal* data,
 				int w, int h, int d, // array sizes (in chunks)
 				int px, int py, int pz, // offset in world
-				glm::vec3 origin, glm::vec3 v1, glm::vec3 v2); // toplevelCharacteristic
+				glm::vec3 origin, glm::vec3 v1, glm::vec3 v2) const; // toplevelCharacteristic
 
 	// genere l'elevation,texture.
-	virtual PlanetGeneratorResponse getCharacteristic(const glm::vec3& pos);
+	virtual PlanetGeneratorResponse getCharacteristic(const glm::vec3& pos) const ;
 
 	private:
 	PlanetInfo* planetInfo;
@@ -40,7 +40,7 @@ class PlanetGenerator
 	//		-valeur intrinsèque de la planete (composition) (TODO)
 	// Le résultat est à valeur dans [-1,1]
 	// La position est une position dans le référentiel de la planète.
-	virtual float getTemperature(const glm::vec3& pos);
+	virtual float getTemperature(const glm::vec3& pos) const;
 
 	// Donne l'humidité en fonction de la position
 	// Prend en compte:
@@ -48,7 +48,7 @@ class PlanetGenerator
 	//		-valeur intrinsèque de la planete (composition) (TODO)
 	// Le résultat est à valeur dans [-1,1]
 	// La position est une position dans le référentiel de la planète.
-	virtual float getHumidity(const glm::vec3& pos);
+	virtual float getHumidity(const glm::vec3& pos) const;
 };
 
 #endif /* end of include guard: PLANETGENERATOR_PJW8VJTB */

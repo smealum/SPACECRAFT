@@ -31,9 +31,8 @@ class PlanetElevationRequest : public ContentRequest
 		virtual bool isRelevant(int id);
 		
 	private:
+		blockTypes::T tile;
 		float elevation;
-		float temperature;
-		float humidity;
 		glm::vec3 coord;
 		Planet& planet;
 		TrackerPointer<PlanetFace>* face;
