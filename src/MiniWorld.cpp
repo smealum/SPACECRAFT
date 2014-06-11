@@ -31,7 +31,7 @@ MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 			}
 		}
 	}
-    planet->handler.requestContent(new MiniWorldDataRequest(*planet, *this, origin, v1, v2, x, 0, z));
+	planet->handler.requestContent(new MiniWorldDataRequest(*planet, *this, origin, v1, v2, x, 0, z, planet->handler));
 }
 
 MiniWorld::~MiniWorld()
@@ -42,9 +42,13 @@ MiniWorld::~MiniWorld()
 				if(chunks[i][j][k])chunks[i][j][k]->destroyChunk();
 }
 
+#include <sstream>
+
 std::string MiniWorld::getName(void)
 {
-	return std::string("test");
+	std::ostringstream oss;
+	oss << planet->getName() << "_" << face->getTopLevel()->getID() << "_" << x << "_" << z;
+	return oss.str();
 }
 
 void MiniWorld::draw(Camera& c)

@@ -48,9 +48,16 @@ void ChunkCache::save(MiniWorld* mw)
 ChunkCacheEntry* ChunkCache::get(std::string name)
 {
 	mutex.lock();
-		auto it=map.find(name);
-	mutex.unlock();
-	return it->second;
+	auto it=map.find(name);
+	if(it!=map.end())
+	{
+		map.erase(it);
+		mutex.unlock();
+		return it->second;
+	}else{
+		mutex.unlock();
+		return NULL;
+	}
 }
 
 void ChunkCache::flush(void)

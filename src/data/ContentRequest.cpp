@@ -207,14 +207,16 @@ void WorldChunkRequest::update(void)
 }
 
 //MiniWorldDataRequest stuff
-MiniWorldDataRequest::MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z):
+MiniWorldDataRequest::MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z, ContentHandler& ch):
 	px(x),
 	py(y),
 	pz(z),
 	origin(o),
 	v1(v1),
 	v2(v2),
-	planet(p)
+	planet(p),
+	name(mw.getName()),
+	contentHandler(ch)
 {
 	miniworld=mw.getTptr();
 	miniworld->grab();
@@ -231,7 +233,12 @@ bool MiniWorldDataRequest::isRelevant(int id)
 
 void MiniWorldDataRequest::process(int id)
 {
-	generateWorldData(id, planet, (chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, px, py, pz, origin, v1, v2);
+	ChunkCacheEntry* cce=contentHandler.cache.get(name);
+	if(!cce)generateWorldData(id, planet, (chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, px, py, pz, origin, v1, v2);
+	else{
+		printf("LOADING FROM CACHE %s\n",name.c_str());
+		memcpy(data,cce->getData(),sizeof(chunkVal)*MINIWORLD_W*MINIWORLD_H*MINIWORLD_D*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2));
+	}
 
 	for(int i=0;i<MINIWORLD_W;i++)
 		for(int j=0;j<MINIWORLD_H;j++)
@@ -298,12 +305,16 @@ void SolarSystemDataRequest::process(int id)
 	planets=new Planet*[numPlanets];
 }
 
+#include <sstream>
+
 void SolarSystemDataRequest::update(void)
 {
 	for(int i=0;i<numPlanets;i++)
 	{
 		PlanetInfo pitest(new EllipticalTrajectory(glm::vec3(0.0f), glm::mat3(10.0f*(i+1)), i*1.037f, 100.0f*(i+1)));
-		planets[i]=new Planet(pitest, contentHandler);
+		std::ostringstream oss;
+		oss << i;
+		planets[i]=new Planet(pitest, contentHandler, oss.str());
 	}
 	sun=new Sun(glm::vec3(0.0f));
 

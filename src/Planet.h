@@ -1,6 +1,7 @@
 #ifndef PLANET_H
 #define PLANET_H
 
+#include <string>
 #include <vector>
 #include <list>
 #include "utils/glm.h"
@@ -69,7 +70,7 @@ class PlanetFace
 	friend class MiniWorld;
 	friend class Chunk;
 	public:
-		PlanetFace(Planet* planet, glm::vec3 v[4]);
+		PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id);
 		PlanetFace(Planet* planet, PlanetFace* father, uint8_t id);
 		~PlanetFace();
 		
@@ -86,6 +87,9 @@ class PlanetFace
 		glm::vec3 getV1(void);
 		glm::vec3 getV2(void);
 		glm::vec3 getN(void);
+
+		PlanetFace* getTopLevel(void);
+		int getID(void);
 
 		TrackerPointer<PlanetFace>* getTptr(void);
 
@@ -128,7 +132,7 @@ class Planet
 	friend class PlanetFace;
 	friend class Chunk;
 	public:
-		Planet(PlanetInfo &pi, class ContentHandler& ch);
+		Planet(PlanetInfo &pi, class ContentHandler& ch, std::string name);
 		~Planet(); // TODO faire tous les free
 		
 		void processLevelOfDetail(Camera& c);
@@ -144,6 +148,8 @@ class Planet
 
 		void changeBlock(glm::i32vec3 p, blockTypes::T v);
 		void deleteBlock(glm::i32vec3 p);
+
+		std::string getName(void);
 
 		const PlanetInfo planetInfo; //read only
 		class ContentHandler& handler;
@@ -184,6 +190,7 @@ class Planet
 	private:
 		std::vector<PlanetNoiseGenerator*> generators;
 		std::list<MiniWorld*> miniWorldList;
+		std::string name;
 
 		PlanetFace* faces[6];
 		PlanetFaceBufferHandler* faceBuffers[6];

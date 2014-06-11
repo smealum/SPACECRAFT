@@ -7,6 +7,7 @@
 
 class ContentHandler
 {
+	friend class MiniWorldDataRequest;
 	friend class MiniWorldDeletionRequest;
 	public:
 		ContentHandler(int numProducers);
