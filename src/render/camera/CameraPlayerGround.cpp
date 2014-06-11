@@ -104,7 +104,7 @@ void CameraPlayerGround::update(Camera& camera)
 			speedVect=(speedVect-gval*g)*0.7+gval*g;
 		}
 
-    	camera.moveReference(glm::dvec3(planet->getPosition()));
+		camera.moveReference(glm::dvec3(planet->getPosition()));
 		camera.updateView();
 		camera.updateFrustum();
 	}
