@@ -108,7 +108,7 @@ BlockType::BlockType() :
 
 BlockType::~BlockType()
 {
-	// free the blocktypes
+	// free the blockTypes
 	for (uint32_t i = 1; i < blockTypes::max; ++i)
 		delete blocks[i];
 }
