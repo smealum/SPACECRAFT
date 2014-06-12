@@ -35,9 +35,9 @@ class Chunk
 		void updateData(chunkVal* data, std::vector<GL_Vertex> va);
 		void destroyChunk(void);
 
-		glm::i32vec3 performRayMarch(glm::dvec3 localBlockPosf, glm::dvec3 localBlockPosf2, int* dir);
+		glm::i32vec3 performRayMarch(glm::dvec3 localBlockPosf, glm::dvec3 localBlockPosf2, glm::dvec3* out, bool* done, int* dir);
 		bool collidePoint(glm::dvec3& p, glm::dvec3& v);
-		bool selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir);
+		bool selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, glm::dvec3& out2, bool& done, int& dir);
 
 		void changeBlock(glm::i32vec3 p, blockTypes::T v);
 		void deleteBlock(glm::i32vec3 p);

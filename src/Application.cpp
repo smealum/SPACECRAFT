@@ -36,10 +36,18 @@ inline void TwWindowSizeGLFW3(GLFWwindow* /*window*/, int width, int height)
 
 void TW_CALL reloadAllShaders(void * /*clientData*/)
 {
-	for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
-	{
-		it->second->load();
-	}
+    for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
+    {
+        it->second->load();
+    }
+}
+#else
+void reloadAllShaders(void * /*clientData*/)
+{
+    for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
+    {
+        it->second->load();
+    }
 }
 #endif
 blockTypes::T tmp_type;

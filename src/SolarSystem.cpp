@@ -4,7 +4,8 @@
 SolarSystem::SolarSystem(ContentHandler& ch):
 	generated(false),
 	tptr(new TrackerPointer<SolarSystem>(this, true)),
-	contentHandler(ch)
+	contentHandler(ch),
+	numPlanets(0)
 {
 	ch.requestContent(new SolarSystemDataRequest(*this, ch));
 }
