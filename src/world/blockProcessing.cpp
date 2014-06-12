@@ -202,34 +202,18 @@ void computeChunkFaces(chunkVal* data,
 		}
 	}
 
-	// //sprites
-	// for(int x=0;x<CHUNK_N;++x)
-	// for(int y=0;y<CHUNK_N;++y)
-	// for(int z=0;z<CHUNK_N;++z)
-	// {
-	// 	current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
-	// 	if (blockStyleID[current] == blockStyle::sprite)
-	// 	{
-	// 		GL_Vertex v;
-	// 		v.facedir=6;
-	// 		v.tile=getBlockID(current,blockPlane::top);
-	// 		v.position=vec3(px+x,py+y,pz+z);
-	// 		vArray.push_back(v);
-
-	// 		v.facedir=7;
-	// 		v.tile=getBlockID(current,blockPlane::top);
-	// 		v.position=vec3(px+x,py+y,pz+z);
-	// 		vArray.push_back(v);
-
-	// 		v.facedir=8;
-	// 		v.tile=getBlockID(current,blockPlane::top);
-	// 		v.position=vec3(px+x,py+y,pz+z);
-	// 		vArray.push_back(v);
-
-	// 		v.facedir=9;
-	// 		v.tile=getBlockID(current,blockPlane::top);
-	// 		v.position=vec3(px+x,py+y,pz+z);
-	// 		vArray.push_back(v);
-	// 	}
-	// }
+	//sprites
+	for(int x=0;x<CHUNK_N;++x)
+	for(int y=0;y<CHUNK_N;++y)
+	for(int z=0;z<CHUNK_N;++z)
+	{
+		current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
+		if (blockStyleID[current] == blockStyle::sprite)
+		{
+			generateFace(vArray, vec3(px+x,py+y,pz+z), 6, origin, v1, v2, getBlockID(current,blockPlane::top));
+			generateFace(vArray, vec3(px+x,py+y,pz+z), 7, origin, v1, v2, getBlockID(current,blockPlane::top));
+			generateFace(vArray, vec3(px+x,py+y,pz+z), 8, origin, v1, v2, getBlockID(current,blockPlane::top));
+			generateFace(vArray, vec3(px+x,py+y,pz+z), 9, origin, v1, v2, getBlockID(current,blockPlane::top));
+		}
+	}
 }

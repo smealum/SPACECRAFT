@@ -360,9 +360,14 @@ void Planet::testFullGeneration(int depth, PlanetFaceBufferHandler* b)
 	// faces[0]->deletePlanetFace();
 }
 
+//TEMP
+extern bool testBool1;
 
 void Planet::processLevelOfDetail(Camera& c)
 {
+	// if(testBool1)return;
+	if(!c.isBoxInFrustum(position-glm::vec3(1), glm::vec3(2,0,0), glm::vec3(0,2,0), glm::vec3(0,0,2)))return;
+	if(glm::length(c.getPosition(position))>20.0f)return;
 	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, faceBuffers[i]);
 }
 
@@ -518,10 +523,11 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 
 void Planet::draw(Camera& c)
 {
-	// TODO position de la planete
+	if(!c.isBoxInFrustum(position-glm::vec3(1), glm::vec3(2,0,0), glm::vec3(0,2,0), glm::vec3(0,0,2)))return;
+
 	lightdir=glm::normalize(sunPosition-position);
 
-	for(int i=0;i<6;i++)faceBuffers[i]->draw(c, lightdir);
+	if(!testBool1)for(int i=0;i<6;i++)faceBuffers[i]->draw(c, lightdir);
 
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
 
