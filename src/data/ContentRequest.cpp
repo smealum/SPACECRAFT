@@ -57,7 +57,6 @@ bool PlanetElevationRequest::isRelevant(int id)
 }
 
 
-
 //MiniWorldDataRequest stuff
 MiniWorldDataRequest::MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z, ContentHandler& ch):
 	px(x),
@@ -96,7 +95,7 @@ void MiniWorldDataRequest::process(int id)
 	for(int i=0;i<MINIWORLD_W;i++)
 		for(int j=0;j<MINIWORLD_H;j++)
 			for(int k=0;k<MINIWORLD_D;k++)
-				computeChunkFaces((chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, i, j, k, px+i*CHUNK_N, py+j*CHUNK_N, pz+k*CHUNK_N, vArray[i][j][k]);
+				computeChunkFaces((chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, i, j, k, px+i*CHUNK_N, py+j*CHUNK_N, pz+k*CHUNK_N, origin, v1, v2, vArray[i][j][k]);
 }
 
 void MiniWorldDataRequest::update(void)

@@ -14,12 +14,137 @@
 
 using namespace glm;
 
+const glm::vec3 o[]={glm::vec3(0.0,0.0,0.0), //bottom
+						glm::vec3(0.0,1.0,0.0), //top
+						glm::vec3(0.0,0.0,0.0), //left
+						glm::vec3(1.0,0.0,1.0), //right
+						glm::vec3(1.0,0.0,0.0), //near
+						glm::vec3(0.0,0.0,1.0), //far
+						glm::vec3(0.0,0.0,0.0), //diag11
+						glm::vec3(1.0,0.0,1.0), //diag12
+						glm::vec3(1.0,0.0,0.0), //diag21
+						glm::vec3(0.0,0.0,1.0) //diag22
+						};
+
+const glm::vec3 d1[]={glm::vec3(1.0,0.0,0.0), //bottom
+						glm::vec3(0.0,0.0,1.0), //top
+						glm::vec3(0.0,0.0,1.0), //left
+						glm::vec3(0.0,0.0,-1.0), //right
+						glm::vec3(-1.0,0.0,0.0), //near
+						glm::vec3(1.0,0.0,0.0), //far
+						glm::vec3(1.0,0.0,1.0), //diag11
+						glm::vec3(-1.0,0.0,-1.0), //diag12
+						glm::vec3(-1.0,0.0,1.0), //diag21
+						glm::vec3(1.0,0.0,-1.0) //diag22
+						};
+
+const glm::vec3 d2[]={glm::vec3(0.0,0.0,1.0), //bottom
+						glm::vec3(1.0,0.0,0.0), //top
+						glm::vec3(0.0,1.0,0.0), //left
+						glm::vec3(0.0,1.0,0.0), //right
+						glm::vec3(0.0,1.0,0.0), //near
+						glm::vec3(0.0,1.0,0.0), //far
+						glm::vec3(0.0,1.0,0.0), //diag11
+						glm::vec3(0.0,1.0,0.0), //diag12
+						glm::vec3(0.0,1.0,0.0), //diag21
+						glm::vec3(0.0,1.0,0.0) //diag22
+						};
+
+const glm::vec3 n[]={glm::vec3(0.0,-1.0,0.0), //bottom
+						glm::vec3(0.0,1.0,0.0), //top
+						glm::vec3(-1.0,0.0,0.0), //left
+						glm::vec3(1.0,0.0,1.0), //right
+						glm::vec3(0.0,0.0,-1.0), //near
+						glm::vec3(0.0,0.0,1.0), //far
+						glm::normalize(glm::vec3(1.0,0.0,-1.0)), //diag11
+						glm::normalize(glm::vec3(-1.0,0.0,1.0)), //diag12
+						glm::normalize(glm::vec3(1.0,0.0,1.0)), //diag21
+						glm::normalize(glm::vec3(-1.0,0.0,-1.0)) //diag22
+						};
+
+void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2, int tile)
+{
+	GL_Vertex v;
+
+	glm::vec3 pos1, pos2;
+	float y;
+
+	pos1=pos+o[facedir];
+	pos2=v1*pos1.x+v2*pos1.z;
+	y=1.0+pos1.y/float(PLANETFACE_BLOCKS);
+
+	const glm::vec3 rn=(normalize(origin+(pos2)/float(PLANETFACE_BLOCKS))*y);
+
+	v.position=(normalize(origin+(pos2)/float(PLANETFACE_BLOCKS))*y);
+	v.texcoord=glm::vec2(1,1);
+	v.tile=tile;
+	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
+	vArray.push_back(v);
+
+
+	pos1=pos+o[facedir]+d1[facedir];
+	pos2=v1*pos1.x+v2*pos1.z;
+	y=1.0+pos1.y/float(PLANETFACE_BLOCKS);
+
+	v.position=(normalize(origin+(pos2)/float(PLANETFACE_BLOCKS))*y);
+	v.texcoord=glm::vec2(0,1);
+	v.tile=tile;
+	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
+	vArray.push_back(v);
+
+
+	pos1=pos+o[facedir]+d2[facedir];
+	pos2=v1*pos1.x+v2*pos1.z;
+	y=1.0+pos1.y/float(PLANETFACE_BLOCKS);
+
+	v.position=(normalize(origin+(pos2)/float(PLANETFACE_BLOCKS))*y);
+	v.texcoord=glm::vec2(1,0);
+	v.tile=tile;
+	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
+	vArray.push_back(v);
+
+
+
+	pos1=pos+o[facedir]+d1[facedir]+d2[facedir];
+	pos2=v1*pos1.x+v2*pos1.z;
+	y=1.0+pos1.y/float(PLANETFACE_BLOCKS);
+
+	v.position=(normalize(origin+(pos2)/float(PLANETFACE_BLOCKS))*y);
+	v.texcoord=glm::vec2(0,0);
+	v.tile=tile;
+	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
+	vArray.push_back(v);
+
+
+	pos1=pos+o[facedir]+d2[facedir];
+	pos2=v1*pos1.x+v2*pos1.z;
+	y=1.0+pos1.y/float(PLANETFACE_BLOCKS);
+
+	v.position=(normalize(origin+(pos2)/float(PLANETFACE_BLOCKS))*y);
+	v.texcoord=glm::vec2(1,0);
+	v.tile=tile;
+	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
+	vArray.push_back(v);
+
+
+	pos1=pos+o[facedir]+d1[facedir];
+	pos2=v1*pos1.x+v2*pos1.z;
+	y=1.0+pos1.y/float(PLANETFACE_BLOCKS);
+
+	v.position=(normalize(origin+(pos2)/float(PLANETFACE_BLOCKS))*y);
+	v.texcoord=glm::vec2(0,1);
+	v.tile=tile;
+	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
+	vArray.push_back(v);
+}
+
 //TODO : optimiser pour éviter les multiplications à chaque fois
 //(juste utiliser un pointeur à chaque fois...)
 void computeChunkFaces(chunkVal* data,
 		int w, int h, int d, //array sizes (in chunks)
 		int sx, int sy, int sz, //chunk in array (in chunks)
 		int px, int py, int pz, //chunk offset in world (in blocks)
+		glm::vec3 origin, glm::vec3 v1, glm::vec3 v2,
 		std::vector<GL_Vertex>& vArray) //output
 {
 	vArray.clear();
@@ -33,21 +158,11 @@ void computeChunkFaces(chunkVal* data,
 		previous = accessArray(data,w,h,d,sx,sy,sz,-1,y,z);
 		for(int x=0;x<CHUNK_N+1;++x)
 		{
-			//BlockTexCoord &bCur = blockType.getBlockTexcoord((blockTypes::T)current),
-						  //&bPrev = blockType.getBlockTexcoord((blockTypes::T)previous);
 			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
 			if (blockShouldBeFace(current,previous)) {
-				GL_Vertex v;
-				v.facedir=2;
-				v.tile = getBlockID(current,blockPlane::side);
-				v.position=vec3(px+x,py+y,pz+z);
-				vArray.push_back(v);
+				generateFace(vArray, vec3(px+x,py+y,pz+z), 2, origin, v1, v2, getBlockID(current,blockPlane::side));
 			}else if (blockShouldBeFace(previous,current)) {
-				GL_Vertex v;
-				v.facedir=3;
-				v.tile = getBlockID(previous,blockPlane::side);
-				v.position=vec3(px+x-1,py+y,pz+z);
-				vArray.push_back(v);
+				generateFace(vArray, vec3(px+x-1,py+y,pz+z), 3, origin, v1, v2, getBlockID(previous,blockPlane::side));
 			}
 			previous=current;
 		}
@@ -62,17 +177,9 @@ void computeChunkFaces(chunkVal* data,
 		{
 			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
 			if (blockShouldBeFace(current,previous)) {
-				GL_Vertex v;
-				v.facedir=0;
-				v.tile = getBlockID(current,blockPlane::bottom);
-				v.position=vec3(px+x,py+y,pz+z);
-				vArray.push_back(v);
+				generateFace(vArray, vec3(px+x,py+y,pz+z), 0, origin, v1, v2, getBlockID(current,blockPlane::bottom));
 			} else if (blockShouldBeFace(previous,current)) {
-					GL_Vertex v;
-					v.facedir=1;
-					v.tile = getBlockID(previous,blockPlane::top);
-					v.position=vec3(px+x,py+y-1,pz+z);
-					vArray.push_back(v);
+				generateFace(vArray, vec3(px+x,py+y-1,pz+z), 1, origin, v1, v2, getBlockID(previous,blockPlane::top));
 			}
 			previous=current;
 		}
@@ -87,50 +194,42 @@ void computeChunkFaces(chunkVal* data,
 		{
 			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
 			if (blockShouldBeFace(current,previous)) {
-				GL_Vertex v;
-				v.facedir=4;
-				v.tile = getBlockID(current,blockPlane::side);
-				v.position=vec3(px+x,py+y,pz+z);
-				vArray.push_back(v);
+				generateFace(vArray, vec3(px+x,py+y,pz+z), 4, origin, v1, v2, getBlockID(current,blockPlane::side));
 			}else if (blockShouldBeFace(previous,current)) {
-				GL_Vertex v;
-				v.facedir=5;
-				v.tile = getBlockID(previous,blockPlane::side);
-				v.position=vec3(px+x,py+y,pz-1+z);
-				vArray.push_back(v);
+				generateFace(vArray, vec3(px+x,py+y,pz+z-1), 5, origin, v1, v2, getBlockID(previous,blockPlane::side));
 			}
 			previous=current;
 		}
 	}
 
-	//sprites
-	for(int x=0;x<CHUNK_N;++x)
-	for(int y=0;y<CHUNK_N;++y)
-	for(int z=0;z<CHUNK_N;++z)
-	{
-		current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
-		if (blockStyleID[current] == blockStyle::sprite)
-		{
-			GL_Vertex v;
-			v.facedir=6;
-			v.tile=getBlockID(current,blockPlane::top);
-			v.position=vec3(px+x,py+y,pz+z);
-			vArray.push_back(v);
+	// //sprites
+	// for(int x=0;x<CHUNK_N;++x)
+	// for(int y=0;y<CHUNK_N;++y)
+	// for(int z=0;z<CHUNK_N;++z)
+	// {
+	// 	current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
+	// 	if (blockStyleID[current] == blockStyle::sprite)
+	// 	{
+	// 		GL_Vertex v;
+	// 		v.facedir=6;
+	// 		v.tile=getBlockID(current,blockPlane::top);
+	// 		v.position=vec3(px+x,py+y,pz+z);
+	// 		vArray.push_back(v);
 
-			v.facedir=7;
-			v.tile=getBlockID(current,blockPlane::top);
-			v.position=vec3(px+x,py+y,pz+z);
-			vArray.push_back(v);
+	// 		v.facedir=7;
+	// 		v.tile=getBlockID(current,blockPlane::top);
+	// 		v.position=vec3(px+x,py+y,pz+z);
+	// 		vArray.push_back(v);
 
-			v.facedir=8;
-			v.tile=getBlockID(current,blockPlane::top);
-			v.position=vec3(px+x,py+y,pz+z);
-			vArray.push_back(v);
+	// 		v.facedir=8;
+	// 		v.tile=getBlockID(current,blockPlane::top);
+	// 		v.position=vec3(px+x,py+y,pz+z);
+	// 		vArray.push_back(v);
 
-			v.facedir=9;
-			v.tile=getBlockID(current,blockPlane::top);
-			v.position=vec3(px+x,py+y,pz+z);
-			vArray.push_back(v);
-		}
-	}
+	// 		v.facedir=9;
+	// 		v.tile=getBlockID(current,blockPlane::top);
+	// 		v.position=vec3(px+x,py+y,pz+z);
+	// 		vArray.push_back(v);
+	// 	}
+	// }
 }

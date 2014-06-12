@@ -1,6 +1,7 @@
 #include <cstdio>
 #include "utils/Tools.h"
 #include "data/ChunkCache.h"
+#include "Compression.h"
 
 ChunkCacheEntry::ChunkCacheEntry(MiniWorld* mw)
 {
@@ -23,7 +24,8 @@ ChunkCacheEntry::ChunkCacheEntry(std::string name, FILE* f):
 	name(name)
 {
 	toSave=false;
-	fread(data,1,sizeof(chunkVal)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*MINIWORLD_H*MINIWORLD_W*MINIWORLD_D,f);
+	chunkDecompression(f,(chunkVal*)data);
+	//fread(data,1,sizeof(chunkVal)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*MINIWORLD_H*MINIWORLD_W*MINIWORLD_D,f);
 }
 
 chunkVal* ChunkCacheEntry::getData(void)
@@ -126,7 +128,8 @@ void ChunkCacheEntry::dump(void)
 	printf("SAVING %s (%p)\n",name.c_str(),f);
 	if(!f)return;
 
-	fwrite(data,1,sizeof(chunkVal)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*MINIWORLD_H*MINIWORLD_W*MINIWORLD_D,f);
+	chunkCompression((chunkVal*)data,f);
+	//fwrite(data,1,sizeof(chunkVal)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*MINIWORLD_H*MINIWORLD_W*MINIWORLD_D,f);
 
 	fclose(f);
 }
