@@ -69,6 +69,20 @@ BlockType::BlockType() :
 						blockTypes::water_4
 						});
 				break;
+            case blockTypes::tree:
+                block = new BlockStatic({
+                        blockTypes::tree_top,
+                        blockTypes::tree,
+                        blockTypes::tree_top
+                        });
+                break;
+            case blockTypes::tree_top: // XXX used for a all sided tree textured block
+                block = new BlockStatic({
+                        blockTypes::tree,
+                        blockTypes::tree,
+                        blockTypes::tree
+                        });
+                break;
 			default:
 				block = new BlockStatic({t,t,t});
 				break;
