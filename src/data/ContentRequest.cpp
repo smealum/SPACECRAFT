@@ -153,7 +153,7 @@ bool SolarSystemDataRequest::isRelevant(int id)
 void SolarSystemDataRequest::process(int id)
 {
 	//TEMP
-	numPlanets=1;
+	numPlanets=5;
 	planets=new Planet*[numPlanets];
 }
 

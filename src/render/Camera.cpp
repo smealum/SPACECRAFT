@@ -51,8 +51,12 @@ glm::dvec3 Camera::getReferenceDouble(void)
 	return refPos;
 }
 
+//TEMP
+extern bool testBool2;
+
 void Camera::updateFrustum(void)
 {
+	if(testBool2)return;
 	final=proj*view;
 
 	vec4 rowX = row(final, 0);
@@ -100,6 +104,7 @@ vec3 box[]={vec3(0.f,0.f,0.f),
 bool Camera::isBoxInFrustum(vec3 o, vec3 v1, vec3 v2, vec3 v3)
 {
     mat3 bm(v1,v2,v3);
+    o-=refPos;
     for(int i=0;i<6;i++)
     {
         int in=0, out=0;
