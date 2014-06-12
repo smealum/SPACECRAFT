@@ -7,6 +7,7 @@ class PlanetGenerator;
 class PlanetInfo
 {
 	public:
+		PlanetInfo(const PlanetInfo& p);
 		PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* planetGen);
 		~PlanetInfo();
 
@@ -39,6 +40,7 @@ class PlanetInfo
 		float period;
 		
 		PlanetGenerator* planetGenerator;
+
 
 };
 

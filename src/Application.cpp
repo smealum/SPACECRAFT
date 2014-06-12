@@ -42,6 +42,15 @@ void TW_CALL reloadAllShaders(void * /*clientData*/)
 	}
 }
 #endif
+
+void reloadAllShaders()
+{
+	for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
+	{
+		it->second->load();
+	}
+}
+
 blockTypes::T tmp_type;
 
 Application::Application() : 
@@ -253,7 +262,7 @@ void Application::loop()
 	testSolarSystem->draw(*camera);
 	testCursor->draw(*camera);
 
-	if(Input::isKeyHold(GLFW_KEY_N))reloadAllShaders(NULL);
+	if(Input::isKeyHold(GLFW_KEY_N))reloadAllShaders();
 	if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.001f;
 	if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.001f;
 

@@ -1,6 +1,7 @@
 #include "PlanetGenerator.h"
 #include "PlanetInfo.h" 
 #include "utils/dbg.h"
+#include "utils/positionMath.h"
 
 PlanetGenerator::PlanetGenerator(int n):
 	nbThread(n)
@@ -29,7 +30,8 @@ float PlanetGenerator::generateWorldData(int threadId, const chunkVal* data,
 
 float PlanetGenerator::getElevation(int threadId, const glm::vec3 &coord) const
 {
-	return generators[threadId]->getElevation(coord);
+	float elevation = (generators[threadId]->getElevation(glm::normalize(coord))+1.0)/2.0f;
+	return blockHeightToElevation(elevation*float(CHUNK_N*MINIWORLD_H));
 }
 
 PlanetGeneratorResponse PlanetGenerator::getCharacteristic(int threadID , const glm::vec3& pos) const

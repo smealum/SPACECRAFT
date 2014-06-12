@@ -131,7 +131,7 @@ class Planet
 	friend class PlanetFace;
 	friend class Chunk;
 	public:
-		Planet(PlanetInfo &pi, class ContentHandler& ch, std::string name);
+		Planet(PlanetInfo *pi, class ContentHandler& ch, std::string name);
 		~Planet(); // TODO faire tous les free
 		
 		void processLevelOfDetail(Camera& c);
@@ -150,7 +150,7 @@ class Planet
 
 		std::string getName(void);
 
-		const PlanetInfo planetInfo; //read only
+		const PlanetInfo* planetInfo; //read only
 		class ContentHandler& handler;
 
 		glm::dvec3 getGravityVector(glm::dvec3 p);

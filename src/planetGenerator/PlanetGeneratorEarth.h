@@ -9,7 +9,6 @@ class PlanetGeneratorEarth : public PlanetGenerator
 {
 	public:
 		PlanetGeneratorEarth(int nbThread);
-		void setPlanetInfo(PlanetInfo* p);
 		virtual ~PlanetGeneratorEarth();
 
 		virtual float generateWorldData(int threadId, const chunkVal* data,
@@ -19,7 +18,6 @@ class PlanetGeneratorEarth : public PlanetGenerator
 
 		virtual PlanetGeneratorResponse getCharacteristic(int threadId, const glm::vec3& pos) const ;
 	private:
-		PlanetInfo* planetInfo;
 		virtual void initGenerators();
 		virtual float getTemperature(const glm::vec3& pos) const;
 		virtual float getHumidity(const glm::vec3& pos) const;

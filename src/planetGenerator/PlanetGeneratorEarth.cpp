@@ -20,10 +20,6 @@ PlanetGeneratorEarth::~PlanetGeneratorEarth()
 
 }
 
-void PlanetGeneratorEarth::setPlanetInfo(PlanetInfo* p)
-{
-	planetInfo = p;
-}
 
 float PlanetGeneratorEarth::generateWorldData(int threadId,
 			const chunkVal* data,
@@ -41,16 +37,16 @@ inline double max(double x, double y)
 
 PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, const glm::vec3& pos) const
 {
-	double elevation = getElevation(threadId,pos);
+	glm::vec3 posn = glm::normalize(pos);
+	float elevation = getElevation(threadId,posn);
 	double block_height=delevationToBlockHeight(elevation);
 
-	float temperature = getTemperature(pos);
-	float humidity = getHumidity(pos);
-	int topTile,sideTile;
+	float temperature = getTemperature(posn);
+	float humidity = getHumidity(posn);
 	if (block_height>double(CHUNK_N*MINIWORLD_H)*0.5) //  terre
 	{
 		// e > 0
-		float e = (1.002 - 1.001) * 1000.f ;
+		float e = (elevation - 1.001) * 1000.f ;
 
 		float sandCoef = 4.0*temperature + 1.4*e - humidity;
 		float snowCoef = -2.0*temperature+ 1.4*e + 0.3*humidity;
@@ -73,16 +69,16 @@ PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, co
 		
 		switch(imax)
 		{
-			case 0: return {1.0,blockTypes::sand};
-			case 1: return {1.0,blockTypes::snow};
-			case 2: return {1.0,blockTypes::stone};
-			case 3: return {1.0,blockTypes::grass};
+			case 0: return {elevation,blockTypes::sand};
+			case 1: return {elevation,blockTypes::snow};
+			case 2: return {elevation,blockTypes::stone};
+			case 3: return {elevation,blockTypes::grass};
 		}
 
 	}
 	else // mer
 	{
-		return {1.0,blockTypes::water};
+		return {elevation,blockTypes::water};
 	}
 }
 
@@ -91,8 +87,7 @@ float PlanetGeneratorEarth::getTemperature(const glm::vec3& pos) const
 	float distanceToEquatorFactor = 1.0-2.0*abs(
 			glm::dot(
 				glm::normalize(pos),
-				//glm::normalize(planetInfo->axis)
-				glm::normalize(glm::vec3(1.0,0.0,0.0))
+				glm::normalize(planetInfo->axis)
 		 ));
 	float noise1 = glm::simplex(pos*10.f) * 0.5;
 	float noise2 = glm::simplex(pos*100.f) * 0.05;

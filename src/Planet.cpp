@@ -329,7 +329,7 @@ static GLuint elements[2*3] = {
     0,1,2,      0,2,3, // face 1
 };
 
-Planet::Planet(PlanetInfo &pi, ContentHandler& ch, std::string name):
+Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name):
 	planetInfo(pi),
 	handler(ch),
 	sunPosition(8.0,0.0,0.0),
@@ -632,8 +632,8 @@ void Planet::deleteBlock(glm::i32vec3 p)
 
 void Planet::update(float time)
 {
-	if(planetInfo.trajectory)position=planetInfo.trajectory->getPosition(time);
-	angle=time*2*PI/planetInfo.period;
+	if(planetInfo->trajectory)position=planetInfo->trajectory->getPosition(time);
+	angle=time*2*PI/planetInfo->period;
 
 	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,axis));
 	invModel=glm::transpose(model);

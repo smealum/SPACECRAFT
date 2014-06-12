@@ -37,17 +37,11 @@ PlanetElevationRequest::PlanetElevationRequest(Planet& p, PlanetFace& pf, glm::v
 PlanetElevationRequest::~PlanetElevationRequest()
 {}
 
-//static inline float getElevation(int prod_id, Planet& planet, glm::vec3 v)
-//{
-	//return (planet.getElevation(prod_id, glm::normalize(v))+1.0)/2.0f; //faut que ça nous sorte une valeur entre 0 et 1
-//}
 
 void PlanetElevationRequest::process(int id)
 {
 	glm::vec3 pos = glm::normalize(coord);
-	PlanetGeneratorResponse p = planet.planetInfo.planetGenerator->getCharacteristic(id,pos);
-	//elevation=blockHeightToElevation(getElevation(id, planet, pos)*float(CHUNK_N*MINIWORLD_H));
-	//tile = blockTypes::grass;
+	PlanetGeneratorResponse p = planet.planetInfo->planetGenerator->getCharacteristic(id,pos);
 	elevation = p.elevation;
 	tile = p.tile;
 }
@@ -119,7 +113,10 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 				{
 					pyPos=zPos;
 					const glm::vec3 pos=origin+((v1*float(vx+px+i))+(v2*float(vz+pz+k)))/float(PLANETFACE_BLOCKS);
-					const int height=int(planet.planetInfo.planetGenerator->getElevation(prod_id, pos)*CHUNK_N*MINIWORLD_H);
+
+					const auto blockReponse=planet.planetInfo->planetGenerator->getCharacteristic(prod_id, pos);
+					const int height = elevationToBlockHeight(blockReponse.elevation);
+					const blockTypes::T tile = blockReponse.tile;
 
 					//TEMP (pour tester)
 					const int waterHeight=CHUNK_N*MINIWORLD_H/2.f;
@@ -146,7 +143,7 @@ void generateWorldData(int prod_id, Planet& planet, chunkVal* data,
 							const int vy=cy*CHUNK_N;
 							for(int j=0;j<(CHUNK_N+2);j++)
 							{
-								if (vy+py+j == height) data[yPos]=blockTypes::grass;
+								if (vy+py+j == height) data[yPos]=tile;
 								else if (vy+py+j < height) data[yPos] = blockTypes::dirt;
 								else if (vy+py+j == height+1 && rand()%100 == 1) data[yPos]=blockTypes::flower_red;
 								else data[yPos]=blockTypes::air;
@@ -323,18 +320,20 @@ void SolarSystemDataRequest::update(void)
 	for(int i=0;i<numPlanets;i++)
 	{
 		PlanetInfo pitest(
-				new EllipticalTrajectory(
-					glm::vec3(0.0f),
-					glm::mat3(10.0f*(i+1)),
-					i*1.037f,
-					100.0f*(i+1)
-				),
-				new PlanetGeneratorEarth(contentHandler.getMaxProducers())
 		);
 		std::ostringstream oss;
 		oss << i;
-		planets[i]=new Planet(
-				pitest,
+		planets[i]=
+			new Planet(
+				new PlanetInfo(
+					new EllipticalTrajectory(
+						glm::vec3(0.0f),
+						glm::mat3(10.0f*(i+1)),
+						i*1.037f,
+						100.0f*(i+1)
+					),
+					new PlanetGeneratorEarth(contentHandler.getMaxProducers())
+				),
 				contentHandler,
 				oss.str()
 		);
