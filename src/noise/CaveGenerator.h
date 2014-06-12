@@ -7,7 +7,7 @@
 #include <vector>
 #include <list>
 
-// fill a 3D grid with aire and blocks (bool) and eventually with blocktypes
+// fill a 3D grid with aire and blocks (bool) and eventually with blockTypes
 
 typedef bool caveBlock; // easier to change in the future
 
