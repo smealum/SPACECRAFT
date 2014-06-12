@@ -23,6 +23,7 @@ Les libraries à installer sont:
 
 ##Compilation
 
+On conseille de créer un dossier build ou faire ` cmake ..`. Ainsi si CMake pose problème on peut toujours faire `rm -rf build` pour regénérer le projet.
 On peut compiler en debug ou en release selon les besoins. Par exemple pour tester avec valgrind on va plutôt utiliser la version debug:
 
 ```
@@ -54,10 +55,10 @@ set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} C:/CodeBlocks/MinGW/include )
 
 ```
 cmake -G "MinGW Makefiles" ..
-mingw32-make
+mingw32-make run
 ```
 
-Finalement il faut copier les dll correspondantes dans le dossier bin
+Finalement il faut copier les dlls correspondantes dans le dossier bin. Cela est nécessaire si les dlls fournies ne marchent pas sur votre système.
 
 ##Exécution
 
