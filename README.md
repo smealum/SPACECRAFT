@@ -23,22 +23,37 @@ Les libraries à installer sont:
 
 ##Compilation
 
+On peut compiler en debug ou en release selon les besoins. Par exemple pour tester avec valgrind on va plutôt utiliser la version debug:
+
+```
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=DEBUG ..
+```
+
+Par défaut on compile en release, c'est équivalent à:
+
+```
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=RELEASE ..
+```
+
 - UNIX
 ```
-cmake .
-make
+make run
 ```
 - Windows
 Chez windows les libraries fournis peuvent poser des soucis à l'édition des liens. Pour que tout fonctionne correctement on conseille de les installer en les compilant soi même et des les mettre dans le dossier de MinGW. Il faut également ajouter le dossier de `include` et `bin` à la ligne 27 et 28:
 
 ```
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} C:/CodeBlocks/MinGW/lib ${PROJECT_SOURCE_DIR}/extlibs/libs-win32)
-  set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} C:/CodeBlocks/MinGW/include )
+set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} C:/CodeBlocks/MinGW/include )
 ```
 
 
 ```
-cmake -G "MinGW Makefiles" .
+cmake -G "MinGW Makefiles" ..
 mingw32-make
 ```
 
@@ -55,7 +70,6 @@ Finalement il faut copier les dll correspondantes dans le dossier bin
 Les tests unitaires sont lancés avec `make test` il faut cepedant avoir fait `make all` avant car CTest ne compile pas les test (c'est un bug qui sera sûrement corrigé). En résumé
 
 ```
-cmake .
 make
 make test
 ```
