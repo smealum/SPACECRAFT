@@ -106,6 +106,7 @@ class PlanetFace
 
 		class MiniWorld* miniworld;
 
+		// glm::vec3 box[8];
 		glm::vec3 vertex[9];
 		glm::vec3 uvertex[9];
 

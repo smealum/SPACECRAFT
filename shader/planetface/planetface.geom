@@ -29,11 +29,10 @@ out float frepeat;
 
 void main()
 {
-	// on n'affiche plus les blocs qui sont de l'autre côté de la planete
+	// on n'affiche pas les blocs qui sont de l'autre côté de la planete
 	vec4 PlanetCenter = view*vec4(planetPos,1.0);
 	vec4 BlocPosition = view*(model*vec4(pos[0],1.0)+vec4(planetPos,0.0));
-	if ( dot(BlocPosition,normalize(PlanetCenter)) > length(PlanetCenter) )
-		return;
+	if(dot(BlocPosition,normalize(PlanetCenter)) > length(PlanetCenter))return;
 
 	frepeat = grepeat[0];
 	
@@ -55,12 +54,12 @@ void main()
 	const float ambient=0.0;
 	vec3 n1=normalize(vec3(v[0]-v[1]));
 	vec3 n2=normalize(vec3(v[0]-v[2]));
-	
-	c[0]=max(dot(lightdir,normalize(vec3(v[0]))),0.0)+ambient;
-	c[1]=max(dot(lightdir,n1),0.0)+ambient;
-	c[2]=max(-dot(lightdir,n1),0.0)+ambient;
-	c[3]=max(dot(lightdir,n2),0.0)+ambient;
-	c[4]=max(-dot(lightdir,n2),0.0)+ambient;
+
+	c[0]=ambient+max(dot(lightdir,normalize(vec3(v[0]))),0.0);
+	c[1]=ambient+max(dot(lightdir,n1),0.0);
+	c[2]=ambient+max(-dot(lightdir,n1),0.0);
+	c[3]=ambient+max(dot(lightdir,n2),0.0);
+	c[4]=ambient+max(-dot(lightdir,n2),0.0);
 
 	bool drawLeft=dot(n1,vec3(v[0])-cameraPos)<0;
 	bool drawFront=dot(n2,vec3(v[0])-cameraPos)<0;

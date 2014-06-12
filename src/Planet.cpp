@@ -135,6 +135,8 @@ void PlanetFace::finalize(void)
 	uvertex[8]=(uvertex[3]+uvertex[0])*0.5f;
 
 	for(int i=0;i<9;i++)vertex[i]=glm::normalize(uvertex[i]);
+	// for(int i=0;i<4;i++)box[i]=vertex[i];
+	// for(int i=0;i<4;i++)box[i+4]=vertex[i]*1.1f;
 
 	planet->handler.requestContent(new PlanetElevationRequest(*planet, *this, vertex[4]));
 }
@@ -171,7 +173,6 @@ bool PlanetFace::shouldHaveMiniworld(Camera& c)
 bool PlanetFace::isDetailedEnough(Camera& c)
 {
 	if(depth>MINIWORLD_DETAIL+PLANET_ADDED_DETAIL+1)return true;
-	if(depth<4)return false;
 
 	glm::vec3 p=planet->invModel*c.getPosition(planet->getPosition());
 	if(glm::dot(vertex[0]*0.99f-p,vertex[0])>0.0f
@@ -179,6 +180,10 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	&& glm::dot(vertex[2]*0.99f-p,vertex[2])>0.0f
 	&& glm::dot(vertex[3]*0.99f-p,vertex[3])>0.0f
 	&& glm::dot(vertex[4]*0.99f-p,vertex[4])>0.0f)return true; //backface culling
+
+	if(depth<4)return false;
+
+    // if(!c.isBoxInFrustum(box, 8, glm::mat4(1)))return true; //frustum culling
 	
 	//if (!sons[0])
 		//if(!c.isPointInFrustum(vertex[4]))
@@ -247,7 +252,6 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 			}
 		}
 	}
-
 
 	// face assez détaillé, on l'affiche
 	if(isDetailedEnough(c))
