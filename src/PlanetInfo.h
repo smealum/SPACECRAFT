@@ -7,6 +7,7 @@ class PlanetGenerator;
 class PlanetInfo
 {
 	public:
+		PlanetInfo(const PlanetInfo& p);
 		PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* planetGen);
 		~PlanetInfo();
 
@@ -33,9 +34,14 @@ class PlanetInfo
 				riverDepth;
 
 		SpaceObjectTrajectory* trajectory;
-		float period; //rotation propre
+
+		// Axe de rotation propre
+		glm::vec3 axis;
+		float period;
 		
 		PlanetGenerator* planetGenerator;
+
+
 };
 
 #endif

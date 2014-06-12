@@ -76,7 +76,7 @@ class PlanetFace
 		
 		void deletePlanetFace(PlanetFaceBufferHandler* b);
 		// mise a jour de l'elevation, de la température et de l'humidité
-		void updateElevation(float e, float t, float h);
+		void updateElevation(float e, blockTypes::T tile);
 		bool shouldHaveMiniworld(Camera& c);
 		bool isDetailedEnough(Camera& c);
 		void processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b);
@@ -115,8 +115,7 @@ class PlanetFace
 		int x, z;
 		int bufferID;
 		float elevation;
-		float temperature;
-		float humidity;
+		float tile;
 		float minElevation;
 		
 		uint8_t id;
@@ -132,7 +131,7 @@ class Planet
 	friend class PlanetFace;
 	friend class Chunk;
 	public:
-		Planet(PlanetInfo &pi, class ContentHandler& ch, std::string name);
+		Planet(PlanetInfo *pi, class ContentHandler& ch, std::string name);
 		~Planet(); // TODO faire tous les free
 		
 		void processLevelOfDetail(Camera& c);
@@ -151,7 +150,7 @@ class Planet
 
 		std::string getName(void);
 
-		const PlanetInfo planetInfo; //read only
+		const PlanetInfo* planetInfo; //read only
 		class ContentHandler& handler;
 
 		glm::dvec3 getGravityVector(glm::dvec3 p);
@@ -160,35 +159,13 @@ class Planet
 		glm::vec3 getCameraRelativePosition(Camera& c);
 		glm::dvec3 getCameraRelativeDoublePosition(Camera& c);
 		PlanetFace& getTopLevelForCamera(Camera& c);
-		inline float getElevation(int id, const glm::vec3 &coord)
-		{
-			return generators[id]->getElevation(coord);
-		}
 		
 		void setSunPosition(glm::vec3 p);
 
 		//TEMP
 		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
 
-		// Donne la température en fonction de la position
-		// Prend en compte
-		// 		-l'axe de rotation de la planete
-		//		-perturbation local par un bruit.
-		// 		-la distance de la planete par rapport au soleil (TODO)
-		//		-valeur intrinsèque de la planete (composition) (TODO)
-		// Le résultat est à valeur dans [-1,1]
-		// La position est une position dans le référentiel de la planète.
-		float getTemperature(const glm::vec3& pos);
-
-		// Donne l'humidité en fonction de la position
-		// Prend en compte:
-		//		-perturbation local par un bruit
-		//		-valeur intrinsèque de la planete (composition) (TODO)
-		// Le résultat est à valeur dans [-1,1]
-		// La position est une position dans le référentiel de la planète.
-		float getHumidity(const glm::vec3& pos);
 	private:
-		std::vector<PlanetNoiseGenerator*> generators;
 		std::list<MiniWorld*> miniWorldList;
 		std::string name;
 

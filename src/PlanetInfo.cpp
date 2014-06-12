@@ -1,5 +1,6 @@
 #include "PlanetInfo.h"
 #include "planetGenerator/PlanetGenerator.h"
+#include "utils/dbg.h"
 
 
 PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p):
@@ -25,6 +26,7 @@ PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p):
 	continentHeightScale((1.f - seaLevel) / 4.f),
 	riverDepth(0.0223f),
 	trajectory(t),
+	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
 	period(1.0f),
 	planetGenerator(p)
 {
@@ -34,5 +36,4 @@ PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p):
 //la suppression de trajectory n'est PAS la responsabilité de planetInfo
 PlanetInfo::~PlanetInfo()
 {
-	delete planetGenerator;
 }
