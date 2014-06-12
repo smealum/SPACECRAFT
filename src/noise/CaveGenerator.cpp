@@ -96,7 +96,7 @@ void CaveGenerator::generate()
 	{
 		for (int i = 1; i < segmentCount; i++, yy += 1.f) // first one is fixed
 		{
-			glm::i32vec3 p1 = glm::i32vec3((*points)[i+1]);
+			glm::i32vec3 p1 = glm::i32vec3((*points)[i-1]);
 			glm::i32vec3 p2 = glm::i32vec3((*points)[i]);
 
 			const int radius = 6;

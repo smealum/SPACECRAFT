@@ -2,7 +2,8 @@
 #include "PlanetInfo.h" 
 #include "utils/dbg.h"
 
-PlanetGenerator::PlanetGenerator()
+PlanetGenerator::PlanetGenerator(int n):
+	nbThread(n)
 {
 
 }
@@ -15,9 +16,10 @@ PlanetGenerator::~PlanetGenerator()
 void PlanetGenerator::setPlanetInfo(PlanetInfo* p)
 {
 	planetInfo = p;
+	initGenerators();
 }
 
-float PlanetGenerator::generateWorldData(const chunkVal* data,
+float PlanetGenerator::generateWorldData(int threadId, const chunkVal* data,
 			int w, int h, int d, // array sizes (in chunks)
 			int px, int py, int pz, // offset in world
 			glm::vec3 origin, glm::vec3 v1, glm::vec3 v2) const  // toplevelCharacteristic
@@ -25,9 +27,14 @@ float PlanetGenerator::generateWorldData(const chunkVal* data,
 	return 0.0;
 }
 
-PlanetGeneratorResponse PlanetGenerator::getCharacteristic(const glm::vec3& pos) const
+float PlanetGenerator::getElevation(int threadId, const glm::vec3 &coord) const
 {
-	return {0.0,blockTypes::grass};
+	return generators[threadId]->getElevation(coord);
+}
+
+PlanetGeneratorResponse PlanetGenerator::getCharacteristic(int threadID , const glm::vec3& pos) const
+{
+	return {1.0,blockTypes::grass};
 }
 
 float PlanetGenerator::getTemperature(const glm::vec3& pos) const
@@ -38,4 +45,9 @@ float PlanetGenerator::getTemperature(const glm::vec3& pos) const
 float PlanetGenerator::getHumidity(const glm::vec3& pos) const
 {
 	return 0.0;
+}
+
+void PlanetGenerator::initGenerators()
+{
+
 }

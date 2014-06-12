@@ -1,5 +1,6 @@
 #include "PlanetInfo.h"
 #include "planetGenerator/PlanetGenerator.h"
+#include "utils/dbg.h"
 
 
 PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p):
@@ -35,5 +36,4 @@ PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p):
 //la suppression de trajectory n'est PAS la responsabilité de planetInfo
 PlanetInfo::~PlanetInfo()
 {
-	delete planetGenerator;
 }

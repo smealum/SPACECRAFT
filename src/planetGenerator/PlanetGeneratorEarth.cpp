@@ -1,10 +1,18 @@
 #include "PlanetGeneratorEarth.h"
 #include "PlanetInfo.h" 
 #include "MiniWorld.h"
+#include "utils/dbg.h"
+#include "utils/positionMath.h"
 
-PlanetGeneratorEarth::PlanetGeneratorEarth()
+PlanetGeneratorEarth::PlanetGeneratorEarth(int nbThread):
+	PlanetGenerator(nbThread)
 {
+}
 
+void PlanetGeneratorEarth::initGenerators()
+{
+	for(int i=0;i<nbThread;++i)
+		generators.push_back(new PlanetNoiseGenerator(*planetInfo));
 }
 
 PlanetGeneratorEarth::~PlanetGeneratorEarth()
@@ -17,7 +25,8 @@ void PlanetGeneratorEarth::setPlanetInfo(PlanetInfo* p)
 	planetInfo = p;
 }
 
-float PlanetGeneratorEarth::generateWorldData(const chunkVal* data,
+float PlanetGeneratorEarth::generateWorldData(int threadId,
+			const chunkVal* data,
 			int w, int h, int d, // array sizes (in chunks)
 			int px, int py, int pz, // offset in world
 			glm::vec3 origin, glm::vec3 v1, glm::vec3 v2) const // toplevelCharacteristic
@@ -30,11 +39,10 @@ inline double max(double x, double y)
 	return (x>y)? x : y;
 }
 
-PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(const glm::vec3& pos) const
+PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, const glm::vec3& pos) const
 {
-
-	//double block_height=delevationToBlockHeight(pf->elevation);
-	double block_height = 3.0;
+	double elevation = getElevation(threadId,pos);
+	double block_height=delevationToBlockHeight(elevation);
 
 	float temperature = getTemperature(pos);
 	float humidity = getHumidity(pos);
@@ -65,16 +73,16 @@ PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(const glm::vec3&
 		
 		switch(imax)
 		{
-			case 0: return {0.0,blockTypes::sand};
-			case 1: return {0.0,blockTypes::snow};
-			case 2: return {0.0,blockTypes::stone};
-			case 3: return {0.0,blockTypes::grass};
+			case 0: return {1.0,blockTypes::sand};
+			case 1: return {1.0,blockTypes::snow};
+			case 2: return {1.0,blockTypes::stone};
+			case 3: return {1.0,blockTypes::grass};
 		}
 
 	}
 	else // mer
 	{
-		return {0.0,blockTypes::water};
+		return {1.0,blockTypes::water};
 	}
 }
 

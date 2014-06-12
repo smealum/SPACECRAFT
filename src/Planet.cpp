@@ -332,7 +332,6 @@ static GLuint elements[2*3] = {
 Planet::Planet(PlanetInfo &pi, ContentHandler& ch, std::string name):
 	planetInfo(pi),
 	handler(ch),
-	generators(ch.getMaxProducers()),
 	sunPosition(8.0,0.0,0.0),
 	position(0.0,0.0,0.0),
 	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
@@ -340,7 +339,6 @@ Planet::Planet(PlanetInfo &pi, ContentHandler& ch, std::string name):
 	name(name),
 	atmosphere()
 {
-	for(int i=0;i<ch.getMaxProducers();i++)generators[i] = new PlanetNoiseGenerator(planetInfo);
 	
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i], i);
 	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], PFBH_MAXSIZE, cubeArray[i][1]-cubeArray[i][0], cubeArray[i][3]-cubeArray[i][0]);

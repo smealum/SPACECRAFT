@@ -159,10 +159,6 @@ class Planet
 		glm::vec3 getCameraRelativePosition(Camera& c);
 		glm::dvec3 getCameraRelativeDoublePosition(Camera& c);
 		PlanetFace& getTopLevelForCamera(Camera& c);
-		inline float getElevation(int id, const glm::vec3 &coord)
-		{
-			return generators[id]->getElevation(coord);
-		}
 		
 		void setSunPosition(glm::vec3 p);
 
@@ -170,7 +166,6 @@ class Planet
 		void testFullGeneration(int depth, PlanetFaceBufferHandler* b);
 
 	private:
-		std::vector<PlanetNoiseGenerator*> generators;
 		std::list<MiniWorld*> miniWorldList;
 		std::string name;
 
