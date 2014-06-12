@@ -101,8 +101,9 @@ TrackerPointer<Chunk>* Chunk::getTptr(void)
 }
 
 //même principe que raymarching de http://www.cse.yorku.ca/~amana/research/grid.pdf
-glm::i32vec3 Chunk::performRayMarch(glm::dvec3 localBlockPosf, glm::dvec3 localBlockPosf2, int* dir)
+glm::i32vec3 Chunk::performRayMarch(glm::dvec3 localBlockPosf, glm::dvec3 localBlockPosf2, glm::dvec3* out, bool* done, int* dir)
 {
+    if(done)*done=false;
     glm::i32vec3 cur(localBlockPosf);
     glm::dvec3 u=glm::normalize(localBlockPosf2-localBlockPosf);
     const double d=glm::length(localBlockPosf2-localBlockPosf);
@@ -132,6 +133,7 @@ glm::i32vec3 Chunk::performRayMarch(glm::dvec3 localBlockPosf, glm::dvec3 localB
             // on a parcouru tout v, donc on s'arrête
             // printf("no collision %d %d %d (%f %f %f) %f (%f %f %f)\n\n",cur.x,cur.y,cur.z,localBlockPosf.x,localBlockPosf.y,localBlockPosf.z,d,tMaxX,tMaxY,tMaxZ);
             // printf("no collision %d %d %d (%f %f %f) %f (%f %f %f)\n\n",cur.x,cur.y,cur.z,localBlockPosf2.x,localBlockPosf2.y,localBlockPosf2.z,d,tMaxX,tMaxY,tMaxZ);
+            if(done)*done=true;
             return cur;
         }
         if(tMaxX < tMaxY)
@@ -140,33 +142,34 @@ glm::i32vec3 Chunk::performRayMarch(glm::dvec3 localBlockPosf, glm::dvec3 localB
             {
                 // printf("step X\n");
                 cur.x+=stepX;
-                if(dir)*dir=0;
-                if(cur.x<0 || cur.x>CHUNK_N)return cur;
                 tMaxX+=tDeltaX;
+                if(dir)*dir=0;
+                if(cur.x<0 || cur.x>CHUNK_N){if(out)*out=localBlockPosf+u*tMaxX; return cur;}
             }else{
                 // printf("step Z\n");
                 cur.z+=stepZ;
-                if(dir)*dir=2;
-                if(cur.z<0 || cur.z>CHUNK_N)return cur;
                 tMaxZ+=tDeltaZ;
+                if(dir)*dir=2;
+                if(cur.z<0 || cur.z>CHUNK_N){if(out)*out=localBlockPosf+u*tMaxZ; return cur;}
             }   
         } else {
             if(tMaxY < tMaxZ) {
                 // printf("step Y\n");
                 cur.y+=stepY;
-                if(dir)*dir=1;
-                if(cur.y<0 || cur.y>CHUNK_N)return cur;
                 tMaxY+=tDeltaY;
+                if(dir)*dir=1;
+                if(cur.y<0 || cur.y>CHUNK_N){if(out)*out=localBlockPosf+u*tMaxY; return cur;}
             }else{
                 // printf("step Z\n");
                 cur.z+=stepZ;
-                if(dir)*dir=2;
-                if(cur.z<0 || cur.z>CHUNK_N)return cur;
                 tMaxZ+=tDeltaZ;
+                if(dir)*dir=2;
+                if(cur.z<0 || cur.z>CHUNK_N){if(out)*out=localBlockPosf+u*tMaxZ; return cur;}
             }
         }
     }while(value[cur.z+1][cur.y+1][cur.x+1]==blockTypes::air);
 
+    if(done)*done=true;
     return cur;
 }
 
@@ -196,7 +199,7 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
         if(value[localBlockPosi.z+1][localBlockPosi.y+1][localBlockPosi.x+1]!=blockTypes::air){return ret;}
 
         int dir;
-        glm::i32vec3 cur=performRayMarch(localBlockPosf, localBlockPosf2, &dir);
+        glm::i32vec3 cur=performRayMarch(localBlockPosf, localBlockPosf2, NULL, NULL, &dir);
         if(value[cur.z+1][cur.y+1][cur.x+1]==blockTypes::air)return ret;
         
         glm::dvec3 u=glm::normalize(localBlockPosf2-localBlockPosf);
@@ -248,7 +251,7 @@ bool Chunk::collidePoint(glm::dvec3& p, glm::dvec3& v)
     return ret;
 }
 
-bool Chunk::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir)
+bool Chunk::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, glm::dvec3& out2, bool& done, int& dir)
 {
     glm::dvec3 blockPos=p;
     glm::dvec3 blockPos2=p+v;
@@ -258,15 +261,19 @@ bool Chunk::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir)
     glm::i32vec3 localBlockPosi=glm::i32vec3(floor(blockPos.x)-px,floor(blockPos.y)-py,floor(blockPos.z)-pz);
     // glm::i32vec3 localBlockPosi2=glm::i32vec3(floor(blockPos2.x)-px,floor(blockPos2.y)-py,floor(blockPos2.z)-pz);
     
-    if(localBlockPosf.x<0 || localBlockPosf.y<0 || localBlockPosf.z<0 ||
-        localBlockPosf.x>=CHUNK_N || localBlockPosf.y>=CHUNK_N || localBlockPosf.z>=CHUNK_N)
+    if(localBlockPosf.x<-1 || localBlockPosf.y<-1 || localBlockPosf.z<-1 ||
+        localBlockPosf.x>CHUNK_N || localBlockPosf.y>CHUNK_N || localBlockPosf.z>CHUNK_N)
         return false;
 
     // printf("BLOCK1 %f %f %f\n",blockPos.x,blockPos.y,blockPos.z);
     // printf("BLOCK2 %f %f %f\n",blockPos2.x,blockPos2.y,blockPos2.z);
 
-    out=performRayMarch(localBlockPosf, localBlockPosf2, &dir); //TODO : bug aux bordures de chunks ?
-    if(value[out.z+1][out.y+1][out.x+1]==blockTypes::air)return false;
+    out=performRayMarch(localBlockPosf, localBlockPosf2, &out2, &done, &dir);
+    if(value[out.z+1][out.y+1][out.x+1]==blockTypes::air)
+    {
+        if(!done)out2+=glm::dvec3(px,py,pz);
+        return false;
+    }
 
     dir*=2;
     switch(dir)

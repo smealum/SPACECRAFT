@@ -121,7 +121,7 @@ bool MiniWorld::collidePoint(glm::dvec3& p, glm::dvec3& v)
 	return ret;
 }
 
-Chunk* MiniWorld::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir)
+Chunk* MiniWorld::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, glm::dvec3& out2, bool& done, int& dir)
 {
 	if(p.x<x-1 || p.z<z-1 || p.x>x+CHUNK_N*MINIWORLD_W+1 || p.z>z+CHUNK_N*MINIWORLD_D+1)return NULL;
 	for(int i=0;i<MINIWORLD_W;i++)
@@ -130,7 +130,10 @@ Chunk* MiniWorld::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int
 		{
 			for(int k=0;k<MINIWORLD_D;k++)
 			{
-				if(chunks[i][j][k]->selectBlock(p,v,out,dir))return chunks[i][j][k];
+				done=false;
+				bool ret=chunks[i][j][k]->selectBlock(p,v,out,out2,done,dir);
+				if(ret)return chunks[i][j][k];
+				if(done)return NULL;
 			}
 		}
 	}

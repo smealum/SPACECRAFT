@@ -653,11 +653,22 @@ bool Planet::collidePoint(glm::dvec3 p, glm::dvec3 v, glm::dvec3& out)
 
 Chunk* Planet::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& dir)
 {
-	for(auto it(miniWorldList.begin());it!=miniWorldList.end();++it)
+	//TODO : pareil que collidePoint
+	// printf("in %f %f %f\n",p.x,p.y,p.z);
+	for(int i=0;i<3;i++)
 	{
-		Chunk* ret=(*it)->selectBlock(p,v,out,dir);
-		if(ret)return ret;
+		for(auto it(miniWorldList.begin());it!=miniWorldList.end();++it)
+		{
+			glm::dvec3 out2=p;
+			bool done;
+			Chunk* ret=(*it)->selectBlock(p,v,out,out2,done,dir);
+			if(ret)return ret;
+			else if(done)return NULL;
+			v-=out2-p;
+			p=out2;
+		}
 	}
+	// printf("out %f %f %f\n",p.x,p.y,p.z);
 	return NULL;
 }
 
