@@ -109,8 +109,10 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 					auto holes = caves.getHolesList(px+i+cx*(CHUNK_N),pz+k+cz*(CHUNK_N));
 					for(auto it = holes.begin(); it!=holes.end();++it)
 					{
-						//if (it->second > caveHeightMax) break;
-						//if (it->first  < caveHeightMin) continue;
+						if (it->first  < caveHeightMin) continue;
+						if (it->second > caveHeightMax) break;
+						log_info("%d %d %d %d", it->first, it->second, caveHeightMin, caveHeightMax);
+
 						for(int i=it->first;i<=it->second;++i)
 						{
 							int y = (i % CHUNK_N)+1;
