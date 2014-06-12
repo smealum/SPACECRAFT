@@ -502,6 +502,7 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 	shader.setUniform("v2", v2);
 	shader.setUniform("lightdir", lightdir);
 	shader.setUniform("planetPos", planetFace.planet->position-c.getReference());
+	shader.setUniform("cameraPos", c.getPosition(planetFace.planet->position));
 	shader.setUniform("model", glm::mat4(planetFace.planet->model));
 
 	// //planetface_atmosphere test

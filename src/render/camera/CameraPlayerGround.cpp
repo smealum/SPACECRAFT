@@ -46,7 +46,9 @@ void CameraPlayerGround::update(Camera& camera)
 		const double tS=3.0*delta;
 		const double gS=0.5*delta;
 		const double jS=0.3;
-		const float rS=1.5*delta;
+		float rS=1.5*delta;
+
+		if (Input::isKeyHold(GLFW_KEY_LEFT_SHIFT))rS/=20.0f;
 
 		// rotation
 		if (Input::isKeyHold(GLFW_KEY_K))localView = glm::dmat3(glm::mat3(glm::rotate(glm::mat4(1.0f),rS,glm::vec3(1.0,0.0,0.0))))*localView;

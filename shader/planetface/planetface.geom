@@ -1,6 +1,7 @@
 #version 330
 
-#define logDepth(v) vec4(v.xy,(log2(max(1e-6,1.0+v.w))*logconst-1.0)*v.w,v.w)
+#define logDepthZ(v) ((log2(max(1e-6,1.0+v.w))*logconst-1.0)*v.w)
+#define logDepth(v) vec4(v.xy,logDepthZ(v),v.w)
 
 layout(points) in;
 layout(triangle_strip, max_vertices = 20) out;
@@ -9,6 +10,7 @@ uniform mat4 model, view, proj;
 uniform float logconst, zfar;
 uniform vec3 lightdir;
 uniform vec3 planetPos;
+uniform vec3 cameraPos;
 
 in vec3 pos[];
 flat in int gtopTile[];
@@ -51,11 +53,17 @@ void main()
 	v[7]=model*vec4(gelevation[0]*normalize(pos[0]+v1+v2),1.0);
 
 	const float ambient=0.0;
+	vec3 n1=normalize(vec3(v[0]-v[1]));
+	vec3 n2=normalize(vec3(v[0]-v[2]));
+	
 	c[0]=max(dot(lightdir,normalize(vec3(v[0]))),0.0)+ambient;
-	c[1]=max(dot(lightdir,normalize(vec3(v[0]-v[1]))),0.0)+ambient;
-	c[2]=max(dot(lightdir,normalize(vec3(v[1]-v[0]))),0.0)+ambient;
-	c[3]=max(dot(lightdir,normalize(vec3(v[0]-v[2]))),0.0)+ambient;
-	c[4]=max(dot(lightdir,normalize(vec3(v[2]-v[0]))),0.0)+ambient;
+	c[1]=max(dot(lightdir,n1),0.0)+ambient;
+	c[2]=max(-dot(lightdir,n1),0.0)+ambient;
+	c[3]=max(dot(lightdir,n2),0.0)+ambient;
+	c[4]=max(-dot(lightdir,n2),0.0)+ambient;
+
+	bool drawLeft=dot(n1,vec3(v[0])-cameraPos)<0;
+	bool drawFront=dot(n2,vec3(v[0])-cameraPos)<0;
 
     mat4 projview = proj * view;
     v[0] = projview * (vec4(planetPos,0.0)+v[0]);
@@ -73,18 +81,6 @@ void main()
     c[2] += (gelevation[0]-1.00)*400.0;
     c[3] += (gelevation[0]-1.00)*400.0;
     c[4] += (gelevation[0]-1.00)*400.0;
-	
-    /*
-	mat4 projView = proj*view;
-	v[0]=projView*(vec4(planetPos,1.0)+v[0]);
-	v[1]=projView*(vec4(planetPos,1.0)+v[1]);
-	v[2]=projView*(vec4(planetPos,1.0)+v[2]);
-	v[3]=projView*(vec4(planetPos,1.0)+v[3]);
-	v[4]=projView*(vec4(planetPos,1.0)+v[4]);
-	v[5]=projView*(vec4(planetPos,1.0)+v[5]);
-	v[6]=projView*(vec4(planetPos,1.0)+v[6]);
-	v[7]=projView*(vec4(planetPos,1.0)+v[7]);
-    */
 
     /*
 	  6-------7
@@ -94,9 +90,7 @@ void main()
 	| 2-----|-3
 	|/      |/
 	0-------1
-
-	*/
-    
+	*/    
 
 	ftile = gtopTile[0];
 
@@ -110,13 +104,9 @@ void main()
 
 	ftile = gsideTile[0];
 
-	//TEMP : heuristique en carton
-	bool drawLeft=v[0].z<v[1].z;
-	bool drawFront=v[0].z<v[2].z;
-
-	// LEFT FACE
 	if(drawLeft)
 	{
+		// LEFT FACE
 		fluminosity = c[1];
 		gl_Position = logDepth(v[0]); ftexCoords = vec2(1.0,1.0); EmitVertex();
 		gl_Position = logDepth(v[2]); ftexCoords = vec2(0.0,1.0); EmitVertex();
@@ -124,7 +114,7 @@ void main()
 		gl_Position = logDepth(v[6]); ftexCoords = vec2(0.0,0.0); EmitVertex();
 		EndPrimitive();
 	}else{
-	// RIGHT FACE
+		// RIGHT FACE
 		fluminosity = c[2];
 		gl_Position = logDepth(v[3]); ftexCoords = vec2(1.0,1.0); EmitVertex();
 		gl_Position = logDepth(v[1]); ftexCoords = vec2(0.0,1.0); EmitVertex();
@@ -133,9 +123,9 @@ void main()
 		EndPrimitive();
 	}
 
-	// FRONT FACE
 	if(drawFront)
 	{
+		// FRONT FACE
 		fluminosity = c[3];
 		gl_Position = logDepth(v[1]); ftexCoords = vec2(1.0,1.0); EmitVertex();
 		gl_Position = logDepth(v[0]); ftexCoords = vec2(0.0,1.0); EmitVertex();
@@ -143,7 +133,7 @@ void main()
 		gl_Position = logDepth(v[4]); ftexCoords = vec2(0.0,0.0); EmitVertex();
 		EndPrimitive();
 	}else{
-	// BACK FACE
+		// BACK FACE
 		fluminosity = c[4];
 		gl_Position = logDepth(v[2]); ftexCoords = vec2(1.0,1.0); EmitVertex();
 		gl_Position = logDepth(v[3]); ftexCoords = vec2(0.0,1.0); EmitVertex();
