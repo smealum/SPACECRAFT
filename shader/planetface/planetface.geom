@@ -110,38 +110,46 @@ void main()
 
 	ftile = gsideTile[0];
 
+	//TEMP : heuristique en carton
+	bool drawLeft=v[0].z<v[1].z;
+	bool drawFront=v[0].z<v[2].z;
+
 	// LEFT FACE
-	fluminosity = c[1];
-	gl_Position = logDepth(v[0]); ftexCoords = vec2(1.0,1.0); EmitVertex();
-	gl_Position = logDepth(v[2]); ftexCoords = vec2(0.0,1.0); EmitVertex();
-	gl_Position = logDepth(v[4]); ftexCoords = vec2(1.0,0.0); EmitVertex();
-	gl_Position = logDepth(v[6]); ftexCoords = vec2(0.0,0.0); EmitVertex();
-	EndPrimitive();
-
-
+	if(drawLeft)
+	{
+		fluminosity = c[1];
+		gl_Position = logDepth(v[0]); ftexCoords = vec2(1.0,1.0); EmitVertex();
+		gl_Position = logDepth(v[2]); ftexCoords = vec2(0.0,1.0); EmitVertex();
+		gl_Position = logDepth(v[4]); ftexCoords = vec2(1.0,0.0); EmitVertex();
+		gl_Position = logDepth(v[6]); ftexCoords = vec2(0.0,0.0); EmitVertex();
+		EndPrimitive();
+	}else{
 	// RIGHT FACE
-	fluminosity = c[2];
-	gl_Position = logDepth(v[3]); ftexCoords = vec2(1.0,1.0); EmitVertex();
-	gl_Position = logDepth(v[1]); ftexCoords = vec2(0.0,1.0); EmitVertex();
-	gl_Position = logDepth(v[7]); ftexCoords = vec2(1.0,0.0); EmitVertex();
-	gl_Position = logDepth(v[5]); ftexCoords = vec2(0.0,0.0); EmitVertex();
-	EndPrimitive();
+		fluminosity = c[2];
+		gl_Position = logDepth(v[3]); ftexCoords = vec2(1.0,1.0); EmitVertex();
+		gl_Position = logDepth(v[1]); ftexCoords = vec2(0.0,1.0); EmitVertex();
+		gl_Position = logDepth(v[7]); ftexCoords = vec2(1.0,0.0); EmitVertex();
+		gl_Position = logDepth(v[5]); ftexCoords = vec2(0.0,0.0); EmitVertex();
+		EndPrimitive();
+	}
 
 	// FRONT FACE
-	fluminosity = c[3];
-	gl_Position = logDepth(v[1]); ftexCoords = vec2(1.0,1.0); EmitVertex();
-	gl_Position = logDepth(v[0]); ftexCoords = vec2(0.0,1.0); EmitVertex();
-	gl_Position = logDepth(v[5]); ftexCoords = vec2(1.0,0.0); EmitVertex();
-	gl_Position = logDepth(v[4]); ftexCoords = vec2(0.0,0.0); EmitVertex();
-	EndPrimitive();
-
-
+	if(drawFront)
+	{
+		fluminosity = c[3];
+		gl_Position = logDepth(v[1]); ftexCoords = vec2(1.0,1.0); EmitVertex();
+		gl_Position = logDepth(v[0]); ftexCoords = vec2(0.0,1.0); EmitVertex();
+		gl_Position = logDepth(v[5]); ftexCoords = vec2(1.0,0.0); EmitVertex();
+		gl_Position = logDepth(v[4]); ftexCoords = vec2(0.0,0.0); EmitVertex();
+		EndPrimitive();
+	}else{
 	// BACK FACE
-	fluminosity = c[4];
-	gl_Position = logDepth(v[2]); ftexCoords = vec2(1.0,1.0); EmitVertex();
-	gl_Position = logDepth(v[3]); ftexCoords = vec2(0.0,1.0); EmitVertex();
-	gl_Position = logDepth(v[6]); ftexCoords = vec2(1.0,0.0); EmitVertex();
-	gl_Position = logDepth(v[7]); ftexCoords = vec2(0.0,0.0); EmitVertex();
-	EndPrimitive();
+		fluminosity = c[4];
+		gl_Position = logDepth(v[2]); ftexCoords = vec2(1.0,1.0); EmitVertex();
+		gl_Position = logDepth(v[3]); ftexCoords = vec2(0.0,1.0); EmitVertex();
+		gl_Position = logDepth(v[6]); ftexCoords = vec2(1.0,0.0); EmitVertex();
+		gl_Position = logDepth(v[7]); ftexCoords = vec2(0.0,0.0); EmitVertex();
+		EndPrimitive();
+	}
 	
 }
