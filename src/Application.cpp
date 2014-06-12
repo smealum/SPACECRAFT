@@ -36,101 +36,101 @@ inline void TwWindowSizeGLFW3(GLFWwindow* /*window*/, int width, int height)
 
 void TW_CALL reloadAllShaders(void * /*clientData*/)
 {
-    for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
-    {
-        it->second->load();
-    }
+	for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
+	{
+		it->second->load();
+	}
 }
 #endif
 blockTypes::T tmp_type;
 
 Application::Application() : 
-    state(appReady),
-    fullscreen(false),
-    vsync(false),
-    active(true),
-    wireframe(false),
+	state(appReady),
+	fullscreen(false),
+	vsync(false),
+	active(true),
+	wireframe(false),
 #ifndef NTWBAR
-    bar(NULL),
+	bar(NULL),
 #endif
-    width(800),
-    height(600),
-    viewWidth(width),
-    viewHeight(height),
-    window(NULL),
-    camera(NULL),
-    bgColor{0.0f, 0.0f, 0.0f},
-    contentHandler(NUMPRODUCERS),
-    deltaTime(0.f),
-    time(0.f),
-    fps(0.f),
-    fpsCounter(0)
+	width(800),
+	height(600),
+	viewWidth(width),
+	viewHeight(height),
+	window(NULL),
+	camera(NULL),
+	bgColor{0.0f, 0.0f, 0.0f},
+	contentHandler(NUMPRODUCERS),
+	deltaTime(0.f),
+	time(0.f),
+	fps(0.f),
+	fpsCounter(0)
 {
 	// glCheckError("Flush Previous Errors");
 
-    if (!glfwInit())
-    {
-        log_err("Cannot initialize glfw3...");
-        std::exit(1);
-    }
+	if (!glfwInit())
+	{
+		log_err("Cannot initialize glfw3...");
+		std::exit(1);
+	}
 
-    glfwWindowHints();
+	glfwWindowHints();
 
-    createWindowInFullscreen(fullscreen);
+	createWindowInFullscreen(fullscreen);
 
-    glfwMakeContextCurrent(window);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // can be GLFW_CURSOR_HIDDEN
+	glfwMakeContextCurrent(window);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // can be GLFW_CURSOR_HIDDEN
 
-    #ifndef NTWBAR
-        TwInit(TW_OPENGL_CORE, NULL);
-    #endif
+#ifndef NTWBAR
+	TwInit(TW_OPENGL_CORE, NULL);
+#endif
 
 	glCheckError("Context creation Errors");
 
-    // transparency
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// transparency
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glCheckError("GL State initialisation");
 
-    #ifndef NTWBAR
-        bar = TwNewBar("SPACECRAFT");
-        //TwDefine((name+" iconified=true").c_str()); // minimizes
-        TwWindowSize(width, height);
-        TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
-        TwAddVarRW(bar, "Planet LOD Details", TW_TYPE_FLOAT, &PlanetFaceDetailsPower, " label='Planet LOD' min=5.0 max=60.0 step=1");
-		TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
-        TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
-        TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
-        TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
-		tmp_type = blockTypes::sand;
-		TwAddVarRW(bar, "blockType", TW_TYPE_INT32, (int*)&tmp_type, "label='type of the underwater block'");
+#ifndef NTWBAR
+	bar = TwNewBar("SPACECRAFT");
+	//TwDefine((name+" iconified=true").c_str()); // minimizes
+	TwWindowSize(width, height);
+	TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
+	TwAddVarRW(bar, "Planet LOD Details", TW_TYPE_FLOAT, &PlanetFaceDetailsPower, " label='Planet LOD' min=5.0 max=60.0 step=1");
+	TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
+	TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
+	TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
+	TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
+	tmp_type = blockTypes::sand;
+	TwAddVarRW(bar, "blockType", TW_TYPE_INT32, (int*)&tmp_type, "label='type of the underwater block'");
 
-        // vsync on
-        glfwSwapInterval(vsync);
+	// vsync on
+	glfwSwapInterval(vsync);
 
-        // Set GLFW event callbacks
-        // - Redirect window size changes to the callback function WindowSizeCB
-        glfwSetWindowSizeCallback(window, (GLFWwindowposfun)TwWindowSizeGLFW3);
+	// Set GLFW event callbacks
+	// - Redirect window size changes to the callback function WindowSizeCB
+	glfwSetWindowSizeCallback(window, (GLFWwindowposfun)TwWindowSizeGLFW3);
 
-        glfwSetMouseButtonCallback(window, (GLFWmousebuttonfun)TwEventMouseButtonGLFW3);
-        glfwSetCursorPosCallback(window, (GLFWcursorposfun)TwEventMousePosGLFW3);
-        glfwSetScrollCallback(window, (GLFWscrollfun)TwEventMouseWheelGLFW3);
-        glfwSetKeyCallback(window, (GLFWkeyfun)TwEventKeyGLFW3);
-        glfwSetCharCallback(window, (GLFWcharfun)TwEventCharGLFW3);
-	
-		glCheckError("tweak bar");
-    #endif
+	glfwSetMouseButtonCallback(window, (GLFWmousebuttonfun)TwEventMouseButtonGLFW3);
+	glfwSetCursorPosCallback(window, (GLFWcursorposfun)TwEventMousePosGLFW3);
+	glfwSetScrollCallback(window, (GLFWscrollfun)TwEventMouseWheelGLFW3);
+	glfwSetKeyCallback(window, (GLFWkeyfun)TwEventKeyGLFW3);
+	glfwSetCharCallback(window, (GLFWcharfun)TwEventCharGLFW3);
 
-    glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_NO_ERROR)
-    {
-        log_err("Cannot initialize GLEW...");
-        glfwTerminate();
-        std::exit(1);
-    }
+	glCheckError("tweak bar");
+#endif
+
+	glewExperimental = GL_TRUE;
+	if (glewInit() != GLEW_NO_ERROR)
+	{
+		log_err("Cannot initialize GLEW...");
+		glfwTerminate();
+		std::exit(1);
+	}
 
 	glCheckError("GLEWInit Errors");
 
@@ -139,35 +139,35 @@ Application::Application() :
 
 void Application::glfwWindowHints()
 {
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
 }
 
 void Application::createWindowInFullscreen(bool fs)
 {
-    if (window)
-    {
-        log_err("createWindowInFullscreen called but windows is alreayd created.");
-    } else {
-        const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        width = mode->width;
-        height = mode->height;
-        viewWidth = width;
-        viewHeight = height;
-        if (!fs)
-            width *= 2.f/3.f, height *= 2.f/3.f;
-        window = glfwCreateWindow(width, height, WIN_TITLE, fs?glfwGetPrimaryMonitor():NULL, NULL); // Windowed
-        if (!window) {
-            log_err("Cannot create window...");
-            glfwTerminate();
-            std::exit(2);
-        }
-	glfwSetCursorPos(window, width/2, height/2);
-    }
+	if (window)
+	{
+		log_err("createWindowInFullscreen called but windows is alreayd created.");
+	} else {
+		const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		width = mode->width;
+		height = mode->height;
+		viewWidth = width;
+		viewHeight = height;
+		if (!fs)
+			width *= 2.f/3.f, height *= 2.f/3.f;
+		window = glfwCreateWindow(width, height, WIN_TITLE, fs?glfwGetPrimaryMonitor():NULL, NULL); // Windowed
+		if (!window) {
+			log_err("Cannot create window...");
+			glfwTerminate();
+			std::exit(2);
+		}
+		glfwSetCursorPos(window, width/2, height/2);
+	}
 }
 
 CaveGenerator caves;
@@ -178,46 +178,46 @@ int testTextureArray;
 
 void Application::run()
 {
-    BlockType::getInstance(); // TODO can be deleted when used
-    state = appInLoop;
-    camera = new Camera(0.0000001f, 100.0f);
-    camera->view = glm::lookAt(
-            glm::vec3(1.5, 1.5f, 1.5f),
-            glm::vec3(0.f),
-            glm::vec3(0, 1.f, 0.f)
-            );
-    camera->setCameraManager(new CameraKeyboardMouse());
+	BlockType::getInstance(); // TODO can be deleted when used
+	state = appInLoop;
+	camera = new Camera(0.0000001f, 100.0f);
+	camera->view = glm::lookAt(
+			glm::vec3(1.5, 1.5f, 1.5f),
+			glm::vec3(0.f),
+			glm::vec3(0, 1.f, 0.f)
+			);
+	camera->setCameraManager(new CameraKeyboardMouse());
 
-    tt=new testShaders;
-    testSolarSystem=new SolarSystem(contentHandler);
-    testCursor=new Cursor();
+	tt=new testShaders;
+	testSolarSystem=new SolarSystem(contentHandler);
+	testCursor=new Cursor();
 
 	testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
-    testTextureArray=TextureManager::getInstance().loadTextureArray("data/blocksPackArray.png",16,16);
+	testTextureArray=TextureManager::getInstance().loadTextureArray("data/blocksPackArray.png",16,16);
 	caves.generate();
 
-    float timeA;
-    char titleBuff[512];
-    while (state != appExiting)
-    {
-        while(!glfwWindowShouldClose(window))
-        {
-            timeA = (float)glfwGetTime();
-            loop();
-            fpsCounter++;
-            deltaTime = (float)glfwGetTime() - timeA;
-            time += deltaTime;
-            if (time > 1.f)
-            {
-                fps = (float)fpsCounter/time;
-                fpsCounter = 0;
-                time = 0.f;
-                // updating title to have FPS
-                sprintf(titleBuff, "%s FPS: %.1f", WIN_TITLE, fps);
-                glfwSetWindowTitle(window, titleBuff);
-            }
+	float timeA;
+	char titleBuff[512];
+	while (state != appExiting)
+	{
+		while(!glfwWindowShouldClose(window))
+		{
+			timeA = (float)glfwGetTime();
+			loop();
+			fpsCounter++;
+			deltaTime = (float)glfwGetTime() - timeA;
+			time += deltaTime;
+			if (time > 1.f)
+			{
+				fps = (float)fpsCounter/time;
+				fpsCounter = 0;
+				time = 0.f;
+				// updating title to have FPS
+				sprintf(titleBuff, "%s FPS: %.1f", WIN_TITLE, fps);
+				glfwSetWindowTitle(window, titleBuff);
+			}
 			BlockAnimated::animation(deltaTime);
-        }
+		}
 
 		// test des ereurs openGL non reporté:
 		{
@@ -225,7 +225,7 @@ void Application::run()
 			if (i++%30)
 				glCheckError("Unreported Error");
 		}
-    }
+	}
 
 }
 
@@ -234,53 +234,53 @@ float globalTime=0.0f;
 
 void Application::loop()
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(window, GL_TRUE);
-        state = appExiting;
-    }
-	
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, GL_TRUE);
+		state = appExiting;
+	}
 
-    Input::update(window);
 
-    testSolarSystem->update(globalTime);
-    camera->update();
+	Input::update(window);
 
-    glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	testSolarSystem->update(globalTime);
+	camera->update();
 
-    glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
-    testSolarSystem->draw(*camera);
-    testCursor->draw(*camera);
+	glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if(Input::isKeyHold(GLFW_KEY_N))reloadAllShaders(NULL);
-    if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.001f;
-    if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.001f;
+	glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
+	testSolarSystem->draw(*camera);
+	testCursor->draw(*camera);
 
-    // printf("test %d\n",testVal);
-    testVal=0;
+	if(Input::isKeyHold(GLFW_KEY_N))reloadAllShaders(NULL);
+	if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.001f;
+	if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.001f;
 
-    contentHandler.handleNewContent();
+	// printf("test %d\n",testVal);
+	testVal=0;
 
-    #ifndef NTWBAR
-        // Draw tweak bars (or don't)
-        glUseProgram(0);
-        glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		// TwDraw();
-    #endif
+	contentHandler.handleNewContent();
 
-    glfwSwapBuffers(window);
-    glfwPollEvents();
+#ifndef NTWBAR
+	// Draw tweak bars (or don't)
+	glUseProgram(0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	TwDraw();
+#endif
+
+	glfwSwapBuffers(window);
+	glfwPollEvents();
 
 }
 
 Application::~Application()
 {
-    #ifndef NTWBAR
-        TwTerminate();
-    #endif
-    glfwTerminate();
+#ifndef NTWBAR
+	TwTerminate();
+#endif
+	glfwTerminate();
 }
