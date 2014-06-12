@@ -63,6 +63,7 @@ void CaveGenerator::generate()
 
 	log_info("[Grotte] Constructing path");
 
+	const int radius = 6;
 	for (auto points(conPoints.begin()); points != conPoints.end(); ++points) // for every starting point
 	{
 		zz++;
@@ -82,6 +83,14 @@ void CaveGenerator::generate()
 
 			glm::vec3 res = (*points)[0] + glm::mat3_cast(qq)*v;
 			// debug("res: %s", glm::to_string(res).c_str());
+			
+			// si le point est hors du chunk
+			if (
+					res.x<radius or res.x>CAVE_CHUNK_SIZE_X-radius or
+					res.y<radius or res.y>CAVE_CHUNK_SIZE_Y-radius or
+					res.z<radius or res.z>CAVE_CHUNK_SIZE_Z-radius
+				)
+			continue;
 
 			// finally add it to the control points
 			points->push_back(res);
@@ -94,12 +103,12 @@ void CaveGenerator::generate()
 	// We must calculate the normal of the direction
 	for (auto points(conPoints.begin()); points != conPoints.end(); ++points) // for every starting point
 	{
-		for (int i = 1; i < segmentCount; i++, yy += 1.f) // first one is fixed
+		int seg = points->size();
+		for (int i = 1; i < seg; i++, yy += 1.f) // first one is fixed
 		{
-			glm::i32vec3 p1 = glm::i32vec3((*points)[i+1]);
+			glm::i32vec3 p1 = glm::i32vec3((*points)[i-1]);
 			glm::i32vec3 p2 = glm::i32vec3((*points)[i]);
 
-			const int radius = 6;
 			for(int i=-radius;i<=radius;++i)
 			for(int j=-radius;j<=radius;++j)
 			for(int k=-radius;k<=radius;++k)
@@ -257,7 +266,9 @@ void CaveGenerator::computeList()
 
 list<pair<int,int> >& CaveGenerator::getHolesList(int x, int z)
 {
-	int xx = (x%(2*CAVE_CHUNK_SIZE_X)); if (xx>=CAVE_CHUNK_SIZE_X) xx=2*CAVE_CHUNK_SIZE_X-xx-1;
-	int zz = (z%(2*CAVE_CHUNK_SIZE_Z)); if (zz>=CAVE_CHUNK_SIZE_Z) zz=2*CAVE_CHUNK_SIZE_Z-zz-1;
+	//int xx = (x%(2*CAVE_CHUNK_SIZE_X)); if (xx>=CAVE_CHUNK_SIZE_X) xx=2*CAVE_CHUNK_SIZE_X-xx-1;
+	//int zz = (z%(2*CAVE_CHUNK_SIZE_Z)); if (zz>=CAVE_CHUNK_SIZE_Z) zz=2*CAVE_CHUNK_SIZE_Z-zz-1;
+	int xx=x%CAVE_CHUNK_SIZE_X;
+	int zz=z%CAVE_CHUNK_SIZE_Z;
 	return holes[xx+CAVE_CHUNK_SIZE_X*zz];
 }

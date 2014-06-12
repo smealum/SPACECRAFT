@@ -3,10 +3,12 @@
 
 #include "SpaceObjectTrajectory.h"
 
+class PlanetGenerator;
 class PlanetInfo
 {
 	public:
-		PlanetInfo(SpaceObjectTrajectory* t);
+		PlanetInfo(const PlanetInfo& p);
+		PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* planetGen);
 		~PlanetInfo();
 
 		int seed;
@@ -32,7 +34,14 @@ class PlanetInfo
 				riverDepth;
 
 		SpaceObjectTrajectory* trajectory;
-		float period; //rotation propre
+
+		// Axe de rotation propre
+		glm::vec3 axis;
+		float period;
+		
+		PlanetGenerator* planetGenerator;
+
+
 };
 
 #endif

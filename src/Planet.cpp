@@ -6,6 +6,7 @@
 #include "glm/gtc/noise.hpp"
 #include "world/BlockType.h"
 #include "utils/positionMath.h"
+#include "world/BlockType.h"
 
 
 using namespace std;
@@ -27,8 +28,6 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id):
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
-	temperature(0.0f),
-	humidity(0.0f),
 	minElevation(elevation-0.01f),
 	elevated(false),
 	id(5+id),
@@ -52,8 +51,6 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
-	temperature(0.0f),
-	humidity(0.0f),
 	elevated(false),
 	id(id),
 	bufferID(-1),
@@ -143,12 +140,11 @@ void PlanetFace::finalize(void)
 }
 
 // mise a jour de l'elevation, de la température et de l'humidité
-void PlanetFace::updateElevation(float e, float t, float h)
+void PlanetFace::updateElevation(float e, blockTypes::T t)
 {
 	elevation=e;
+	tile = t;
 	minElevation=e-2.0f/(1<<depth);
-	temperature=t;
-	humidity=h;
 	elevated=true;
 }
 
@@ -333,18 +329,15 @@ static GLuint elements[2*3] = {
     0,1,2,      0,2,3, // face 1
 };
 
-Planet::Planet(PlanetInfo &pi, ContentHandler& ch, std::string name):
+Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name):
 	planetInfo(pi),
 	handler(ch),
-	generators(ch.getMaxProducers()),
 	sunPosition(8.0,0.0,0.0),
 	position(0.0,0.0,0.0),
-	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
 	angle(0.0),
 	name(name),
 	atmosphere()
 {
-	for(int i=0;i<ch.getMaxProducers();i++)generators[i] = new PlanetNoiseGenerator(planetInfo);
 	
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i], i);
 	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], PFBH_MAXSIZE, cubeArray[i][1]-cubeArray[i][0], cubeArray[i][3]-cubeArray[i][0]);
@@ -419,60 +412,9 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	faces.push_back(pf);
 	const glm::vec3 n=pf->uvertex[4];
 
-	double block_height=delevationToBlockHeight(pf->elevation);
+	int topTile = getBlockID(pf->tile,blockPlane::top);
+	int sideTile = getBlockID(pf->tile,blockPlane::side);
 
-	int topTile,sideTile;
-	if (block_height>double(CHUNK_N*MINIWORLD_H)*0.5) //  terre
-	{
-		// e > 0
-		float e = (pf->elevation - 1.001) * 1000.f ;
-
-		float sandCoef = 4.0*pf->temperature + 1.4*e - pf->humidity;
-		float snowCoef = -2.0*pf->temperature+ 1.4*e + 0.3*pf->humidity;
-		float stoneCoef = snowCoef+0.01 - 0.1*pf->humidity;
-		float grassCoef = 0.05 + 2.0*abs(pf->humidity);
-
-		// inihibition
-		// (pas de sable près de l'eau)
-		if (e<0.05) sandCoef = 0.0;
-		// (A partir d'un moment la neige recouvre les cailloux
-		stoneCoef = max(stoneCoef,0.8);
-
-	
-		// on choisit le plus grand
-		int imax=0;int vmax=sandCoef;
-		if (vmax<snowCoef) {vmax=snowCoef;imax=1;}
-		if (vmax<stoneCoef) {vmax=stoneCoef;imax=2;}
-		if (vmax<grassCoef) {vmax=grassCoef;imax=3;}
-		
-		
-		switch(imax)
-		{
-			case 0:  topTile = blockTypes::sand-1;
-			        sideTile = blockTypes::sand-1;
-					break;
-			case 1:  topTile = blockTypes::snow-1;
-			        sideTile = blockTypes::snow-1;
-					break;
-			case 2:  topTile = blockTypes::stone-1;
-			        sideTile = blockTypes::stone-1;
-					break;
-			case 3:  topTile = blockTypes::grass-1;
-			        sideTile = blockTypes::grass_side-1;
-					break;
-		}
-
-	}
-	else // mer
-	{
-		// water
-		topTile = blockTypes::water-1;
-		sideTile = blockTypes::water-1;
-
-		// sand
-		//topTile = 18;
-		//sideTile = 18;
-	}
 
 	float repeat;
 	//if (pf->depth < MINIWORLD_DETAIL)
@@ -700,32 +642,13 @@ void Planet::deleteBlock(glm::i32vec3 p)
 
 void Planet::update(float time)
 {
-	if(planetInfo.trajectory)position=planetInfo.trajectory->getPosition(time);
-	angle=time*2*PI/planetInfo.period;
+	if(planetInfo->trajectory)position=planetInfo->trajectory->getPosition(time);
+	angle=time*2*PI/planetInfo->period;
 
-	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,axis));
+	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,planetInfo->axis));
 	invModel=glm::transpose(model);
 }
 
-float Planet::getTemperature(const glm::vec3& pos)
-{
-	float distanceToEquatorFactor = 1.0-2.0*abs(
-			glm::dot(
-				glm::normalize(pos),
-				glm::normalize(axis)
-		 ));
-	float noise1 = glm::simplex(pos*10.f) * 0.5;
-	float noise2 = glm::simplex(pos*100.f) * 0.05;
-
-	return glm::clamp(distanceToEquatorFactor+noise1+noise2,-1.f,1.f);
-}
-
-float Planet::getHumidity(const glm::vec3& pos)
-{
-	float noise = glm::simplex(pos*2.f) *  1.4;
-	
-	return glm::clamp(noise,-1.f,1.f);
-}
 glm::vec3 PlanetFace::getOrigin(void)
 {
 	return uvertex[0];
