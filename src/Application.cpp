@@ -272,8 +272,16 @@ void Application::loop()
 	testCursor->draw(*camera);
 
 	if(Input::isKeyPressed(GLFW_KEY_N))reloadAllShaders();
-	if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.001f;
-    if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.001f;
+
+    if(Input::isKeyHold(GLFW_KEY_LEFT_SHIFT))
+    {
+        if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.1f;
+        if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.1f;
+    }else{
+    	if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.001f;
+        if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.001f;
+    }
+
     if(Input::isKeyPressed(GLFW_KEY_V))testBool1^=1;
 	if(Input::isKeyPressed(GLFW_KEY_B))testBool2^=1;
 
