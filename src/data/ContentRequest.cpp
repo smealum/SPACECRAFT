@@ -194,7 +194,7 @@ bool WorldChunkRequest::isRelevant(int id)
 void WorldChunkRequest::process(int id)
 {
 	generateWorldData(id, planet, (chunkVal*)data, 1, 1, 1, px, py, pz, origin, v1, v2);
-	computeChunkFaces((chunkVal*)data, 1, 1, 1, 0, 0, 0, px, py, pz, vArray);
+	// computeChunkFaces((chunkVal*)data, 1, 1, 1, 0, 0, 0, px, py, pz, vArray);
 }
 
 void WorldChunkRequest::update(void)
@@ -244,7 +244,7 @@ void MiniWorldDataRequest::process(int id)
 	for(int i=0;i<MINIWORLD_W;i++)
 		for(int j=0;j<MINIWORLD_H;j++)
 			for(int k=0;k<MINIWORLD_D;k++)
-				computeChunkFaces((chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, i, j, k, px+i*CHUNK_N, py+j*CHUNK_N, pz+k*CHUNK_N, vArray[i][j][k]);
+				computeChunkFaces((chunkVal*)data, MINIWORLD_W, MINIWORLD_H, MINIWORLD_D, i, j, k, px+i*CHUNK_N, py+j*CHUNK_N, pz+k*CHUNK_N, origin, v1, v2, vArray[i][j][k]);
 }
 
 void MiniWorldDataRequest::update(void)

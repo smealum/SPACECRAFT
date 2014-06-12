@@ -12,7 +12,7 @@ set_option(CMAKE_BUILD_TYPE RELEASE STRING "DEBUG: -g, RELEASE: -O3")
 
 if (CMAKE_BUILD_TYPE MATCHES "RELEASE")
   add_definitions(-DNDEBUG)
-  add_definitions(-DNTWBAR)
+  #add_definitions(-DNTWBAR)
 endif()
 
 project(spacecraft)

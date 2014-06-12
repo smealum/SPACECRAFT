@@ -14,6 +14,7 @@ void computeChunkFaces(chunkVal* data,
 		int w, int h, int d, //array sizes (in chunks)
 		int sx, int sy, int sz, //chunk in array (in chunks)
 		int px, int py, int pz, //chunk offset in world (in blocks)
+		glm::vec3 origin, glm::vec3 v1, glm::vec3 v2,
 		std::vector<GL_Vertex>& vArray); //output
 
 #endif
