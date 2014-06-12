@@ -111,7 +111,6 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 					{
 						if (it->first  < caveHeightMin) continue;
 						if (it->second > caveHeightMax) break;
-						log_info("%d %d %d %d", it->first, it->second, caveHeightMin, caveHeightMax);
 
 						for(int i=it->first;i<=it->second;++i)
 						{
@@ -147,11 +146,12 @@ inline double max(double x, double y)
 PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, const glm::vec3& pos) const
 {
 	glm::vec3 posn = glm::normalize(pos);
+	float temperature = getTemperature(posn);
+	log_info("temperature = %f",temperature);
+	float humidity = getHumidity(posn);
 	float elevation = getElevation(threadId,posn);
 	double block_height=delevationToBlockHeight(elevation);
 
-	float temperature = getTemperature(posn);
-	float humidity = getHumidity(posn);
 	if (block_height>double(CHUNK_N*MINIWORLD_H)*0.5) //  terre
 	{
 		// e > 0
@@ -164,7 +164,7 @@ PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, co
 
 		// inihibition
 		// (pas de sable près de l'eau)
-		if (e<0.05) sandCoef = 0.0;
+		//if (e<0.05) sandCoef = 0.0;
 		// (A partir d'un moment la neige recouvre les cailloux
 		stoneCoef = max(stoneCoef,0.8);
 
@@ -193,13 +193,13 @@ PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, co
 
 float PlanetGeneratorEarth::getTemperature(const glm::vec3& pos) const
 {
-	float distanceToEquatorFactor = 1.0-2.0*abs(
+	float distanceToEquatorFactor = 1.0-2.0*fabs(
 			glm::dot(
 				glm::normalize(pos),
 				glm::normalize(planetInfo->axis)
 		 ));
-	float noise1 = glm::simplex(pos*10.f) * 0.5;
-	float noise2 = glm::simplex(pos*100.f) * 0.05;
+	float noise1 = glm::simplex(pos*10.f) * 0.0;
+	float noise2 = glm::simplex(pos*100.f) * 0.00;
 
 	return glm::clamp(distanceToEquatorFactor+noise1+noise2,-1.f,1.f);
 }

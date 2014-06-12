@@ -175,7 +175,6 @@ class Planet
 		glm::vec3 lightdir;
 		glm::vec3 sunPosition;
 		glm::vec3 position;
-		glm::vec3 axis;
 		glm::mat3 model, invModel;
 
 		float angle;

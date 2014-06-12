@@ -334,7 +334,6 @@ Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name):
 	handler(ch),
 	sunPosition(8.0,0.0,0.0),
 	position(0.0,0.0,0.0),
-	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
 	angle(0.0),
 	name(name),
 	atmosphere()
@@ -646,7 +645,7 @@ void Planet::update(float time)
 	if(planetInfo->trajectory)position=planetInfo->trajectory->getPosition(time);
 	angle=time*2*PI/planetInfo->period;
 
-	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,axis));
+	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,planetInfo->axis));
 	invModel=glm::transpose(model);
 }
 
