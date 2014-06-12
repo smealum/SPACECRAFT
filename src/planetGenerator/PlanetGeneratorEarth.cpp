@@ -143,11 +143,15 @@ inline double max(double x, double y)
 	return (x>y)? x : y;
 }
 
+inline float min(float a, float b)
+{
+	return (a<b)?a:b;
+}
+
 PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, const glm::vec3& pos) const
 {
 	glm::vec3 posn = glm::normalize(pos);
 	float temperature = getTemperature(posn);
-	log_info("temperature = %f",temperature);
 	float humidity = getHumidity(posn);
 	float elevation = getElevation(threadId,posn);
 	double block_height=delevationToBlockHeight(elevation);
@@ -157,16 +161,16 @@ PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, co
 		// e > 0
 		float e = (elevation - 1.001) * 1000.f ;
 
-		float sandCoef = 4.0*temperature + 1.4*e - humidity;
-		float snowCoef = -2.0*temperature+ 1.4*e + 0.3*humidity;
-		float stoneCoef = snowCoef+0.01 - 0.1*humidity;
-		float grassCoef = 0.05 + 2.0*abs(humidity);
+		float sandCoef  = 4.0*temperature + 1.4*e - humidity;
+		float snowCoef  = -2.0*temperature+ 1.4*e + 0.3*humidity;
+		float stoneCoef = snowCoef+0.01;
+		float grassCoef = 0.5 + 0.5*abs(humidity);
 
 		// inihibition
 		// (pas de sable près de l'eau)
 		//if (e<0.05) sandCoef = 0.0;
 		// (A partir d'un moment la neige recouvre les cailloux
-		stoneCoef = max(stoneCoef,0.8);
+		stoneCoef = min(stoneCoef,1.0);
 
 	
 		// on choisit le plus grand
@@ -198,8 +202,8 @@ float PlanetGeneratorEarth::getTemperature(const glm::vec3& pos) const
 				glm::normalize(pos),
 				glm::normalize(planetInfo->axis)
 		 ));
-	float noise1 = glm::simplex(pos*10.f) * 0.0;
-	float noise2 = glm::simplex(pos*100.f) * 0.00;
+	float noise1 = glm::simplex(pos*10.f) * 0.1;
+	float noise2 = glm::simplex(pos*100.f) * 0.01;
 
 	return glm::clamp(distanceToEquatorFactor+noise1+noise2,-1.f,1.f);
 }
