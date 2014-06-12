@@ -40,25 +40,6 @@ class PlanetElevationRequest : public ContentRequest
 
 #include "Chunk.h"
 
-class WorldChunkRequest : public ContentRequest
-{
-	public:
-		WorldChunkRequest(Planet& p, Chunk& c, float elevation, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z);
-		void process(int id);
-		void update(void);
-		virtual ~WorldChunkRequest();
-		virtual bool isRelevant(int id);
-		
-	private:
-		chunkVal data[(CHUNK_N+2)][(CHUNK_N+2)][(CHUNK_N+2)];
-		int px, py, pz;
-		float elevation;
-		glm::vec3 origin, v1, v2;
-		Planet& planet;
-		TrackerPointer<Chunk>* chunk;
-		std::vector<GL_Vertex> vArray;
-};
-
 #include "MiniWorld.h"
 
 class MiniWorldDataRequest : public ContentRequest

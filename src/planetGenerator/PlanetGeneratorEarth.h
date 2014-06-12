@@ -11,7 +11,7 @@ class PlanetGeneratorEarth : public PlanetGenerator
 		PlanetGeneratorEarth(int nbThread);
 		virtual ~PlanetGeneratorEarth();
 
-		virtual float generateWorldData(int threadId, const chunkVal* data,
+		virtual void generateWorldData(int threadId,chunkVal* data,
 					int w, int h, int d, // array sizes (in chunks)
 					int px, int py, int pz, // offset in world
 					glm::vec3 origin, glm::vec3 v1, glm::vec3 v2) const; // toplevelCharacteristic
