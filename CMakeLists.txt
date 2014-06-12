@@ -8,7 +8,7 @@ macro(set_option var default type docstring)
   set(${var} ${${var}} CACHE ${type} ${docstring} FORCE)
 endmacro()
 
-set_option(CMAKE_BUILD_TYPE DEBUG STRING "DEBUG: -g -O3, RELEASE: -O3")
+set_option(CMAKE_BUILD_TYPE RELEASE STRING "DEBUG: -g, RELEASE: -O3")
 
 if (CMAKE_BUILD_TYPE MATCHES "RELEASE")
   add_definitions(-DNDEBUG)
@@ -26,7 +26,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   set(OS_WINDOWS 1)
   set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} C:/MinGW/lib C:/CodeBlocks/MinGW/lib ${PROJECT_SOURCE_DIR}/extlibs/libs-win32)
   set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} C:/MinGW/include C:/CodeBlocks/MinGW/include )
-  add_definitions(-DGLEW_NO_GLU -DGLEW_BUILD)
+  add_definitions(-DGLEW_NO_GLU -DGLEW_BUILD -DGLEW_STATIC)
   # create the bin dir and copy the dlls
   file(MAKE_DIRECTORY ${EXECUTABLE_OUTPUT_PATH})
   file(GLOB_RECURSE dll_files extlibs/dll/*)
@@ -52,7 +52,8 @@ endif()
 # set some options
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-reorder -Wno-unused-parameter")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -W -O3")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O3")
+# -g is there by default
+#set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 # Compiler-specific C++11 activation.
