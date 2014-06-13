@@ -18,6 +18,8 @@
 // #define PFBH_MAXSIZE (1024*16)
 #define PFBH_MAXSIZE (1024*512)
 #define PFBH_MINCAP (128)
+#define PFBH_THRESHOLD (1024)
+#define PFBH_LOWTHRESHOLD (PFBH_THRESHOLD/4)
 
 typedef struct
 {
@@ -111,7 +113,7 @@ class PlanetFace
 
 		class MiniWorld* miniworld;
 
-		// glm::vec3 box[8];
+		glm::vec3 box[8];
 		glm::vec3 vertex[9];
 		glm::vec3 uvertex[9];
 
@@ -119,6 +121,7 @@ class PlanetFace
 
 		PlanetFaceBufferHandler* faceBuffer;
 
+		bool noBuffer;
 		bool elevated;
 		int x, z;
 		int bufferID;

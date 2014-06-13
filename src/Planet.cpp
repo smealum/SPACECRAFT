@@ -39,7 +39,8 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id):
 	z(0),
 	depth(0),
 	childrenDepth(0),
-	isDisplayOk(false)
+	isDisplayOk(false),
+	noBuffer(false)
 {
 	uvertex[0]=v[0]; uvertex[1]=v[1];
 	uvertex[2]=v[2]; uvertex[3]=v[3];
@@ -59,7 +60,8 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	miniworld(NULL),
 	toplevel(father->toplevel),
 	childrenDepth(0),
-	isDisplayOk(false)
+	isDisplayOk(false),
+	noBuffer(false)
 {
 	//TODO : exception ?
 	// if(!father);
@@ -105,12 +107,13 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 
 PlanetFace::~PlanetFace()
 {
+	if(faceBuffer)delete faceBuffer;
 	removeMiniWorld();
 }
 
 void PlanetFace::deletePlanetFace(PlanetFaceBufferHandler* b)
 {
-	b->deleteFace(this);
+	if(b)b->deleteFace(this);
 
 	// delete children
 	for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
@@ -137,8 +140,8 @@ void PlanetFace::finalize(void)
 	uvertex[8]=(uvertex[3]+uvertex[0])*0.5f;
 
 	for(int i=0;i<9;i++)vertex[i]=glm::normalize(uvertex[i]);
-	// for(int i=0;i<4;i++)box[i]=vertex[i];
-	// for(int i=0;i<4;i++)box[i+4]=vertex[i]*1.1f;
+	for(int i=0;i<4;i++)box[i]=vertex[i];
+	for(int i=0;i<4;i++)box[i+4]=vertex[i]*1.1f;
 
 	planet->handler.requestContent(new PlanetElevationRequest(*planet, *this, vertex[4]));
 }
@@ -175,6 +178,7 @@ bool PlanetFace::shouldHaveMiniworld(Camera& c)
 bool PlanetFace::isDetailedEnough(Camera& c)
 {
 	if(depth>MINIWORLD_DETAIL+PLANET_ADDED_DETAIL+1)return true;
+	if(depth<4)return false;
 
 	glm::vec3 p=planet->invModel*c.getPosition(planet->getPosition());
 	if(glm::dot(vertex[0]*0.99f-p,vertex[0])>0.0f
@@ -183,7 +187,7 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	&& glm::dot(vertex[3]*0.99f-p,vertex[3])>0.0f
 	&& glm::dot(vertex[4]*0.99f-p,vertex[4])>0.0f)return true; //backface culling
 
-	if(depth<4)return false;
+	// if(depth<4)return false;
 
     // if(!c.isBoxInFrustum(box, 8, glm::mat4(1)))return true; //frustum culling
 	
@@ -232,13 +236,62 @@ static inline int max(int a, int b)
 
 void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 {
-	if(!b && !faceBuffer)
+	bool detailedEnough=isDetailedEnough(c);
+
+	// if(!faceBuffer)
+	// {
+	// 	if(sons[0])
+	// 	{
+	// 		bool allSons=true;
+	// 		for(int i=0;allSons && i<4;i++)allSons=allSons && sons[i]->faceBuffer;
+
+	// 		if(allSons)
+	// 		{
+	// 			int sum=0;
+	// 			for(int i=0;i<4;i++)sum+=sons[i]->faceBuffer->getSize();
+	// 			if(sum<PFBH_LOWTHRESHOLD)
+	// 			{
+	// 				noBuffer=false;
+	// 				for(int i=0;i<4;i++)
+	// 				{
+	// 					delete sons[i]->faceBuffer;
+	// 					sons[i]->faceBuffer=NULL;
+	// 					sons[i]->noBuffer=false;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	// if(faceBuffer)
+	// {
+	// 	if(b)printf("ERROR1\n");
+	// 	b=faceBuffer;
+	// 	if(faceBuffer->getSize()>PFBH_THRESHOLD && !detailedEnough)
+	// 	{
+	// 		printf("DELETE %d %d\n",depth,faceBuffer->getSize());
+	// 		delete faceBuffer;
+	// 		b=faceBuffer=NULL;
+	// 		noBuffer=true;
+	// 	}
+	// }else if(!noBuffer){
+	// 	if(!b)b=faceBuffer=new PlanetFaceBufferHandler(*this, PFBH_MAXSIZE, getV1(), getV2());
+	// }
+
+	// if(!b && !faceBuffer)
+	// {
+	// 	b=faceBuffer=new PlanetFaceBufferHandler(*this, PFBH_MAXSIZE, getV1(), getV2());
+	// }else if(!b)
+	// {
+	// 	b=faceBuffer;
+	// }
+
+	if(faceBuffer)
 	{
-		b=faceBuffer=new PlanetFaceBufferHandler(*this, PFBH_MAXSIZE, getV1(), getV2());
-	}else if(!b)
-	{
+		if(b)printf("ERROR1 %d\n",depth);
 		b=faceBuffer;
-	}
+	}else if(!b && depth==2)b=faceBuffer=new PlanetFaceBufferHandler(*this, PFBH_MAXSIZE, getV1(), getV2());
+
 
 	// update childrenDepth
 	childrenDepth = 0;
@@ -264,12 +317,13 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 	}
 
 	// face assez détaillé, on l'affiche
-	if(isDetailedEnough(c))
+	if(detailedEnough)
 	{
 		// dessin de la face
 		if (elevated)
 		{
-			b->addFace(this); 
+			if(b)b->addFace(this); 
+			else{printf("ERROR2 %d\n",depth);}
 
 			// suppresion des éventuels miniWorlds si on a la face qui s'affiche
 			removeMiniWorld();
@@ -290,23 +344,20 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 			if(miniworld && miniworld->isGenerated())
 			{
 				// suppresion de la face
-				b->deleteFace(this);
+				if(b)b->deleteFace(this);
 				// suppression des éventuels enfants
 				for(int i=0;i<4;i++)
 					if(sons[i])
 						sons[i]->deletePlanetFace(b);
-			}
-			
+			}			
 		}else{
 
 			// ajout des éventuels enfants
 			bool done=true;
 			for(int i=0;i<4;i++)
 			{
-				if(!sons[i])
-					sons[i]=new PlanetFace(planet,this,i);
-				else
-					sons[i]->processLevelOfDetail(c, b);
+				if(!sons[i])sons[i]=new PlanetFace(planet,this,i);
+				else sons[i]->processLevelOfDetail(c, b);
 
 				done &= ( sons[i]->isDisplayOk );
 			}
@@ -314,7 +365,7 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 			// on peux ne plus afficher la face si les enfants affichent quelque chose.
 			if (done)
 			{
-				b->deleteFace(this);
+				if(b)b->deleteFace(this);
 				removeMiniWorld();
 			}
 		}
@@ -377,7 +428,7 @@ extern bool testBool1;
 
 void Planet::processLevelOfDetail(Camera& c)
 {
-	// if(testBool1)return;
+	if(testBool1)return;
 	if(!c.isBoxInFrustum(position-glm::vec3(1), glm::vec3(2,0,0), glm::vec3(0,2,0), glm::vec3(0,0,2)))return;
 	if(glm::length(c.getPosition(position))>20.0f)return;
 	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, NULL);
@@ -404,6 +455,7 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 
 PlanetFaceBufferHandler::~PlanetFaceBufferHandler()
 {
+	for(auto it=faces.begin();it!=faces.end();++it)(*it)->bufferID=-1;
 	curCapacity=0;
 	resizeVBO();
 }
@@ -560,7 +612,8 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 
 void PlanetFace::draw(Camera& c, glm::vec3 lightdir)
 {
-	if(!faceBuffer)
+	if(!c.isBoxInFrustum(box, 8, glm::mat4(planet->getModel())))return; //frustum culling
+	if(!faceBuffer || noBuffer)
 	{
 		if(sons[0])for(int i=0;i<4;i++)sons[i]->draw(c,lightdir);
 	}else{
@@ -575,8 +628,7 @@ void Planet::draw(Camera& c)
 
 	lightdir=glm::normalize(sunPosition-position);
 
-	if(!testBool1)for(int i=0;i<6;i++)faces[i]->draw(c, lightdir);
-
+	for(int i=0;i<6;i++)faces[i]->draw(c, lightdir);
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
 
 	// printf("%d\n",miniWorldList.size());
