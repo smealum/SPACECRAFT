@@ -152,11 +152,6 @@ void computeChunkFaces(chunkVal* data,
 	vArray.clear();
 	auto &blockType = BlockType::getInstance();
 
-	// printf("o %f %f %f\n",origin.x,origin.y,origin.z);
-	// printf("v %f %f %f\n",v1.x,v1.y,v1.z);
-	// printf("p %d %d %d\n",px,py,pz);
-	// printf("%d %d\n",numBlocks,PLANETFACE_BLOCKS);
-
 	chunkVal previous,current;
 	// X
 	for(int y=0;y<CHUNK_N;++y)

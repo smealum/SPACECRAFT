@@ -22,6 +22,7 @@ uniform float m_Km4PI;
 uniform vec3 m_fWavelength4;
 uniform float m_g;
 uniform float m_ESun;
+uniform float scale;
 uniform bool sky;
 
 uniform vec3 cameraPosition;

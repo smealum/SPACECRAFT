@@ -181,16 +181,16 @@ void Atmosphere::makePhaseBuffer(void)
 
 extern float testAngle;
 
-void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position)
+void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, float scale)
 {
-	bind(c,lightDirection,position,shader);
+	bind(c,lightDirection,position,scale,shader);
 }
 
-void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, ShaderProgram& sprogram)
+void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, float scale, ShaderProgram& sprogram)
 {
 	sprogram.use();
 
-	sprogram.setUniform("cameraPosition", c.getPosition(position));
+	sprogram.setUniform("cameraPosition", c.getPosition(position)/scale);
 	sprogram.setUniform("lightDirection", lightDirection);
 	sprogram.setUniform("m_fWavelength4", m_fWavelength4);
 	sprogram.setUniform("m_g", m_g);
@@ -203,6 +203,7 @@ void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, S
 	sprogram.setUniform("m_fScale", m_fScale);
 	sprogram.setUniform("m_fOuterRadius", m_fOuterRadius);
 	sprogram.setUniform("m_nSamples", m_nSamples);
+	sprogram.setUniform("scale", scale);
 
 	sprogram.setUniform("depthTex",0);
 	sprogram.setUniform("phaseTex",1);
@@ -214,12 +215,12 @@ void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, S
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
 }
 
-void Atmosphere::draw(Camera& c, glm::vec3 lightDirection, glm::vec3 position)
+void Atmosphere::draw(Camera& c, glm::vec3 lightDirection, glm::vec3 position, float scale)
 {
-	bind(c, lightDirection, position);
+	bind(c, lightDirection, position, scale);
 	
 	shader.setUniform("sky", true);
-	shader.setUniform("model", glm::translate(glm::mat4(1.f),position-c.getReference()));
+	shader.setUniform("model", glm::translate(glm::mat4(scale),position-c.getReference()));
 
 	c.updateCamera(shader);
 

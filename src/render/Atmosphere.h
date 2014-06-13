@@ -30,9 +30,9 @@ class Atmosphere
 		void makePhaseBuffer(void);
 		void generateVBO(void);
 
-		void bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, ShaderProgram& sprogram);
-		void bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position);
-		void draw(Camera& c, glm::vec3 lightDirection, glm::vec3 position);
+		void bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, float scale, ShaderProgram& sprogram);
+		void bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, float scale);
+		void draw(Camera& c, glm::vec3 lightDirection, glm::vec3 position, float scale);
 
 	private:
 		ShaderProgram& shader;

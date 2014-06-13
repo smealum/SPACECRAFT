@@ -27,13 +27,14 @@ Chunk::Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, 
 
     memset(value,0,sizeof(chunkVal)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2));
 
-    boundingVolume[0]=origin+(v1*float(px)+v2*float(pz))/float(PLANETFACE_BLOCKS);
-    boundingVolume[1]=origin+(v1*float(px+CHUNK_N)+v2*float(pz))/float(PLANETFACE_BLOCKS);
-    boundingVolume[2]=origin+(v1*float(px+CHUNK_N)+v2*float(pz+CHUNK_N))/float(PLANETFACE_BLOCKS);
-    boundingVolume[3]=origin+(v1*float(px)+v2*float(pz+CHUNK_N))/float(PLANETFACE_BLOCKS);
+    int numBlocks=p->getNumBlocks();
+    boundingVolume[0]=origin+(v1*float(px)+v2*float(pz))/float(numBlocks);
+    boundingVolume[1]=origin+(v1*float(px+CHUNK_N)+v2*float(pz))/float(numBlocks);
+    boundingVolume[2]=origin+(v1*float(px+CHUNK_N)+v2*float(pz+CHUNK_N))/float(numBlocks);
+    boundingVolume[3]=origin+(v1*float(px)+v2*float(pz+CHUNK_N))/float(numBlocks);
     for(int i=0;i<4;i++)boundingVolume[i]=glm::normalize(boundingVolume[i]);
-    for(int i=0;i<4;i++)boundingVolume[i+4]=boundingVolume[i]*(1.0f+float(py+CHUNK_N)/float(PLANETFACE_BLOCKS));
-    for(int i=0;i<4;i++)boundingVolume[i]*=1.0f+float(py)/float(PLANETFACE_BLOCKS);
+    for(int i=0;i<4;i++)boundingVolume[i+4]=boundingVolume[i]*(1.0f+float(py+CHUNK_N)/float(numBlocks));
+    for(int i=0;i<4;i++)boundingVolume[i]*=1.0f+float(py)/float(numBlocks);
 
     n=mw->face->toplevel->vertex[4];
 
@@ -83,7 +84,6 @@ void Chunk::draw(Camera& cam, glm::mat4 model)
     program.setUniform("origin",origin);
     program.setUniform("v1",v1);
     program.setUniform("v2",v2);
-    program.setUniform("numBlocks",float(PLANETFACE_BLOCKS));
     program.setUniform("lightdir",planet->lightdir);
     program.setUniform("model",(model));
 

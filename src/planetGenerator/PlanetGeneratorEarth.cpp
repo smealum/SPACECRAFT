@@ -58,11 +58,11 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 				for(int k=0;k<(CHUNK_N+2);k++)
 				{
 					pyPos=zPos;
-					const glm::vec3 pos=origin+((v1*float(vx+px+i))+(v2*float(vz+pz+k)))/float(PLANETFACE_BLOCKS);
+					const glm::vec3 pos=origin+((v1*float(vx+px+i))+(v2*float(vz+pz+k)))/float(planetInfo->numBlocks);
 
 					const auto blockReponse=getCharacteristic(threadId, pos);
-					const int height = elevationToBlockHeight(blockReponse.elevation, planetInfo->numBlocks);
-					const blockTypes::T tile = blockReponse.tile;
+					const int height=elevationToBlockHeight(blockReponse.elevation, planetInfo->numBlocks);
+					const blockTypes::T tile=blockReponse.tile;
 
 					//TEMP (pour tester)
 					const int waterHeight=CHUNK_N*MINIWORLD_H/2.f;

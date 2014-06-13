@@ -7,6 +7,7 @@ in vec3 position;
 uniform mat4 model, view, proj;
 uniform float logconst, zfar;
 uniform float m_fOuterRadius;
+uniform float scale;
 
 out vec3 vPos;
 
@@ -14,7 +15,7 @@ void main()
 {	
 	vPos = position;
 	
-	vec4 v = proj * view * model * vec4(position*m_fOuterRadius, 1.0);
+	vec4 v = proj * view * model * vec4(position*m_fOuterRadius*scale, 1.0);
 
 	gl_Position = logDepth(v);
 }

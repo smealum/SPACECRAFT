@@ -592,7 +592,7 @@ void Planet::draw(Camera& c)
 	// printf("%d\n",miniWorldList.size());
 	
 	// dessin de l'athmosphere
-	atmosphere.draw(c, lightdir, position);
+	atmosphere.draw(c, lightdir, position, scale);
 
 	// dessin des nuages
 	// cloud.draw(c);
@@ -625,6 +625,11 @@ PlanetFace& Planet::getTopLevelForCamera(Camera& c)
 glm::mat3 Planet::getModel(void)
 {
 	return model;
+}
+
+glm::mat3 Planet::getInvModel(void)
+{
+	return invModel;
 }
 
 int Planet::getNumBlocks(void)
