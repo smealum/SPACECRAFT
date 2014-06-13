@@ -75,7 +75,7 @@ class PlanetFace
 	friend class MiniWorld;
 	friend class Chunk;
 	public:
-		PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id);
+		PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id, int size=1);
 		PlanetFace(Planet* planet, PlanetFace* father, uint8_t id);
 		~PlanetFace();
 		
@@ -130,7 +130,7 @@ class PlanetFace
 		float minElevation;
 		
 		uint8_t id;
-		int depth;
+		int depth, size;
 		int childrenDepth;
 		inline bool isDrawingFace() {return bufferID>=0;}
 		bool isDisplayOk;
@@ -142,7 +142,7 @@ class Planet
 	friend class PlanetFace;
 	friend class Chunk;
 	public:
-		Planet(PlanetInfo *pi, class ContentHandler& ch, std::string name);
+		Planet(PlanetInfo *pi, class ContentHandler& ch, std::string name, int size=1);
 		~Planet(); // TODO faire tous les free
 		
 		void processLevelOfDetail(Camera& c);
@@ -160,6 +160,7 @@ class Planet
 		void deleteBlock(glm::i32vec3 p);
 
 		std::string getName(void);
+		int getNumBlocks(void);
 
 		const PlanetInfo* planetInfo; //read only
 		class ContentHandler& handler;
@@ -167,6 +168,7 @@ class Planet
 		glm::dvec3 getGravityVector(glm::dvec3 p);
 		glm::vec3 getPosition(void);
 		glm::mat3 getModel(void);
+		glm::mat3 getInvModel(void);
 		glm::vec3 getCameraRelativePosition(Camera& c);
 		glm::dvec3 getCameraRelativeDoublePosition(Camera& c);
 		PlanetFace& getTopLevelForCamera(Camera& c);
@@ -188,6 +190,9 @@ class Planet
 		glm::mat3 model, invModel;
 
 		float angle;
+
+		float scale;
+		int size;
 
 		Cloud cloud;
 		Atmosphere atmosphere;

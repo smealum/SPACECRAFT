@@ -83,12 +83,12 @@ void Cursor::draw(Camera& c)
 	shader.setUniform("v1", v1);
 	shader.setUniform("v2", v2);
 	shader.setUniform("position", glm::vec3(pos));
-    shader.setUniform("numBlocks",float(PLANETFACE_BLOCKS));
+    shader.setUniform("numBlocks",float(numBlocks));
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 12);
 }
 
-void Cursor::setPosition(glm::i32vec3 pos, int dir, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2, glm::mat4 planetModel)
+void Cursor::setPosition(glm::i32vec3 pos, int dir, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2, glm::mat4 planetModel, int numBlocks)
 {
 	affected=true;
 	this->dir=dir;

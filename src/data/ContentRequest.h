@@ -45,7 +45,7 @@ class PlanetElevationRequest : public ContentRequest
 class MiniWorldDataRequest : public ContentRequest
 {
 	public:
-		MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z, ContentHandler& ch);
+		MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z, int numBlocks, ContentHandler& ch);
 		void process(int id);
 		void update(void);
 		virtual ~MiniWorldDataRequest();
@@ -55,6 +55,7 @@ class MiniWorldDataRequest : public ContentRequest
 		chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)];
 		int px, py, pz;
 		glm::vec3 origin, v1, v2;
+		int numBlocks;
 		std::string name;
 		Planet& planet;
 		TrackerPointer<MiniWorld>* miniworld;

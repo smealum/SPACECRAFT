@@ -258,7 +258,6 @@ void Application::loop()
 		state = appExiting;
 	}
 
-
 	Input::update(window);
 
 	testSolarSystem->update(globalTime);

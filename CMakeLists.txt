@@ -9,6 +9,7 @@ macro(set_option var default type docstring)
 endmacro()
 
 set_option(CMAKE_BUILD_TYPE RELEASE STRING "DEBUG: -g, RELEASE: -O3")
+SET(CMAKE_BUILD_TYPE "DEBUG")
 
 if (CMAKE_BUILD_TYPE MATCHES "RELEASE")
   add_definitions(-DNDEBUG)
@@ -54,6 +55,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-reorder -Wno-unused-p
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -W -O3")
 # -g is there by default
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O3")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 # Compiler-specific C++11 activation.

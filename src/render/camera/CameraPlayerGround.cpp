@@ -15,7 +15,7 @@ CameraPlayerGround::CameraPlayerGround(Planet* p, Camera& c, PlanetFace& pf):
 	planet(p),
 	face(pf)
 {
-	localPosition=dspaceToBlock(glm::transpose(glm::dmat3(planet->getModel()))*c.getPositionDouble(glm::dvec3(planet->getPosition())),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()),glm::dvec3(face.getN()));
+	localPosition=dspaceToBlock(glm::dmat3(planet->getInvModel())*c.getPositionDouble(glm::dvec3(planet->getPosition())),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()),glm::dvec3(face.getN()),planet->getNumBlocks());
 	localView=glm::dmat3(1.0f);
 
     c.moveReference(glm::dvec3(planet->getPosition()));
@@ -37,6 +37,7 @@ const glm::dvec3 playerBoundingBox[]=
 
 void CameraPlayerGround::update(Camera& camera)
 {
+	int numBlocks=planet->getNumBlocks();
 	//déplacements
 	{
 		float delta = Application::getInstance().getFrameDeltaTime();
@@ -85,16 +86,16 @@ void CameraPlayerGround::update(Camera& camera)
 		localPosition+=speedVect;
 
 		//TODO : passer dans une methode de planet ?
-		glm::dvec3 uPos=dblockToSpace(localPosition,glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()));
+		glm::dvec3 uPos=dblockToSpace(localPosition,glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()),numBlocks);
 		camera.setPosition(glm::dmat3(planet->getModel())*uPos+glm::dvec3(planet->getPosition()));
 		
-		glm::dvec3 mx=(dblockToSpace(localPosition+glm::dvec3(1.0,0.0,0.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))-uPos);
-		glm::dvec3 my=(dblockToSpace(localPosition+glm::dvec3(0.0,1.0,0.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))-uPos);
-		glm::dvec3 mz=(dblockToSpace(localPosition+glm::dvec3(0.0,0.0,1.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()))-uPos);
+		glm::dvec3 mx=(dblockToSpace(localPosition+glm::dvec3(1.0,0.0,0.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()),numBlocks)-uPos);
+		glm::dvec3 my=(dblockToSpace(localPosition+glm::dvec3(0.0,1.0,0.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()),numBlocks)-uPos);
+		glm::dvec3 mz=(dblockToSpace(localPosition+glm::dvec3(0.0,0.0,1.0),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()),numBlocks)-uPos);
 		my=glm::normalize(my);
 		mx=glm::normalize(mx-my*glm::dot(mx,my));
 		mz=glm::normalize(mz-my*glm::dot(mz,my)-mx*glm::dot(mz,mx));
-		camera.view3=glm::mat3(localView)*glm::transpose(planet->getModel()*glm::mat3(mx,my,mz));
+		camera.view3=glm::mat3(localView)*glm::transpose(glm::mat3(mx,my,mz))*planet->getInvModel();
 
 		if(ret)
 		{
@@ -139,7 +140,7 @@ void CameraPlayerGround::update(Camera& camera)
 					case 5: planet->changeBlock(out+glm::i32vec3(0,0,1),t); break;
 				}
 			}
-			testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2,glm::translate(glm::mat4(1.0f),planet->getPosition()-camera.getReference())*glm::mat4(planet->getModel()));
+			testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2,glm::translate(glm::mat4(1.0f),planet->getPosition()-camera.getReference())*glm::mat4(planet->getModel()),numBlocks);
 		}else{
 			// printf("no block !\n");
 			testCursor->unaffect();
