@@ -188,9 +188,7 @@ void SolarSystemDataRequest::update(void)
 					new PlanetGeneratorEarth(contentHandler.getMaxProducers())
 				),
 				contentHandler,
-				oss.str(),
-				// i+1
-				2-i //TEMP
+				oss.str()
 		);
 	}
 	sun=new Sun(glm::vec3(0.0f));
