@@ -43,9 +43,11 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=RELEASE ..
 ```
 
+Si on compile avec l'option `-j` on risque d'avoir des erreurs à l'édition des liens. Dans ce cas lancer à nouveau `make` sans l'option `-j`.
+
 - **UNIX**
 ```
-make run
+make
 ```
 
 - **Windows**:
@@ -59,12 +61,14 @@ set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} C:/CodeBlocks/MinGW/include )
 
 ```
 cmake -G "MinGW Makefiles" ..
-mingw32-make run
+mingw32-make
 ```
 
 Finalement il faut copier les dlls correspondantes dans le dossier bin. Cela est nécessaire si les dlls fournies ne marchent pas sur votre système.
 
 ##Exécution
+
+Il est possible que sous OS X un fix soit nécessaire (car on n'utilise pas de `.app`). Si l'exécution donne une erreur concernant des dylibs introuvables, faire: `make osxfix` pour corriger cela. Par défaut `make run` fait le fix.
 
 ```
 make run
@@ -84,6 +88,8 @@ Les tests unitaires sont lancés avec `make test` il faut cepedant avoir fait `m
 make
 make test
 ```
+
+Sur OS X faire `make osxfix` avant de lancer les tests.
 
 Ces tests permettent de vérifier les focntionalités des différentes classes/modules et ainsi aassurent le développement par incréments.
 

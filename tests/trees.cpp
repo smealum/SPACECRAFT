@@ -5,7 +5,7 @@ int main(void)
 {
     Tree tree;
 
-	tree.generate();
+	tree.generate(1);
 
 	debug("size: %d, height: %d", tree.getSize(), tree.getHeight());
 
