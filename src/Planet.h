@@ -51,14 +51,13 @@ class PlanetFaceBufferHandler
 	
 		void addFace(PlanetFace* pf);
 		void deleteFace(PlanetFace* pf);
-		void changeFace(PlanetFace* pf, int i);
 		void draw(Camera& c, glm::vec3 lightdir);
 
 	private:
 		ShaderProgram &shader;
 		PlanetFace& planetFace;
 		std::vector<PlanetFace*> faces;
-		faceBufferEntry_s* buffer;
+		std::vector<faceBufferEntry_s> buffer;
 		int maxSize, curSize;
 		GLuint vbo, vao;
 		glm::vec3 v1, v2;

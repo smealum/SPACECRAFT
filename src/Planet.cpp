@@ -388,8 +388,6 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, ms*sizeof(faceBufferEntry_s), NULL, GL_STATIC_DRAW);
 
-    buffer=(faceBufferEntry_s*)malloc(ms*sizeof(faceBufferEntry_s));
-
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
@@ -410,20 +408,18 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 
 PlanetFaceBufferHandler::~PlanetFaceBufferHandler()
 {
-	free(buffer);
 }
 
 //TODO : grouper les glBufferSubData de façon intelligente à chaque frame (glBufferSubData individuels pour les delete, mais groupé pour les add en queue ?)
 
-void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
+void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 {
-	if(i>=maxSize)return;
-	faces.push_back(pf);
+	if(curSize>=maxSize || pf->bufferID>=0)return;
+
 	const glm::vec3 n=pf->uvertex[4];
 
 	int topTile = getBlockID(pf->tile,blockPlane::top);
 	int sideTile = getBlockID(pf->tile,blockPlane::side);
-
 
 	float repeat;
 	//if (pf->depth < MINIWORLD_DETAIL)
@@ -453,19 +449,14 @@ void PlanetFaceBufferHandler::changeFace(PlanetFace* pf, int i)
 	//
 	//
 	//
-	repeat = 2.0;
-	
+	repeat = 2.0;	
 
-	buffer[i]=(faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->minElevation,1.0f/(1<<pf->depth),topTile,sideTile,repeat};
+	faces.push_back(pf);
+	buffer.push_back((faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->minElevation,1.0f/(1<<pf->depth),topTile,sideTile,repeat});
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, i*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[i]);
-}
+	glBufferSubData(GL_ARRAY_BUFFER, curSize*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[curSize]);
 
-void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
-{
-	if(curSize>=maxSize || pf->bufferID>=0)return;
-	changeFace(pf, curSize);
 	pf->bufferID=curSize;
 	curSize++;
 
@@ -489,6 +480,7 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 	}
 
 	pf->bufferID=-1;
+	buffer.pop_back();
 	faces.pop_back();
 	curSize--;
 	pf->isDisplayOk = false;
