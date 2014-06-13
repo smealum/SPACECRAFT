@@ -4,6 +4,7 @@
 #include "Planet.h"
 #include "render/Sun.h"
 #include "render/Camera.h"
+#include "utils/glm.h"
 
 class SolarSystem
 {
@@ -21,7 +22,12 @@ class SolarSystem
 
 		TrackerPointer<SolarSystem>* getTptr(void);
 
+		const glm::dvec3& getPosition() const;
+
 	private:
+
+		glm::dvec3 position;
+
 		bool generated;
 
 		int numPlanets;
