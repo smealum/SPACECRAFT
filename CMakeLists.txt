@@ -127,7 +127,7 @@ file(GLOB_RECURSE all_obj ${OBJ_FILES}/*.o)
 list(REMOVE_ITEM all_obj ${OBJ_FILES}/main.cpp.o)
 #STRING(REPLACE ; " " all_obj "${all_obj}")
 file(GLOB_RECURSE all_tests ${PROJECT_SOURCE_DIR}/tests/*.cpp)
-#message("tests: ${all_tests}")
+#message("tests: ${all_obj}")
 
 foreach(t ${all_tests})
 	GET_FILENAME_COMPONENT(f_base ${t} NAME_WE)
