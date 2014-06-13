@@ -12,9 +12,9 @@
 typedef bool caveBlock; // easier to change in the future
 
 #define CAVE_CHUNK_SIZE_X (300) // size of the block where the worms can travel
-#define CAVE_CHUNK_SIZE_Y (1024)
+#define CAVE_CHUNK_SIZE_Y (512)
 #define CAVE_CHUNK_Y_OFFSET (0)
-#define CAVE_CHUNK_SIZE_Z (300)
+#define CAVE_CHUNK_SIZE_Z (256)
 #define CAVE_CHUNK_SPACE  (80)
 
 

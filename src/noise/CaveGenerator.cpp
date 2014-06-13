@@ -116,7 +116,7 @@ void CaveGenerator::generate()
 				int rr = k*k+j*j+i*i;
 				if (
 						(rr<=radius*radius) and
-						(rr>=(radius-2)*(radius-2))
+						(rr>=(radius-1)*(radius-1))
 				)
 				{
 					glm::i32vec3 decal(i,j,k);
