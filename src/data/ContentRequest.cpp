@@ -9,6 +9,8 @@
 
 #include "planetGenerator/PlanetGeneratorEarth.h"
 
+#include "noise/Tree.h"
+
 #include <cstdio>
 
 using namespace glm;
@@ -56,6 +58,26 @@ bool PlanetElevationRequest::isRelevant(int id)
 	return true;
 }
 
+                                //if (vy+py+j > height &&
+                                        //vy+py+j < height + tree.getHeight() + 1 &&
+                                        //i >= CHUNK_N/2 - tree.getSize()/2 &&
+                                        //i < CHUNK_N/2 + tree.getSize()/2 &&
+                                        //k >= CHUNK_N/2 - tree.getSize()/2 &&
+                                        //k < CHUNK_N/2 + tree.getSize()/2)
+                                //{
+                                    //int x = i - (CHUNK_N/2 - tree.getSize()/2),
+                                        //y = vy+py+j - height -1,
+                                        //z = k - (CHUNK_N/2 - tree.getSize()/2);
+                                    //if (x >= 0 && x < tree.getSize() &&
+                                            //y >=0 && y < tree.getHeight() &&
+                                            //z >= 0 && z < tree.getSize())
+                                    //{
+                                        ////debug("Tree %d, %d, %d", x, y, z);
+                                        //data[yPos] = tree.getBlock(x, y, z);
+                                    //}
+                                    //else
+                                        //log_err("WTF OMG NOOOB");
+                                //}
 
 //MiniWorldDataRequest stuff
 MiniWorldDataRequest::MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o, glm::vec3 v1, glm::vec3 v2, int x, int y, int z, ContentHandler& ch):

@@ -27,6 +27,8 @@ namespace blockTypes
 		sand = 19,
 		tree = 21,
 		tree_top = 22,
+		tree_foliage = tree + TEXCOLS * 2,
+		tree_foliage_opaque = tree_foliage + 1,
 		grass_blaze = 2*TEXCOLS+8,
 		sponge = 3*TEXCOLS+1,
 		water = 12*TEXCOLS+14,

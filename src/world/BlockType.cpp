@@ -69,6 +69,20 @@ BlockType::BlockType() :
 						blockTypes::water_4
 						});
 				break;
+            case blockTypes::tree:
+                block = new BlockStatic({
+                        blockTypes::tree_top,
+                        blockTypes::tree,
+                        blockTypes::tree_top
+                        });
+                break;
+            case blockTypes::tree_top: // XXX used for a all sided tree textured block
+                block = new BlockStatic({
+                        blockTypes::tree,
+                        blockTypes::tree,
+                        blockTypes::tree
+                        });
+                break;
 			default:
 				block = new BlockStatic({t,t,t});
 				break;
@@ -223,6 +237,14 @@ void blockTypeLoadValues()
 	blockTransparencyID[blockTypes::water_2] = blockTransparency::transparent;
 	blockTransparencyID[blockTypes::water_3] = blockTransparency::transparent;
 	blockTransparencyID[blockTypes::water_4] = blockTransparency::transparent;
+
+    // trees
+    blockTileID[blockTypes::tree][blockPlane::side] = blockTypes::tree;
+    blockTileID[blockTypes::tree][blockPlane::bottom] = 
+        blockTileID[blockTypes::tree][blockPlane::top] = blockTypes::tree_top;
+    
+    blockTransparencyID[blockTypes::tree_foliage] = blockTransparency::seeThrough;
+
 }
 
 bool blockShouldBeFace(int type1, int type2)
