@@ -17,7 +17,7 @@
 #define PLANET_ADDED_DETAIL (4)
 // #define PFBH_MAXSIZE (1024*16)
 #define PFBH_MAXSIZE (1024*512)
-#define PFBH_MINCAP (32)
+#define PFBH_MINCAP (128)
 
 typedef struct
 {
@@ -55,6 +55,8 @@ class PlanetFaceBufferHandler
 		void draw(Camera& c, glm::vec3 lightdir);
 		void resizeVBO(void);
 
+		int getSize(void);
+
 	private:
 		ShaderProgram &shader;
 		PlanetFace& planetFace;
@@ -80,9 +82,11 @@ class PlanetFace
 		void updateElevation(float e, blockTypes::T tile);
 		bool shouldHaveMiniworld(Camera& c);
 		bool isDetailedEnough(Camera& c);
-		void processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b);
 		void createMiniWorld(void);
 		void removeMiniWorld(void);
+
+		void processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b);
+		void draw(Camera& c, glm::vec3 lightdir);
 
 		glm::vec3 getOrigin(void);
 		glm::vec3 getV1(void);
@@ -112,6 +116,8 @@ class PlanetFace
 		glm::vec3 uvertex[9];
 
 		TrackerPointer<PlanetFace>* tptr;
+
+		PlanetFaceBufferHandler* faceBuffer;
 
 		bool elevated;
 		int x, z;
@@ -172,7 +178,6 @@ class Planet
 		std::string name;
 
 		PlanetFace* faces[6];
-		PlanetFaceBufferHandler* faceBuffers[6];
 
 		glm::vec3 lightdir;
 		glm::vec3 sunPosition;

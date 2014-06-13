@@ -25,6 +25,7 @@ extern float PlanetFaceDetailsPower;
 PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id):
 	planet(planet),
 	father(NULL),
+	faceBuffer(NULL),
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
@@ -48,6 +49,7 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id):
 PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	planet(planet),
 	father(father),
+	faceBuffer(NULL),
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
@@ -230,6 +232,14 @@ static inline int max(int a, int b)
 
 void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 {
+	if(!b && !faceBuffer)
+	{
+		b=faceBuffer=new PlanetFaceBufferHandler(*this, PFBH_MAXSIZE, getV1(), getV2());
+	}else if(!b)
+	{
+		b=faceBuffer;
+	}
+
 	// update childrenDepth
 	childrenDepth = 0;
 	for(int i=0;i<4;i++)
@@ -321,12 +331,12 @@ glm::vec3 cubeArray[6][4]=
 		{glm::vec3(-1.0,-1.0,1.0),glm::vec3(-1.0,1.0,1.0),glm::vec3(1.0,1.0,1.0),glm::vec3(1.0,-1.0,1.0)}}; //far
 
 static GLfloat vertices[] = {
-    //     POSITION    |      COLOR           |     NORMAL
+    //   POSITION    |      COLOR       |     NORMAL
     // x positif
-    +0.0 , -0.5 , -0.5 , 1.0 , 0.0 , 0.0 , 1.f, +1.0 , 0.0 , 0.0 ,
-    +0.0 , +0.5 , -0.5 , 1.0 , 0.0 , 0.0 , 1.f, +1.0 , 0.0 , 0.0 ,
-    +0.0 , +0.5 , +0.5 , 1.0 , 0.0 , 0.0 , 1.f, +1.0 , 0.0 , 0.0 ,
-    +0.0 , -0.5 , +0.5 , 1.0 , 0.0 , 0.0 , 1.f, +1.0 , 0.0 , 0.0 ,
+    +0.0, -0.5, -0.5, 1.0, 0.0, 0.0, 1.f, +1.0, 0.0, 0.0,
+    +0.0, +0.5, -0.5, 1.0, 0.0, 0.0, 1.f, +1.0, 0.0, 0.0,
+    +0.0, +0.5, +0.5, 1.0, 0.0, 0.0, 1.f, +1.0, 0.0, 0.0,
+    +0.0, -0.5, +0.5, 1.0, 0.0, 0.0, 1.f, +1.0, 0.0, 0.0,
 };
 
 static GLuint elements[2*3] = {
@@ -341,10 +351,8 @@ Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name):
 	angle(0.0),
 	name(name),
 	atmosphere()
-{
-	
+{	
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i], i);
-	for(int i=0;i<6;i++)faceBuffers[i]=new PlanetFaceBufferHandler(*faces[i], PFBH_MAXSIZE, cubeArray[i][1]-cubeArray[i][0], cubeArray[i][3]-cubeArray[i][0]);
 }
 
 void PlanetFace::testFullGeneration(int depth, PlanetFaceBufferHandler* b)
@@ -372,7 +380,7 @@ void Planet::processLevelOfDetail(Camera& c)
 	// if(testBool1)return;
 	if(!c.isBoxInFrustum(position-glm::vec3(1), glm::vec3(2,0,0), glm::vec3(0,2,0), glm::vec3(0,0,2)))return;
 	if(glm::length(c.getPosition(position))>20.0f)return;
-	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, faceBuffers[i]);
+	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, NULL);
 }
 
 PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::vec3 v1, glm::vec3 v2):
@@ -398,6 +406,11 @@ PlanetFaceBufferHandler::~PlanetFaceBufferHandler()
 {
 	curCapacity=0;
 	resizeVBO();
+}
+
+int PlanetFaceBufferHandler::getSize(void)
+{
+	return curSize;
 }
 
 void PlanetFaceBufferHandler::resizeVBO(void)
@@ -545,6 +558,16 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 	// printf("%d, %d\n",curSize,faces.size());
 }
 
+void PlanetFace::draw(Camera& c, glm::vec3 lightdir)
+{
+	if(!faceBuffer)
+	{
+		if(sons[0])for(int i=0;i<4;i++)sons[i]->draw(c,lightdir);
+	}else{
+		faceBuffer->draw(c,lightdir);
+	}
+}
+
 
 void Planet::draw(Camera& c)
 {
@@ -552,7 +575,7 @@ void Planet::draw(Camera& c)
 
 	lightdir=glm::normalize(sunPosition-position);
 
-	if(!testBool1)for(int i=0;i<6;i++)faceBuffers[i]->draw(c, lightdir);
+	if(!testBool1)for(int i=0;i<6;i++)faces[i]->draw(c, lightdir);
 
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
 
