@@ -17,6 +17,7 @@
 #define PLANET_ADDED_DETAIL (4)
 // #define PFBH_MAXSIZE (1024*16)
 #define PFBH_MAXSIZE (1024*512)
+#define PFBH_MINCAP (32)
 
 typedef struct
 {
@@ -52,13 +53,14 @@ class PlanetFaceBufferHandler
 		void addFace(PlanetFace* pf);
 		void deleteFace(PlanetFace* pf);
 		void draw(Camera& c, glm::vec3 lightdir);
+		void resizeVBO(void);
 
 	private:
 		ShaderProgram &shader;
 		PlanetFace& planetFace;
 		std::vector<PlanetFace*> faces;
 		std::vector<faceBufferEntry_s> buffer;
-		int maxSize, curSize;
+		int maxSize, curSize, curCapacity;
 		GLuint vbo, vao;
 		glm::vec3 v1, v2;
 };

@@ -381,33 +381,55 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 	shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface")),
 	// shader(ShaderProgram::loadFromFile("shader/planetface_atmosphere/planetface_atmosphere.vert", "shader/planetface_atmosphere/planetface_atmosphere.frag", "shader/planetface_atmosphere/planetface_atmosphere.geom", "planetface_atmosphere")),
 	curSize(0),
+	curCapacity(PFBH_MINCAP),
 	v1(glm::normalize(v1)),
-	v2(glm::normalize(v2))
+	v2(glm::normalize(v2)),
+	vbo(0),
+	vao(0)
 {
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, ms*sizeof(faceBufferEntry_s), NULL, GL_STATIC_DRAW);
-
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	shader.setBuffers(vao, vbo, 0);
+	resizeVBO();
 	shader.use();
 	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
-
-	shader.setAttribute("position", 3, GL_FALSE, 9, 0);
-	shader.setAttribute("elevation", 1, GL_FALSE, 9, 3);
-	shader.setAttribute("minElevation", 1, GL_FALSE, 9, 4);
-	shader.setAttribute("size", 1, GL_FALSE, 9, 5);
-	shader.setAttribute("topTile", 1, GL_FALSE, 9, 6);
-	shader.setAttribute("sideTile", 1, GL_FALSE, 9, 7);
-	shader.setAttribute("repeat", 1, GL_FALSE, 9, 8);
 
 	shader.setUniform("model", glm::mat4(1.0f));
 }
 
 PlanetFaceBufferHandler::~PlanetFaceBufferHandler()
 {
+	curCapacity=0;
+	resizeVBO();
+}
+
+void PlanetFaceBufferHandler::resizeVBO(void)
+{
+	// printf("RESIZE %d\n",curCapacity);
+	if(vbo && vao && !curCapacity)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		glDeleteBuffers(1, &vbo);
+		glDeleteBuffers(1, &vao);
+		vbo=vao=0;
+	}else if(curCapacity){
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, curCapacity*sizeof(faceBufferEntry_s), NULL, GL_STATIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, curSize*sizeof(faceBufferEntry_s), (void*)&buffer[0]);
+
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+
+		shader.setBuffers(vao, vbo, 0);
+		shader.use();
+
+		shader.setAttribute("position", 3, GL_FALSE, 9, 0);
+		shader.setAttribute("elevation", 1, GL_FALSE, 9, 3);
+		shader.setAttribute("minElevation", 1, GL_FALSE, 9, 4);
+		shader.setAttribute("size", 1, GL_FALSE, 9, 5);
+		shader.setAttribute("topTile", 1, GL_FALSE, 9, 6);
+		shader.setAttribute("sideTile", 1, GL_FALSE, 9, 7);
+		shader.setAttribute("repeat", 1, GL_FALSE, 9, 8);
+	}
 }
 
 //TODO : grouper les glBufferSubData de façon intelligente à chaque frame (glBufferSubData individuels pour les delete, mais groupé pour les add en queue ?)
@@ -415,6 +437,12 @@ PlanetFaceBufferHandler::~PlanetFaceBufferHandler()
 void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 {
 	if(curSize>=maxSize || pf->bufferID>=0)return;
+
+	if(curSize>=curCapacity)
+	{
+		while(curSize>=curCapacity)curCapacity*=2;
+		resizeVBO();
+	}
 
 	const glm::vec3 n=pf->uvertex[4];
 
