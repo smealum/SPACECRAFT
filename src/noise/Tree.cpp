@@ -12,15 +12,14 @@ Tree::Tree() :
 {
 }
 
-void Tree::generate()
+void Tree::generate(int seed)
 {
-	noise::module::Perlin rnd;
-	// XXX
-	seed = time(NULL);
+	this->seed = seed;
 	rnd.SetSeed(seed);
 
-	height = 7 + (rnd.GetValue(0, 0, 0) + 1.f) * 2;
-	size = height + (rnd.GetValue(5, 0, 0) + 1.f) * 3;
+	height = 7 + (rnd.GetValue(0.1, seed/10000, 0) + 1.f) * 9;
+	size = 3 + (rnd.GetValue(0.2, seed/10000, 0) + 1.f) * 7;
+	log_info("seed: %d -> %d, %d", seed, height, size);
 
 	array = new blockTypes::T[height * size * size];
 
@@ -33,7 +32,7 @@ void Tree::generate()
 	glm::i32vec2 si(size/2, size/2);
 	glm::i32vec3 pos = center - glm::i32vec3(si.x/2, 0, si.y/2);
 
-	int maxBase = 3;
+	int maxBase = 0; // XXX
 	for (int i = 0; i < maxBase; i++)
 	{
 		digSquare(pos, si, blockTypes::tree); // c'est en réalité du tree sur tous les cotés
@@ -52,15 +51,85 @@ void Tree::generate()
 
 	// on creuse un peu la base pour faire comme des racines
 
-	// on créé le tronc
+
+	// on dessine le feuillage
 	
-	pos -= glm::i32vec3(1, 1, 1);
-	si += glm::i32vec2(2);
-	for (int i = maxBase; i < height; i++)
+	pos = glm::i32vec3(size/2, height/1.5f, size/2);
+	glm::i32vec3 cubeSize(size, height/3, size);
+	while (cubeSize.x >= 3)
 	{
-		digSquare(pos, si, blockTypes::tree);
+		digCube(pos, cubeSize, blockTypes::tree_foliage_opaque);
+		// dig the line to make it round
+		glm::i32vec3 a = pos - cubeSize/2,
+					 b = a;
+		b.y += cubeSize.y;
+		digLine(a, b, blockTypes::air);
+		
+		a.x += cubeSize.x-1;
+		b = a;
+		b.y += cubeSize.y;
+		digLine(a, b, blockTypes::air);
+
+		a.z += cubeSize.z-1;
+		b = a;
+		b.y += cubeSize.y;
+		digLine(a, b, blockTypes::air);
+
+		a.x -= (cubeSize.x-1);
+		b = a;
+		b.y += cubeSize.y;
+		digLine(a, b, blockTypes::air);
+
+		pos.y += cubeSize.y-1;
+		cubeSize -= glm::i32vec3(2);
+		cubeSize.y++;
+		if (cubeSize.y < 1)
+			cubeSize.y = 1;
+	}
+	//digRecursiveCube(pos, cubeSize);
+
+	// on créé le tronc
+	cubeSize += glm::i32vec3(2);
+	int maxY = pos.y - cubeSize.y/2;
+	pos = glm::i32vec3(size/2, 0, size/2);
+	si = glm::i32vec2(size % 2?1:2);
+	for (int i = 0; i < maxY; i++)
+	{
+		digSquare(pos-glm::i32vec3(si.x/2, 0, si.y/2), si, blockTypes::tree);
 		pos.y++;
 	}
+}
+
+void Tree::digCube(const glm::i32vec3 &p, const glm::i32vec3 &si, blockTypes::T type)
+{
+	glm::i32vec3 pos = p - si / 2;
+	for (int i = 0; i < si.y; i++)
+	{
+		pos.y = p.y - si.y / 2 + i;
+		digSquare(pos, glm::i32vec2(si.x, si.z), blockTypes::tree_foliage);
+	}
+}
+
+void Tree::digRecursiveCube(const glm::i32vec3 &p, const glm::i32vec3 &si)
+{
+	glm::i32vec3 pos = p - si / 2;
+	for (int i = 0; i < si.y; i++)
+	{
+		pos.y = p.y - si.y / 2 + i;
+		digSquare(pos, glm::i32vec2(si.x, si.z), blockTypes::tree_foliage_opaque);
+	}
+
+	if (si.x <= 1 || si.y <= 1)
+		return;
+
+	digRecursiveCube(p + glm::i32vec3(si.x/2, si.y/2, si.z/2), si / 2);
+	digRecursiveCube(p + glm::i32vec3(si.x/2, si.y/2, -si.z/2), si / 2);
+	//digRecursiveCube(p + glm::i32vec3(si.x/2, -si.y/2, si.z/2), si / 2);
+	//digRecursiveCube(p + glm::i32vec3(si.x/2, -si.y/2, -si.z/2), si / 2);
+	digRecursiveCube(p + glm::i32vec3(-si.x/2, si.y/2, si.z/2), si / 2);
+	digRecursiveCube(p + glm::i32vec3(-si.x/2, si.y/2, -si.z/2), si / 2);
+	//digRecursiveCube(p + glm::i32vec3(-si.x/2, -si.y/2, si.z/2), si / 2);
+	digRecursiveCube(p + glm::i32vec3(-si.x/2, -si.y/2, -si.z/2), si / 2);
 }
 
 Tree::~Tree()
@@ -78,6 +147,12 @@ void Tree::digLine(const glm::i32vec3 &a, const glm::i32vec3 &b, blockTypes::T t
 				 absinc; // l, m, n
 
 	pixel = a;
+	if (a == b)
+	{
+		array[TPOS(pixel)] = type; // air
+		return;
+	}
+
 	d = b - a;
 	for (int i = 0; i < 3; i++)
 	{
@@ -154,7 +229,7 @@ void Tree::digSquare(const glm::i32vec3 &p, const glm::i32vec2 &si, blockTypes::
 	for (int i = 0; i < si.y; i++)
 	{
 		glm::i32vec3 a = p + glm::i32vec3(0, 0, i);
-		digLine(a, a + glm::i32vec3(si.x, 0, 0), type);
+		digLine(a, a + glm::i32vec3(si.x-1, 0, 0), type);
 	}
 }
 
