@@ -4,10 +4,12 @@
 #include "utils/glm.h"
 #include "render/Camera.h"
 #include "SolarSystem.h"
+#include "render/Shader.h"
+#include <vector>
 
 ///////////////////////////////////////////////////////////////
 class  Galaxy;
-struct  GalaxySolarResponse;
+struct GalaxySolarResponse;
 class  GalaxyTree;
 //////////////////////////////////////////////////////////////
 
@@ -29,8 +31,19 @@ class Galaxy
 		GalaxySolarResponse getClosestSolarSystem(const glm::dvec3& pos);
 		GalaxySolarResponse getClosestSolarSystem(const glm::dvec3& pos, double maxDist);
 		void pushSolarSystem(SolarSystem* s);
+
+		void draw(Camera& camera);
 	private:
+
+		// OctoTree part
 		GalaxyTree* galaxyTree;
+
+		// graphic part
+		std::vector<glm::vec3> solarPosition;
+		GLuint vao, vbo;
+		ShaderProgram& program;
+		bool isVBOGenerated;
+		void generateVBO();
 };
 
 /////////////////////////////////////////////////////////////

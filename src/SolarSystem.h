@@ -10,7 +10,7 @@ class SolarSystem
 {
 	friend class SolarSystemDataRequest;
 	public:
-		SolarSystem(ContentHandler& ch);
+		SolarSystem(const glm::dvec3& position, ContentHandler& ch);
 		~SolarSystem();
 
 		void draw(Camera& c);

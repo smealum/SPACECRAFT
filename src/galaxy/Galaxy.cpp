@@ -1,24 +1,32 @@
 #include "Galaxy.h"
 #include <list>
 
+
 using namespace glm;
 using namespace std;
 
 const double GALAXY_WIDTH = 100.0;
 const dvec3 GALAXY_CENTER(0.0,0.0,0.0);
-
-// TODO penser a vérifier que 2 solar systèmes ne possèdent pas la même position;
+const double SOLARSYSTEM_MIN_DISTANCE = 0.1; 
 
 /////////////////////////////////////////////////////////
 
 Galaxy::Galaxy():
-	galaxyTree(NULL)
+	galaxyTree(NULL),
+	vbo(0),
+	vao(0),
+	program(ShaderProgram::loadFromFile(
+		"shader/galaxy/galaxy.vert",
+		"shader/galaxy/galaxy.frag",
+		"galaxy")),
+	isVBOGenerated(false)
 {
 	
 }
 
 void Galaxy::pushSolarSystem(SolarSystem* s)
 {
+	solarPosition.push_back(vec3(s->getPosition()));
 	if (galaxyTree)
 	{
 		galaxyTree->pushSolarSystem(s);
@@ -35,7 +43,37 @@ GalaxySolarResponse Galaxy::getClosestSolarSystem(const dvec3& pos , double maxD
 	if (galaxyTree)
 		return galaxyTree->getClosestSolarSystem(pos,maxDist);
 	else
-		return {NULL,maxDist};
+		return {NULL,2.0*maxDist};
+}
+
+void Galaxy::generateVBO()
+{
+	isVBOGenerated = true;
+
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*solarPosition.size(), &solarPosition[0], GL_STATIC_DRAW);
+
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	program.setBuffers(vao, vbo, 0);
+	program.use();
+
+	glBindFragDataLocation(program.getHandle(), 0, "outColor");
+	program.setAttribute("position", 3, GL_FALSE, 0, 0);
+}
+
+void Galaxy::draw(Camera& camera)
+{
+    program.use();
+
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    camera.updateCamera(program);
+
+    glDrawArrays(GL_TRIANGLES, 0, solarPosition.size());
 }
 
 ////////////////////////////////////////////////////////
@@ -80,7 +118,16 @@ void GalaxyTree::pushSolarSystem(SolarSystem* s)
 	if (not isSubdivised)
 	{
 		previousSolarSystem = solarSystem;
+
+		// suppression des systèmes solaires trop proches
+		if (glm::distance(solarSystem->getPosition(),s->getPosition()) < SOLARSYSTEM_MIN_DISTANCE)
+		{
+			previousSolarSystem->deleteSolarSystem();
+			previousSolarSystem = NULL;
+		}
+
 		isSubdivised = true;
+
 		children={{{NULL,NULL},{NULL,NULL}},{{NULL,NULL},{NULL,NULL}}};
 	}
 
@@ -139,7 +186,7 @@ GalaxySolarResponse GalaxyTree::getClosestSolarSystem(const glm::dvec3& pos, dou
 	}
 	else
 	{
-		return {solarSystem,distance(solarSystem->getPosition(),pos)};
+		return {solarSystem,glm::distance(solarSystem->getPosition(),pos)};
 	}
 }
 

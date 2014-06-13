@@ -176,6 +176,8 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 
 	glm::vec3 p=planet->invModel*c.getPosition(planet->getPosition());
 
+	if(depth<4)return false;
+
 	if(glm::dot(vertex[0]*0.99f-p,vertex[0])>0.0f
 	&& glm::dot(vertex[1]*0.99f-p,vertex[1])>0.0f
 	&& glm::dot(vertex[2]*0.99f-p,vertex[2])>0.0f

@@ -13,6 +13,8 @@
 #include "world/BlockType.h"
 #include "utils/glm.h"
 #include "noise/CaveGenerator.h"
+#include "galaxy/Galaxy.h"
+
 #define WIN_TITLE "SPACECRAFT"
 
 float PlanetFaceDetailsPower = 28.0;
@@ -207,12 +209,27 @@ void Application::run()
 	camera->setCameraManager(new CameraKeyboardMouse());
 
 	tt=new testShaders;
-	testSolarSystem=new SolarSystem(contentHandler);
+	testSolarSystem=new SolarSystem(dvec3(0.0,0.0,0.0),contentHandler);
 	testCursor=new Cursor();
 
 	testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
 	testTextureArray=TextureManager::getInstance().loadTextureArray("data/blocksPackArray.png",16,16);
 	caves.generate();
+
+	//Galaxy galaxy;
+	//for(int i=0;i<100*100;++i)
+	//{
+		//galaxy.pushSolarSystem(
+			//new SolarSystem(
+				//dvec3(
+					//(i%100)%10,
+					//(i%100)/10,
+					//(i/100)
+				//),
+				//contentHandler
+			//)
+		//);
+	//}
 
 	float timeA;
 	char titleBuff[512];
@@ -297,7 +314,7 @@ void Application::loop()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-        // TwDraw();
+		TwDraw();
     #endif
 
 	glfwSwapBuffers(window);
