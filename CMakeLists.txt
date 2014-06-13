@@ -44,6 +44,11 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(OS_OSX 1)
   set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${PROJECT_SOURCE_DIR}/extlibs/libs-osx)
+  add_custom_target(osxfix
+	  COMMAND ${PROJECT_SOURCE_DIR}/osx-fix.sh bin/*
+	  DEPENDS
+	  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+	  )
 else()
   message("FATAL: Unsupported OS")
   return()
@@ -94,6 +99,10 @@ add_executable(
   ${source_files}
 )
 
+if(${OS_OSX})
+	add_dependencies(${EXEC} fixosx)
+endif()
+
 # Finding libs
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
@@ -106,11 +115,19 @@ include_directories( ${OPENGL_INCLUDE_DIRS} ${GLEW_INCLUDE_PATH} ${GLFW_INCLUDE_
 # libs
 target_link_libraries(${EXEC} ${GLEW_LIBRARY} ${GLFW_LIBRARIES} ${OPENGL_LIBRARIES} ${ANTTWEAKBAR_LIBRARY} ${NOISE_LIBRARY} ${SFML_LIBRARIES})
 
-add_custom_target(run
-  COMMAND ${EXECUTABLE_OUTPUT_PATH}/${EXEC}
-  DEPENDS ${EXEC}
-  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-  )
+if (${OS_OSX})
+	add_custom_target(run
+		COMMAND ${EXECUTABLE_OUTPUT_PATH}/${EXEC}
+		DEPENDS ${EXEC} osxfix
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		)
+else()
+	add_custom_target(run
+		COMMAND ${EXECUTABLE_OUTPUT_PATH}/${EXEC}
+		DEPENDS ${EXEC}
+		WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+		)
+endif()
 
 add_custom_target(valgrind
   COMMAND valgrind --leak-check=full --tool=memcheck
@@ -127,7 +144,8 @@ file(GLOB_RECURSE all_obj ${OBJ_FILES}/*.o)
 list(REMOVE_ITEM all_obj ${OBJ_FILES}/main.cpp.o)
 #STRING(REPLACE ; " " all_obj "${all_obj}")
 file(GLOB_RECURSE all_tests ${PROJECT_SOURCE_DIR}/tests/*.cpp)
-#message("tests: ${all_obj}")
+# XXX this line makes the difference between being able to compile tests ot not on OSX. I just cannot understand why
+message("obj: ${all_obj}")
 
 foreach(t ${all_tests})
 	GET_FILENAME_COMPONENT(f_base ${t} NAME_WE)
