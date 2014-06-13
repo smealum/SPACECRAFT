@@ -75,7 +75,7 @@ class PlanetFace
 	friend class MiniWorld;
 	friend class Chunk;
 	public:
-		PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id);
+		PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id, int size=1);
 		PlanetFace(Planet* planet, PlanetFace* father, uint8_t id);
 		~PlanetFace();
 		
@@ -142,7 +142,7 @@ class Planet
 	friend class PlanetFace;
 	friend class Chunk;
 	public:
-		Planet(PlanetInfo *pi, class ContentHandler& ch, std::string name);
+		Planet(PlanetInfo *pi, class ContentHandler& ch, std::string name, int size=1);
 		~Planet(); // TODO faire tous les free
 		
 		void processLevelOfDetail(Camera& c);
@@ -188,6 +188,9 @@ class Planet
 		glm::mat3 model, invModel;
 
 		float angle;
+
+		float scale;
+		int size;
 
 		Cloud cloud;
 		Atmosphere atmosphere;

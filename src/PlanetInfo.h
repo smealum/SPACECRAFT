@@ -12,8 +12,6 @@ class PlanetInfo
 		~PlanetInfo();
 
 		int seed;
-		int gridWidth,
-			gridHeight;
 		float continentFrequency,
 				continentLacunarity,
 				mountainLacunarity,

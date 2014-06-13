@@ -5,8 +5,6 @@
 
 PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p):
 	seed(0),
-	gridWidth(200),
-	gridHeight(gridWidth / 2),
 	continentFrequency( 1.f),
 	continentLacunarity(2.089f),
 	mountainLacunarity(2.142f),

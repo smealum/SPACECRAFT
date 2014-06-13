@@ -69,7 +69,7 @@ void Chunk::draw(Camera& cam, glm::mat4 model)
     // if(!vArray.size())return;
     if(!vArray.size())return;
 
-    if(!cam.isBoxInFrustum(boundingVolume, 8, model))return;
+    // if(!cam.isBoxInFrustum(boundingVolume, 8, model))return;
 
     testVal++; //TEMP
  

@@ -153,8 +153,8 @@ bool SolarSystemDataRequest::isRelevant(int id)
 void SolarSystemDataRequest::process(int id)
 {
 	//TEMP
-	// numPlanets=5;
-	numPlanets=1;
+	numPlanets=2;
+	// numPlanets=1;
 	planets=new Planet*[numPlanets];
 }
 
@@ -187,7 +187,9 @@ void SolarSystemDataRequest::update(void)
 					new PlanetGeneratorEarth(contentHandler.getMaxProducers())
 				),
 				contentHandler,
-				oss.str()
+				oss.str(),
+				// i+1
+				2-i //TEMP
 		);
 	}
 	sun=new Sun(glm::vec3(0.0f));

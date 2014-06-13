@@ -22,7 +22,7 @@ using namespace std;
 
 extern float PlanetFaceDetailsPower;
 
-PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id):
+PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id, int size):
 	planet(planet),
 	father(NULL),
 	faceBuffer(NULL),
@@ -37,13 +37,13 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id):
 	toplevel(this),
 	x(0),
 	z(0),
-	depth(0),
+	depth(size-1),
 	childrenDepth(0),
 	isDisplayOk(false),
 	noBuffer(false)
 {
-	uvertex[0]=v[0]; uvertex[1]=v[1];
-	uvertex[2]=v[2]; uvertex[3]=v[3];
+	uvertex[0]=v[0]/float(size); uvertex[1]=v[1]/float(size);
+	uvertex[2]=v[2]/float(size); uvertex[3]=v[3]/float(size);
 	finalize();
 }
 
@@ -166,7 +166,7 @@ bool PlanetFace::shouldHaveMiniworld(Camera& c)
 	{
 		if (miniworld)
 		{
-			glm::vec3 p=planet->invModel*c.getPosition(planet->getPosition());
+			glm::vec3 p=planet->getCameraRelativePosition(c);
 			return glm::length(vertex[4]*elevation-p)*(2<<(depth))<20.0f;
 		}else{
 			return (childrenDepth >= PLANET_ADDED_DETAIL);
@@ -180,7 +180,7 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	if(depth>MINIWORLD_DETAIL+PLANET_ADDED_DETAIL+1)return true;
 	if(depth<4)return false;
 
-	glm::vec3 p=planet->invModel*c.getPosition(planet->getPosition());
+	glm::vec3 p=planet->getCameraRelativePosition(c);
 	if(glm::dot(vertex[0]*0.99f-p,vertex[0])>0.0f
 	&& glm::dot(vertex[1]*0.99f-p,vertex[1])>0.0f
 	&& glm::dot(vertex[2]*0.99f-p,vertex[2])>0.0f
@@ -237,54 +237,6 @@ static inline int max(int a, int b)
 void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 {
 	bool detailedEnough=isDetailedEnough(c);
-
-	// if(!faceBuffer)
-	// {
-	// 	if(sons[0])
-	// 	{
-	// 		bool allSons=true;
-	// 		for(int i=0;allSons && i<4;i++)allSons=allSons && sons[i]->faceBuffer;
-
-	// 		if(allSons)
-	// 		{
-	// 			int sum=0;
-	// 			for(int i=0;i<4;i++)sum+=sons[i]->faceBuffer->getSize();
-	// 			if(sum<PFBH_LOWTHRESHOLD)
-	// 			{
-	// 				noBuffer=false;
-	// 				for(int i=0;i<4;i++)
-	// 				{
-	// 					delete sons[i]->faceBuffer;
-	// 					sons[i]->faceBuffer=NULL;
-	// 					sons[i]->noBuffer=false;
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	// if(faceBuffer)
-	// {
-	// 	if(b)printf("ERROR1\n");
-	// 	b=faceBuffer;
-	// 	if(faceBuffer->getSize()>PFBH_THRESHOLD && !detailedEnough)
-	// 	{
-	// 		printf("DELETE %d %d\n",depth,faceBuffer->getSize());
-	// 		delete faceBuffer;
-	// 		b=faceBuffer=NULL;
-	// 		noBuffer=true;
-	// 	}
-	// }else if(!noBuffer){
-	// 	if(!b)b=faceBuffer=new PlanetFaceBufferHandler(*this, PFBH_MAXSIZE, getV1(), getV2());
-	// }
-
-	// if(!b && !faceBuffer)
-	// {
-	// 	b=faceBuffer=new PlanetFaceBufferHandler(*this, PFBH_MAXSIZE, getV1(), getV2());
-	// }else if(!b)
-	// {
-	// 	b=faceBuffer;
-	// }
 
 	if(faceBuffer)
 	{
@@ -394,16 +346,18 @@ static GLuint elements[2*3] = {
     0,1,2,      0,2,3, // face 1
 };
 
-Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name):
+Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name, int size):
 	planetInfo(pi),
 	handler(ch),
-	sunPosition(8.0,0.0,0.0),
-	position(0.0,0.0,0.0),
+	sunPosition(0),
+	position(0),
 	angle(0.0),
 	name(name),
-	atmosphere()
+	size(size),
+	// scale(1.0f/(1<<(size-1)))
+	scale(1.0f)
 {	
-	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i], i);
+	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i], i, size);
 }
 
 void PlanetFace::testFullGeneration(int depth, PlanetFaceBufferHandler* b)
@@ -593,13 +547,13 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 	shader.setUniform("planetPos", planetFace.planet->position-c.getReference());
 	shader.setUniform("cameraPos", c.getPosition(planetFace.planet->position));
 	shader.setUniform("model", glm::mat4(planetFace.planet->model));
+	shader.setUniform("planetSize", planetFace.planet->scale);
 
 	// //planetface_atmosphere test
 	// planetFace.planet->atmosphere.bind(c,lightdir,shader);
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
 
 	// bind la texture
 	glActiveTexture(GL_TEXTURE0);
@@ -752,7 +706,8 @@ void Planet::update(float time)
 	angle=time*2*PI/planetInfo->period;
 
 	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,planetInfo->axis));
-	invModel=glm::transpose(model);
+	invModel=glm::transpose(model)/scale;
+	model*=scale;
 }
 
 glm::vec3 PlanetFace::getOrigin(void)
