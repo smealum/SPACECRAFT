@@ -38,12 +38,14 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id, int size):
 	x(0),
 	z(0),
 	depth(size-1),
-	childrenDepth(0),
+	// depth(0),
+	childrenDepth(depth),
+	size(0),
 	isDisplayOk(false),
 	noBuffer(false)
 {
-	uvertex[0]=v[0]/float(size); uvertex[1]=v[1]/float(size);
-	uvertex[2]=v[2]/float(size); uvertex[3]=v[3]/float(size);
+	uvertex[0]=v[0]; uvertex[1]=v[1];
+	uvertex[2]=v[2]; uvertex[3]=v[3];
 	finalize();
 }
 
@@ -101,6 +103,7 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	}
 	
 	depth=father->depth+1;
+	size=father->size+1;
 
 	finalize();
 }
@@ -354,10 +357,11 @@ Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name, int size):
 	angle(0.0),
 	name(name),
 	size(size),
-	// scale(1.0f/(1<<(size-1)))
-	scale(1.0f)
-{	
+	scale(1.0f/(1<<(size-1)))
+	// scale(1.0f)
+{
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i], i, size);
+	pi->numBlocks=(PLANETFACE_BLOCKS>>(size-1));
 }
 
 void PlanetFace::testFullGeneration(int depth, PlanetFaceBufferHandler* b)
@@ -499,7 +503,7 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 	repeat = 2.0;	
 
 	faces.push_back(pf);
-	buffer.push_back((faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->minElevation,1.0f/(1<<pf->depth),topTile,sideTile,repeat});
+	buffer.push_back((faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->minElevation,1.0f/(1<<pf->size),topTile,sideTile,repeat});
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, curSize*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[curSize]);
@@ -621,6 +625,11 @@ PlanetFace& Planet::getTopLevelForCamera(Camera& c)
 glm::mat3 Planet::getModel(void)
 {
 	return model;
+}
+
+int Planet::getNumBlocks(void)
+{
+	return planetInfo->numBlocks;
 }
 
 void Planet::addMiniWorld(MiniWorld* mw)

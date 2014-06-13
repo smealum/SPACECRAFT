@@ -36,6 +36,7 @@ class PlanetInfo
 		// Axe de rotation propre
 		glm::vec3 axis;
 		float period;
+		int numBlocks;
 		
 		PlanetGenerator* planetGenerator;
 

@@ -20,7 +20,7 @@ void PlanetGenerator::setPlanetInfo(PlanetInfo* p)
 	initGenerators();
 }
 
-void PlanetGenerator::generateWorldData(int threadId,chunkVal* data,
+void PlanetGenerator::generateWorldData(int threadId, chunkVal* data,
 			int w, int h, int d, // array sizes (in chunks)
 			int px, int py, int pz, // offset in world
 			glm::vec3 origin, glm::vec3 v1, glm::vec3 v2) const  // toplevelCharacteristic
@@ -30,7 +30,7 @@ void PlanetGenerator::generateWorldData(int threadId,chunkVal* data,
 float PlanetGenerator::getElevation(int threadId, const glm::vec3 &coord) const
 {
 	float elevation = (generators[threadId]->getElevation(glm::normalize(coord))+1.0)/2.0f;
-	return blockHeightToElevation(elevation*float(CHUNK_N*MINIWORLD_H));
+	return blockHeightToElevation(elevation*float(CHUNK_N*MINIWORLD_H), planetInfo->numBlocks);
 }
 
 PlanetGeneratorResponse PlanetGenerator::getCharacteristic(int threadID , const glm::vec3& pos) const

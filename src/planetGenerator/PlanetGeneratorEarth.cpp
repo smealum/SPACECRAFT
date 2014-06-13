@@ -61,7 +61,7 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 					const glm::vec3 pos=origin+((v1*float(vx+px+i))+(v2*float(vz+pz+k)))/float(PLANETFACE_BLOCKS);
 
 					const auto blockReponse=getCharacteristic(threadId, pos);
-					const int height = elevationToBlockHeight(blockReponse.elevation);
+					const int height = elevationToBlockHeight(blockReponse.elevation, planetInfo->numBlocks);
 					const blockTypes::T tile = blockReponse.tile;
 
 					//TEMP (pour tester)
@@ -154,7 +154,7 @@ PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, co
 	float temperature = getTemperature(posn);
 	float humidity = getHumidity(posn);
 	float elevation = getElevation(threadId,posn);
-	double block_height=delevationToBlockHeight(elevation);
+	double block_height=delevationToBlockHeight(elevation, planetInfo->numBlocks);
 
 	if (block_height>double(CHUNK_N*MINIWORLD_H)*0.5) //  terre
 	{

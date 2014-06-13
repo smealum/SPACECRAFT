@@ -1,4 +1,5 @@
 #include "blockProcessing.h"
+#include "utils/positionMath.h"
 
 //TODO pour computeChunkFaces et generateWorldData : NETTOYER (on peut clairement faire plus jolie et lisible)
 
@@ -62,7 +63,7 @@ const glm::vec3 n[]={glm::vec3(0.0,-1.0,0.0), //bottom
 						glm::normalize(glm::vec3(-1.0,0.0,-1.0)) //diag22
 						};
 
-void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2, int tile)
+void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2, int numBlocks, int tile)
 {
 	GL_Vertex v;
 
@@ -71,11 +72,11 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 
 	pos1=pos+o[facedir];
 	pos2=v1*pos1.x+v2*pos1.z;
-	y=1.0+pos1.y/float(PLANETFACE_BLOCKS);
+	y=blockHeightToElevation(pos1.y,numBlocks);
 
-	const glm::vec3 rn=(normalize(origin+(pos2)/float(PLANETFACE_BLOCKS))*y);
+	const glm::vec3 rn=(normalize(origin+(pos2)/float(numBlocks))*y);
 
-	v.position=(normalize(origin+(pos2)/float(PLANETFACE_BLOCKS))*y);
+	v.position=(normalize(origin+(pos2)/float(numBlocks))*y);
 	v.texcoord=glm::vec2(1,1);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
@@ -84,9 +85,9 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 
 	pos1=pos+o[facedir]+d1[facedir];
 	pos2=v1*pos1.x+v2*pos1.z;
-	y=1.0+pos1.y/float(PLANETFACE_BLOCKS);
+	y=1.0+pos1.y/float(numBlocks);
 
-	v.position=(normalize(origin+(pos2)/float(PLANETFACE_BLOCKS))*y);
+	v.position=(normalize(origin+(pos2)/float(numBlocks))*y);
 	v.texcoord=glm::vec2(0,1);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
@@ -95,9 +96,9 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 
 	pos1=pos+o[facedir]+d2[facedir];
 	pos2=v1*pos1.x+v2*pos1.z;
-	y=1.0+pos1.y/float(PLANETFACE_BLOCKS);
+	y=1.0+pos1.y/float(numBlocks);
 
-	v.position=(normalize(origin+(pos2)/float(PLANETFACE_BLOCKS))*y);
+	v.position=(normalize(origin+(pos2)/float(numBlocks))*y);
 	v.texcoord=glm::vec2(1,0);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
@@ -107,9 +108,9 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 
 	pos1=pos+o[facedir]+d1[facedir]+d2[facedir];
 	pos2=v1*pos1.x+v2*pos1.z;
-	y=1.0+pos1.y/float(PLANETFACE_BLOCKS);
+	y=1.0+pos1.y/float(numBlocks);
 
-	v.position=(normalize(origin+(pos2)/float(PLANETFACE_BLOCKS))*y);
+	v.position=(normalize(origin+(pos2)/float(numBlocks))*y);
 	v.texcoord=glm::vec2(0,0);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
@@ -118,9 +119,9 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 
 	pos1=pos+o[facedir]+d2[facedir];
 	pos2=v1*pos1.x+v2*pos1.z;
-	y=1.0+pos1.y/float(PLANETFACE_BLOCKS);
+	y=1.0+pos1.y/float(numBlocks);
 
-	v.position=(normalize(origin+(pos2)/float(PLANETFACE_BLOCKS))*y);
+	v.position=(normalize(origin+(pos2)/float(numBlocks))*y);
 	v.texcoord=glm::vec2(1,0);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
@@ -129,9 +130,9 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 
 	pos1=pos+o[facedir]+d1[facedir];
 	pos2=v1*pos1.x+v2*pos1.z;
-	y=1.0+pos1.y/float(PLANETFACE_BLOCKS);
+	y=1.0+pos1.y/float(numBlocks);
 
-	v.position=(normalize(origin+(pos2)/float(PLANETFACE_BLOCKS))*y);
+	v.position=(normalize(origin+(pos2)/float(numBlocks))*y);
 	v.texcoord=glm::vec2(0,1);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
@@ -145,10 +146,16 @@ void computeChunkFaces(chunkVal* data,
 		int sx, int sy, int sz, //chunk in array (in chunks)
 		int px, int py, int pz, //chunk offset in world (in blocks)
 		glm::vec3 origin, glm::vec3 v1, glm::vec3 v2,
+		int numBlocks,
 		std::vector<GL_Vertex>& vArray) //output
 {
 	vArray.clear();
 	auto &blockType = BlockType::getInstance();
+
+	// printf("o %f %f %f\n",origin.x,origin.y,origin.z);
+	// printf("v %f %f %f\n",v1.x,v1.y,v1.z);
+	// printf("p %d %d %d\n",px,py,pz);
+	// printf("%d %d\n",numBlocks,PLANETFACE_BLOCKS);
 
 	chunkVal previous,current;
 	// X
@@ -160,9 +167,9 @@ void computeChunkFaces(chunkVal* data,
 		{
 			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
 			if (blockShouldBeFace(current,previous)) {
-				generateFace(vArray, vec3(px+x,py+y,pz+z), 2, origin, v1, v2, getBlockID(current,blockPlane::side));
+				generateFace(vArray, vec3(px+x,py+y,pz+z), 2, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::side));
 			}else if (blockShouldBeFace(previous,current)) {
-				generateFace(vArray, vec3(px+x-1,py+y,pz+z), 3, origin, v1, v2, getBlockID(previous,blockPlane::side));
+				generateFace(vArray, vec3(px+x-1,py+y,pz+z), 3, origin, v1, v2, numBlocks, getBlockID(previous,blockPlane::side));
 			}
 			previous=current;
 		}
@@ -177,9 +184,9 @@ void computeChunkFaces(chunkVal* data,
 		{
 			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
 			if (blockShouldBeFace(current,previous)) {
-				generateFace(vArray, vec3(px+x,py+y,pz+z), 0, origin, v1, v2, getBlockID(current,blockPlane::bottom));
+				generateFace(vArray, vec3(px+x,py+y,pz+z), 0, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::bottom));
 			} else if (blockShouldBeFace(previous,current)) {
-				generateFace(vArray, vec3(px+x,py+y-1,pz+z), 1, origin, v1, v2, getBlockID(previous,blockPlane::top));
+				generateFace(vArray, vec3(px+x,py+y-1,pz+z), 1, origin, v1, v2, numBlocks, getBlockID(previous,blockPlane::top));
 			}
 			previous=current;
 		}
@@ -194,9 +201,9 @@ void computeChunkFaces(chunkVal* data,
 		{
 			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
 			if (blockShouldBeFace(current,previous)) {
-				generateFace(vArray, vec3(px+x,py+y,pz+z), 4, origin, v1, v2, getBlockID(current,blockPlane::side));
+				generateFace(vArray, vec3(px+x,py+y,pz+z), 4, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::side));
 			}else if (blockShouldBeFace(previous,current)) {
-				generateFace(vArray, vec3(px+x,py+y,pz+z-1), 5, origin, v1, v2, getBlockID(previous,blockPlane::side));
+				generateFace(vArray, vec3(px+x,py+y,pz+z-1), 5, origin, v1, v2, numBlocks, getBlockID(previous,blockPlane::side));
 			}
 			previous=current;
 		}
@@ -210,10 +217,10 @@ void computeChunkFaces(chunkVal* data,
 		current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
 		if (blockStyleID[current] == blockStyle::sprite)
 		{
-			generateFace(vArray, vec3(px+x,py+y,pz+z), 6, origin, v1, v2, getBlockID(current,blockPlane::top));
-			generateFace(vArray, vec3(px+x,py+y,pz+z), 7, origin, v1, v2, getBlockID(current,blockPlane::top));
-			generateFace(vArray, vec3(px+x,py+y,pz+z), 8, origin, v1, v2, getBlockID(current,blockPlane::top));
-			generateFace(vArray, vec3(px+x,py+y,pz+z), 9, origin, v1, v2, getBlockID(current,blockPlane::top));
+			generateFace(vArray, vec3(px+x,py+y,pz+z), 6, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::top));
+			generateFace(vArray, vec3(px+x,py+y,pz+z), 7, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::top));
+			generateFace(vArray, vec3(px+x,py+y,pz+z), 8, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::top));
+			generateFace(vArray, vec3(px+x,py+y,pz+z), 9, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::top));
 		}
 	}
 }

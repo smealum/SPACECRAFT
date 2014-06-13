@@ -258,7 +258,6 @@ void Application::loop()
 		state = appExiting;
 	}
 
-
 	Input::update(window);
 
 	testSolarSystem->update(globalTime);
@@ -285,7 +284,7 @@ void Application::loop()
     if(Input::isKeyPressed(GLFW_KEY_V))testBool1^=1;
 	if(Input::isKeyPressed(GLFW_KEY_B))testBool2^=1;
 
-	printf("test %d\n",testVal);
+	// printf("test %d\n",testVal);
 	testVal=0;
 
 	contentHandler.handleNewContent();

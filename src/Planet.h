@@ -130,7 +130,7 @@ class PlanetFace
 		float minElevation;
 		
 		uint8_t id;
-		int depth;
+		int depth, size;
 		int childrenDepth;
 		inline bool isDrawingFace() {return bufferID>=0;}
 		bool isDisplayOk;
@@ -160,6 +160,7 @@ class Planet
 		void deleteBlock(glm::i32vec3 p);
 
 		std::string getName(void);
+		int getNumBlocks(void);
 
 		const PlanetInfo* planetInfo; //read only
 		class ContentHandler& handler;

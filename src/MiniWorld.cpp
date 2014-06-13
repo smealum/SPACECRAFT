@@ -32,7 +32,7 @@ MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 			}
 		}
 	}
-	planet->handler.requestContent(new MiniWorldDataRequest(*planet, *this, origin, v1, v2, x, 0, z, planet->handler));
+	planet->handler.requestContent(new MiniWorldDataRequest(*planet, *this, origin, v1, v2, x, 0, z, p->getNumBlocks(), planet->handler));
 }
 
 MiniWorld::~MiniWorld()
