@@ -10,7 +10,6 @@
 #include "render/Shader.h"
 #include "render/Camera.h"
 #include "render/Cloud.h"
-#include "render/Atmosphere.h"
 #include "world/BlockType.h"
 #include "PlanetInfo.h"
 
@@ -181,7 +180,6 @@ class Planet
 		float angle;
 
 		Cloud cloud;
-		Atmosphere atmosphere;
 };
 
 #endif

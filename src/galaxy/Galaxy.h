@@ -3,9 +3,10 @@
 
 #include "utils/glm.h"
 #include "render/Camera.h"
-#include "SolarSystem.h"
-#include "render/Shader.h"
 #include <vector>
+
+class SolarSystem;
+class ShaderProgram;
 
 ///////////////////////////////////////////////////////////////
 class  Galaxy;

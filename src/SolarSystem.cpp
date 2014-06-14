@@ -8,7 +8,7 @@ SolarSystem::SolarSystem(const glm::dvec3& pos, ContentHandler& ch):
 	numPlanets(0),
 	position(pos)
 {
-	ch.requestContent(new SolarSystemDataRequest(*this, ch));
+	//ch.requestContent(new SolarSystemDataRequest(*this, ch));
 }
 
 SolarSystem::~SolarSystem()

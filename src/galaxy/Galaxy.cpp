@@ -1,5 +1,8 @@
 #include "Galaxy.h"
 #include <list>
+#include "utils/dbg.h"
+#include "SolarSystem.h"
+#include "render/Shader.h"
 
 
 using namespace glm;
@@ -7,7 +10,7 @@ using namespace std;
 
 /////////////////////////////////////////////////////////
 // paramètres de la galaxie
-const double GALAXY_WIDTH = 100.0;
+const double GALAXY_WIDTH = 1000.0;
 const dvec3 GALAXY_CENTER(0.0,0.0,0.0);
 const double SOLARSYSTEM_MIN_DISTANCE = 0.1; 
 
@@ -59,15 +62,17 @@ void Galaxy::generateVBO()
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
+	glBindFragDataLocation(program.getHandle(), 0, "outColor");
+	program.setAttribute("position", 3, GL_FALSE, 0, 0);
+
 	program.setBuffers(vao, vbo, 0);
 	program.use();
 
-	glBindFragDataLocation(program.getHandle(), 0, "outColor");
-	program.setAttribute("position", 3, GL_FALSE, 0, 0);
 }
 
 void Galaxy::draw(Camera& camera)
 {
+	if (not isVBOGenerated) generateVBO();
     program.use();
 
     glBindVertexArray(vao);
@@ -75,7 +80,7 @@ void Galaxy::draw(Camera& camera)
 
     camera.updateCamera(program);
 
-    glDrawArrays(GL_TRIANGLES, 0, solarPosition.size());
+    glDrawArrays(GL_POINTS, 0, solarPosition.size());
 }
 
 ////////////////////////////////////////////////////////
@@ -94,20 +99,20 @@ dvec3 cubeDecalage[2][2][2]=
 	{
 		{
 			dvec3(-1.0,-1.0,-1.0),
-			dvec3(+1.0,-1.0,-1.0),
+			dvec3(-1.0,-1.0,+1.0),
 		},
 		{
 			dvec3(-1.0,+1.0,-1.0),
-			dvec3(+1.0,+1.0,-1.0),
+			dvec3(-1.0,+1.0,+1.0),
 		}
 	},
 	{
 		{
-			dvec3(-1.0,-1.0,+1.0),
+			dvec3(+1.0,-1.0,-1.0),
 			dvec3(+1.0,-1.0,+1.0),
 		},
 		{
-			dvec3(-1.0,+1.0,+1.0),
+			dvec3(+1.0,+1.0,-1.0),
 			dvec3(+1.0,+1.0,+1.0),
 		}
 	},
@@ -130,8 +135,14 @@ void GalaxyTree::pushSolarSystem(SolarSystem* s)
 
 		isSubdivised = true;
 
-		// TODO
-		//children={{{NULL,NULL},{NULL,NULL}},{{NULL,NULL},{NULL,NULL}}};
+		children[0][0][0]=NULL;
+		children[0][0][1]=NULL;
+		children[0][1][0]=NULL;
+		children[0][1][1]=NULL;
+		children[1][0][0]=NULL;
+		children[1][0][1]=NULL;
+		children[1][1][0]=NULL;
+		children[1][1][1]=NULL;
 	}
 
 	// calcul dans quel branche poser s
@@ -147,10 +158,11 @@ void GalaxyTree::pushSolarSystem(SolarSystem* s)
 	}
 	else
 	{
+		dvec3 c = center + cubeDecalage[xx][yy][zz]*width*0.5;
 		children[xx][yy][zz] =
 			new GalaxyTree(
 					s,
-					cubeDecalage[xx][yy][zz]*width*0.5,
+					c,
 					width*0.5
 			);
 	}

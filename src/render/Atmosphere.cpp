@@ -43,6 +43,21 @@ void Atmosphere::initLightConstants(void)
 //(attention aux appels GL)
 void Atmosphere::makeOpticalDepthBuffer(void)
 {
+	// on ne génère que une fois ceci.
+	static bool isOpticalDepthBufferGenerated = false;
+	static GLuint depthTextureGlobal = 0;
+	static GLuint phaseTextureGlobal = 0;
+	if (isOpticalDepthBufferGenerated)
+	{
+		depthTexture=depthTextureGlobal;
+		phaseTexture=phaseTextureGlobal;
+		return;
+	}
+	else
+	{
+		isOpticalDepthBufferGenerated = true;
+	}
+
 	const int nSize = 256;
 	const int nSamples = 50;
 	const float fScale = 1.0f / (m_fOuterRadius - m_fInnerRadius);
@@ -137,7 +152,11 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	
 	free(opticalBuffer);
+
+	phaseTextureGlobal=phaseTexture;
+	depthTextureGlobal=depthTexture;
 }
+
 
 //TODO : idem
 void Atmosphere::makePhaseBuffer(void)

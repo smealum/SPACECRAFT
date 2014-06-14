@@ -14,6 +14,7 @@
 #include "utils/glm.h"
 #include "noise/CaveGenerator.h"
 #include "galaxy/Galaxy.h"
+#include "galaxy/GalaxyGenerator.h"
 
 #define WIN_TITLE "SPACECRAFT"
 
@@ -194,6 +195,7 @@ SolarSystem* testSolarSystem;
 Cursor* testCursor;
 int testTexture;
 int testTextureArray;
+Galaxy* galaxy;
 bool testBool1=false, testBool2=false;
 
 void Application::run()
@@ -215,22 +217,9 @@ void Application::run()
 	testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
 	testTextureArray=TextureManager::getInstance().loadTextureArray("data/blocksPackArray.png",16,16);
 	caves.generate();
-
-	Galaxy galaxy;
-	for(int i=0;i<100*100;++i)
-	{
-		log_info("Ajout d'un system solaire");
-		galaxy.pushSolarSystem(
-			new SolarSystem(
-				dvec3(
-					(i%100)%10,
-					(i%100)/10,
-					(i/100)
-				),
-				contentHandler
-			)
-		);
-	}
+	
+	galaxy = new Galaxy();
+	GalaxyGenerate(galaxy,contentHandler);
 
 	float timeA;
 	char titleBuff[512];
@@ -252,13 +241,12 @@ void Application::run()
 				sprintf(titleBuff, "%s FPS: %.1f", WIN_TITLE, fps);
 				glfwSetWindowTitle(window, titleBuff);
 			}
-			BlockAnimated::animation(deltaTime);
 		}
 
-		// test des ereurs openGL non reporté:
+		// test des ereurs openGL non reportées:
 		{
 			static int i=0;
-			if (i++%30)
+			if (i++%300==0)
 				glCheckError("Unreported Error");
 		}
 	}
@@ -279,6 +267,7 @@ void Application::loop()
 
 	Input::update(window);
 
+
 	testSolarSystem->update(globalTime);
 	camera->update();
 
@@ -286,8 +275,11 @@ void Application::loop()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
+
+	galaxy->draw(*camera);
 	testSolarSystem->draw(*camera);
 	testCursor->draw(*camera);
+
 
 	if(Input::isKeyPressed(GLFW_KEY_N))reloadAllShaders();
 

@@ -18,12 +18,11 @@
 #include "utils/glm.h"
 #include "utils/Sphere.h"
 #include "render/Camera.h"
+#include "utils/Singleton.h"
 
-class Atmosphere
+class Atmosphere : public Singleton<Atmosphere>
 {
 	public:
-		Atmosphere();
-		~Atmosphere();
 
 		void initLightConstants(void);
 		void makeOpticalDepthBuffer(void);
@@ -35,6 +34,9 @@ class Atmosphere
 		void draw(Camera& c, glm::vec3 lightDirection, glm::vec3 position);
 
 	private:
+		Atmosphere();
+		virtual ~Atmosphere();
+
 		ShaderProgram& shader;
 
 		int m_nSamples;
@@ -54,6 +56,8 @@ class Atmosphere
 		GLuint vao, vbo, ebo;
 
 		int lod;
+
+	friend class Singleton<Atmosphere>;
 };
 
 #endif

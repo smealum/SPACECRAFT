@@ -7,6 +7,7 @@
 #include "world/BlockType.h"
 #include "utils/positionMath.h"
 #include "world/BlockType.h"
+#include "render/Atmosphere.h"
 
 
 using namespace std;
@@ -342,8 +343,7 @@ Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name):
 	sunPosition(8.0,0.0,0.0),
 	position(0.0,0.0,0.0),
 	angle(0.0),
-	name(name),
-	atmosphere()
+	name(name)
 {
 	
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i], i);
@@ -542,7 +542,7 @@ void Planet::draw(Camera& c)
 	// printf("%d\n",miniWorldList.size());
 	
 	// dessin de l'athmosphere
-	atmosphere.draw(c, lightdir, position);
+	Atmosphere::getInstance().draw(c, lightdir, position);
 
 	// dessin des nuages
 	// cloud.draw(c);
