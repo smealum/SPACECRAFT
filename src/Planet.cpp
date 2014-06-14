@@ -161,6 +161,7 @@ void PlanetFace::updateElevation(float e, blockTypes::T t)
 #include <cstdio>
 
 int randomSource=4;
+#define PLANET_ALTITUDETHRESHOLD (1.005f)
 
 bool PlanetFace::shouldHaveMiniworld(Camera& c)
 {
@@ -170,7 +171,12 @@ bool PlanetFace::shouldHaveMiniworld(Camera& c)
 		if (miniworld)
 		{
 			glm::vec3 p=planet->getCameraRelativePosition(c);
-			return glm::length(vertex[4]*elevation-p)*(2<<(depth))<20.0f;
+			// return glm::length(vertex[4]*elevation-p)*(2<<(depth))<20.0f;
+
+			//on ne prend plus en compte l'élévation, c'est fait exprès
+			p=glm::normalize(p)*max(PLANET_ALTITUDETHRESHOLD,glm::length(p));
+			const float l=glm::length(vertex[4]*PLANET_ALTITUDETHRESHOLD-p);
+			return l*(2<<(depth))<20.0f;
 		}else{
 			return (childrenDepth >= PLANET_ADDED_DETAIL);
 		}
@@ -201,7 +207,12 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	//float d=2.0f/(1<<(depth-2));
 	//if(length(vertex[4]*elevation-p)/d<1.2f)return false;
 	// if(length(vertex[4]*elevation-p)*(2<<(depth))<40.0f) return false;
-	if(glm::length(vertex[4]*elevation-p)*(2<<(depth-1))<PlanetFaceDetailsPower) return false;
+	// if(glm::length(vertex[4]*elevation-p)*(2<<(depth-1))<PlanetFaceDetailsPower) return false;
+
+	//on ne prend plus en compte l'élévation, c'est fait exprès
+	p=glm::normalize(p)*max(PLANET_ALTITUDETHRESHOLD,glm::length(p));
+	const float l=glm::length(vertex[4]*PLANET_ALTITUDETHRESHOLD-p);
+	if(l*(2<<(depth-1))<PlanetFaceDetailsPower) return false;
 	return true;
 }
 
