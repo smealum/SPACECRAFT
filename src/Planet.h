@@ -167,6 +167,7 @@ class Planet
 
 		glm::dvec3 getGravityVector(glm::dvec3 p);
 		glm::vec3 getPosition(void);
+		glm::mat4 getFullModel(Camera& c);
 		glm::mat3 getModel(void);
 		glm::mat3 getInvModel(void);
 		glm::vec3 getCameraRelativePosition(Camera& c);

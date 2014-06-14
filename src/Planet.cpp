@@ -144,7 +144,7 @@ void PlanetFace::finalize(void)
 
 	for(int i=0;i<9;i++)vertex[i]=glm::normalize(uvertex[i]);
 	for(int i=0;i<4;i++)box[i]=vertex[i];
-	for(int i=0;i<4;i++)box[i+4]=vertex[i]*1.1f;
+	for(int i=0;i<4;i++)box[i+4]=vertex[i]*1.4f;
 
 	planet->handler.requestContent(new PlanetElevationRequest(*planet, *this, vertex[4]));
 }
@@ -570,7 +570,7 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 
 void PlanetFace::draw(Camera& c, glm::vec3 lightdir)
 {
-	if(!c.isBoxInFrustum(box, 8, glm::mat4(planet->getModel())))return; //frustum culling
+	if(!c.isBoxInFrustum(box, 8, planet->getFullModel(c)))return; //frustum culling
 	if(!faceBuffer || noBuffer)
 	{
 		if(sons[0])for(int i=0;i<4;i++)sons[i]->draw(c,lightdir);
@@ -620,6 +620,11 @@ PlanetFace& Planet::getTopLevelForCamera(Camera& c)
 	}
 	printf("ERROR ERROR\n");
 	return *faces[0];
+}
+
+glm::mat4 Planet::getFullModel(Camera& c)
+{
+	return glm::translate(glm::mat4(1),position-c.getReference())*glm::mat4(model);
 }
 
 glm::mat3 Planet::getModel(void)
