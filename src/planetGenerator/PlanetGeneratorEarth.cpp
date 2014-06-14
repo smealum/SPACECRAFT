@@ -16,20 +16,24 @@ PlanetGeneratorEarth::PlanetGeneratorEarth(int nbThread):
 void PlanetGeneratorEarth::initGenerators()
 {
 	for(int i=0;i<nbThread;++i)
-		generators.push_back(new PlanetNoiseGenerator(*planetInfo));
+		generators.push_back(new PlanetNoiseGenerator(*((PlanetInfoEarth*)planetInfo)));
 }
 
 PlanetGeneratorEarth::~PlanetGeneratorEarth()
 {
-
 }
 
+void PlanetGeneratorEarth::setPlanetInfo(PlanetInfo* p)
+{
+	planetInfo = p;
+	initGenerators();
+}
 
 void PlanetGeneratorEarth::generateWorldData(int threadId,
 			chunkVal* data,
 			int w, int h, int d, // array sizes (in chunks)
 			int px, int py, int pz, // offset in world
-			glm::vec3 origin, glm::vec3 v1, glm::vec3 v2) const // toplevelCharacteristic
+			glm::vec3 origin, glm::vec3 v1, glm::vec3 v2) // toplevelCharacteristic
 {
 	/*
 		i CHUNK_N
@@ -148,7 +152,7 @@ inline float min(float a, float b)
 	return (a<b)?a:b;
 }
 
-PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, const glm::vec3& pos) const
+PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, const glm::vec3& pos)
 {
 	glm::vec3 posn = glm::normalize(pos);
 	float temperature = getTemperature(posn);
@@ -195,7 +199,13 @@ PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, co
 	}
 }
 
-float PlanetGeneratorEarth::getTemperature(const glm::vec3& pos) const
+float PlanetGeneratorEarth::getElevation(int threadId, const glm::vec3 &coord)
+{
+	float elevation = (generators[threadId]->getElevation(glm::normalize(coord))+1.0)/2.0f;
+	return blockHeightToElevation(elevation*float(CHUNK_N*MINIWORLD_H), planetInfo->numBlocks);
+}
+
+float PlanetGeneratorEarth::getTemperature(const glm::vec3& pos)
 {
 	float distanceToEquatorFactor = 1.0-2.0*fabs(
 			glm::dot(
@@ -208,7 +218,7 @@ float PlanetGeneratorEarth::getTemperature(const glm::vec3& pos) const
 	return glm::clamp(distanceToEquatorFactor+noise1+noise2,-1.f,1.f);
 }
 
-float PlanetGeneratorEarth::getHumidity(const glm::vec3& pos) const
+float PlanetGeneratorEarth::getHumidity(const glm::vec3& pos)
 {
 	float noise = glm::simplex(pos*2.f) *  1.4;
 	

@@ -196,13 +196,11 @@ void SolarSystemDataRequest::update(void)
 {
 	for(int i=0;i<numPlanets;i++)
 	{
-		PlanetInfo pitest(
-		);
 		std::ostringstream oss;
 		oss << i;
 		planets[i]=
 			new Planet(
-				new PlanetInfo(
+				new PlanetInfoEarth(
 					new EllipticalTrajectory(
 						glm::vec3(0.0f),
 						glm::mat3(10.0f*(i+1)),

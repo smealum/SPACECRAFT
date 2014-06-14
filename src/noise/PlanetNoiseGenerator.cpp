@@ -1,6 +1,6 @@
 #include "noise/PlanetNoiseGenerator.h"
 
-PlanetNoiseGenerator::PlanetNoiseGenerator(const PlanetInfo & pinfo):
+PlanetNoiseGenerator::PlanetNoiseGenerator(const PlanetInfoEarth & pinfo):
 	pi(pinfo)
 {
     baseContinentDef_pe0.SetSeed (pi.seed + 0);

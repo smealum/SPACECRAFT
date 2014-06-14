@@ -2,9 +2,23 @@
 #include "planetGenerator/PlanetGenerator.h"
 #include "utils/dbg.h"
 
-
+//setPlanetInfo is the responsibility of descending classes as it should only be called after PI's been fully initialized
 PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p):
 	seed(0),
+	trajectory(t),
+	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
+	period(1.0f),
+	planetGenerator(p)
+{
+}
+
+//la suppression de trajectory n'est PAS la responsabilité de planetInfo
+PlanetInfo::~PlanetInfo()
+{
+}
+
+PlanetInfoEarth::PlanetInfoEarth(SpaceObjectTrajectory* t, PlanetGenerator* p):
+	PlanetInfo(t,p),
 	continentFrequency( 1.f),
 	continentLacunarity(2.089f),
 	mountainLacunarity(2.142f),
@@ -22,16 +36,12 @@ PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p):
 	terrainOffset(1.f),
 	mountainGlaciation(1.375f),
 	continentHeightScale((1.f - seaLevel) / 4.f),
-	riverDepth(0.0223f),
-	trajectory(t),
-	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
-	period(1.0f),
-	planetGenerator(p)
+	riverDepth(0.0223f)
 {
 	planetGenerator->setPlanetInfo(this);
 }
 
 //la suppression de trajectory n'est PAS la responsabilité de planetInfo
-PlanetInfo::~PlanetInfo()
+PlanetInfoEarth::~PlanetInfoEarth()
 {
 }

@@ -18,25 +18,22 @@ class PlanetGenerator
 {
 	public:
 		PlanetGenerator(int nbThread);
-		virtual ~PlanetGenerator();
-		void setPlanetInfo(PlanetInfo* p);
+		virtual void setPlanetInfo(PlanetInfo* p);
 
 		// genere un miniworld
 		virtual void generateWorldData(int threadId,chunkVal* data,
 					int w, int h, int d, // array sizes (in chunks)
 					int px, int py, int pz, // offset in world
-					glm::vec3 origin, glm::vec3 v1, glm::vec3 v2) const; // toplevelCharacteristic
+					glm::vec3 origin, glm::vec3 v1, glm::vec3 v2) = 0; // toplevelCharacteristic
 
 		// genere l'elevation,texture.
-		virtual PlanetGeneratorResponse getCharacteristic(int threadId, const glm::vec3& pos) const ;
+		virtual PlanetGeneratorResponse getCharacteristic(int threadId, const glm::vec3& pos)  = 0;
 
 		// genere seulement l'elevation
-		virtual float getElevation(int threadId, const glm::vec3& pos) const;
+		virtual float getElevation(int threadId, const glm::vec3& pos)  = 0;
 
 	protected:
-		virtual void initGenerators();
 		int nbThread;
-		std::vector<PlanetNoiseGenerator*> generators;
 		PlanetInfo* planetInfo;
 		// Donne la température en fonction de la position
 		// Prend en compte
@@ -46,7 +43,7 @@ class PlanetGenerator
 		//		-valeur intrinsèque de la planete (composition) (TODO)
 		// Le résultat est à valeur dans [-1,1]
 		// La position est une position dans le référentiel de la planète.
-		virtual float getTemperature(const glm::vec3& pos) const;
+		virtual float getTemperature(const glm::vec3& pos)  = 0;
 
 		// Donne l'humidité en fonction de la position
 		// Prend en compte:
@@ -54,7 +51,7 @@ class PlanetGenerator
 		//		-valeur intrinsèque de la planete (composition) (TODO)
 		// Le résultat est à valeur dans [-1,1]
 		// La position est une position dans le référentiel de la planète.
-		virtual float getHumidity(const glm::vec3& pos) const;
+		virtual float getHumidity(const glm::vec3& pos)  = 0;
 
 };
 

@@ -4,14 +4,28 @@
 #include "SpaceObjectTrajectory.h"
 
 class PlanetGenerator;
+
 class PlanetInfo
 {
 	public:
-		PlanetInfo(const PlanetInfo& p);
 		PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* planetGen);
 		~PlanetInfo();
 
 		int seed;
+
+		PlanetGenerator* planetGenerator;
+		SpaceObjectTrajectory* trajectory;
+		glm::vec3 axis;
+		float period;
+		int numBlocks;		
+};
+
+class PlanetInfoEarth : public PlanetInfo
+{
+	public:
+		PlanetInfoEarth(SpaceObjectTrajectory* t, PlanetGenerator* planetGen);
+		~PlanetInfoEarth();
+
 		float continentFrequency,
 				continentLacunarity,
 				mountainLacunarity,
@@ -29,18 +43,7 @@ class PlanetInfo
 				terrainOffset,
 				mountainGlaciation,
 				continentHeightScale,
-				riverDepth;
-
-		SpaceObjectTrajectory* trajectory;
-
-		// Axe de rotation propre
-		glm::vec3 axis;
-		float period;
-		int numBlocks;
-		
-		PlanetGenerator* planetGenerator;
-
-
+				riverDepth;		
 };
 
 #endif
