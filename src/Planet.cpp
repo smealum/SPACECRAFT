@@ -406,8 +406,8 @@ void Planet::processLevelOfDetail(Camera& c)
 PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::vec3 v1, glm::vec3 v2):
 	planetFace(pf),
 	maxSize(ms),
-	shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface")),
-	// shader(ShaderProgram::loadFromFile("shader/planetface_atmosphere/planetface_atmosphere.vert", "shader/planetface_atmosphere/planetface_atmosphere.frag", "shader/planetface_atmosphere/planetface_atmosphere.geom", "planetface_atmosphere")),
+	// shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface")),
+	shader(ShaderProgram::loadFromFile("shader/planetface_atmosphere/planetface_atmosphere.vert", "shader/planetface_atmosphere/planetface_atmosphere.frag", "shader/planetface_atmosphere/planetface_atmosphere.geom", "planetface_atmosphere")),
 	curSize(0),
 	curCapacity(PFBH_MINCAP),
 	v1(glm::normalize(v1)),
@@ -564,15 +564,15 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 	shader.setUniform("model", glm::mat4(planetFace.planet->model));
 	shader.setUniform("planetSize", planetFace.planet->scale);
 
-	// //planetface_atmosphere test
-	// planetFace.planet->atmosphere.bind(c,lightdir,shader);
+	//planetface_atmosphere test
+	planetFace.planet->atmosphere.bind(c,lightdir,planetFace.planet->position,planetFace.planet->scale,shader);
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	// bind la texture
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY,testTextureArray);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, testTextureArray);
 	shader.setUniform("Texture",0);
 
 	glDrawArrays(GL_POINTS, 0, curSize);

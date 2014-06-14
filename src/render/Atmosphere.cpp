@@ -205,14 +205,16 @@ void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, f
 	sprogram.setUniform("m_nSamples", m_nSamples);
 	sprogram.setUniform("scale", scale);
 
-	sprogram.setUniform("depthTex",0);
-	sprogram.setUniform("phaseTex",1);
+	sprogram.setUniform("depthTex",1);
+	sprogram.setUniform("phaseTex",2);
 
-	glActiveTexture(GL_TEXTURE1);
+	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_1D, phaseTexture);
 
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, depthTexture);
+
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void Atmosphere::draw(Camera& c, glm::vec3 lightDirection, glm::vec3 position, float scale)

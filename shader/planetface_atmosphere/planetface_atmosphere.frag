@@ -3,8 +3,13 @@
 // original code by sean p o'neill (http://sponeil.net/)
 // fragment shader adaptation by smea (http://smealum.net)
 
+uniform sampler2DArray Texture;
+
 in vec3 vPos;
-in vec4 fcolor;
+in float fluminosity;
+flat in int ftile;
+in vec2 ftexCoords;
+in float frepeat;
 
 out vec4 outColor;
 
@@ -23,6 +28,7 @@ uniform float m_Km4PI;
 uniform vec3 m_fWavelength4;
 uniform float m_g;
 uniform float m_ESun;
+uniform float scale;
 uniform bool sky;
 
 uniform vec3 cameraPosition;
@@ -161,13 +167,8 @@ void main()
 
 	color=vec4(t,1.0);
 
-	//color=texelFetch(tex, ivec2((int(gl_FragCoord[0])%texSize),(int(gl_FragCoord[1])%texSize)), 0);
-	// if(!sky)color*=gl_Color;
-	outColor = (5*color)*fcolor;
-	// outColor = texture(depthTex,vec2(gl_FragCoord)/800);
-	// outColor = vec4(color.xyz,1.0);
-	// outColor = vec4(normalize(vt),1.0);
-	// outColor = vec4(vPos+vec3(0.5,0,0),1.0);
-	// outColor = texture(tex, vec2(vPos));
-	//gl_FragColor = gl_Color;
+	outColor = texture(Texture,vec3(ftexCoords.xy*frepeat,ftile));
+	outColor.xyz*=fluminosity;
+	outColor.a = 1.0;
+	outColor+=(color);
 }
