@@ -216,20 +216,21 @@ void Application::run()
 	testTextureArray=TextureManager::getInstance().loadTextureArray("data/blocksPackArray.png",16,16);
 	caves.generate();
 
-	//Galaxy galaxy;
-	//for(int i=0;i<100*100;++i)
-	//{
-		//galaxy.pushSolarSystem(
-			//new SolarSystem(
-				//dvec3(
-					//(i%100)%10,
-					//(i%100)/10,
-					//(i/100)
-				//),
-				//contentHandler
-			//)
-		//);
-	//}
+	Galaxy galaxy;
+	for(int i=0;i<100*100;++i)
+	{
+		log_info("Ajout d'un system solaire");
+		galaxy.pushSolarSystem(
+			new SolarSystem(
+				dvec3(
+					(i%100)%10,
+					(i%100)/10,
+					(i/100)
+				),
+				contentHandler
+			)
+		);
+	}
 
 	float timeA;
 	char titleBuff[512];

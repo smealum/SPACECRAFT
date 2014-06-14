@@ -5,6 +5,8 @@
 using namespace glm;
 using namespace std;
 
+/////////////////////////////////////////////////////////
+// paramètres de la galaxie
 const double GALAXY_WIDTH = 100.0;
 const dvec3 GALAXY_CENTER(0.0,0.0,0.0);
 const double SOLARSYSTEM_MIN_DISTANCE = 0.1; 
@@ -128,7 +130,8 @@ void GalaxyTree::pushSolarSystem(SolarSystem* s)
 
 		isSubdivised = true;
 
-		children={{{NULL,NULL},{NULL,NULL}},{{NULL,NULL},{NULL,NULL}}};
+		// TODO
+		//children={{{NULL,NULL},{NULL,NULL}},{{NULL,NULL},{NULL,NULL}}};
 	}
 
 	// calcul dans quel branche poser s
