@@ -2,39 +2,35 @@
 #include "Atmosphere.h"
 #include "utils/SphereManager.h"
 
-Atmosphere::Atmosphere():
-	shader(ShaderProgram::loadFromFile("shader/atmosphere/atmosphere.vert", "shader/atmosphere/atmosphere.frag", "atmosphere")),
+AtmosphereInfo::AtmosphereInfo():
 	m_fInnerRadius(1.0f),
 	m_fOuterRadius(1.05f),
+	m_nSamples(NUMSAMPLES),
+	m_Kr(KR),
+	m_Kr4PI(m_Kr*4.0f*PI),
+	m_Km(KM),
+	m_Km4PI(m_Km*4.0f*PI),
+	m_ESun(ESUN),
+	m_g(G),
+	m_fScale(1.0f/(m_fOuterRadius - m_fInnerRadius)),
+	m_fWavelength(glm::vec3(WAVELENGTH0, WAVELENGTH1, WAVELENGTH2)),
+	m_fRayleighScaleDepth(RAYLEIGHDEPTH),
+	m_fMieScaleDepth(MIEDEPTH)
+{
+	m_fWavelength4[0]=(powf(m_fWavelength[0], 4.0f));
+	m_fWavelength4[1]=(powf(m_fWavelength[1], 4.0f));
+	m_fWavelength4[2]=(powf(m_fWavelength[2], 4.0f));
+}
+
+Atmosphere::Atmosphere(AtmosphereInfo* ai):
+	info(ai),
+	shader(ShaderProgram::loadFromFile("shader/atmosphere/atmosphere.vert", "shader/atmosphere/atmosphere.frag", "atmosphere")),
 	lod(6)
 {
-	initLightConstants();
-
 	makeOpticalDepthBuffer();
 	makePhaseBuffer();
 
 	shader.use();
-}
-
-void Atmosphere::initLightConstants(void)
-{
-	m_nSamples = NUMSAMPLES;
-	m_Kr = KR;
-	m_Kr4PI = m_Kr*4.0f*PI;
-	m_Km = KM;
-	m_Km4PI = m_Km*4.0f*PI;
-	m_ESun = ESUN;
-	m_g = G;
-
-	m_fScale = 1 / (m_fOuterRadius - m_fInnerRadius);
-
-	m_fWavelength = glm::vec3(WAVELENGTH0, WAVELENGTH1, WAVELENGTH2);
-	m_fWavelength4[0] = powf(m_fWavelength[0], 4.0f);
-	m_fWavelength4[1] = powf(m_fWavelength[1], 4.0f);
-	m_fWavelength4[2] = powf(m_fWavelength[2], 4.0f);
-
-	m_fRayleighScaleDepth = RAYLEIGHDEPTH;
-	m_fMieScaleDepth = MIEDEPTH;
 }
 
 #include <cstdio>
@@ -45,7 +41,7 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 {
 	const int nSize = 256;
 	const int nSamples = 50;
-	const float fScale = 1.0f / (m_fOuterRadius - m_fInnerRadius);
+	const float fScale = 1.0f / (info->m_fOuterRadius - info->m_fInnerRadius);
 	const int m_nChannels=4;
 	
 	float* opticalBuffer=(float*)malloc(sizeof(float)*m_nChannels*nSize*nSize);
@@ -60,22 +56,22 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 		for(int nHeight=0; nHeight<nSize; nHeight++)
 		{
 			// As the x tex coord goes from 0 to 1, the height goes from the bottom of the atmosphere to the top
-			float fHeight = DELTA + m_fInnerRadius + ((m_fOuterRadius - m_fInnerRadius) * nHeight) / nSize;
+			float fHeight = DELTA + info->m_fInnerRadius + ((info->m_fOuterRadius - info->m_fInnerRadius) * nHeight) / nSize;
 			glm::vec3 vPos(0, fHeight, 0);				// The position of the camera
 
 			// If the ray from vPos heading in the vRay direction intersects the inner radius (i.e. the planet), then this spot is not visible from the viewpoint
 			float B = 2.0f * glm::dot(vPos,vRay);
 			float Bsq = B * B;
 			float Cpart = glm::dot(vPos, vPos);
-			float C = Cpart - m_fInnerRadius*m_fInnerRadius;
+			float C = Cpart - info->m_fInnerRadius*info->m_fInnerRadius;
 			float fDet = Bsq - 4.0f * C;
 			bool bVisible = ((fDet < 0 )|| ((0.5f * (-B - sqrtf(fDet)) <= 0) && (0.5f * (-B + sqrtf(fDet)) <= 0)));
 			float fRayleighDensityRatio;
 			float fMieDensityRatio;
 			if(bVisible)
 			{
-				fRayleighDensityRatio = expf(-(fHeight - m_fInnerRadius) * fScale / m_fRayleighScaleDepth);
-				fMieDensityRatio = expf(-(fHeight - m_fInnerRadius) * fScale / m_fMieScaleDepth);
+				fRayleighDensityRatio = expf(-(fHeight - info->m_fInnerRadius) * fScale / info->m_fRayleighScaleDepth);
+				fMieDensityRatio = expf(-(fHeight - info->m_fInnerRadius) * fScale / info->m_fMieScaleDepth);
 			}
 			else
 			{
@@ -86,7 +82,7 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 
 			// Determine where the ray intersects the outer radius (the top of the atmosphere)
 			// This is the end of our ray for determining the optical depth (vPos is the start)
-			C = Cpart - m_fOuterRadius*m_fOuterRadius;
+			C = Cpart - info->m_fOuterRadius*info->m_fOuterRadius;
 			fDet = Bsq - 4.0f * C;
 			float fFar = 0.5f * (-B + sqrtf(fDet));
 
@@ -102,10 +98,10 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 			for(int i=0; i<nSamples; i++)
 			{
 				float fHeight = glm::length(vPos);
-				float fAltitude = (fHeight - m_fInnerRadius) * fScale;
+				float fAltitude = (fHeight - info->m_fInnerRadius) * fScale;
 				if(fAltitude<0.0f)fAltitude=0.0f;
-				fRayleighDepth += expf(-fAltitude / m_fRayleighScaleDepth);
-				fMieDepth += expf(-fAltitude / m_fMieScaleDepth);
+				fRayleighDepth += expf(-fAltitude / info->m_fRayleighScaleDepth);
+				fMieDepth += expf(-fAltitude / info->m_fMieScaleDepth);
 				vPos = (vPos+vSampleRay);
 			}
 
@@ -149,12 +145,12 @@ void Atmosphere::makePhaseBuffer(void)
 	{
 		float fAngle=float(2*i)/(nSize)-1.0f;
 		float fAngle2=fAngle*fAngle;
-		float g2 =m_g*m_g;
+		float g2=info->m_g*info->m_g;
 		glm::vec2 fPhase;
 		fPhase.x = 0.75f * (1.0f + fAngle2);
-		fPhase.y = 1.5f * ((1.0f - g2) / (2.0f + g2)) * (1.0f + fAngle2) / pow(1.0f + g2 - 2*m_g*fAngle, 1.5f);
-		fPhase.x *= m_Kr * m_ESun;
-		fPhase.y *= m_Km * m_ESun;
+		fPhase.y = 1.5f * ((1.0f - g2) / (2.0f + g2)) * (1.0f + fAngle2) / pow(1.0f + g2 - 2*info->m_g*fAngle, 1.5f);
+		fPhase.x *= info->m_Kr * info->m_ESun;
+		fPhase.y *= info->m_Km * info->m_ESun;
 		phaseBuffer[k++]=fPhase.x;
 		phaseBuffer[k++]=fPhase.y;
 		phaseBuffer[k++]=1.0f;
@@ -192,17 +188,17 @@ void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, f
 
 	sprogram.setUniform("cameraPosition", c.getPosition(position)/scale);
 	sprogram.setUniform("lightDirection", lightDirection);
-	sprogram.setUniform("m_fWavelength4", m_fWavelength4);
-	sprogram.setUniform("m_g", m_g);
-	sprogram.setUniform("m_ESun", m_ESun);
-	sprogram.setUniform("m_Kr", m_Kr);
-	sprogram.setUniform("m_Km", m_Km);
-	sprogram.setUniform("m_Kr4PI", m_Kr4PI);
-	sprogram.setUniform("m_Km4PI", m_Km4PI);
-	sprogram.setUniform("m_fInnerRadius", m_fInnerRadius);
-	sprogram.setUniform("m_fScale", m_fScale);
-	sprogram.setUniform("m_fOuterRadius", m_fOuterRadius);
-	sprogram.setUniform("m_nSamples", m_nSamples);
+	sprogram.setUniform("m_fWavelength4", info->m_fWavelength4);
+	sprogram.setUniform("m_g", info->m_g);
+	sprogram.setUniform("m_ESun", info->m_ESun);
+	sprogram.setUniform("m_Kr", info->m_Kr);
+	sprogram.setUniform("m_Km", info->m_Km);
+	sprogram.setUniform("m_Kr4PI", info->m_Kr4PI);
+	sprogram.setUniform("m_Km4PI", info->m_Km4PI);
+	sprogram.setUniform("m_fInnerRadius", info->m_fInnerRadius);
+	sprogram.setUniform("m_fScale", info->m_fScale);
+	sprogram.setUniform("m_fOuterRadius", info->m_fOuterRadius);
+	sprogram.setUniform("m_nSamples", info->m_nSamples);
 	sprogram.setUniform("scale", scale);
 
 	sprogram.setUniform("depthTex",1);

@@ -19,23 +19,10 @@
 #include "utils/Sphere.h"
 #include "render/Camera.h"
 
-class Atmosphere
+class AtmosphereInfo
 {
 	public:
-		Atmosphere();
-		~Atmosphere();
-
-		void initLightConstants(void);
-		void makeOpticalDepthBuffer(void);
-		void makePhaseBuffer(void);
-		void generateVBO(void);
-
-		void bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, float scale, ShaderProgram& sprogram);
-		void bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, float scale);
-		void draw(Camera& c, glm::vec3 lightDirection, glm::vec3 position, float scale);
-
-	private:
-		ShaderProgram& shader;
+		AtmosphereInfo();
 
 		int m_nSamples;
 		float m_Kr, m_Kr4PI;
@@ -49,6 +36,26 @@ class Atmosphere
 		glm::vec3 m_fWavelength4;
 		float m_fRayleighScaleDepth;
 		float m_fMieScaleDepth;
+};
+
+class Atmosphere
+{
+	public:
+		Atmosphere(AtmosphereInfo* ai);
+		~Atmosphere();
+
+		void makeOpticalDepthBuffer(void);
+		void makePhaseBuffer(void);
+		void generateVBO(void);
+
+		void bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, float scale, ShaderProgram& sprogram);
+		void bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, float scale);
+		void draw(Camera& c, glm::vec3 lightDirection, glm::vec3 position, float scale);
+
+	private:
+		ShaderProgram& shader;
+
+		AtmosphereInfo* info;
 		
 		GLuint depthTexture, phaseTexture;
 		GLuint vao, vbo, ebo;

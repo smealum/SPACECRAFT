@@ -2,6 +2,7 @@
 #define __PLANETINFO_H__
 
 #include "SpaceObjectTrajectory.h"
+#include "render/Atmosphere.h"
 
 class PlanetGenerator;
 
@@ -13,6 +14,7 @@ class PlanetInfo
 
 		int seed;
 
+		AtmosphereInfo atmosphereInfo;
 		PlanetGenerator* planetGenerator;
 		SpaceObjectTrajectory* trajectory;
 		glm::vec3 axis;

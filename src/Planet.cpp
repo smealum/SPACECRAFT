@@ -368,8 +368,8 @@ Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name, int size):
 	angle(0.0),
 	name(name),
 	size(size),
-	scale(1.0f/(1<<(size-1)))
-	// scale(1.0f)
+	scale(1.0f/(1<<(size-1))),
+	atmosphere(&pi->atmosphereInfo)
 {
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i], i, size);
 	pi->numBlocks=(PLANETFACE_BLOCKS>>(size-1));
