@@ -22,6 +22,7 @@ class ChunkCacheEntry
 
 		void dump(void);
 
+		bool shouldBeSaved(void);
 		chunkVal* getData(void);
 		std::string getName(void);
 

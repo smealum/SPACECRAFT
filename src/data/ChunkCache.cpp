@@ -33,6 +33,11 @@ chunkVal* ChunkCacheEntry::getData(void)
 	return (chunkVal*)data;
 }
 
+bool ChunkCacheEntry::shouldBeSaved(void)
+{
+	return toSave;
+}
+
 std::string ChunkCacheEntry::getName(void)
 {
 	return name;

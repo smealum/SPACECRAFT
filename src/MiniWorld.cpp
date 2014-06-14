@@ -89,8 +89,9 @@ TrackerPointer<MiniWorld>* MiniWorld::getTptr(void)
 	return tptr;
 }
 
-void MiniWorld::updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D])
+void MiniWorld::updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D], bool modified)
 {
+	this->modified=modified;
 	generated=true;
 	for(int i=0;i<MINIWORLD_W;i++)
 	{

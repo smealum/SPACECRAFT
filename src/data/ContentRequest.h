@@ -56,6 +56,7 @@ class MiniWorldDataRequest : public ContentRequest
 		int px, py, pz;
 		glm::vec3 origin, v1, v2;
 		int numBlocks;
+		bool modified;
 		std::string name;
 		Planet& planet;
 		TrackerPointer<MiniWorld>* miniworld;

@@ -90,6 +90,7 @@ MiniWorldDataRequest::MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o
 	v2(v2),
 	planet(p),
 	name(mw.getName()),
+	modified(false),
 	contentHandler(ch)
 {
 	miniworld=mw.getTptr();
@@ -108,10 +109,11 @@ bool MiniWorldDataRequest::isRelevant(int id)
 void MiniWorldDataRequest::process(int id)
 {
 	TrackerPointer<ChunkCacheEntry>* cce=contentHandler.cache.get(name);
-	if(!cce) planet.planetInfo->planetGenerator->generateWorldData(id,(chunkVal*)data,MINIWORLD_W,MINIWORLD_H,MINIWORLD_D,px,py,pz,origin,v1,v2);
+	if(!cce)planet.planetInfo->planetGenerator->generateWorldData(id,(chunkVal*)data,MINIWORLD_W,MINIWORLD_H,MINIWORLD_D,px,py,pz,origin,v1,v2);
 	else{
 		printf("LOADING FROM CACHE %s\n",name.c_str());
 		memcpy(data,cce->getPointer()->getData(),sizeof(chunkVal)*MINIWORLD_W*MINIWORLD_H*MINIWORLD_D*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2));
+		modified=cce->getPointer()->shouldBeSaved();
 		cce->release();
 	}
 
@@ -124,7 +126,7 @@ void MiniWorldDataRequest::process(int id)
 void MiniWorldDataRequest::update(void)
 {
 	//if (not isCanceled)
-	miniworld->getPointer()->updateChunks(data, vArray);
+	miniworld->getPointer()->updateChunks(data, vArray, modified);
 	miniworld->release();
 }
 
