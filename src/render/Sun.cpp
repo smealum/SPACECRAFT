@@ -42,7 +42,7 @@ void Sun::draw(Camera& c)
 	shader.setUniform("time",time);
 	shader.setUniform("model",
 			translate(
-				mat4(1.0),
+				mat4(SunWidth),
 				position-c.getReference()
 			)
 	);
@@ -59,7 +59,7 @@ void Sun::drawGlow(Camera& c)
 	shaderGlow.setUniform("time",time);
 	shaderGlow.setUniform("model",
 			translate(
-				mat4(1.0),
+				mat4(SunWidth),
 				position-c.getReference()
 			)
 	);
