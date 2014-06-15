@@ -10,9 +10,9 @@ using namespace std;
 
 /////////////////////////////////////////////////////////
 // paramètres de la galaxie
-const double GALAXY_WIDTH = 1000.0;
+const double GALAXY_WIDTH = 20000.0;
 const dvec3 GALAXY_CENTER(0.0,0.0,0.0);
-const double SOLARSYSTEM_MIN_DISTANCE = 0.1; 
+const double SOLARSYSTEM_MIN_DISTANCE = 0.001; 
 
 /////////////////////////////////////////////////////////
 
@@ -24,7 +24,8 @@ Galaxy::Galaxy():
 		"shader/galaxy/galaxy.vert",
 		"shader/galaxy/galaxy.frag",
 		"galaxy")),
-	isVBOGenerated(false)
+	isVBOGenerated(false),
+	selectedSolarSystem(NULL)
 {
 	
 }
@@ -46,9 +47,22 @@ void Galaxy::pushSolarSystem(SolarSystem* s)
 GalaxySolarResponse Galaxy::getClosestSolarSystem(const dvec3& pos , double maxDist)
 {
 	if (galaxyTree)
-		return galaxyTree->getClosestSolarSystem(pos,maxDist);
-	else
-		return {NULL,2.0*maxDist};
+	{
+		// test qu'on se trouve un peu dans la galaxie.
+		dvec3 p = pos - GALAXY_CENTER;
+		if (
+				(p.x + maxDist > -GALAXY_WIDTH) and
+				(p.x - maxDist <  GALAXY_WIDTH) and
+				(p.y + maxDist > -GALAXY_WIDTH) and
+				(p.y - maxDist <  GALAXY_WIDTH) and
+				(p.z + maxDist > -GALAXY_WIDTH) and
+				(p.z - maxDist <  GALAXY_WIDTH)
+		)
+		{
+			return galaxyTree->getClosestSolarSystem(pos,maxDist);
+		}
+	}
+	return {NULL,2.0*maxDist};
 }
 
 void Galaxy::generateVBO()
@@ -70,6 +84,42 @@ void Galaxy::generateVBO()
 
 }
 
+
+void Galaxy::step(Camera& camera, ContentHandler& contentHandler)
+{
+	// TODO intégration
+	return;
+	
+	dvec3 origin(0.0,0.0,0.0);
+	dvec3 position = camera.getPositionDouble(origin);
+	GalaxySolarResponse r = getClosestSolarSystem(position,10.0);
+
+	if (r.solarSystem)
+	{
+		dvec3 p = r.solarSystem->getPosition();
+		log_info("Plus proche : (%f,%f,%f) = %f", p.x, p.y, p.z, r.distance);
+
+		if (selectedSolarSystem == r.solarSystem) return;
+
+		// suppression du précédent système solaire.
+		if (selectedSolarSystem)
+		{
+			// TODO suppression du contenu généré
+			selectedSolarSystem = NULL;
+		}
+
+		// ajout du nouveau système solaire.
+		selectedSolarSystem = r.solarSystem;
+		selectedSolarSystem->generate(contentHandler);
+	}
+	else
+	{
+		log_info("Trop loin");
+		selectedSolarSystem = NULL;
+	}
+}
+
+
 void Galaxy::draw(Camera& camera)
 {
 	if (not isVBOGenerated) generateVBO();
@@ -81,6 +131,15 @@ void Galaxy::draw(Camera& camera)
     camera.updateCamera(program);
 
     glDrawArrays(GL_POINTS, 0, solarPosition.size());
+	
+	// TODO intégration
+	return;
+	
+	// affichage du système solaire le plus proche
+	if (selectedSolarSystem)
+	{
+		selectedSolarSystem->draw(camera);
+	}
 }
 
 ////////////////////////////////////////////////////////
@@ -91,7 +150,7 @@ GalaxyTree::GalaxyTree(SolarSystem* s, const glm::dvec3& c, double w):
 	center(c),
 	width(w)
 {
-	
+
 }
 
 dvec3 cubeDecalage[2][2][2]=
@@ -180,12 +239,12 @@ GalaxySolarResponse GalaxyTree::getClosestSolarSystem(const glm::dvec3& pos, dou
 		dvec3 p = pos - center;
 		bool xValid[2], yValid[2], zValid[2];
 
-		xValid[0] = (p.x + maxDist > 0.0);
-		xValid[1] = (p.x - maxDist > 0.0);
-		yValid[0] = (p.y + maxDist > 0.0);
-		yValid[1] = (p.y - maxDist > 0.0);
-		zValid[0] = (p.z + maxDist > 0.0);
-		zValid[1] = (p.z - maxDist > 0.0);
+		xValid[0] = (p.x - maxDist < 0.0);
+		xValid[1] = (p.x + maxDist > 0.0);
+		yValid[0] = (p.y - maxDist < 0.0);
+		yValid[1] = (p.y + maxDist > 0.0);
+		zValid[0] = (p.z - maxDist < 0.0);
+		zValid[1] = (p.z + maxDist > 0.0);
 		list<GalaxySolarResponse> l;
 		for(int x=0;x<2;++x)
 		for(int y=0;y<2;++y)
@@ -196,8 +255,15 @@ GalaxySolarResponse GalaxyTree::getClosestSolarSystem(const glm::dvec3& pos, dou
 				l.push_back(children[x][y][z]->getClosestSolarSystem(pos,maxDist));
 			}
 		}
-		l.sort();
-		return l.front(); // TODO protection (assert)
+		if (not l.empty())
+		{
+			l.sort();
+			return l.front();
+		}
+		else
+		{
+			return {NULL,maxDist*2.0};
+		}
 	}
 	else
 	{

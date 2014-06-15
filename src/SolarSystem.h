@@ -10,8 +10,10 @@ class SolarSystem
 {
 	friend class SolarSystemDataRequest;
 	public:
-		SolarSystem(const glm::dvec3& position, ContentHandler& ch);
+		SolarSystem(const glm::dvec3& position);
 		~SolarSystem();
+
+		void generate(ContentHandler& ch);
 
 		void draw(Camera& c);
 		void update(float time);
@@ -35,7 +37,6 @@ class SolarSystem
 		Sun* sun;
 		Planet** planets;
 
-		ContentHandler& contentHandler;
 		TrackerPointer<SolarSystem>* tptr;
 };
 

@@ -1,14 +1,18 @@
 #include "SolarSystem.h"
 #include "data/ContentHandler.h"
 
-SolarSystem::SolarSystem(const glm::dvec3& pos, ContentHandler& ch):
+SolarSystem::SolarSystem(const glm::dvec3& pos):
 	generated(false),
 	tptr(new TrackerPointer<SolarSystem>(this, true)),
-	contentHandler(ch),
 	numPlanets(0),
 	position(pos)
 {
-	//ch.requestContent(new SolarSystemDataRequest(*this, ch));
+
+}
+
+void SolarSystem::generate(ContentHandler& ch)
+{
+	ch.requestContent(new SolarSystemDataRequest(*this, ch));
 }
 
 SolarSystem::~SolarSystem()

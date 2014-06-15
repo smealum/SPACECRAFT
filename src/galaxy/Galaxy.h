@@ -7,6 +7,7 @@
 
 class SolarSystem;
 class ShaderProgram;
+class ContentHandler;
 
 ///////////////////////////////////////////////////////////////
 class  Galaxy;
@@ -33,6 +34,7 @@ class Galaxy
 		GalaxySolarResponse getClosestSolarSystem(const glm::dvec3& pos, double maxDist);
 		void pushSolarSystem(SolarSystem* s);
 
+		void step(Camera& camera, ContentHandler& contentHandler);
 		void draw(Camera& camera);
 	private:
 
@@ -45,6 +47,10 @@ class Galaxy
 		ShaderProgram& program;
 		bool isVBOGenerated;
 		void generateVBO();
+
+		//===================
+		
+		SolarSystem* selectedSolarSystem;
 };
 
 /////////////////////////////////////////////////////////////

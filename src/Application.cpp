@@ -202,7 +202,7 @@ void Application::run()
 {
 	BlockType::getInstance(); // TODO can be deleted when used
 	state = appInLoop;
-	camera = new Camera(0.0000001f, 100.0f);
+	camera = new Camera(0.0000001f, 100000.0f);
 	camera->view = glm::lookAt(
 			glm::vec3(1.5, 1.5f, 1.5f),
 			glm::vec3(0.f),
@@ -211,7 +211,8 @@ void Application::run()
 	camera->setCameraManager(new CameraKeyboardMouse());
 
 	tt=new testShaders;
-	testSolarSystem=new SolarSystem(dvec3(0.0,0.0,0.0),contentHandler);
+	testSolarSystem=new SolarSystem(dvec3(0.0,0.0,0.0));
+	testSolarSystem->generate(contentHandler);
 	testCursor=new Cursor();
 
 	testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
@@ -241,13 +242,12 @@ void Application::run()
 				sprintf(titleBuff, "%s FPS: %.1f", WIN_TITLE, fps);
 				glfwSetWindowTitle(window, titleBuff);
 			}
-		}
-
-		// test des ereurs openGL non reportées:
-		{
-			static int i=0;
-			if (i++%300==0)
-				glCheckError("Unreported Error");
+			// test des ereurs openGL non reportées:
+			{
+				static int i=0;
+				if (i++%300==0)
+					glCheckError("Unreported Error");
+			}
 		}
 	}
 
@@ -271,6 +271,11 @@ void Application::loop()
 	testSolarSystem->update(globalTime);
 	camera->update();
 
+	galaxy->step(*camera,contentHandler);
+
+	//---------------------
+	//    drawing
+	//--------------------
 	glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
