@@ -174,12 +174,14 @@ bool SolarSystemDataRequest::isRelevant(int id)
 	return true;
 }
 
+#include "solarsystem/SolarSystemGeneratorSol.h"
+
 //idée ici c'est de générer les planetInfo côté producer (ie process) puis de faire l'initialisation des objets côté consumer (ie update)
 void SolarSystemDataRequest::process(int id)
 {
-	//TEMP
-	numPlanets=1;
-	planets=new Planet*[numPlanets];
+	SolarSystemGeneratorSol ssgs(0, contentHandler);
+	ssgs.generatePlanetInfos(planetInfos);
+	planets=new Planet*[planetInfos.size()];
 }
 
 #include <sstream>
@@ -193,28 +195,17 @@ void SolarSystemDataRequest::process(int id)
 
 void SolarSystemDataRequest::update(void)
 {
-	for(int i=0;i<numPlanets;i++)
+	int i=0;
+	for(auto it=planetInfos.begin(); it!=planetInfos.end(); ++it)
 	{
 		std::ostringstream oss;
 		oss << i;
-		planets[i]=
-			new Planet(
-				new PlanetInfoEarth(
-					new EllipticalTrajectory(
-						glm::vec3(0.0f),
-						glm::mat3(10.0f*(i+1)),
-						i*1.037f,
-						100.0f*(i+1)
-					),
-					new PlanetGeneratorEarth(contentHandler.getMaxProducers())
-				),
-				contentHandler,
-				oss.str()
-		);
+		planets[i]=new Planet(*it, contentHandler, oss.str());
+		i++;
 	}
 	sun=new Sun(glm::vec3(0.0f));
 
-	solarSystem->getPointer()->numPlanets=numPlanets;
+	solarSystem->getPointer()->numPlanets=planetInfos.size();
 	solarSystem->getPointer()->planets=planets;
 	solarSystem->getPointer()->sun=sun;
 	solarSystem->getPointer()->generated=true;

@@ -18,7 +18,7 @@ Producer::Producer(int id, ContentInputQueue& iq, ContentOutputQueue& oq):
 	id(id)
 {
     thread->launch();
-	debug("Thread lauched");
+	debug("Thread started");
 }
 
 Producer::~Producer()

@@ -93,7 +93,7 @@ class SolarSystemDataRequest : public ContentRequest
 		TrackerPointer<SolarSystem>* solarSystem;
 		ContentHandler& contentHandler;
 
-		int numPlanets;
+		std::vector<PlanetInfo*> planetInfos;
 
 		Sun* sun;
 		Planet** planets;

@@ -3,8 +3,8 @@
 #include "utils/dbg.h"
 
 //setPlanetInfo is the responsibility of descending classes as it should only be called after PI's been fully initialized
-PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p):
-	seed(0),
+PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p, int seed):
+	seed(seed),
 	trajectory(t),
 	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
 	period(1.0f),
@@ -17,8 +17,8 @@ PlanetInfo::~PlanetInfo()
 {
 }
 
-PlanetInfoEarth::PlanetInfoEarth(SpaceObjectTrajectory* t, PlanetGenerator* p):
-	PlanetInfo(t,p),
+PlanetInfoEarth::PlanetInfoEarth(SpaceObjectTrajectory* t, PlanetGenerator* p, int seed):
+	PlanetInfo(t,p,seed),
 	continentFrequency( 1.f),
 	continentLacunarity(2.089f),
 	mountainLacunarity(2.142f),
