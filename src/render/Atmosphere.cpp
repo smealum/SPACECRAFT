@@ -39,21 +39,6 @@ Atmosphere::Atmosphere(AtmosphereInfo* ai):
 //(attention aux appels GL)
 void Atmosphere::makeOpticalDepthBuffer(void)
 {
-	// on ne génère que une fois ceci.
-	static bool isOpticalDepthBufferGenerated = false;
-	static GLuint depthTextureGlobal = 0;
-	static GLuint phaseTextureGlobal = 0;
-	if (isOpticalDepthBufferGenerated)
-	{
-		depthTexture=depthTextureGlobal;
-		phaseTexture=phaseTextureGlobal;
-		return;
-	}
-	else
-	{
-		isOpticalDepthBufferGenerated = true;
-	}
-
 	const int nSize = 256;
 	const int nSamples = 50;
 	const float fScale = 1.0f / (info->m_fOuterRadius - info->m_fInnerRadius);
@@ -148,9 +133,6 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	
 	free(opticalBuffer);
-
-	phaseTextureGlobal=phaseTexture;
-	depthTextureGlobal=depthTexture;
 }
 
 
@@ -249,4 +231,6 @@ void Atmosphere::draw(Camera& c, glm::vec3 lightDirection, glm::vec3 position, f
 
 Atmosphere::~Atmosphere()
 {
+	glDeleteTextures(1,&phaseTexture);
+	glDeleteTextures(1,&depthTexture);
 }
