@@ -130,6 +130,8 @@ void Galaxy::draw(Camera& camera)
 
     camera.updateCamera(program);
 
+    program.setUniform("model",glm::translate(glm::mat4(1.0f),-camera.getReference()));
+
     glDrawArrays(GL_POINTS, 0, solarPosition.size());
 	
 	// TODO intégration
