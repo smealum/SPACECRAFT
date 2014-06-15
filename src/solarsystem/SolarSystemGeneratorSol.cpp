@@ -32,7 +32,26 @@ void SolarSystemGeneratorSol::generatePlanetInfos(std::vector<PlanetInfo*>& v)
 		v.push_back(new PlanetInfoEarth(
 						trajectory,
 						new PlanetGeneratorEarth(contentHandler.getMaxProducers()),
-						seed*1000+i)
+						seed*1000+i*10,
+						1)
 					);
+
+		const int numSatellites=int_dist(engine)%3;
+		for(int j=0;j<numSatellites;j++)
+		{
+			SpaceObjectTrajectory* satTrajectory =
+							new EllipticalTrajectory(
+								*trajectory,
+								glm::mat3(3.0f),
+								i*1.037f,
+								10.0f);
+
+			v.push_back(new PlanetInfoEarth(
+							satTrajectory,
+							new PlanetGeneratorEarth(contentHandler.getMaxProducers()),
+							seed*1000+i*10+j+1,
+							3)
+						);
+		}
 	}
 }

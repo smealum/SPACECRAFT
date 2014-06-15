@@ -202,7 +202,6 @@ void Application::run()
 {
 	BlockType::getInstance(); // TODO can be deleted when used
 	state = appInLoop;
-    // camera = new Camera(0.0000001f, 100000.0f);
 	camera = new Camera(0.0000001f, 1e5);
 	camera->view = glm::lookAt(
 			glm::vec3(1.5, 1.5f, 1.5f),

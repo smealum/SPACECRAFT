@@ -142,7 +142,7 @@ class Planet
 	friend class PlanetFace;
 	friend class Chunk;
 	public:
-		Planet(PlanetInfo *pi, class ContentHandler& ch, std::string name, int size=1);
+		Planet(PlanetInfo *pi, class ContentHandler& ch, std::string name);
 		~Planet(); // TODO faire tous les free
 		
 		void processLevelOfDetail(Camera& c);

@@ -9,10 +9,11 @@ class PlanetGenerator;
 class PlanetInfo
 {
 	public:
-		PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* planetGen, int seed);
+		PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* planetGen, int seed, int size=1);
 		~PlanetInfo();
 
 		int seed;
+		int size;
 
 		AtmosphereInfo atmosphereInfo;
 		PlanetGenerator* planetGenerator;
@@ -25,7 +26,7 @@ class PlanetInfo
 class PlanetInfoEarth : public PlanetInfo
 {
 	public:
-		PlanetInfoEarth(SpaceObjectTrajectory* t, PlanetGenerator* planetGen, int seed);
+		PlanetInfoEarth(SpaceObjectTrajectory* t, PlanetGenerator* planetGen, int seed, int size=1);
 		~PlanetInfoEarth();
 
 		float continentFrequency,

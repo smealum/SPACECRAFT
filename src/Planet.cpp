@@ -362,15 +362,15 @@ static GLuint elements[2*3] = {
     0,1,2,      0,2,3, // face 1
 };
 
-Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name, int size):
+Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name):
 	planetInfo(pi),
 	handler(ch),
 	sunPosition(0),
 	position(0),
 	angle(0.0),
 	name(name),
-	size(size),
-	scale(1.0f/(1<<(size-1))),
+	size(pi->size),
+	scale(1.0f/(1<<(pi->size-1))),
 	atmosphere(&pi->atmosphereInfo)
 {
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i], i, size);
