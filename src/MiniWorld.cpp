@@ -78,10 +78,13 @@ bool MiniWorld::isConstructionCanceled()
 
 void MiniWorld::destroyMiniWorld(void)
 {
-	constructionCanceled = true;
-	planet->handler.requestContent(new MiniWorldDeletionRequest(*this, planet->handler),false);
-		tptr->release();
-	planet->handler.manualReleaseInput();
+	constructionCanceled=true;
+	if(generated)
+	{
+		planet->handler.requestContent(new MiniWorldDeletionRequest(*this, planet->handler),false);
+			tptr->release();
+		planet->handler.manualReleaseInput();
+	}else tptr->release();
 }
 
 TrackerPointer<MiniWorld>* MiniWorld::getTptr(void)

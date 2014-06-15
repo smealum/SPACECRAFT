@@ -18,6 +18,8 @@ CameraPlayerGround::CameraPlayerGround(Planet* p, Camera& c, PlanetFace& pf):
 	localPosition=dspaceToBlock(glm::dmat3(planet->getInvModel())*c.getPositionDouble(glm::dvec3(planet->getPosition())),glm::dvec3(face.getOrigin()),glm::dvec3(face.getV1()),glm::dvec3(face.getV2()),glm::dvec3(face.getN()),planet->getNumBlocks());
 	localView=glm::dmat3(1.0f);
 
+	printf("%d %d %d\n",int(localPosition.x),int(localPosition.y),int(localPosition.z));
+
     c.moveReference(glm::dvec3(planet->getPosition()));
 }
 

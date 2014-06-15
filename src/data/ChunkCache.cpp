@@ -57,6 +57,8 @@ void ChunkCache::save(MiniWorld* mw)
 	printf("CACHING %s\n",name.c_str());
 
 	mutex.lock();
+		auto it=map.find(name);
+		if(it!=map.end())printf("TRYING TO CACHE ALREADY CACHED CHUNK\n");
 		removeChunk(name);
 		while(map.size()>CACHE_MAXSIZE)removeChunk(map.begin()->first); //TODO : système de prio (maintenir une queue de prio en parallèle ?)
 		map.insert(std::pair<std::string,TrackerPointer<ChunkCacheEntry>*>(name, new TrackerPointer<ChunkCacheEntry>(new ChunkCacheEntry(mw), true)));
