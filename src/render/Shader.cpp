@@ -473,7 +473,7 @@ void ShaderProgram::setAttribute(const char *name, GLint size, GLboolean normali
             normalized,
             stride*sizeof(GLfloat),
             (void*)(offset*sizeof(GLfloat))
-            );
+	);
     attributes[name].size = size;
     attributes[name].normalized = normalized;
     attributes[name].stride = stride;

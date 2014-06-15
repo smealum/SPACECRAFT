@@ -4,13 +4,16 @@
 #include "Planet.h"
 #include "render/Sun.h"
 #include "render/Camera.h"
+#include "utils/glm.h"
 
 class SolarSystem
 {
 	friend class SolarSystemDataRequest;
 	public:
-		SolarSystem(ContentHandler& ch);
+		SolarSystem(const glm::dvec3& position);
 		~SolarSystem();
+
+		void generate(ContentHandler& ch);
 
 		void draw(Camera& c);
 		void update(float time);
@@ -21,7 +24,12 @@ class SolarSystem
 
 		TrackerPointer<SolarSystem>* getTptr(void);
 
+		const glm::dvec3& getPosition() const;
+
 	private:
+
+		glm::dvec3 position;
+
 		bool generated;
 
 		int numPlanets;
@@ -29,7 +37,6 @@ class SolarSystem
 		Sun* sun;
 		Planet** planets;
 
-		ContentHandler& contentHandler;
 		TrackerPointer<SolarSystem>* tptr;
 };
 

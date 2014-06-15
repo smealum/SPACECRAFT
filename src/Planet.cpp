@@ -7,6 +7,7 @@
 #include "world/BlockType.h"
 #include "utils/positionMath.h"
 #include "world/BlockType.h"
+#include "render/Atmosphere.h"
 
 
 using namespace std;
@@ -190,6 +191,7 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	if(depth<4)return false;
 
 	glm::vec3 p=planet->getCameraRelativePosition(c);
+
 	if(glm::dot(vertex[0]*0.99f-p,vertex[0])>0.0f
 	&& glm::dot(vertex[1]*0.99f-p,vertex[1])>0.0f
 	&& glm::dot(vertex[2]*0.99f-p,vertex[2])>0.0f

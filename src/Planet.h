@@ -10,9 +10,9 @@
 #include "render/Shader.h"
 #include "render/Camera.h"
 #include "render/Cloud.h"
-#include "render/Atmosphere.h"
 #include "world/BlockType.h"
 #include "PlanetInfo.h"
+#include "render/Atmosphere.h"
 
 #define PLANET_ADDED_DETAIL (4)
 // #define PFBH_MAXSIZE (1024*16)

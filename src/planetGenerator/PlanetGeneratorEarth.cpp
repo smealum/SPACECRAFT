@@ -165,7 +165,7 @@ PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, co
 		// e > 0
 		float e = (elevation - 1.001) * 1000.f ;
 
-		float sandCoef  = 4.0*temperature + 1.4*e - humidity;
+		float sandCoef  = 3.0*temperature + 0.4*e - humidity;
 		float snowCoef  = -2.0*temperature+ 1.4*e + 0.3*humidity;
 		float stoneCoef = snowCoef+0.01;
 		float grassCoef = 0.5 + 0.5*abs(humidity);
@@ -175,6 +175,7 @@ PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, co
 		//if (e<0.05) sandCoef = 0.0;
 		// (A partir d'un moment la neige recouvre les cailloux
 		stoneCoef = min(stoneCoef,1.0);
+
 
 	
 		// on choisit le plus grand
@@ -190,6 +191,7 @@ PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, co
 			case 1: return {elevation,blockTypes::snow};
 			case 2: return {elevation,blockTypes::stone};
 			case 3: return {elevation,blockTypes::grass};
+			default : return {1.0,blockTypes::grass};
 		}
 
 	}

@@ -6,6 +6,8 @@
 #include "utils/glm.h"
 #include "Planet.h"
 
+#define PI 3.14159265f
+
 class Cursor
 {
 	public:

@@ -13,6 +13,9 @@
 #include "world/BlockType.h"
 #include "utils/glm.h"
 #include "noise/CaveGenerator.h"
+#include "galaxy/Galaxy.h"
+#include "galaxy/GalaxyGenerator.h"
+
 #define WIN_TITLE "SPACECRAFT"
 
 float PlanetFaceDetailsPower = 28.0;
@@ -192,13 +195,14 @@ SolarSystem* testSolarSystem;
 Cursor* testCursor;
 int testTexture;
 int testTextureArray;
+Galaxy* galaxy;
 bool testBool1=false, testBool2=false;
 
 void Application::run()
 {
 	BlockType::getInstance(); // TODO can be deleted when used
 	state = appInLoop;
-	camera = new Camera(0.0000001f, 100.0f);
+	camera = new Camera(0.0000001f, 100000.0f);
 	camera->view = glm::lookAt(
 			glm::vec3(1.5, 1.5f, 1.5f),
 			glm::vec3(0.f),
@@ -207,12 +211,16 @@ void Application::run()
 	camera->setCameraManager(new CameraKeyboardMouse());
 
 	tt=new testShaders;
-	testSolarSystem=new SolarSystem(contentHandler);
+	testSolarSystem=new SolarSystem(dvec3(0.0,0.0,0.0));
+	testSolarSystem->generate(contentHandler);
 	testCursor=new Cursor();
 
 	testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
 	testTextureArray=TextureManager::getInstance().loadTextureArray("data/blocksPackArray.png",16,16);
 	caves.generate();
+	
+	galaxy = new Galaxy();
+	GalaxyGenerate(galaxy,contentHandler);
 
 	float timeA;
 	char titleBuff[512];
@@ -234,14 +242,12 @@ void Application::run()
 				sprintf(titleBuff, "%s FPS: %.1f", WIN_TITLE, fps);
 				glfwSetWindowTitle(window, titleBuff);
 			}
-			BlockAnimated::animation(deltaTime);
-		}
-
-		// test des ereurs openGL non reporté:
-		{
-			static int i=0;
-			if (i++%30)
-				glCheckError("Unreported Error");
+			// test des ereurs openGL non reportées:
+			{
+				static int i=0;
+				if (i++%300==0)
+					glCheckError("Unreported Error");
+			}
 		}
 	}
 
@@ -260,15 +266,24 @@ void Application::loop()
 
 	Input::update(window);
 
+
 	testSolarSystem->update(globalTime);
 	camera->update();
 
+	galaxy->step(*camera,contentHandler);
+
+	//---------------------
+	//    drawing
+	//--------------------
 	glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
+
+	galaxy->draw(*camera);
 	testSolarSystem->draw(*camera);
 	testCursor->draw(*camera);
+
 
 	if(Input::isKeyPressed(GLFW_KEY_N))reloadAllShaders();
 
@@ -296,7 +311,7 @@ void Application::loop()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-        // TwDraw();
+		TwDraw();
     #endif
 
 	glfwSwapBuffers(window);

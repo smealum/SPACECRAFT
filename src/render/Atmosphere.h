@@ -18,6 +18,7 @@
 #include "utils/glm.h"
 #include "utils/Sphere.h"
 #include "render/Camera.h"
+#include "utils/Singleton.h"
 
 class AtmosphereInfo
 {
@@ -38,6 +39,9 @@ class AtmosphereInfo
 		float m_fMieScaleDepth;
 };
 
+
+// Il faudrait mettre en singleton.
+// J'ai bien rebooter plusieurs fois mon ordi car trop de texture ont été générées.
 class Atmosphere
 {
 	public:
@@ -61,6 +65,7 @@ class Atmosphere
 		GLuint vao, vbo, ebo;
 
 		int lod;
+
 };
 
 #endif
