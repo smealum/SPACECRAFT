@@ -3,13 +3,10 @@
 #include "utils/SphereManager.h"
 #include "utils/glm.h"
 
-#define SunWidth (108.0f)
-//#define SunWidth (1.0f)
-
 using namespace std;
 using namespace glm;
 
-Sun::Sun(vec3 position):
+Sun::Sun(vec3 position, float size):
 	shader(ShaderProgram::loadFromFile(
 				"shader/sun/sun.vert",
 				"shader/sun/sun.frag",
@@ -19,6 +16,7 @@ Sun::Sun(vec3 position):
 				"shader/sun/sunGlow.frag",
 				"sunGlow")),
 	position(position),
+	size(size),
 	time(0.0)
 {
 
@@ -29,7 +27,7 @@ void Sun::draw(Camera& c)
 	// mise a jour du levelOfDetails
 	glm::vec3 p=c.getPosition(position);
 	
-	double l = length(p)/SunWidth;
+	double l = length(p)/size;
 	lod=clamp(4.f/log(glm::max(l,1.1)),3.0,4.0);
 
 	// update time
@@ -42,9 +40,9 @@ void Sun::draw(Camera& c)
 	shader.setUniform("time",time);
 	shader.setUniform("model",
 			translate(
-				mat4(SunWidth),
+				mat4(1.0f),
 				position-c.getReference()
-			)
+			)*mat4(mat3(size))
 	);
 
 	// draw
@@ -59,9 +57,9 @@ void Sun::drawGlow(Camera& c)
 	shaderGlow.setUniform("time",time);
 	shaderGlow.setUniform("model",
 			translate(
-				mat4(SunWidth),
+				mat4(1.0f),
 				position-c.getReference()
-			)
+			)*mat4(mat3(size))
 	);
 
 	// draw

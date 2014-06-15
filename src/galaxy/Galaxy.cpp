@@ -10,7 +10,7 @@ using namespace std;
 
 /////////////////////////////////////////////////////////
 // paramètres de la galaxie
-const double GALAXY_WIDTH = 20000.0;
+const double GALAXY_WIDTH = 2e10;
 const dvec3 GALAXY_CENTER(0.0,0.0,0.0);
 const double SOLARSYSTEM_MIN_DISTANCE = 0.001; 
 

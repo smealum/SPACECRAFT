@@ -203,7 +203,8 @@ void SolarSystemDataRequest::update(void)
 		planets[i]=new Planet(*it, contentHandler, oss.str());
 		i++;
 	}
-	sun=new Sun(glm::vec3(0.0f));
+	sun=new Sun(glm::vec3(0.0f), 108.0f);
+	// sun=new Sun(glm::vec3(0.0f), 40.0f);
 
 	solarSystem->getPointer()->numPlanets=planetInfos.size();
 	solarSystem->getPointer()->planets=planets;

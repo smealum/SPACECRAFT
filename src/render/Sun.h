@@ -14,7 +14,7 @@
 class Sun
 {
 	public:
-		Sun(glm::vec3 position);
+		Sun(glm::vec3 position, float size);
 
 		void draw(Camera& c);
 		void drawGlow(Camera& c);
@@ -26,6 +26,7 @@ class Sun
 		ShaderProgram &shaderGlow;
 		
 		float time;
+		float size;
 		glm::vec3 position;
 		int lod;
 
