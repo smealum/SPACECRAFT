@@ -26,7 +26,7 @@ class Cursor
 
 		glm::mat4 planetModel;
 		glm::vec3 origin, v1, v2;
-		PlanetFace* toplevel;
+		//PlanetFace* toplevel;
 		int numBlocks;
 
 		ShaderProgram& shader;

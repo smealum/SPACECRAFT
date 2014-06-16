@@ -31,6 +31,7 @@ class PlanetElevationRequest : public ContentRequest
 		virtual bool isRelevant(int id);
 		
 	private:
+		bool isWater;
 		blockTypes::T tile;
 		float elevation;
 		glm::vec3 coord;

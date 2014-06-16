@@ -14,6 +14,8 @@ class PlanetInfo
 
 		int seed;
 		int size;
+		float waterLevelBlock;
+		float waterLevelElevation;
 
 		AtmosphereInfo atmosphereInfo;
 		PlanetGenerator* planetGenerator;
@@ -47,6 +49,13 @@ class PlanetInfoEarth : public PlanetInfo
 				mountainGlaciation,
 				continentHeightScale,
 				riverDepth;		
+};
+
+class PlanetInfoMoon : public PlanetInfo
+{
+	public:
+		PlanetInfoMoon(SpaceObjectTrajectory* t, PlanetGenerator* planetGen, int seed, int size=1);
+		~PlanetInfoMoon();	
 };
 
 #endif

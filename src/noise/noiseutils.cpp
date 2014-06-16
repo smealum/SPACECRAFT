@@ -36,14 +36,14 @@ const int BMP_HEADER_SIZE = 54;
 
 // Direction of the light source, in compass degrees (0 = north, 90 = east,
 // 180 = south, 270 = east)
-const double DEFAULT_LIGHT_AZIMUTH = 45.0;
+//const double DEFAULT_LIGHT_AZIMUTH = 45.0;
 
 // Amount of contrast between light and dark areas.
-const double DEFAULT_LIGHT_CONTRAST  =  1.0;
+//const double DEFAULT_LIGHT_CONTRAST  =  1.0;
 
 // Elevation of the light source above the horizon, in degrees (0 = on
 // horizon, 90 = directly overhead)
-const double DEFAULT_LIGHT_ELEVATION = 45.0;
+//const double DEFAULT_LIGHT_ELEVATION = 45.0;
 
 //////////////////////////////////////////////////////////////////////////////
 // Miscellaneous functions
@@ -671,7 +671,7 @@ void WriterTER::WriteDestFile ()
   int height = m_pSourceNoiseMap->GetHeight ();
 
   int bufferSize = CalcWidthByteCount (width);
-  int destSize   = bufferSize * height;
+  //int destSize   = bufferSize * height;
 
   // This buffer holds one horizontal line in the destination file.
   noise::uint8* pLineBuffer = NULL;

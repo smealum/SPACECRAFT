@@ -11,8 +11,8 @@ static GLfloat vertices[] =
 
 Cursor::Cursor():
 	affected(false),
-	shader(ShaderProgram::loadFromFile("shader/cursor/cursor.vert", "shader/cursor/cursor.frag", "cursor")),
-	planetModel(glm::mat4(1.0f))
+	planetModel(glm::mat4(1.0f)),
+	shader(ShaderProgram::loadFromFile("shader/cursor/cursor.vert", "shader/cursor/cursor.frag", "cursor"))
 {
 	//generate VBO
 	glGenBuffers(1, &vbo);

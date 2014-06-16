@@ -4,6 +4,8 @@
 
 layout(location = 0) in vec3 position;
 
+out vec3 color;
+
 uniform mat4 proj = mat4(1.0);
 uniform mat4 model = mat4(1.0);
 uniform mat4 view = mat4(1.0);
@@ -15,4 +17,5 @@ void main ()
     vec4 p = proj*view*model*vec4(position,1.0);
 	// gl_Position = logDepth(p);
 	gl_Position = vec4(p.xy,0.9*p.w,p.w);
+	color=normalize(position);
 }

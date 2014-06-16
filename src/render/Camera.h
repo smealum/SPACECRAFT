@@ -21,6 +21,7 @@ class Camera {
 		
 		void setCameraManager(CameraManager* c);
 		void setPosition(glm::dvec3 p);
+		void movePositionDouble(glm::dvec3 v);
 		
 		glm::vec3 getPosition(glm::vec3 ref);
 		glm::dvec3 getPositionDouble(glm::dvec3 ref);

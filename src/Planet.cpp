@@ -26,25 +26,25 @@ extern float PlanetFaceDetailsPower;
 PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id, int size):
 	planet(planet),
 	father(NULL),
-	faceBuffer(NULL),
+	toplevel(this),
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
-	elevation(1.0f),
-	minElevation(elevation-0.01f),
-	elevated(false),
-	id(5+id),
-	bufferID(-1),
 	miniworld(NULL),
-	toplevel(this),
+	faceBuffer(NULL),
+	waterBuffer(NULL),
+	noBuffer(false),
+	elevated(false),
 	x(0),
 	z(0),
+	bufferID({-1,-1}),
+	elevation(1.0f),
+	id(5+id),
 	depth(size-1),
-	// depth(0),
-	childrenDepth(depth),
 	size(0),
-	isDisplayOk(false),
-	noBuffer(false)
+	isDisplayOk(false)
 {
+	minElevation=elevation-0.01f;
+	childrenDepth=depth;
 	uvertex[0]=v[0]; uvertex[1]=v[1];
 	uvertex[2]=v[2]; uvertex[3]=v[3];
 	finalize();
@@ -53,18 +53,19 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id, int size):
 PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	planet(planet),
 	father(father),
-	faceBuffer(NULL),
 	sons{NULL, NULL, NULL, NULL},
-	tptr(new TrackerPointer<PlanetFace>(this, true)),
-	elevation(1.0f),
-	elevated(false),
-	id(id),
-	bufferID(-1),
 	miniworld(NULL),
+	tptr(new TrackerPointer<PlanetFace>(this, true)),
+	faceBuffer(NULL),
+	waterBuffer(NULL),
+	noBuffer(false),
+	elevated(false),
 	toplevel(father->toplevel),
+	bufferID({-1,-1}),
+	elevation(1.0f),
+	id(id),
 	childrenDepth(0),
-	isDisplayOk(false),
-	noBuffer(false)
+	isDisplayOk(false)
 {
 	//TODO : exception ?
 	// if(!father);
@@ -115,12 +116,13 @@ PlanetFace::~PlanetFace()
 	removeMiniWorld();
 }
 
-void PlanetFace::deletePlanetFace(PlanetFaceBufferHandler* b)
+void PlanetFace::deletePlanetFace(PlanetFaceBufferHandler* b, PlanetFaceBufferHandler* w)
 {
 	if(b)b->deleteFace(this);
+	if(w)w->deleteFace(this);
 
 	// delete children
-	for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b);
+	for(int i=0;i<4;i++)if(sons[i])sons[i]->deletePlanetFace(b,w);
 
 	// inform father
 	if(father)
@@ -250,7 +252,7 @@ static inline int max(int a, int b)
 	return (a>b)?a:b;
 }
 
-void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
+void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b, PlanetFaceBufferHandler* w)
 {
 	bool detailedEnough=isDetailedEnough(c);
 
@@ -259,6 +261,12 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 		if(b)printf("ERROR1 %d\n",depth);
 		b=faceBuffer;
 	}else if(!b && depth==2)b=faceBuffer=new PlanetFaceBufferHandler(*this, PFBH_MAXSIZE, getV1(), getV2());
+
+	if(waterBuffer)
+	{
+		if(w)printf("ERROR1.5 %d\n",depth);
+		w=waterBuffer;
+	}else if(!w && depth==2)w=waterBuffer=new PlanetFaceBufferHandler(*this, PFBH_MAXSIZE, getV1(), getV2(), 1, 0.9, true);
 
 
 	// update childrenDepth
@@ -290,8 +298,11 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 		// dessin de la face
 		if (elevated)
 		{
-			if(b)b->addFace(this); 
+			if(b)b->addFace(this);
 			else{printf("ERROR2 %d\n",depth);}
+
+			if(w && elevation < planet->planetInfo->waterLevelElevation)w->addFace(this,planet->planetInfo->waterLevelElevation,blockTypes::water);
+			// else{printf("ERROR2.5 %d\n",depth);}
 
 			// suppresion des éventuels miniWorlds si on a la face qui s'affiche
 			removeMiniWorld();
@@ -299,7 +310,7 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 			// suppression des éventuels enfants
 			for(int i=0;i<4;i++)
 				if(sons[i])
-					sons[i]->deletePlanetFace(b);
+					sons[i]->deletePlanetFace(b,w);
 		}
 	}else{
 		// creation/destruction du miniWorld
@@ -313,10 +324,11 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 			{
 				// suppresion de la face
 				if(b)b->deleteFace(this);
+				if(w)w->deleteFace(this);
 				// suppression des éventuels enfants
 				for(int i=0;i<4;i++)
 					if(sons[i])
-						sons[i]->deletePlanetFace(b);
+						sons[i]->deletePlanetFace(b,w);
 			}			
 		}else{
 
@@ -325,7 +337,7 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 			for(int i=0;i<4;i++)
 			{
 				if(!sons[i])sons[i]=new PlanetFace(planet,this,i);
-				else sons[i]->processLevelOfDetail(c, b);
+				else sons[i]->processLevelOfDetail(c, b, w);
 
 				done &= ( sons[i]->isDisplayOk );
 			}
@@ -334,6 +346,7 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 			if (done)
 			{
 				if(b)b->deleteFace(this);
+				if(w)w->deleteFace(this);
 				removeMiniWorld();
 			}
 		}
@@ -349,32 +362,18 @@ glm::vec3 cubeArray[6][4]=
 		{glm::vec3(1.0,1.0,-1.0),glm::vec3(-1.0,1.0,-1.0),glm::vec3(-1.0,-1.0,-1.0),glm::vec3(1.0,-1.0,-1.0)}, //near
 		{glm::vec3(-1.0,-1.0,1.0),glm::vec3(-1.0,1.0,1.0),glm::vec3(1.0,1.0,1.0),glm::vec3(1.0,-1.0,1.0)}}; //far
 
-static GLfloat vertices[] = {
-    //   POSITION    |      COLOR       |     NORMAL
-    // x positif
-    +0.0, -0.5, -0.5, 1.0, 0.0, 0.0, 1.f, +1.0, 0.0, 0.0,
-    +0.0, +0.5, -0.5, 1.0, 0.0, 0.0, 1.f, +1.0, 0.0, 0.0,
-    +0.0, +0.5, +0.5, 1.0, 0.0, 0.0, 1.f, +1.0, 0.0, 0.0,
-    +0.0, -0.5, +0.5, 1.0, 0.0, 0.0, 1.f, +1.0, 0.0, 0.0,
-};
-
-static GLuint elements[2*3] = {
-    0,1,2,      0,2,3, // face 1
-};
-
 Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name):
 	planetInfo(pi),
 	handler(ch),
+	name(name),
 	sunPosition(0),
 	position(0),
 	angle(0.0),
-	name(name),
-	size(pi->size),
 	scale(1.0f/(1<<(pi->size-1))),
+	size(pi->size),
 	atmosphere(&pi->atmosphereInfo)
 {
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i], i, size);
-	pi->numBlocks=(PLANETFACE_BLOCKS>>(size-1));
 }
 
 void PlanetFace::testFullGeneration(int depth, PlanetFaceBufferHandler* b)
@@ -402,20 +401,22 @@ void Planet::processLevelOfDetail(Camera& c)
 	if(testBool1)return;
 	if(!c.isBoxInFrustum(position-glm::vec3(1), glm::vec3(2,0,0), glm::vec3(0,2,0), glm::vec3(0,0,2)))return;
 	if(glm::length(c.getPosition(position))>20.0f)return;
-	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, NULL);
+	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, NULL, NULL);
 }
 
-PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::vec3 v1, glm::vec3 v2):
+PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::vec3 v1, glm::vec3 v2, int index, float alpha, bool water):
 	planetFace(pf),
 	maxSize(ms),
-	shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface")),
-	// shader(ShaderProgram::loadFromFile("shader/planetface_atmosphere/planetface_atmosphere.vert", "shader/planetface_atmosphere/planetface_atmosphere.frag", "shader/planetface_atmosphere/planetface_atmosphere.geom", "planetface_atmosphere")),
 	curSize(0),
 	curCapacity(PFBH_MINCAP),
 	v1(glm::normalize(v1)),
 	v2(glm::normalize(v2)),
 	vbo(0),
-	vao(0)
+	vao(0),
+	index(index),
+	alpha(alpha),
+	shader(water?ShaderProgram::loadFromFile("shader/planetface_water/planetface_water.vert", "shader/planetface_water/planetface_water.frag", "shader/planetface_water/planetface_water.geom", "planetface_water"):
+			ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface"))
 {
 	resizeVBO();
 	shader.use();
@@ -426,7 +427,7 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 
 PlanetFaceBufferHandler::~PlanetFaceBufferHandler()
 {
-	for(auto it=faces.begin();it!=faces.end();++it)(*it)->bufferID=-1;
+	for(auto it=faces.begin();it!=faces.end();++it)(*it)->bufferID[index]=-1;
 	curCapacity=0;
 	resizeVBO();
 }
@@ -472,7 +473,12 @@ void PlanetFaceBufferHandler::resizeVBO(void)
 
 void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 {
-	if(curSize>=maxSize || pf->bufferID>=0)return;
+	addFace(pf,pf->elevation,pf->tile);
+}
+
+void PlanetFaceBufferHandler::addFace(PlanetFace* pf, float elevation, blockTypes::T tile)
+{
+	if(curSize>=maxSize || pf->bufferID[index]>=0)return;
 
 	if(curSize>=curCapacity)
 	{
@@ -482,10 +488,11 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 
 	const glm::vec3 n=pf->uvertex[4];
 
-	int topTile = getBlockID(pf->tile,blockPlane::top);
-	int sideTile = getBlockID(pf->tile,blockPlane::side);
+	int topTile = getBlockID(tile,blockPlane::top);
+	int sideTile = getBlockID(tile,blockPlane::side);
 
 	float repeat;
+
 	//if (pf->depth < MINIWORLD_DETAIL)
 	//{
 		//repeat = 1<<(MINIWORLD_DETAIL-(pf->depth));
@@ -509,19 +516,16 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 	// j'attend des feedback (si quelqu'un passe par là)
 	//-------------------------------------------------
 	//
-	// 
-	//
-	//
-	//
+
 	repeat = 2.0;	
 
 	faces.push_back(pf);
-	buffer.push_back((faceBufferEntry_s){{n.x,n.y,n.z},pf->elevation,pf->minElevation,1.0f/(1<<pf->size),topTile,sideTile,repeat});
+	buffer.push_back((faceBufferEntry_s){{n.x,n.y,n.z},elevation,pf->minElevation,1.0f/(1<<pf->size),topTile,sideTile,repeat});
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, curSize*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[curSize]);
 
-	pf->bufferID=curSize;
+	pf->bufferID[index]=curSize;
 	curSize++;
 
 	pf->isDisplayOk = true;
@@ -529,7 +533,7 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 
 void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 {
-	const int i=pf->bufferID;
+	const int i=pf->bufferID[index];
 	if(i>=curSize || i<0)return;
 
 	if(faces.size()>1)
@@ -537,13 +541,13 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 		faces[i]=faces[curSize-1];
 		buffer[i]=buffer[curSize-1];
 
-		faces[i]->bufferID=i;
+		faces[i]->bufferID[index]=i;
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferSubData(GL_ARRAY_BUFFER, i*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[i]);
 	}
 
-	pf->bufferID=-1;
+	pf->bufferID[index]=-1;
 	buffer.pop_back();
 	faces.pop_back();
 	curSize--;
@@ -565,6 +569,7 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 	shader.setUniform("cameraPos", c.getPosition(planetFace.planet->position));
 	shader.setUniform("model", glm::mat4(planetFace.planet->model));
 	shader.setUniform("planetSize", planetFace.planet->scale);
+	shader.setUniform("alpha", alpha);
 
 	//planetface_atmosphere test
 	planetFace.planet->atmosphere.bind(c,lightdir,planetFace.planet->position,planetFace.planet->scale,shader);
@@ -581,17 +586,17 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 	// printf("%d, %d\n",curSize,faces.size());
 }
 
-void PlanetFace::draw(Camera& c, glm::vec3 lightdir)
+void PlanetFace::draw(Camera& c, glm::vec3 lightdir, bool water)
 {
 	if(!c.isBoxInFrustum(box, 8, planet->getFullModel(c)))return; //frustum culling
-	if(!faceBuffer || noBuffer)
+	if((!faceBuffer && !water) || (!waterBuffer && water) || noBuffer)
 	{
-		if(sons[0])for(int i=0;i<4;i++)sons[i]->draw(c,lightdir);
+		if(sons[0])for(int i=0;i<4;i++)sons[i]->draw(c,lightdir,water);
 	}else{
-		faceBuffer->draw(c,lightdir);
+		if(water && waterBuffer)waterBuffer->draw(c,lightdir);
+		else if(!water && faceBuffer)faceBuffer->draw(c,lightdir);
 	}
 }
-
 
 void Planet::draw(Camera& c)
 {
@@ -601,6 +606,7 @@ void Planet::draw(Camera& c)
 
 	for(int i=0;i<6;i++)faces[i]->draw(c, lightdir);
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
+	for(int i=0;i<6;i++)faces[i]->draw(c, lightdir, true);
 
 	// printf("%d\n",miniWorldList.size());
 	

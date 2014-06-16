@@ -49,10 +49,11 @@ class PlanetFace;
 class PlanetFaceBufferHandler
 {
 	public:
-		PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::vec3 v1, glm::vec3 v2);
+		PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::vec3 v1, glm::vec3 v2, int index=0, float alpha=1.0, bool water=false);
 		~PlanetFaceBufferHandler();
 	
 		void addFace(PlanetFace* pf);
+		void addFace(PlanetFace* pf, float elevation, blockTypes::T tile);
 		void deleteFace(PlanetFace* pf);
 		void draw(Camera& c, glm::vec3 lightdir);
 		void resizeVBO(void);
@@ -60,6 +61,7 @@ class PlanetFaceBufferHandler
 		int getSize(void);
 
 	private:
+		int index;
 		ShaderProgram &shader;
 		PlanetFace& planetFace;
 		std::vector<PlanetFace*> faces;
@@ -67,6 +69,7 @@ class PlanetFaceBufferHandler
 		int maxSize, curSize, curCapacity;
 		GLuint vbo, vao;
 		glm::vec3 v1, v2;
+		float alpha;
 };
 
 class PlanetFace
@@ -79,7 +82,7 @@ class PlanetFace
 		PlanetFace(Planet* planet, PlanetFace* father, uint8_t id);
 		~PlanetFace();
 		
-		void deletePlanetFace(PlanetFaceBufferHandler* b);
+		void deletePlanetFace(PlanetFaceBufferHandler* b, PlanetFaceBufferHandler* w);
 		// mise a jour de l'elevation, de la température et de l'humidité
 		void updateElevation(float e, blockTypes::T tile);
 		bool shouldHaveMiniworld(Camera& c);
@@ -87,8 +90,8 @@ class PlanetFace
 		void createMiniWorld(void);
 		void removeMiniWorld(void);
 
-		void processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b);
-		void draw(Camera& c, glm::vec3 lightdir);
+		void processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b, PlanetFaceBufferHandler* w);
+		void draw(Camera& c, glm::vec3 lightdir, bool water=false);
 
 		glm::vec3 getOrigin(void);
 		glm::vec3 getV1(void);
@@ -120,19 +123,20 @@ class PlanetFace
 		TrackerPointer<PlanetFace>* tptr;
 
 		PlanetFaceBufferHandler* faceBuffer;
+		PlanetFaceBufferHandler* waterBuffer;
 
 		bool noBuffer;
 		bool elevated;
 		int x, z;
-		int bufferID;
+		int bufferID[2];
 		float elevation;
-		float tile;
+		blockTypes::T tile;
 		float minElevation;
 		
 		uint8_t id;
 		int depth, size;
 		int childrenDepth;
-		inline bool isDrawingFace() {return bufferID>=0;}
+		inline bool isDrawingFace() {return bufferID[0]>=0;}
 		bool isDisplayOk;
 };
 

@@ -37,6 +37,8 @@ const glm::dvec3 playerBoundingBox[]=
 	glm::dvec3(-1.0,0.20,1.0)*playerBoundingBoxSize
 };
 
+extern blockTypes::T selectBlockType;
+
 void CameraPlayerGround::update(Camera& camera)
 {
 	int numBlocks=planet->getNumBlocks();
@@ -130,7 +132,7 @@ void CameraPlayerGround::update(Camera& camera)
 			else if(Input::isKeyPressed(GLFW_KEY_C))
 			{
 				//TODO : check que player n'intersecte pas avec le nouveau bloc...
-				blockTypes::T t=blockTypes::dirt;
+				blockTypes::T t=selectBlockType;
 				// blockTypes::T t=blockTypes::water;
 				switch(dir)
 				{

@@ -16,6 +16,5 @@ void main()
 	// XXX
 	// outColor.xyz-=2.0*(1.0-outColor.a);
 	outColor.xyz*=fluminosity;
-	// outColor.a=alpha;
-	outColor.a=1.0;
+	outColor.a=alpha;
 }

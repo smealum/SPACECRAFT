@@ -36,6 +36,11 @@ glm::dvec3 Camera::getPositionDouble(glm::dvec3 ref)
     return pos-ref+refPos;
 }
 
+void Camera::movePositionDouble(glm::dvec3 v)
+{
+    pos+=v;
+}
+
 void Camera::setPosition(glm::dvec3 p)
 {
     pos=p-refPos;
