@@ -62,7 +62,7 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 
 	
 	// génération de la map des hauteurs
-	const int offset = 10;
+	const int offset = 5;
 	const int heightMapX = MINIWORLD_W*CHUNK_N+2*offset;
 	const int heightMapZ = MINIWORLD_D*CHUNK_N+2*offset;
 	int          heightMap[heightMapX][heightMapZ];
@@ -79,7 +79,7 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 		}
 	}
 
-	list<i32vec3> treePositions;
+	list<i32vec4> treePositions;
 
 	// génération des blocs
 	for(int cx=0;cx<w;cx++)
@@ -102,14 +102,19 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 
 					int rx = (px + i+(CHUNK_N)*cx);
 					int ry = (pz + k+(CHUNK_N)*cz);
-					int randomSource = ((rx+ry)^rx + 10)^ry;
+					unsigned long long randomSource = rx*3+ry*231331;
+					randomSource ^= (randomSource >> 29) & 0x5555555555555555ULL;
+					randomSource ^= (randomSource << 17) & 0x71D67FFFEDA60000ULL;
+					randomSource ^= ry;
+					randomSource ^= (randomSource << 37) & 0xFFF7EEE000000000ULL;
+					randomSource ^= (randomSource >> 43);
 
 					// ajout des arbres
 					if (
-							randomSource % 140 == 0 and
+							randomSource % 200 == 100 and
 							tile == blockTypes::grass
 					)
-					treePositions.push_back(glm::i32vec3(i+(CHUNK_N)*cx,height,k+(CHUNK_N)*cz));
+					treePositions.push_back(glm::i32vec4(i+(CHUNK_N)*cx,height,k+(CHUNK_N)*cz,randomSource));
 
 
 					//TEMP (pour tester)
@@ -188,7 +193,7 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 	// list positions ou poser des arbres
 	for(auto tPos = treePositions.begin(); tPos != treePositions.end(); ++tPos)
 	{
-		Tree& t = treePool[0];
+		Tree& t = treePool[tPos->w % treePool.size()];
 		auto& tList = t.generateList();
 
 		for( auto it = tList.begin(); it!=tList.end(); ++it)
