@@ -1,6 +1,6 @@
 #include "solarsystem/SolarSystemGeneratorSol.h"
 #include "planetGenerator/PlanetGeneratorEarth.h"
-#include <random>
+#include "utils/mt19937.h"
 
 
 SolarSystemGeneratorSol::SolarSystemGeneratorSol(int seed, ContentHandler& ch):
@@ -11,16 +11,12 @@ SolarSystemGeneratorSol::SolarSystemGeneratorSol(int seed, ContentHandler& ch):
 
 void SolarSystemGeneratorSol::generatePlanetInfos(std::vector<PlanetInfo*>& v)
 {
-	std::mt19937 engine(seed);
-	std::uniform_int_distribution<int> int_dist(1,10);
-	std::uniform_real_distribution<float> float_dist(0.0f,1.0f);
-	// std::uniform_real_distribution<double> double_distance_dist(1e3,1e5);
-	std::uniform_real_distribution<double> double_distance_dist(1e1,1e3);
+	init_genrand64(seed);
 		
-	const int numPlanet=int_dist(engine);
+	const int numPlanet=genrand64_int64()&7;
 	for(int i=0;i<numPlanet;i++)
 	{
-		double distance=double_distance_dist(engine);
+		double distance=genrand64_real2()*1e3+1e1;
 
 		SpaceObjectTrajectory* trajectory =
 						new EllipticalTrajectory(
@@ -36,7 +32,7 @@ void SolarSystemGeneratorSol::generatePlanetInfos(std::vector<PlanetInfo*>& v)
 						1)
 					);
 
-		const int numSatellites=int_dist(engine)%3;
+		const int numSatellites=genrand64_int64()&3;
 		for(int j=0;j<numSatellites;j++)
 		{
 			SpaceObjectTrajectory* satTrajectory =
