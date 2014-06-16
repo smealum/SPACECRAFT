@@ -54,6 +54,8 @@ class MiniWorld
 		bool isConstructionCanceled();
 
 	private:
+		void generateName(void);
+		
 		bool constructionCanceled;
 		Planet* planet;
 		PlanetFace* face;
@@ -63,6 +65,7 @@ class MiniWorld
 		int x, z;
 		bool generated;
 		bool modified;
+		std::string name;
 
 		TrackerPointer<MiniWorld>* tptr;
 };
