@@ -26,25 +26,25 @@ extern float PlanetFaceDetailsPower;
 PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id, int size):
 	planet(planet),
 	father(NULL),
-	faceBuffer(NULL),
-	waterBuffer(NULL),
+	toplevel(this),
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
-	elevation(1.0f),
-	minElevation(elevation-0.01f),
-	elevated(false),
-	id(5+id),
-	bufferID({-1,-1}),
 	miniworld(NULL),
-	toplevel(this),
+	faceBuffer(NULL),
+	waterBuffer(NULL),
+	noBuffer(false),
+	elevated(false),
 	x(0),
 	z(0),
+	bufferID({-1,-1}),
+	elevation(1.0f),
+	minElevation(elevation-0.01f),
+	id(5+id),
 	depth(size-1),
 	// depth(0),
-	childrenDepth(depth),
 	size(0),
-	isDisplayOk(false),
-	noBuffer(false)
+	childrenDepth(depth),
+	isDisplayOk(false)
 {
 	uvertex[0]=v[0]; uvertex[1]=v[1];
 	uvertex[2]=v[2]; uvertex[3]=v[3];
@@ -54,19 +54,19 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id, int size):
 PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	planet(planet),
 	father(father),
+	sons{NULL, NULL, NULL, NULL},
+	miniworld(NULL),
+	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	faceBuffer(NULL),
 	waterBuffer(NULL),
-	sons{NULL, NULL, NULL, NULL},
-	tptr(new TrackerPointer<PlanetFace>(this, true)),
-	elevation(1.0f),
+	noBuffer(false),
 	elevated(false),
-	id(id),
-	bufferID({-1,-1}),
-	miniworld(NULL),
 	toplevel(father->toplevel),
+	bufferID({-1,-1}),
+	elevation(1.0f),
+	id(id),
 	childrenDepth(0),
-	isDisplayOk(false),
-	noBuffer(false)
+	isDisplayOk(false)
 {
 	//TODO : exception ?
 	// if(!father);
@@ -357,28 +357,15 @@ glm::vec3 cubeArray[6][4]=
 		{glm::vec3(1.0,1.0,-1.0),glm::vec3(-1.0,1.0,-1.0),glm::vec3(-1.0,-1.0,-1.0),glm::vec3(1.0,-1.0,-1.0)}, //near
 		{glm::vec3(-1.0,-1.0,1.0),glm::vec3(-1.0,1.0,1.0),glm::vec3(1.0,1.0,1.0),glm::vec3(1.0,-1.0,1.0)}}; //far
 
-static GLfloat vertices[] = {
-    //   POSITION    |      COLOR       |     NORMAL
-    // x positif
-    +0.0, -0.5, -0.5, 1.0, 0.0, 0.0, 1.f, +1.0, 0.0, 0.0,
-    +0.0, +0.5, -0.5, 1.0, 0.0, 0.0, 1.f, +1.0, 0.0, 0.0,
-    +0.0, +0.5, +0.5, 1.0, 0.0, 0.0, 1.f, +1.0, 0.0, 0.0,
-    +0.0, -0.5, +0.5, 1.0, 0.0, 0.0, 1.f, +1.0, 0.0, 0.0,
-};
-
-static GLuint elements[2*3] = {
-    0,1,2,      0,2,3, // face 1
-};
-
 Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name):
 	planetInfo(pi),
 	handler(ch),
+	name(name),
 	sunPosition(0),
 	position(0),
 	angle(0.0),
-	name(name),
-	size(pi->size),
 	scale(1.0f/(1<<(pi->size-1))),
+	size(pi->size),
 	atmosphere(&pi->atmosphereInfo)
 {
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i], i, size);

@@ -20,6 +20,8 @@
 
 float PlanetFaceDetailsPower = 28.0;
 
+blockTypes::T selectBlockType;
+
 using namespace std;
 using namespace glm;
 
@@ -53,6 +55,10 @@ void reloadAllShaders(void * /*clientData*/)
     }
 }
 #endif
+void mouseWheelCallback(GLFWwindow *, double x, double y)
+{
+	selectBlockType = (blockTypes::T)(selectBlockType + (int)y);
+}
 
 void reloadAllShaders()
 {
@@ -61,8 +67,6 @@ void reloadAllShaders()
 		it->second->load();
 	}
 }
-
-blockTypes::T tmp_type;
 
 Application::Application() : 
 	state(appReady),
@@ -125,8 +129,7 @@ Application::Application() :
 	TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
 	TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
 	TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
-	tmp_type = blockTypes::sand;
-	TwAddVarRW(bar, "blockType", TW_TYPE_INT32, (int*)&tmp_type, "label='type of the underwater block'");
+	TwAddVarRW(bar, "blockType", TW_TYPE_UINT8, (char*)&selectBlockType, "label='type of the selected block' min=0 max=255 step=1");
 
 	// vsync on
 	glfwSwapInterval(vsync);
@@ -143,6 +146,8 @@ Application::Application() :
 
 	glCheckError("tweak bar");
 #endif
+
+	glfwSetScrollCallback(window, &mouseWheelCallback);
 
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_NO_ERROR)

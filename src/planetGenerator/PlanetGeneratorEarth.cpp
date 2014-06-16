@@ -4,13 +4,20 @@
 #include "utils/dbg.h"
 #include "utils/positionMath.h"
 #include "noise/CaveGenerator.h" // XXX debug
+#include "noise/Tree.h"
 
 // XXX temp
 extern CaveGenerator caves;
 
 PlanetGeneratorEarth::PlanetGeneratorEarth(int nbThread):
-	PlanetGenerator(nbThread)
+	PlanetGenerator(nbThread),
+	treePool(20)
 {
+	for (unsigned int i = 0; i < treePool.size(); i++)
+	{
+		treePool[i].generate(i);
+		treePool[i].generateList();
+	}
 }
 
 void PlanetGeneratorEarth::initGenerators()
@@ -47,6 +54,8 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 	pxPos=0;
 
 	caves.generate();
+
+	//unsigned int treeIndex = threadId;
 
 	for(int cx=0;cx<w;cx++)
 	{
@@ -99,6 +108,29 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 							const int vy=cy*CHUNK_N;
 							for(int j=0;j<(CHUNK_N+2);j++)
 							{
+								//if (vy+py+j > height)
+								//{
+									//Tree &tree = treePool[treeIndex];
+									//if(vy+py+j < height + tree.getHeight() + 1 &&
+											//i >= CHUNK_N/2 - tree.getSize()/2 &&
+											//i < CHUNK_N/2 + tree.getSize()/2 &&
+											//k >= CHUNK_N/2 - tree.getSize()/2 &&
+											//k < CHUNK_N/2 + tree.getSize()/2)
+									//{
+										//int x = i - (CHUNK_N/2 - tree.getSize()/2),
+											//y = vy+py+j - height -1,
+											//z = k - (CHUNK_N/2 - tree.getSize()/2);
+										//if (x >= 0 && x < tree.getSize() &&
+												//y >=0 && y < tree.getHeight() &&
+												//z >= 0 && z < tree.getSize())
+										//{
+											////debug("Tree %d, %d, %d", x, y, z);
+											//data[yPos] = tree.getBlock(x, y, z);
+										//}
+										//else
+											//log_err("WTF OMG NOOOB");
+									//}
+								//}
 								if (vy+py+j == height) data[yPos]=tile;
 								else if (vy+py+j < height) data[yPos] = blockTypes::dirt;
 								else if (vy+py+j == height+1 && rand()%100 == 1) data[yPos]=blockTypes::flower_red;

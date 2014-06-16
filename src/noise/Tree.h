@@ -12,6 +12,16 @@ class Tree {
 		int seed;
 		int height, size;
 
+		//generation variables
+		int minHeight;
+		int minSize;
+		int halfRandomHeight;
+		int halfRandomSize;
+
+		// list of the blocks
+		// pos relative to center -> block type
+		std::list<std::pair<glm::i32vec3, blockTypes::T> > blockList;
+
 		blockTypes::T *array; // 3D flattened array
 		noise::module::Perlin rnd;
 
@@ -36,6 +46,19 @@ class Tree {
 		void digCube(const glm::i32vec3 &p, const glm::i32vec3 &si, blockTypes::T type);
 
 	public:
+
+		inline int getHalfRandomSize() const { return halfRandomSize; }
+		inline void setHalfRandomSize(int v) { halfRandomSize = v; }
+
+		inline int getHalfRandomHeight() const { return halfRandomHeight; }
+		inline void setHalfRandomHeight(int v) { halfRandomHeight = v; }
+
+		inline int getMinSize() const { return minSize; }
+		inline void setMinSize(int v) { minSize = v; }
+
+		inline void setMinHeight(int v) { minHeight = v; }
+		inline int getMinHeight() const { return minHeight; }
+
 		Tree();
 		~Tree();
 
@@ -48,6 +71,11 @@ class Tree {
 		{
 			return array[x + size * (y + z * height)];
 		}
+
+		// generate the list of blocks to add
+		// pos is the offset used to calculate the index in the falttened array
+		const std::list<std::pair<glm::i32vec3, blockTypes::T> >& generateList();
+
 };
 
 #endif
