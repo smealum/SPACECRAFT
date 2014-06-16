@@ -408,8 +408,8 @@ void Planet::processLevelOfDetail(Camera& c)
 PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::vec3 v1, glm::vec3 v2):
 	planetFace(pf),
 	maxSize(ms),
-	// shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface")),
-	shader(ShaderProgram::loadFromFile("shader/planetface_atmosphere/planetface_atmosphere.vert", "shader/planetface_atmosphere/planetface_atmosphere.frag", "shader/planetface_atmosphere/planetface_atmosphere.geom", "planetface_atmosphere")),
+	shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface")),
+	// shader(ShaderProgram::loadFromFile("shader/planetface_atmosphere/planetface_atmosphere.vert", "shader/planetface_atmosphere/planetface_atmosphere.frag", "shader/planetface_atmosphere/planetface_atmosphere.geom", "planetface_atmosphere")),
 	curSize(0),
 	curCapacity(PFBH_MINCAP),
 	v1(glm::normalize(v1)),
