@@ -82,9 +82,16 @@ ou
 
 ##Tests
 
-Les tests unitaires sont lancés avec `make test` il faut cepedant avoir fait `make all` avant car CTest ne compile pas les tests. En résumé:
+Les tests unitaires sont lancés avec `make test` il faut cepedant avoir fait `make all` avant car CTest ne compile pas les tests. L'édition des liens peut donner des erreurs, dans ce cas il faut refaire `cmake ..` et relancer `make`. En résumé:
 
 ```
+make && make test
+```
+
+S'il y a une erreur:
+
+```
+cmake .. # on considère qu'on est dans build/
 make
 make test
 ```
