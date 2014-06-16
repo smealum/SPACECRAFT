@@ -27,13 +27,14 @@ PlanetFace::PlanetFace(Planet* planet, glm::vec3 v[4], uint8_t id, int size):
 	planet(planet),
 	father(NULL),
 	faceBuffer(NULL),
+	waterBuffer(NULL),
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
 	minElevation(elevation-0.01f),
 	elevated(false),
 	id(5+id),
-	bufferID(-1),
+	bufferID({-1,-1}),
 	miniworld(NULL),
 	toplevel(this),
 	x(0),
@@ -54,12 +55,13 @@ PlanetFace::PlanetFace(Planet* planet, PlanetFace* father, uint8_t id):
 	planet(planet),
 	father(father),
 	faceBuffer(NULL),
+	waterBuffer(NULL),
 	sons{NULL, NULL, NULL, NULL},
 	tptr(new TrackerPointer<PlanetFace>(this, true)),
 	elevation(1.0f),
 	elevated(false),
 	id(id),
-	bufferID(-1),
+	bufferID({-1,-1}),
 	miniworld(NULL),
 	toplevel(father->toplevel),
 	childrenDepth(0),
@@ -250,7 +252,7 @@ static inline int max(int a, int b)
 	return (a>b)?a:b;
 }
 
-void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
+void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b, PlanetFaceBufferHandler* w)
 {
 	bool detailedEnough=isDetailedEnough(c);
 
@@ -259,6 +261,12 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 		if(b)printf("ERROR1 %d\n",depth);
 		b=faceBuffer;
 	}else if(!b && depth==2)b=faceBuffer=new PlanetFaceBufferHandler(*this, PFBH_MAXSIZE, getV1(), getV2());
+
+	if(waterBuffer)
+	{
+		if(w)printf("ERROR1.5 %d\n",depth);
+		w=waterBuffer;
+	}else if(!w && depth==2)w=waterBuffer=new PlanetFaceBufferHandler(*this, PFBH_MAXSIZE, getV1(), getV2());
 
 
 	// update childrenDepth
@@ -325,7 +333,7 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b)
 			for(int i=0;i<4;i++)
 			{
 				if(!sons[i])sons[i]=new PlanetFace(planet,this,i);
-				else sons[i]->processLevelOfDetail(c, b);
+				else sons[i]->processLevelOfDetail(c, b, w);
 
 				done &= ( sons[i]->isDisplayOk );
 			}
@@ -402,7 +410,7 @@ void Planet::processLevelOfDetail(Camera& c)
 	if(testBool1)return;
 	if(!c.isBoxInFrustum(position-glm::vec3(1), glm::vec3(2,0,0), glm::vec3(0,2,0), glm::vec3(0,0,2)))return;
 	if(glm::length(c.getPosition(position))>20.0f)return;
-	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, NULL);
+	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, NULL, NULL);
 }
 
 PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::vec3 v1, glm::vec3 v2):
@@ -415,7 +423,8 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 	v1(glm::normalize(v1)),
 	v2(glm::normalize(v2)),
 	vbo(0),
-	vao(0)
+	vao(0),
+	index(0)
 {
 	resizeVBO();
 	shader.use();
@@ -426,7 +435,7 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 
 PlanetFaceBufferHandler::~PlanetFaceBufferHandler()
 {
-	for(auto it=faces.begin();it!=faces.end();++it)(*it)->bufferID=-1;
+	for(auto it=faces.begin();it!=faces.end();++it)(*it)->bufferID[index]=-1;
 	curCapacity=0;
 	resizeVBO();
 }
@@ -472,7 +481,7 @@ void PlanetFaceBufferHandler::resizeVBO(void)
 
 void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 {
-	if(curSize>=maxSize || pf->bufferID>=0)return;
+	if(curSize>=maxSize || pf->bufferID[index]>=0)return;
 
 	if(curSize>=curCapacity)
 	{
@@ -486,6 +495,7 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 	int sideTile = getBlockID(pf->tile,blockPlane::side);
 
 	float repeat;
+
 	//if (pf->depth < MINIWORLD_DETAIL)
 	//{
 		//repeat = 1<<(MINIWORLD_DETAIL-(pf->depth));
@@ -509,10 +519,7 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 	// j'attend des feedback (si quelqu'un passe par là)
 	//-------------------------------------------------
 	//
-	// 
-	//
-	//
-	//
+
 	repeat = 2.0;	
 
 	faces.push_back(pf);
@@ -521,7 +528,7 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, curSize*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[curSize]);
 
-	pf->bufferID=curSize;
+	pf->bufferID[index]=curSize;
 	curSize++;
 
 	pf->isDisplayOk = true;
@@ -529,7 +536,7 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 
 void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 {
-	const int i=pf->bufferID;
+	const int i=pf->bufferID[index];
 	if(i>=curSize || i<0)return;
 
 	if(faces.size()>1)
@@ -537,13 +544,13 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 		faces[i]=faces[curSize-1];
 		buffer[i]=buffer[curSize-1];
 
-		faces[i]->bufferID=i;
+		faces[i]->bufferID[index]=i;
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferSubData(GL_ARRAY_BUFFER, i*sizeof(faceBufferEntry_s), sizeof(faceBufferEntry_s), (void*)&buffer[i]);
 	}
 
-	pf->bufferID=-1;
+	pf->bufferID[index]=-1;
 	buffer.pop_back();
 	faces.pop_back();
 	curSize--;

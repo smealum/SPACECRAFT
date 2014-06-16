@@ -60,6 +60,7 @@ class PlanetFaceBufferHandler
 		int getSize(void);
 
 	private:
+		int index;
 		ShaderProgram &shader;
 		PlanetFace& planetFace;
 		std::vector<PlanetFace*> faces;
@@ -87,7 +88,7 @@ class PlanetFace
 		void createMiniWorld(void);
 		void removeMiniWorld(void);
 
-		void processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b);
+		void processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b, PlanetFaceBufferHandler* w);
 		void draw(Camera& c, glm::vec3 lightdir);
 
 		glm::vec3 getOrigin(void);
@@ -120,11 +121,12 @@ class PlanetFace
 		TrackerPointer<PlanetFace>* tptr;
 
 		PlanetFaceBufferHandler* faceBuffer;
+		PlanetFaceBufferHandler* waterBuffer;
 
 		bool noBuffer;
 		bool elevated;
 		int x, z;
-		int bufferID;
+		int bufferID[2];
 		float elevation;
 		float tile;
 		float minElevation;
@@ -132,7 +134,7 @@ class PlanetFace
 		uint8_t id;
 		int depth, size;
 		int childrenDepth;
-		inline bool isDrawingFace() {return bufferID>=0;}
+		inline bool isDrawingFace() {return bufferID[0]>=0;}
 		bool isDisplayOk;
 };
 
