@@ -17,6 +17,7 @@ typedef uint8_t chunkVal;
 struct GL_Vertex
 {
 	glm::vec3 position;
+	float elevation;
 	glm::vec2 texcoord;
 	int tile;
 	glm::vec3 normal;

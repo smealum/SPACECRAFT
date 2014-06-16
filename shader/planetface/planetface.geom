@@ -51,7 +51,8 @@ void main()
 	v[6]=model*vec4(gelevation[0]*normalize(pos[0]-v1+v2),1.0);
 	v[7]=model*vec4(gelevation[0]*normalize(pos[0]+v1+v2),1.0);
 
-	const float ambient=0.0;
+	// const float ambient=0.0;
+	const float ambient=0.2;
 	vec3 n1=normalize(vec3(v[0]-v[1]));
 	vec3 n2=normalize(vec3(v[0]-v[2]));
 
@@ -74,12 +75,12 @@ void main()
     v[6] = projview * (vec4(planetPos,0.0)+v[6]);
     v[7] = projview * (vec4(planetPos,0.0)+v[7]);
 
-	// XXX temp
-    c[0] += (gelevation[0]-1.00)*400.0;
-    c[1] += (gelevation[0]-1.00)*400.0;
-    c[2] += (gelevation[0]-1.00)*400.0;
-    c[3] += (gelevation[0]-1.00)*400.0;
-    c[4] += (gelevation[0]-1.00)*400.0;
+	// XXX magique
+    c[0] *= (gelevation[0]-1.00)*600.0;
+    c[1] *= (gelevation[0]-1.00)*600.0;
+    c[2] *= (gelevation[0]-1.00)*600.0;
+    c[3] *= (gelevation[0]-1.00)*600.0;
+    c[4] *= (gelevation[0]-1.00)*600.0;
 
     /*
 	  6-------7
