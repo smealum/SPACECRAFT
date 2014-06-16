@@ -77,6 +77,7 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 	const glm::vec3 rn=(normalize(origin+(pos2)/float(numBlocks))*y);
 
 	v.position=(normalize(origin+(pos2)/float(numBlocks))*y);
+	v.elevation=y;
 	v.texcoord=glm::vec2(1,1);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
@@ -88,6 +89,7 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 	y=1.0+pos1.y/float(numBlocks);
 
 	v.position=(normalize(origin+(pos2)/float(numBlocks))*y);
+	v.elevation=y;
 	v.texcoord=glm::vec2(0,1);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
@@ -99,6 +101,7 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 	y=1.0+pos1.y/float(numBlocks);
 
 	v.position=(normalize(origin+(pos2)/float(numBlocks))*y);
+	v.elevation=y;
 	v.texcoord=glm::vec2(1,0);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
@@ -111,6 +114,7 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 	y=1.0+pos1.y/float(numBlocks);
 
 	v.position=(normalize(origin+(pos2)/float(numBlocks))*y);
+	v.elevation=y;
 	v.texcoord=glm::vec2(0,0);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
@@ -122,6 +126,7 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 	y=1.0+pos1.y/float(numBlocks);
 
 	v.position=(normalize(origin+(pos2)/float(numBlocks))*y);
+	v.elevation=y;
 	v.texcoord=glm::vec2(1,0);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
@@ -133,6 +138,7 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 	y=1.0+pos1.y/float(numBlocks);
 
 	v.position=(normalize(origin+(pos2)/float(numBlocks))*y);
+	v.elevation=y;
 	v.texcoord=glm::vec2(0,1);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
