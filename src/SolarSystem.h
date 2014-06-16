@@ -13,7 +13,7 @@ class SolarSystem
 		SolarSystem(const glm::dvec3& position);
 		~SolarSystem();
 
-		void generate(ContentHandler& ch);
+		void generate(ContentHandler& contentHandler);
 
 		void draw(Camera& c);
 		void update(float time);

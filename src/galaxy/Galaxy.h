@@ -18,8 +18,11 @@ class  GalaxyTree;
 
 struct GalaxySolarResponse
 {
-	SolarSystem* solarSystem; // NULL <=> notFound
-	double distance;  // distance depuis la position demandée.
+	// position du systeme solaire trouvé
+	glm::dvec3* solarSystem;
+
+	// distance depuis la position demandée.
+	double distance;
 
 	bool operator<(const GalaxySolarResponse& other) const;
 };
@@ -30,13 +33,15 @@ class Galaxy
 {
 	public:
 		Galaxy();
+		~Galaxy();
 		GalaxySolarResponse getClosestSolarSystem(const glm::dvec3& pos);
 		GalaxySolarResponse getClosestSolarSystem(const glm::dvec3& pos, double maxDist);
-		void pushSolarSystem(SolarSystem* s);
+		void pushSolarSystem(const glm::dvec3& p);
 
 		void step(Camera& camera, ContentHandler& contentHandler);
 		void draw(Camera& camera);
 	private:
+		std::vector<glm::dvec3*> allocatedPositions;
 
 		// OctoTree part
 		GalaxyTree* galaxyTree;
@@ -50,7 +55,11 @@ class Galaxy
 
 		//===================
 		
-		SolarSystem* selectedSolarSystem;
+
+		glm::dvec3* selectedPosition;
+		SolarSystem* currentSolarSystem;
+
+
 };
 
 /////////////////////////////////////////////////////////////
@@ -58,9 +67,9 @@ class Galaxy
 class GalaxyTree
 {
 	public:
-		GalaxyTree(SolarSystem* solarSystem, const glm::dvec3& center, double width);
+		GalaxyTree(glm::dvec3* p, const glm::dvec3& center, double width);
 		GalaxySolarResponse getClosestSolarSystem(const glm::dvec3& pos, double maxDist);
-		void pushSolarSystem(SolarSystem* s);
+		void pushSolarSystem(glm::dvec3* s);
 
 	private:
 		bool isSubdivised;
@@ -71,7 +80,7 @@ class GalaxyTree
 			GalaxyTree* children[2][2][2];
 
 			// Le SolarSystem
-			SolarSystem* solarSystem; // non NULL
+			glm::dvec3* solarSystem;
 		};
 
 		// dimension du noeud

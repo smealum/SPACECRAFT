@@ -211,7 +211,7 @@ void Application::run()
 	camera->setCameraManager(new CameraKeyboardMouse());
 
 	tt=new testShaders;
-	testSolarSystem=new SolarSystem(dvec3(0.0,0.0,0.0));
+	testSolarSystem=new SolarSystem(dvec3(100.0,0.0,0.0));
 	testSolarSystem->generate(contentHandler);
 	testCursor=new Cursor();
 
@@ -220,7 +220,7 @@ void Application::run()
 	caves.generate();
 	
 	galaxy = new Galaxy();
-	GalaxyGenerate(galaxy,contentHandler);
+	GalaxyGenerate(galaxy);
 
 	float timeA;
 	char titleBuff[512];

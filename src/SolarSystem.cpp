@@ -7,7 +7,6 @@ SolarSystem::SolarSystem(const glm::dvec3& pos):
 	numPlanets(0),
 	position(pos)
 {
-
 }
 
 void SolarSystem::generate(ContentHandler& ch)
@@ -19,6 +18,7 @@ SolarSystem::~SolarSystem()
 {
 
 }
+
 
 void SolarSystem::deleteSolarSystem(void)
 {
