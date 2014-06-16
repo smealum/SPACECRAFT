@@ -1,5 +1,7 @@
 #include "PlanetInfo.h"
+#include "MiniWorld.h"
 #include "planetGenerator/PlanetGenerator.h"
+#include "utils/positionMath.h"
 #include "utils/dbg.h"
 
 //setPlanetInfo is the responsibility of descending classes as it should only be called after PI's been fully initialized
@@ -9,8 +11,11 @@ PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p, int seed, i
 	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
 	period(1.0f),
 	planetGenerator(p),
-	size(size)
+	size(size),
+	waterLevelBlock(float(CHUNK_N*MINIWORLD_H)*0.5),
+	numBlocks(PLANETFACE_BLOCKS>>(size-1))
 {
+	waterLevelElevation=(dblockHeightToElevation(waterLevelBlock, numBlocks));
 }
 
 //la suppression de trajectory n'est PAS la responsabilité de planetInfo

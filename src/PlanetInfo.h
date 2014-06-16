@@ -14,6 +14,8 @@ class PlanetInfo
 
 		int seed;
 		int size;
+		float waterLevelBlock;
+		float waterLevelElevation;
 
 		AtmosphereInfo atmosphereInfo;
 		PlanetGenerator* planetGenerator;

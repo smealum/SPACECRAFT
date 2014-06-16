@@ -78,7 +78,7 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 					const blockTypes::T tile=blockReponse.tile;
 
 					//TEMP (pour tester)
-					const int waterHeight=CHUNK_N*MINIWORLD_H/2.f;
+					const int waterHeight=planetInfo->waterLevelBlock;
 					int caveHeightMin;
 					int caveHeightMax;
 					if(height<waterHeight)
@@ -192,7 +192,7 @@ PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, co
 	float elevation = getElevation(threadId,posn);
 	double block_height=delevationToBlockHeight(elevation, planetInfo->numBlocks);
 
-	if (block_height>double(CHUNK_N*MINIWORLD_H)*0.5) //  terre
+	if (block_height>planetInfo->waterLevelBlock) //  terre
 	{
 		// e > 0
 		float e = (elevation - 1.001) * 1000.f ;
@@ -226,10 +226,9 @@ PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, co
 			default : return {1.0,blockTypes::grass};
 		}
 
-	}
-	else // mer
-	{
-		return {elevation,blockTypes::water};
+	}else{
+		// mer
+		return {elevation,blockTypes::sand};
 	}
 }
 
