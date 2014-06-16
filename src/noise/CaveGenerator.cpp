@@ -264,7 +264,7 @@ void CaveGenerator::computeList()
 	}
 }
 
-list<pair<int,int> >& CaveGenerator::getHolesList(int x, int z)
+const list<pair<int,int> >& CaveGenerator::getHolesList(int x, int z)
 {
 	//int xx = (x%(2*CAVE_CHUNK_SIZE_X)); if (xx>=CAVE_CHUNK_SIZE_X) xx=2*CAVE_CHUNK_SIZE_X-xx-1;
 	//int zz = (z%(2*CAVE_CHUNK_SIZE_Z)); if (zz>=CAVE_CHUNK_SIZE_Z) zz=2*CAVE_CHUNK_SIZE_Z-zz-1;

@@ -1,13 +1,17 @@
 #include "noise/Tree.h"
 #include "utils/maths.h"
 #include "utils/dbg.h"
-#include <ctime>
+#include "Chunk.h"
 
 // helper to get the 1D index in a flattened 3D array, using a vec3
 #define TPOS(V) ((V).x + size * ((V).y + (V).z * height))
 
 Tree::Tree() :
 	seed(0),
+	minHeight(7),
+	minSize(3),
+	halfRandomHeight(9),
+	halfRandomSize(7),
 	array(NULL)
 {
 }
@@ -17,8 +21,8 @@ void Tree::generate(int seed)
 	this->seed = seed;
 	rnd.SetSeed(seed);
 
-	height = 7 + (rnd.GetValue(0.1, seed/10000, 0) + 1.f) * 9;
-	size = 3 + (rnd.GetValue(0.2, seed/10000, 0) + 1.f) * 7;
+	height = minHeight + (rnd.GetValue(0.1, seed/10000, 0) + 1.f) * halfRandomHeight;
+	size = minSize + (rnd.GetValue(0.2, seed/10000, 0) + 1.f) * halfRandomSize;
 	log_info("seed: %d -> %d, %d", seed, height, size);
 
 	array = new blockTypes::T[height * size * size];
@@ -55,10 +59,12 @@ void Tree::generate(int seed)
 	// on dessine le feuillage
 	
 	pos = glm::i32vec3(size/2, height/1.5f, size/2);
+	int maxH = size;
 	glm::i32vec3 cubeSize(size, height/3, size);
 	while (cubeSize.x >= 3)
 	{
 		digCube(pos, cubeSize, blockTypes::tree_foliage_opaque);
+		maxH = pos.y - cubeSize.y / 2;
 		// dig the line to make it round
 		glm::i32vec3 a = pos - cubeSize/2,
 					 b = a;
@@ -90,14 +96,17 @@ void Tree::generate(int seed)
 
 	// on créé le tronc
 	cubeSize += glm::i32vec3(2);
-	int maxY = pos.y - cubeSize.y/2;
+	maxH--;
 	pos = glm::i32vec3(size/2, 0, size/2);
 	si = glm::i32vec2(size % 2?1:2);
-	for (int i = 0; i < maxY; i++)
+	for (int i = 0; i < maxH; i++)
 	{
 		digSquare(pos-glm::i32vec3(si.x/2, 0, si.y/2), si, blockTypes::tree);
 		pos.y++;
 	}
+
+	// the lis in not valid anymore
+	blockList.clear();
 }
 
 void Tree::digCube(const glm::i32vec3 &p, const glm::i32vec3 &si, blockTypes::T type)
@@ -106,7 +115,7 @@ void Tree::digCube(const glm::i32vec3 &p, const glm::i32vec3 &si, blockTypes::T 
 	for (int i = 0; i < si.y; i++)
 	{
 		pos.y = p.y - si.y / 2 + i;
-		digSquare(pos, glm::i32vec2(si.x, si.z), blockTypes::tree_foliage);
+		digSquare(pos, glm::i32vec2(si.x, si.z), type);
 	}
 }
 
@@ -233,3 +242,28 @@ void Tree::digSquare(const glm::i32vec3 &p, const glm::i32vec2 &si, blockTypes::
 	}
 }
 
+//#define CHUNKPOS(V) ((V).x + (CHUNK_N+2) * ((V).y + (V).z * (CHUNK_N+2)))
+const std::list<std::pair<glm::i32vec3, blockTypes::T> >& Tree::generateList()
+{
+	if (!blockList.empty())
+		return blockList;
+
+	glm::i32vec3 center(glm::i32vec3(size)/2); // position in the Tree array
+	center.y = 0;
+	glm::i32vec3 p;
+
+	for (int x = 0; x < size; x++)
+		for(int y = 0; y < height; y++)
+			for (int z = 0; z < size; z++)
+			{
+				p = glm::i32vec3(x, y, z) - center;
+				blockTypes::T type = array[TPOS(p)];
+				if (type != blockTypes::air)
+				{
+					blockList.push_back({p, type});
+				}
+			}
+
+	return blockList;
+
+}

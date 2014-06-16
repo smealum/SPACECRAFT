@@ -2,6 +2,7 @@
 #define PLANETGENERATOREARTH_TDQAA38S
 
 #include "PlanetGenerator.h"
+#include "noise/Tree.h"
 #include <vector>
 
 
@@ -23,6 +24,7 @@ class PlanetGeneratorEarth : public PlanetGenerator
 	
 	private:
 		std::vector<PlanetNoiseGenerator*> generators;
+		std::vector<Tree> treePool;
 
 		void initGenerators();
 		virtual float getTemperature(const glm::vec3& pos);

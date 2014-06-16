@@ -52,7 +52,7 @@ class CaveGenerator {
 
 		caveBlock getBlock(const glm::i32vec3 &p);
 
-		std::list<std::pair<int,int> >& getHolesList(int x, int z);
+		const std::list<std::pair<int,int> >& getHolesList(int x, int z);
 
 		inline caveBlock getBlock(int x, int y, int z)
 		{
