@@ -41,10 +41,11 @@ Chunk::Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, 
     initGLObjects();
 }
 
-void Chunk::updateData(chunkVal* data, std::vector<GL_Vertex>& va)
+void Chunk::updateData(chunkVal* data, std::vector<GL_Vertex>& vareg, std::vector<GL_Vertex>& valpha)
 {
     memcpy(value,data,sizeof(chunkVal)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2));
-    vArray.swap(va);
+    vArray.swap(vareg);
+    alpha_vArray.swap(valpha);
     destroyGLObjects();
     initGLObjects();
 }
@@ -306,7 +307,7 @@ void Chunk::changeBlock(glm::i32vec3 p, blockTypes::T v)
 
     //TODO (pas sûr qu'on puisse de façon efficace/utile) : mieux optimiser la modification du VBO ?
     //(de toute façon, changeBlock est un évènement *très* ponctuel, donc ça ne devrait pas géner)
-    computeChunkFaces((chunkVal*)value, 1, 1, 1, 0, 0, 0, px, py, pz, origin, v1, v2, planet->getNumBlocks(), vArray);
+    computeChunkFaces((chunkVal*)value, 1, 1, 1, 0, 0, 0, px, py, pz, origin, v1, v2, planet->getNumBlocks(), vArray, alpha_vArray);
 
     destroyGLObjects();
     initGLObjects();

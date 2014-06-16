@@ -62,6 +62,7 @@ class MiniWorldDataRequest : public ContentRequest
 		Planet& planet;
 		TrackerPointer<MiniWorld>* miniworld;
 		std::vector<GL_Vertex> vArray[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];
+		std::vector<GL_Vertex> alpha_vArray[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D];
 		ContentHandler& contentHandler;
 };
 

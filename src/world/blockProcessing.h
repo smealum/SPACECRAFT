@@ -16,6 +16,6 @@ void computeChunkFaces(chunkVal* data,
 		int px, int py, int pz, //chunk offset in world (in blocks)
 		glm::vec3 origin, glm::vec3 v1, glm::vec3 v2,
 		int numBlocks,
-		std::vector<GL_Vertex>& vArray); //output
+		std::vector<GL_Vertex>& vArray, std::vector<GL_Vertex>& alpha_vArray); //output
 
 #endif

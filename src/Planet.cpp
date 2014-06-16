@@ -607,6 +607,7 @@ void Planet::draw(Camera& c)
 	for(int i=0;i<6;i++)faces[i]->draw(c, lightdir);
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
 	for(int i=0;i<6;i++)faces[i]->draw(c, lightdir, true);
+	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c, false);
 
 	// printf("%d\n",miniWorldList.size());
 	
