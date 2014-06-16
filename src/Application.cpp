@@ -20,7 +20,7 @@
 
 float PlanetFaceDetailsPower = 28.0;
 
-blockTypes::T selectBlockType;
+blockTypes::T selectBlockType(blockTypes::dirt);
 
 using namespace std;
 using namespace glm;
