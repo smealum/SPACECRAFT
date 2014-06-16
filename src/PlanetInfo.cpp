@@ -51,3 +51,14 @@ PlanetInfoEarth::PlanetInfoEarth(SpaceObjectTrajectory* t, PlanetGenerator* p, i
 PlanetInfoEarth::~PlanetInfoEarth()
 {
 }
+
+PlanetInfoMoon::PlanetInfoMoon(SpaceObjectTrajectory* t, PlanetGenerator* p, int seed, int size):
+	PlanetInfo(t,p,seed,size)
+{
+	planetGenerator->setPlanetInfo(this);
+}
+
+//la suppression de trajectory n'est PAS la responsabilité de planetInfo
+PlanetInfoMoon::~PlanetInfoMoon()
+{
+}

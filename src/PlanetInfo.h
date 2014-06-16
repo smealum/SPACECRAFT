@@ -51,4 +51,11 @@ class PlanetInfoEarth : public PlanetInfo
 				riverDepth;		
 };
 
+class PlanetInfoMoon : public PlanetInfo
+{
+	public:
+		PlanetInfoMoon(SpaceObjectTrajectory* t, PlanetGenerator* planetGen, int seed, int size=1);
+		~PlanetInfoMoon();	
+};
+
 #endif
