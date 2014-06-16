@@ -2,8 +2,7 @@
 #define GALAXYGENERATOR_M8JZWPW8
 
 class Galaxy;
-class ContentHandler;
 
-void GalaxyGenerate(Galaxy* galaxy,ContentHandler& contentHandler);
+void GalaxyGenerate(Galaxy* galaxy);
 
 #endif /* end of include guard: GALAXYGENERATOR_M8JZWPW8 */

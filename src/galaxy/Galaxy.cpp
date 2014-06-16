@@ -25,21 +25,37 @@ Galaxy::Galaxy():
 		"shader/galaxy/galaxy.frag",
 		"galaxy")),
 	isVBOGenerated(false),
-	selectedSolarSystem(NULL)
+	selectedPosition(NULL),
+	currentSolarSystem(NULL)
 {
 	
 }
 
-void Galaxy::pushSolarSystem(SolarSystem* s)
+Galaxy::~Galaxy()
 {
-	solarPosition.push_back(vec3(s->getPosition()));
+	for(auto it = allocatedPositions.begin(); it!= allocatedPositions.end(); ++it)
+	{
+		delete *it;
+	}
+
+	if (vbo) glDeleteBuffers(1,&vbo);
+	if (vao) glDeleteBuffers(1,&vao);
+}
+
+void Galaxy::pushSolarSystem(const dvec3& s)
+{
+	solarPosition.push_back(vec3(s));
+
+	dvec3* solarSystem = new dvec3(s);
+	allocatedPositions.push_back(solarSystem);
+
 	if (galaxyTree)
 	{
-		galaxyTree->pushSolarSystem(s);
+		galaxyTree->pushSolarSystem(solarSystem);
 	}
 	else
 	{
-		galaxyTree = new GalaxyTree(s,GALAXY_CENTER, GALAXY_WIDTH);
+		galaxyTree = new GalaxyTree(solarSystem,GALAXY_CENTER, GALAXY_WIDTH);
 	}
 }
 
@@ -87,35 +103,41 @@ void Galaxy::generateVBO()
 
 void Galaxy::step(Camera& camera, ContentHandler& contentHandler)
 {
-	// TODO intégration
-	return;
 	
 	dvec3 origin(0.0,0.0,0.0);
 	dvec3 position = camera.getPositionDouble(origin);
 	GalaxySolarResponse r = getClosestSolarSystem(position,10.0);
 
-	if (r.solarSystem)
+	log_info("%f",r.distance);
+	return;
+
+	if (r.solarSystem and r.distance<10.0)
 	{
-		dvec3 p = r.solarSystem->getPosition();
+		dvec3 p = *(r.solarSystem);
 		log_info("Plus proche : (%f,%f,%f) = %f", p.x, p.y, p.z, r.distance);
 
-		if (selectedSolarSystem == r.solarSystem) return;
+
+		if (selectedPosition == r.solarSystem) return;
 
 		// suppression du précédent système solaire.
-		if (selectedSolarSystem)
+		if (currentSolarSystem)
 		{
 			// TODO suppression du contenu généré
-			selectedSolarSystem = NULL;
+			currentSolarSystem = NULL;
 		}
 
 		// ajout du nouveau système solaire.
-		selectedSolarSystem = r.solarSystem;
-		selectedSolarSystem->generate(contentHandler);
+		selectedPosition = r.solarSystem;
+		currentSolarSystem = new SolarSystem(p);
+		currentSolarSystem->generate(contentHandler);
+
+		return;
 	}
 	else
 	{
 		log_info("Trop loin");
-		selectedSolarSystem = NULL;
+		selectedPosition = NULL;
+		currentSolarSystem = NULL;
 	}
 }
 
@@ -138,15 +160,15 @@ void Galaxy::draw(Camera& camera)
 	return;
 	
 	// affichage du système solaire le plus proche
-	if (selectedSolarSystem)
+	if (currentSolarSystem)
 	{
-		selectedSolarSystem->draw(camera);
+		currentSolarSystem->draw(camera);
 	}
 }
 
 ////////////////////////////////////////////////////////
 
-GalaxyTree::GalaxyTree(SolarSystem* s, const glm::dvec3& c, double w):
+GalaxyTree::GalaxyTree(dvec3* s, const glm::dvec3& c, double w):
 	isSubdivised(false),
 	solarSystem(s),
 	center(c),
@@ -179,18 +201,17 @@ dvec3 cubeDecalage[2][2][2]=
 	},
 };
 
-void GalaxyTree::pushSolarSystem(SolarSystem* s)
+void GalaxyTree::pushSolarSystem(dvec3* s)
 {
 	// sauvegarde du solarSystem si il est présent
-	SolarSystem* previousSolarSystem = NULL;
+	dvec3* previousSolarSystem = NULL;
 	if (not isSubdivised)
 	{
 		previousSolarSystem = solarSystem;
 
 		// suppression des systèmes solaires trop proches
-		if (glm::distance(solarSystem->getPosition(),s->getPosition()) < SOLARSYSTEM_MIN_DISTANCE)
+		if (glm::distance(*solarSystem,*s) < SOLARSYSTEM_MIN_DISTANCE)
 		{
-			previousSolarSystem->deleteSolarSystem();
 			previousSolarSystem = NULL;
 		}
 
@@ -207,10 +228,9 @@ void GalaxyTree::pushSolarSystem(SolarSystem* s)
 	}
 
 	// calcul dans quel branche poser s
-	const dvec3 sPos = s->getPosition();
-	int xx = (sPos.x>center.x)? 1 : 0;
-	int yy = (sPos.y>center.y)? 1 : 0;
-	int zz = (sPos.z>center.z)? 1 : 0;
+	int xx = (s->x>center.x)? 1 : 0;
+	int yy = (s->y>center.y)? 1 : 0;
+	int zz = (s->z>center.z)? 1 : 0;
 
 	// insertion
 	if (children[xx][yy][zz])
@@ -264,12 +284,12 @@ GalaxySolarResponse GalaxyTree::getClosestSolarSystem(const glm::dvec3& pos, dou
 		}
 		else
 		{
-			return {NULL,maxDist*2.0};
+			return {NULL,2*maxDist};
 		}
 	}
 	else
 	{
-		return {solarSystem,glm::distance(solarSystem->getPosition(),pos)};
+		return {solarSystem,glm::distance(*solarSystem,pos)};
 	}
 }
 
@@ -280,4 +300,3 @@ bool GalaxySolarResponse::operator<(const GalaxySolarResponse& other) const
 {
 	return distance<other.distance;
 }
-
