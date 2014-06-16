@@ -73,6 +73,11 @@ Planet* SolarSystem::getClosestPlanet(glm::vec3 p)
 	return ret;
 }
 
+glm::dvec3 SolarSystem::getPosition(void)
+{
+	return position;
+}
+
 TrackerPointer<SolarSystem>* SolarSystem::getTptr(void)
 {
 	return tptr;

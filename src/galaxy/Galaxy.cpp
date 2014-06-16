@@ -106,18 +106,25 @@ void Galaxy::step(Camera& camera, ContentHandler& contentHandler)
 	
 	dvec3 origin(0.0,0.0,0.0);
 	dvec3 position = camera.getPositionDouble(origin);
-	GalaxySolarResponse r = getClosestSolarSystem(position,10.0);
+	if(selectedPosition)position+=*selectedPosition;
+	GalaxySolarResponse r = getClosestSolarSystem(position,1e9);
 
-	log_info("%f",r.distance);
-	return;
+	// log_info("%f",r.distance);
+	// return;
 
-	if (r.solarSystem and r.distance<10.0)
+	// printf("DIST %f\n",glm::length(camera.getPositionDouble(origin)));
+
+	if (r.solarSystem and r.distance<1e4)
 	{
 		dvec3 p = *(r.solarSystem);
-		log_info("Plus proche : (%f,%f,%f) = %f", p.x, p.y, p.z, r.distance);
-
+		// log_info("Plus proche : (%f,%f,%f) = %f", p.x, p.y, p.z, r.distance);
 
 		if (selectedPosition == r.solarSystem) return;
+
+		log_info("%f",r.distance);
+		printf("NEW NEW NEW %p\n",selectedPosition);
+
+		if(selectedPosition)camera.movePositionDouble(*selectedPosition);
 
 		// suppression du précédent système solaire.
 		if (currentSolarSystem)
@@ -128,14 +135,16 @@ void Galaxy::step(Camera& camera, ContentHandler& contentHandler)
 
 		// ajout du nouveau système solaire.
 		selectedPosition = r.solarSystem;
-		currentSolarSystem = new SolarSystem(p);
-		currentSolarSystem->generate(contentHandler);
+		// currentSolarSystem = new SolarSystem(p);
+		// currentSolarSystem->generate(contentHandler);
+
+		camera.movePositionDouble(-*selectedPosition);
 
 		return;
-	}
-	else
-	{
-		log_info("Trop loin");
+	}else{
+		// suppression du précédent système solaire.
+		// log_info("Trop loin");
+		if(selectedPosition)camera.movePositionDouble(*selectedPosition);
 		selectedPosition = NULL;
 		currentSolarSystem = NULL;
 	}
@@ -152,7 +161,8 @@ void Galaxy::draw(Camera& camera)
 
     camera.updateCamera(program);
 
-    program.setUniform("model",glm::translate(glm::mat4(1.0f),-camera.getReference()));
+    if(selectedPosition)program.setUniform("model",glm::translate(glm::mat4(1.0f),glm::vec3(-*selectedPosition)-camera.getReference()));
+    else program.setUniform("model",glm::translate(glm::mat4(1.0f),-camera.getReference()));
 
     glDrawArrays(GL_POINTS, 0, solarPosition.size());
 	

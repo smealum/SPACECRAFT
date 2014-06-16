@@ -268,9 +268,9 @@ void Application::loop()
 
 
 	testSolarSystem->update(globalTime);
-	camera->update();
-
 	galaxy->step(*camera,contentHandler);
+    
+    camera->update();
 
 	//---------------------
 	//    drawing
