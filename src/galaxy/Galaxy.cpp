@@ -10,7 +10,7 @@ using namespace std;
 
 /////////////////////////////////////////////////////////
 // paramètres de la galaxie
-const double GALAXY_WIDTH = 20000.0;
+const double GALAXY_WIDTH = 2e10;
 const dvec3 GALAXY_CENTER(0.0,0.0,0.0);
 const double SOLARSYSTEM_MIN_DISTANCE = 0.001; 
 
@@ -129,6 +129,8 @@ void Galaxy::draw(Camera& camera)
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     camera.updateCamera(program);
+
+    program.setUniform("model",glm::translate(glm::mat4(1.0f),-camera.getReference()));
 
     glDrawArrays(GL_POINTS, 0, solarPosition.size());
 	

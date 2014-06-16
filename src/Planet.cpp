@@ -362,15 +362,15 @@ static GLuint elements[2*3] = {
     0,1,2,      0,2,3, // face 1
 };
 
-Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name, int size):
+Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name):
 	planetInfo(pi),
 	handler(ch),
 	sunPosition(0),
 	position(0),
 	angle(0.0),
 	name(name),
-	size(size),
-	scale(1.0f/(1<<(size-1))),
+	size(pi->size),
+	scale(1.0f/(1<<(pi->size-1))),
 	atmosphere(&pi->atmosphereInfo)
 {
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i], i, size);
@@ -408,8 +408,8 @@ void Planet::processLevelOfDetail(Camera& c)
 PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::vec3 v1, glm::vec3 v2):
 	planetFace(pf),
 	maxSize(ms),
-	// shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface")),
-	shader(ShaderProgram::loadFromFile("shader/planetface_atmosphere/planetface_atmosphere.vert", "shader/planetface_atmosphere/planetface_atmosphere.frag", "shader/planetface_atmosphere/planetface_atmosphere.geom", "planetface_atmosphere")),
+	shader(ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface")),
+	// shader(ShaderProgram::loadFromFile("shader/planetface_atmosphere/planetface_atmosphere.vert", "shader/planetface_atmosphere/planetface_atmosphere.frag", "shader/planetface_atmosphere/planetface_atmosphere.geom", "planetface_atmosphere")),
 	curSize(0),
 	curCapacity(PFBH_MINCAP),
 	v1(glm::normalize(v1)),

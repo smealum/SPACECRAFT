@@ -326,10 +326,11 @@ void Chunk::initGLObjects()
         program.setBuffers(vao, vbo, 0);
         program.use();
         glBindFragDataLocation(program.getHandle(), 0, "outColor");
-        program.setAttribute("position", 3, GL_FALSE, 9, 0);
-        program.setAttribute("intexcoord", 2, GL_FALSE, 9, 3);
-        program.setAttribute("tile", 1, GL_FALSE, 9, 5);
-        program.setAttribute("normal", 3, GL_FALSE, 9, 6);
+        program.setAttribute("position", 3, GL_FALSE, 10, 0);
+        program.setAttribute("elevation", 1, GL_FALSE, 10, 3);
+        program.setAttribute("intexcoord", 2, GL_FALSE, 10, 4);
+        program.setAttribute("tile", 1, GL_FALSE, 10, 6);
+        program.setAttribute("normal", 3, GL_FALSE, 10, 7);
     }else{
         vbo=vao=0;
     }

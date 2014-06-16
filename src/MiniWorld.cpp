@@ -32,6 +32,7 @@ MiniWorld::MiniWorld(Planet* p, PlanetFace* pf):
 			}
 		}
 	}
+	generateName();
 	planet->handler.requestContent(new MiniWorldDataRequest(*planet, *this, origin, v1, v2, x, 0, z, p->getNumBlocks(), planet->handler));
 }
 
@@ -45,11 +46,16 @@ MiniWorld::~MiniWorld()
 
 #include <sstream>
 
-std::string MiniWorld::getName(void)
+void MiniWorld::generateName(void)
 {
 	std::ostringstream oss;
 	oss << planet->getName() << "_" << face->getTopLevel()->getID() << "_" << x << "_" << z;
-	return oss.str();
+	name=oss.str();
+}
+
+std::string MiniWorld::getName(void)
+{
+	return name;
 }
 
 void MiniWorld::draw(Camera& c)
@@ -78,10 +84,13 @@ bool MiniWorld::isConstructionCanceled()
 
 void MiniWorld::destroyMiniWorld(void)
 {
-	constructionCanceled = true;
-	planet->handler.requestContent(new MiniWorldDeletionRequest(*this, planet->handler),false);
-		tptr->release();
-	planet->handler.manualReleaseInput();
+	constructionCanceled=true;
+	if(generated)
+	{
+		planet->handler.requestContent(new MiniWorldDeletionRequest(*this, planet->handler),false);
+			tptr->release();
+		planet->handler.manualReleaseInput();
+	}else tptr->release();
 }
 
 TrackerPointer<MiniWorld>* MiniWorld::getTptr(void)

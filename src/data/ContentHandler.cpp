@@ -27,7 +27,7 @@ void ContentHandler::handleNewContent(void)
 	while(q.size()>0)
 	{
 		ContentRequest* r=q.front();
-		r->update();
+		if(!r->isCanceled)r->update();
 		q.pop();
 		delete r;
 	}

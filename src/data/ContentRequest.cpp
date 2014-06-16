@@ -34,8 +34,9 @@ PlanetElevationRequest::PlanetElevationRequest(Planet& p, PlanetFace& pf, glm::v
 }
 
 PlanetElevationRequest::~PlanetElevationRequest()
-{}
-
+{
+	face->release();
+}
 
 void PlanetElevationRequest::process(int id)
 {
@@ -48,7 +49,6 @@ void PlanetElevationRequest::process(int id)
 void PlanetElevationRequest::update(void)
 {
 	face->getPointer()->updateElevation(elevation,tile);
-	face->release();
 }
 
 bool PlanetElevationRequest::isRelevant(int id)
@@ -75,12 +75,13 @@ MiniWorldDataRequest::MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o
 }
 
 MiniWorldDataRequest::~MiniWorldDataRequest()
-{}
-
+{
+	miniworld->release();
+}
 
 bool MiniWorldDataRequest::isRelevant(int id)
 {
-	return not miniworld->getPointer()->isConstructionCanceled();
+	return !miniworld->getPointer()->isConstructionCanceled();
 }
 
 void MiniWorldDataRequest::process(int id)
@@ -104,7 +105,6 @@ void MiniWorldDataRequest::update(void)
 {
 	//if (not isCanceled)
 	miniworld->getPointer()->updateChunks(data, vArray, modified);
-	miniworld->release();
 }
 
 //MiniWorldDeletionRequest stuff
@@ -116,7 +116,9 @@ MiniWorldDeletionRequest::MiniWorldDeletionRequest(MiniWorld& mw, ContentHandler
 }
 
 MiniWorldDeletionRequest::~MiniWorldDeletionRequest()
-{}
+{
+	miniworld->release();
+}
 
 bool MiniWorldDeletionRequest::isRelevant(int id)
 {
@@ -127,7 +129,6 @@ void MiniWorldDeletionRequest::process(int id)
 {
 	if(miniworld->getNumRef()>1)return;
 	contentHandler.cache.save(miniworld->getPointer());
-	miniworld->release();
 }
 
 void MiniWorldDeletionRequest::update(void)
@@ -144,19 +145,23 @@ SolarSystemDataRequest::SolarSystemDataRequest(SolarSystem& ss, ContentHandler& 
 }
 
 SolarSystemDataRequest::~SolarSystemDataRequest()
-{}
+{
+	solarSystem->release();
+}
 
 bool SolarSystemDataRequest::isRelevant(int id)
 {
 	return true;
 }
 
+#include "solarsystem/SolarSystemGeneratorSol.h"
+
 //idée ici c'est de générer les planetInfo côté producer (ie process) puis de faire l'initialisation des objets côté consumer (ie update)
 void SolarSystemDataRequest::process(int id)
 {
-	//TEMP
-	numPlanets=1;
-	planets=new Planet*[numPlanets];
+	SolarSystemGeneratorSol ssgs(0, contentHandler);
+	ssgs.generatePlanetInfos(planetInfos);
+	planets=new Planet*[planetInfos.size()];
 }
 
 #include <sstream>
@@ -170,31 +175,20 @@ void SolarSystemDataRequest::process(int id)
 
 void SolarSystemDataRequest::update(void)
 {
-	for(int i=0;i<numPlanets;i++)
+	int i=0;
+	for(auto it=planetInfos.begin(); it!=planetInfos.end(); ++it)
 	{
 		std::ostringstream oss;
 		oss << i;
-		planets[i]=
-			new Planet(
-				new PlanetInfoEarth(
-					new EllipticalTrajectory(
-						glm::vec3(0.0f),
-						glm::mat3(10.0f*(i+1)),
-						i*1.037f,
-						100.0f*(i+1)
-					),
-					new PlanetGeneratorEarth(contentHandler.getMaxProducers())
-				),
-				contentHandler,
-				oss.str()
-		);
+		planets[i]=new Planet(*it, contentHandler, oss.str());
+		i++;
 	}
-	sun=new Sun(glm::vec3(0.0f));
+	sun=new Sun(glm::vec3(0.0f), 108.0f);
+	// sun=new Sun(glm::vec3(0.0f), 40.0f);
 
-	solarSystem->getPointer()->numPlanets=numPlanets;
+	solarSystem->getPointer()->numPlanets=planetInfos.size();
 	solarSystem->getPointer()->planets=planets;
 	solarSystem->getPointer()->sun=sun;
 	solarSystem->getPointer()->generated=true;
-	solarSystem->release();
 }
 
