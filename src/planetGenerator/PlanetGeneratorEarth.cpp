@@ -5,9 +5,12 @@
 #include "utils/positionMath.h"
 #include "noise/CaveGenerator.h" // XXX debug
 #include "noise/Tree.h"
+#include <list>
 
 // XXX temp
 extern CaveGenerator caves;
+using namespace std;
+using namespace glm;
 
 PlanetGeneratorEarth::PlanetGeneratorEarth(int nbThread):
 	PlanetGenerator(nbThread),
@@ -57,6 +60,28 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 
 	unsigned int treeIndex = threadId;
 
+	
+	// génération de la map des hauteurs
+	const int offset = 10;
+	const int heightMapX = MINIWORLD_W*CHUNK_N+2*offset;
+	const int heightMapZ = MINIWORLD_D*CHUNK_N+2*offset;
+	int          heightMap[heightMapX][heightMapZ];
+	blockTypes::T  tileMap[heightMapX][heightMapZ];
+
+	for(int x=0;x<heightMapX;++x)
+	{
+		for(int z=0;z<heightMapZ;++z)
+		{
+			const glm::vec3 pos=origin+((v1*float(px+x-offset))+(v2*float(pz+z-offset)))/float(planetInfo->numBlocks);
+			const auto blockReponse=getCharacteristic(threadId, pos);
+			heightMap[x][z] = elevationToBlockHeight(blockReponse.elevation, planetInfo->numBlocks);
+			tileMap[x][z]   = blockReponse.tile;
+		}
+	}
+
+	list<i32vec3> treePositions;
+
+	// génération des blocs
 	for(int cx=0;cx<w;cx++)
 	{
 		pzPos=pxPos;
@@ -71,11 +96,21 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 				for(int k=0;k<(CHUNK_N+2);k++)
 				{
 					pyPos=zPos;
-					const glm::vec3 pos=origin+((v1*float(vx+px+i))+(v2*float(vz+pz+k)))/float(planetInfo->numBlocks);
+					
+					const auto height=heightMap[i+(CHUNK_N)*cx+offset][k+(CHUNK_N)*cz+offset];
+					const auto tile  =tileMap[i+(CHUNK_N)*cx+offset][k+(CHUNK_N)*cz+offset];
 
-					const auto blockReponse=getCharacteristic(threadId, pos);
-					const int height=elevationToBlockHeight(blockReponse.elevation, planetInfo->numBlocks);
-					const blockTypes::T tile=blockReponse.tile;
+					int rx = (px + i+(CHUNK_N)*cx);
+					int ry = (pz + k+(CHUNK_N)*cz);
+					int randomSource = ((rx+ry)^rx + 10)^ry;
+
+					// ajout des arbres
+					if (
+							randomSource % 140 == 0 and
+							tile == blockTypes::grass
+					)
+					treePositions.push_back(glm::i32vec3(i+(CHUNK_N)*cx,height,k+(CHUNK_N)*cz));
+
 
 					//TEMP (pour tester)
 					const int waterHeight=CHUNK_N*MINIWORLD_H/2.f;
@@ -108,29 +143,6 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 							const int vy=cy*CHUNK_N;
 							for(int j=0;j<(CHUNK_N+2);j++)
 							{
-								//if (vy+py+j > height)
-								//{
-									//Tree &tree = treePool[treeIndex];
-									//if(vy+py+j < height + tree.getHeight() + 1 &&
-											//i >= CHUNK_N/2 - tree.getSize()/2 &&
-											//i < CHUNK_N/2 + tree.getSize()/2 &&
-											//k >= CHUNK_N/2 - tree.getSize()/2 &&
-											//k < CHUNK_N/2 + tree.getSize()/2)
-									//{
-										//int x = i - (CHUNK_N/2 - tree.getSize()/2),
-											//y = vy+py+j - height -1,
-											//z = k - (CHUNK_N/2 - tree.getSize()/2);
-										//if (x >= 0 && x < tree.getSize() &&
-												//y >=0 && y < tree.getHeight() &&
-												//z >= 0 && z < tree.getSize())
-										//{
-											////debug("Tree %d, %d, %d", x, y, z);
-											//data[yPos] = tree.getBlock(x, y, z);
-										//}
-										//else
-											//log_err("WTF OMG NOOOB");
-									//}
-								//}
 								if (vy+py+j == height) data[yPos]=tile;
 								else if (vy+py+j < height) data[yPos] = blockTypes::dirt;
 								else if (vy+py+j == height+1 && rand()%100 == 1) data[yPos]=blockTypes::flower_red;
@@ -172,6 +184,32 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 		}
 		pxPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*1;
 	}
+
+	// list positions ou poser des arbres
+	for(auto tPos = treePositions.begin(); tPos != treePositions.end(); ++tPos)
+	{
+		Tree& t = treePool[0];
+		auto& tList = t.generateList();
+
+		for( auto it = tList.begin(); it!=tList.end(); ++it)
+		{
+			const glm::i32vec3& v = it->first;
+
+			putBlock(data,
+					tPos->x+v.x,
+					tPos->y+v.y,
+					tPos->z+v.z,
+					it->second);
+		}
+	}
+	
+	//for(int x=0;x<16;++x)
+	//for(int y=0;y<16;++y)
+	//for(int z=0;z<100;++z)
+	//{
+		//putBlock(data,x,y,z,blockTypes::snow);
+	//}
+	
 }
 
 inline double max(double x, double y)

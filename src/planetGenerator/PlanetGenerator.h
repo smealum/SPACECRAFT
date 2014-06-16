@@ -53,6 +53,10 @@ class PlanetGenerator
 		// La position est une position dans le référentiel de la planète.
 		virtual float getHumidity(const glm::vec3& pos)  = 0;
 
-};
+		void putBlock(chunkVal* data,
+					int x, int y, int z, // position of the bloc dans le miniworld
+					blockTypes::T b
+		);
 
+};
 #endif /* end of include guard: PLANETGENERATOR_PJW8VJTB */

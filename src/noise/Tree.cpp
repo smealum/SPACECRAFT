@@ -68,7 +68,7 @@ void Tree::generate(int seed)
 		// dig the line to make it round
 		glm::i32vec3 a = pos - cubeSize/2,
 					 b = a;
-		b.y += cubeSize.y;
+		b.y += cubeSize.y -1 ;
 		digLine(a, b, blockTypes::air);
 		
 		a.x += cubeSize.x-1;
@@ -256,10 +256,11 @@ const std::list<std::pair<glm::i32vec3, blockTypes::T> >& Tree::generateList()
 		for(int y = 0; y < height; y++)
 			for (int z = 0; z < size; z++)
 			{
-				p = glm::i32vec3(x, y, z) - center;
+				p = glm::i32vec3(x, y, z);
 				blockTypes::T type = array[TPOS(p)];
 				if (type != blockTypes::air)
 				{
+					p-=center;
 					blockList.push_back({p, type});
 				}
 			}
