@@ -103,6 +103,12 @@ void Galaxy::generateVBO()
 
 void Galaxy::step(Camera& camera, ContentHandler& contentHandler)
 {
+	// on saute des frames:
+	{
+		static const int nbSkippedFrame = 30;
+		static int n = 0;
+		if (n++%nbSkippedFrame) return;
+	}
 	
 	dvec3 origin(0.0,0.0,0.0);
 	dvec3 position = camera.getPositionDouble(origin);
