@@ -36,7 +36,7 @@ void chunkDecompression(
 {
 	// on obtient la taille du fichier
 	fseek(file, 0L, SEEK_END);
-	int inSize = ftell(file)/3; // (3 = nombre de octet dans repeat et value)
+	unsigned int inSize = ftell(file)/3; // (3 = nombre de octet dans repeat et value)
 	fseek(file, 0L, SEEK_SET);
 
 	// on decompresse dans data

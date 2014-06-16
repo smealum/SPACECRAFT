@@ -33,7 +33,7 @@ Sphere::Sphere(ShaderProgram& shader, int lod):
 	for(int i=0;i<numOriginalVertices;i++)vertices.push_back(originalVertices[i]);
 	for(int i=0;i<numOriginalFaces;i++)faces.push_back(originalFaces[i]);
 
-	subDivide(lod);
+	subDivide(this->lod);
 }
 
 void Sphere::subDivide(int d)

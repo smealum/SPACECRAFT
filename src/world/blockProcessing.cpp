@@ -156,7 +156,7 @@ void computeChunkFaces(chunkVal* data,
 		std::vector<GL_Vertex>& vArray) //output
 {
 	vArray.clear();
-	auto &blockType = BlockType::getInstance();
+	//auto &blockType = BlockType::getInstance();
 
 	chunkVal previous,current;
 	// X

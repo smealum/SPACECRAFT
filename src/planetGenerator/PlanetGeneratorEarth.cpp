@@ -55,7 +55,7 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 
 	caves.generate();
 
-	unsigned int treeIndex = threadId;
+	//unsigned int treeIndex = threadId;
 
 	for(int cx=0;cx<w;cx++)
 	{
