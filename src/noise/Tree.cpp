@@ -10,7 +10,7 @@ Tree::Tree() :
 	seed(0),
 	minHeight(7),
 	minSize(3),
-	halfRandomHeight(9),
+	halfRandomHeight(20),
 	halfRandomSize(7),
 	array(NULL)
 {
@@ -58,33 +58,38 @@ void Tree::generate(int seed)
 
 	// on dessine le feuillage
 	
-	pos = glm::i32vec3(size/2, height/1.5f, size/2);
+	float pTree = 0.5f; // where to start the foliage
+	pos = glm::i32vec3(size/2, height*pTree, size/2);
 	int maxH = size;
-	glm::i32vec3 cubeSize(size, height/3, size);
-	while (cubeSize.x >= 3)
+	glm::i32vec3 cubeSize(size, ((1.f - pTree)*height)/3, size);
+	while (cubeSize.x >= 3 && pos.y + cubeSize.y/2 < height)
 	{
 		digCube(pos, cubeSize, blockTypes::tree_foliage_opaque);
-		maxH = pos.y - cubeSize.y / 2;
+		maxH = pos.y + cubeSize.y / 2;
 		// dig the line to make it round
 		glm::i32vec3 a = pos - cubeSize/2,
 					 b = a;
-		b.y += cubeSize.y -1 ;
-		digLine(a, b, blockTypes::air);
-		
-		a.x += cubeSize.x-1;
-		b = a;
-		b.y += cubeSize.y;
-		digLine(a, b, blockTypes::air);
+		b.y += cubeSize.y-1 ;
+		if (a.y < b.y)
+		{
 
-		a.z += cubeSize.z-1;
-		b = a;
-		b.y += cubeSize.y;
-		digLine(a, b, blockTypes::air);
+			digLine(a, b, blockTypes::air);
 
-		a.x -= (cubeSize.x-1);
-		b = a;
-		b.y += cubeSize.y;
-		digLine(a, b, blockTypes::air);
+			a.x += cubeSize.x-1;
+			b = a;
+			b.y += cubeSize.y-1;
+			digLine(a, b, blockTypes::air);
+
+			a.z += cubeSize.z-1;
+			b = a;
+			b.y += cubeSize.y-1;
+			digLine(a, b, blockTypes::air);
+
+			a.x -= (cubeSize.x-1);
+			b = a;
+			b.y += cubeSize.y-1;
+			digLine(a, b, blockTypes::air);
+		}
 
 		pos.y += cubeSize.y-1;
 		cubeSize -= glm::i32vec3(2);
@@ -96,7 +101,6 @@ void Tree::generate(int seed)
 
 	// on créé le tronc
 	cubeSize += glm::i32vec3(2);
-	maxH--;
 	pos = glm::i32vec3(size/2, 0, size/2);
 	si = glm::i32vec2(size % 2?1:2);
 	for (int i = 0; i < maxH; i++)
