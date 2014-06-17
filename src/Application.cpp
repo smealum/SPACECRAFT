@@ -272,11 +272,8 @@ void Application::loop()
 		state = appExiting;
 	}
 
-	Input::update(window);
-
-
-	globalGalaxy->step(*camera,contentHandler,globalTime);
-    
+	globalGalaxy->step(*camera,contentHandler,globalTime,deltaTime);
+    Input::update(window);
     camera->update();
 
 	//---------------------

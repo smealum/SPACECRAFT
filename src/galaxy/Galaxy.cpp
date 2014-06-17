@@ -21,6 +21,7 @@ Galaxy::Galaxy():
 	galaxyTree(NULL),
 	vbo(0),
 	vao(0),
+	time(0),
 	program(ShaderProgram::loadFromFile(
 		"shader/galaxy/galaxy.vert",
 		"shader/galaxy/galaxy.frag",
@@ -45,7 +46,7 @@ Galaxy::~Galaxy()
 
 void Galaxy::pushSolarSystem(const dvec3& s)
 {
-	solarPosition.push_back(vec3(s));
+	solarPosition.push_back(vec4(vec3(s),genrand64_real2()*3.14));
 
 	dvec3* solarSystem = new dvec3(s);
 	allocatedPositions.push_back(solarSystem);
@@ -94,7 +95,8 @@ void Galaxy::generateVBO()
 	glBindVertexArray(vao);
 
 	glBindFragDataLocation(program.getHandle(), 0, "outColor");
-	program.setAttribute("position", 3, GL_FALSE, 0, 0);
+	program.setAttribute("position", 3, GL_FALSE, 4, 0);
+	program.setAttribute("offset", 1, GL_FALSE, 4, 3);
 
 	program.setBuffers(vao, vbo, 0);
 	program.use();
@@ -102,13 +104,14 @@ void Galaxy::generateVBO()
 }
 
 
-void Galaxy::step(Camera& camera, ContentHandler& contentHandler, float globalTime)
+void Galaxy::step(Camera& camera, ContentHandler& contentHandler, float globalTime, float deltaTime)
 {
 	if (currentSolarSystem)
 	{
 		currentSolarSystem->update(globalTime);
 	}
 	
+	time+=deltaTime;
 
 	// on saute des frames:
 	{
@@ -188,6 +191,8 @@ void Galaxy::draw(Camera& camera)
 
     if(selectedPosition)program.setUniform("model",glm::translate(glm::mat4(1.0f),glm::vec3(-*selectedPosition)-camera.getReference()));
     else program.setUniform("model",glm::translate(glm::mat4(1.0f),-camera.getReference()));
+    
+    program.setUniform("t",time);
 
     glDrawArrays(GL_POINTS, 0, solarPosition.size());
 	
