@@ -93,11 +93,13 @@ void PlanetGeneratorMoon::generateWorldData(int threadId,
 
 PlanetGeneratorResponse PlanetGeneratorMoon::getCharacteristic(int threadId, const glm::vec3& pos)
 {
-	return {getElevation(threadId, pos),blockTypes::moondust};
+	return {getElevation(threadId, glm::normalize(pos)), blockTypes::moondust};
 }
 
 float PlanetGeneratorMoon::getElevation(int threadId, const glm::vec3 &coord)
 {
-	// return planetInfo->waterLevelElevation;
-	return blockHeightToElevation(((glm::simplex(coord)+1.0f)/2)*MINIWORLD_H*CHUNK_N, planetInfo->numBlocks);
+	float elev=(glm::simplex(coord*8.0f)+1.0f)/8+0.4f;
+	float v=glm::simplex(coord*128.0f);
+	if(v<0.0f)elev+=v/16;
+	return blockHeightToElevation((elev)*MINIWORLD_H*CHUNK_N, planetInfo->numBlocks);
 }
