@@ -11,6 +11,7 @@ uniform float logconst, zfar;
 uniform vec3 lightdir;
 uniform vec3 planetPos;
 uniform vec3 cameraPos;
+uniform float size;
 
 in vec3 pos[];
 flat in int gtopTile[];
@@ -76,11 +77,11 @@ void main()
     v[7] = projview * (vec4(planetPos,0.0)+v[7]);
 
 	// XXX magique
-    c[0] *= (gelevation[0]-1.00)*600.0;
-    c[1] *= (gelevation[0]-1.00)*600.0;
-    c[2] *= (gelevation[0]-1.00)*600.0;
-    c[3] *= (gelevation[0]-1.00)*600.0;
-    c[4] *= (gelevation[0]-1.00)*600.0;
+    c[0] *= (gelevation[0]-1.00)*600.0/size;
+    c[1] *= (gelevation[0]-1.00)*600.0/size;
+    c[2] *= (gelevation[0]-1.00)*600.0/size;
+    c[3] *= (gelevation[0]-1.00)*600.0/size;
+    c[4] *= (gelevation[0]-1.00)*600.0/size;
 
     /*
 	  6-------7

@@ -410,8 +410,6 @@ void ShaderProgram::detachShader(Shader &s)
                 name.c_str());
 }
 
-extern GLfloat elements[], vertices[];
-
 void ShaderProgram::use()
 {
     if (!valid)

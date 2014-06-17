@@ -572,6 +572,7 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 	shader.setUniform("model", glm::mat4(planetFace.planet->model));
 	shader.setUniform("planetSize", planetFace.planet->scale);
 	shader.setUniform("alpha", alpha);
+	shader.setUniform("size", float(planetFace.planet->planetInfo->size));
 
 	//planetface_atmosphere test
 	planetFace.planet->atmosphere.bind(c,lightdir,planetFace.planet->position,planetFace.planet->scale,shader);

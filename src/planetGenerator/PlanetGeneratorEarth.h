@@ -27,8 +27,24 @@ class PlanetGeneratorEarth : public PlanetGenerator
 		std::vector<Tree> treePool;
 
 		void initGenerators();
-		virtual float getTemperature(const glm::vec3& pos);
-		virtual float getHumidity(const glm::vec3& pos);
+
+		// Donne la température en fonction de la position
+		// Prend en compte
+		// 		-l'axe de rotation de la planete
+		//		-perturbation local par un bruit.
+		// 		-la distance de la planete par rapport au soleil (TODO)
+		//		-valeur intrinsèque de la planete (composition) (TODO)
+		// Le résultat est à valeur dans [-1,1]
+		// La position est une position dans le référentiel de la planète.
+		float getTemperature(const glm::vec3& pos);
+
+		// Donne l'humidité en fonction de la position
+		// Prend en compte:
+		//		-perturbation local par un bruit
+		//		-valeur intrinsèque de la planete (composition) (TODO)
+		// Le résultat est à valeur dans [-1,1]
+		// La position est une position dans le référentiel de la planète.
+		float getHumidity(const glm::vec3& pos);
 };
 
 #endif /* end of include guard: PLANETGENERATOREARTH_TDQAA38S */

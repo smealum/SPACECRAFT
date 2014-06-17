@@ -35,23 +35,6 @@ class PlanetGenerator
 	protected:
 		int nbThread;
 		PlanetInfo* planetInfo;
-		// Donne la température en fonction de la position
-		// Prend en compte
-		// 		-l'axe de rotation de la planete
-		//		-perturbation local par un bruit.
-		// 		-la distance de la planete par rapport au soleil (TODO)
-		//		-valeur intrinsèque de la planete (composition) (TODO)
-		// Le résultat est à valeur dans [-1,1]
-		// La position est une position dans le référentiel de la planète.
-		virtual float getTemperature(const glm::vec3& pos)  = 0;
-
-		// Donne l'humidité en fonction de la position
-		// Prend en compte:
-		//		-perturbation local par un bruit
-		//		-valeur intrinsèque de la planete (composition) (TODO)
-		// Le résultat est à valeur dans [-1,1]
-		// La position est une position dans le référentiel de la planète.
-		virtual float getHumidity(const glm::vec3& pos)  = 0;
 
 		void putBlock(chunkVal* data,
 					int x, int y, int z, // position of the bloc dans le miniworld

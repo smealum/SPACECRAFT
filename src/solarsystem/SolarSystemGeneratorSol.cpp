@@ -27,7 +27,7 @@ void SolarSystemGeneratorSol::generatePlanetInfos(std::vector<PlanetInfo*>& v)
 
 		v.push_back(new PlanetInfoEarth(
 						trajectory,
-						new PlanetGeneratorEarth(contentHandler.getMaxProducers()),
+						contentHandler,
 						seed*1000+i*10,
 						1)
 					);
@@ -42,9 +42,9 @@ void SolarSystemGeneratorSol::generatePlanetInfos(std::vector<PlanetInfo*>& v)
 								i*1.037f,
 								10.0f);
 
-			v.push_back(new PlanetInfoEarth(
+			v.push_back(new PlanetInfoMoon(
 							satTrajectory,
-							new PlanetGeneratorEarth(contentHandler.getMaxProducers()),
+							contentHandler,
 							seed*1000+i*10+j+1,
 							3)
 						);
