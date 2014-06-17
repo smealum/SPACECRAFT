@@ -8,15 +8,16 @@
 #include "utils/dbg.h"
 
 //setPlanetInfo is the responsibility of descending classes as it should only be called after PI's been fully initialized
-PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p, int seed, int size):
+PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p, int seed, int size, float waterLevelBlock):
 	seed(seed),
 	trajectory(t),
 	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
 	period(1.0f),
 	planetGenerator(p),
 	size(size),
-	waterLevelBlock(float(CHUNK_N*MINIWORLD_H)*0.5),
-	numBlocks(PLANETFACE_BLOCKS>>(size-1))
+	waterLevelBlock(waterLevelBlock),
+	numBlocks(PLANETFACE_BLOCKS>>(size-1)),
+	atmosphereInfo(NULL)
 {
 	waterLevelElevation=(dblockHeightToElevation(waterLevelBlock, numBlocks));
 }
@@ -24,10 +25,11 @@ PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p, int seed, i
 //la suppression de trajectory n'est PAS la responsabilité de planetInfo
 PlanetInfo::~PlanetInfo()
 {
+	if(atmosphereInfo)delete atmosphereInfo;
 }
 
 PlanetInfoEarth::PlanetInfoEarth(SpaceObjectTrajectory* t, ContentHandler& ch, int seed, int size):
-	PlanetInfo(t,(PlanetGenerator*)(new PlanetGeneratorEarth(ch.getMaxProducers())),seed,size),
+	PlanetInfo(t,(PlanetGenerator*)(new PlanetGeneratorEarth(ch.getMaxProducers())),seed,size,float(CHUNK_N*MINIWORLD_H)*0.5),
 	continentFrequency( 1.f),
 	continentLacunarity(2.089f),
 	mountainLacunarity(2.142f),
@@ -47,6 +49,7 @@ PlanetInfoEarth::PlanetInfoEarth(SpaceObjectTrajectory* t, ContentHandler& ch, i
 	continentHeightScale((1.f - seaLevel) / 4.f),
 	riverDepth(0.0223f)
 {
+	atmosphereInfo=new AtmosphereInfo();
 	planetGenerator->setPlanetInfo(this);
 }
 
@@ -56,7 +59,7 @@ PlanetInfoEarth::~PlanetInfoEarth()
 }
 
 PlanetInfoMoon::PlanetInfoMoon(SpaceObjectTrajectory* t, ContentHandler& ch, int seed, int size):
-	PlanetInfo(t,(PlanetGenerator*)(new PlanetGeneratorMoon(ch.getMaxProducers())),seed,size)
+	PlanetInfo(t,(PlanetGenerator*)(new PlanetGeneratorMoon(ch.getMaxProducers())),seed,size,0.0f)
 {
 	planetGenerator->setPlanetInfo(this);
 }

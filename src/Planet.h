@@ -200,7 +200,7 @@ class Planet
 		int size;
 
 		Cloud cloud;
-		Atmosphere atmosphere;
+		Atmosphere* atmosphere;
 };
 
 #endif

@@ -12,7 +12,7 @@ class PlanetGeneratorMoon;
 class PlanetInfo
 {
 	public:
-		PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* planetGen, int seed, int size=1);
+		PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* planetGen, int seed, int size, float waterLevelBlock);
 		~PlanetInfo();
 
 		int seed;
@@ -20,7 +20,7 @@ class PlanetInfo
 		float waterLevelBlock;
 		float waterLevelElevation;
 
-		AtmosphereInfo atmosphereInfo;
+		AtmosphereInfo* atmosphereInfo;
 		PlanetGenerator* planetGenerator;
 		SpaceObjectTrajectory* trajectory;
 		glm::vec3 axis;

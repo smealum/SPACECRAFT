@@ -116,6 +116,11 @@ PlanetFace::~PlanetFace()
 	removeMiniWorld();
 }
 
+Planet::~Planet()
+{
+	if(atmosphere)delete atmosphere;
+}
+
 void PlanetFace::deletePlanetFace(PlanetFaceBufferHandler* b, PlanetFaceBufferHandler* w)
 {
 	if(b)b->deleteFace(this);
@@ -370,10 +375,11 @@ Planet::Planet(PlanetInfo *pi, ContentHandler& ch, std::string name):
 	position(0),
 	angle(0.0),
 	scale(1.0f/(1<<(pi->size-1))),
-	size(pi->size),
-	atmosphere(&pi->atmosphereInfo)
+	size(pi->size)
 {
 	for(int i=0;i<6;i++)faces[i]=new PlanetFace(this, cubeArray[i], i, size);
+	if(pi->atmosphereInfo)atmosphere=new Atmosphere(pi->atmosphereInfo);
+	else atmosphere=NULL;
 }
 
 void PlanetFace::testFullGeneration(int depth, PlanetFaceBufferHandler* b)
@@ -575,7 +581,7 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 	shader.setUniform("size", float(planetFace.planet->planetInfo->size));
 
 	//planetface_atmosphere test
-	planetFace.planet->atmosphere.bind(c,lightdir,planetFace.planet->position,planetFace.planet->scale,shader);
+	if(planetFace.planet->atmosphere)planetFace.planet->atmosphere->bind(c,lightdir,planetFace.planet->position,planetFace.planet->scale,shader);
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -615,7 +621,7 @@ void Planet::draw(Camera& c)
 	// printf("%d\n",miniWorldList.size());
 	
 	// dessin de l'athmosphere
-	atmosphere.draw(c, lightdir, position, scale);
+	if(atmosphere)atmosphere->draw(c, lightdir, position, scale);
 
 	// dessin des nuages
 	// cloud.draw(c);
