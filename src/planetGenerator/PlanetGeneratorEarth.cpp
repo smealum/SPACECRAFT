@@ -56,10 +56,8 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 	int pxPos,pzPos,xPos,zPos,pyPos,yPos;
 	pxPos=0;
 
-	caves.generate();
-
-	//unsigned int treeIndex = threadId;
-
+	// liste des positions d'arbres
+	list<i32vec4> treePositions;
 	
 	// génération de la map des hauteurs
 	const int offset = 5;
@@ -67,6 +65,7 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 	const int heightMapZ = MINIWORLD_D*CHUNK_N+2*offset;
 	int          heightMap[heightMapX][heightMapZ];
 	blockTypes::T  tileMap[heightMapX][heightMapZ];
+
 
 	for(int x=0;x<heightMapX;++x)
 	{
@@ -79,25 +78,24 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 			tileMap[x][z]   = blockReponse.tile;
 
 			// ajout des arbres.
-			int rx = (px + x);
-			int ry = (pz + y);
-			unsigned long long randomSource = rx*3+ry*231331;
+			int rx = (px + x - offset);
+			int rz = (pz + z - offset);
+			unsigned long long randomSource = rx*3+rz*231331;
 			randomSource ^= (randomSource >> 29) & 0x5555555555555555ULL;
 			randomSource ^= (randomSource << 17) & 0x71D67FFFEDA60000ULL;
-			randomSource ^= ry;
+			randomSource ^= rz;
 			randomSource ^= (randomSource << 37) & 0xFFF7EEE000000000ULL;
 			randomSource ^= (randomSource >> 43);
 
 			// ajout des arbres
 			if (
-					randomSource % 200 == 100 and
-					tile == blockTypes::grass
+					(randomSource % 200 == 100) and
+					blockReponse.tile == blockTypes::grass
 			)
-			treePositions.push_back(glm::i32vec4(i+(CHUNK_N)*cx,height,k+(CHUNK_N)*cz,randomSource));
+			treePositions.push_back(glm::i32vec4(x-offset,heightMap[x][z], z-offset ,randomSource));
 		}
 	}
 
-	list<i32vec4> treePositions;
 
 	// génération des blocs
 	for(int cx=0;cx<w;cx++)
@@ -205,7 +203,7 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 
 			putBlock(data,
 					tPos->x+v.x,
-					tPos->y+v.y,
+					tPos->y+v.y-2,
 					tPos->z+v.z,
 					it->second);
 		}
