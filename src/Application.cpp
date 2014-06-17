@@ -20,7 +20,7 @@
 
 float PlanetFaceDetailsPower = 28.0;
 
-blockTypes::T selectBlockType(blockTypes::dirt);
+uint8_t selectBlockType(blockTypes::dirt);
 
 using namespace std;
 using namespace glm;
@@ -57,7 +57,7 @@ void reloadAllShaders(void * /*clientData*/)
 #endif
 void mouseWheelCallback(GLFWwindow *, double x, double y)
 {
-	selectBlockType = (blockTypes::T)(selectBlockType + (int)y);
+	selectBlockType = (selectBlockType + (int)y);
 }
 
 void reloadAllShaders()
@@ -130,7 +130,7 @@ Application::Application() :
 	TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
 	TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
 	TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
-	TwAddVarRW(bar, "blockType", TW_TYPE_UINT8, (char*)&selectBlockType, "label='type of the selected block' min=0 max=255 step=1");
+	TwAddVarRW(bar, "blockType", TW_TYPE_UINT8, &selectBlockType, "label='type of the selected block' min=0 max=255 step=1");
 
 	// vsync on
 	glfwSwapInterval(vsync);
@@ -213,17 +213,21 @@ void Application::run()
 			glm::vec3(0.f),
 			glm::vec3(0, 1.f, 0.f)
 			);
-	camera->setCameraManager(new CameraKeyboardMouse());
+	camera->setCameraManager(new CameraKeyboardMouse);
 
 	tt=new testShaders;
-	testCursor=new Cursor();
+	testCursor=new Cursor;
 
 	testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
 	testTextureArray=TextureManager::getInstance().loadTextureArray("data/blocksPackArray.png",16,16);
 	caves.generate();
 	
-	globalGalaxy = new Galaxy();
+	globalGalaxy = new Galaxy;
 	GalaxyGenerate(globalGalaxy);
+
+	ui = new PlayerUI;
+
+	ui->generateVBO();
 
 	float timeA;
 	char titleBuff[512];
@@ -285,6 +289,9 @@ void Application::loop()
 	globalGalaxy->draw(*camera);
 	testCursor->draw(*camera);
 
+	glDisable(GL_DEPTH_TEST);
+	//ui->draw();
+	glEnable(GL_DEPTH_TEST);
 
 	if(Input::isKeyPressed(GLFW_KEY_N))reloadAllShaders();
 

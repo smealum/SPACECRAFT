@@ -11,6 +11,7 @@
 #include "render/camera/CameraKeyboardMouse.h"
 #include "tests/testShaders.h"
 #include "data/ContentHandler.h"
+#include "ui/PlayerUI.h"
 
 #define NUMPRODUCERS (3)
 
@@ -38,6 +39,8 @@ class Application : public Singleton<Application> {
         ContentHandler contentHandler;
         float deltaTime, time, fps;
         int fpsCounter;
+
+        PlayerUI *ui;
 
         friend class Singleton<Application>;
 
