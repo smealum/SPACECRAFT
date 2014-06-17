@@ -4,14 +4,14 @@
 
 extern uint8_t selectBlockType;
 
-GLfloat vertices[] = {
-	-0.5f,  -0.5f, 0.0f, 1.0f, // Top-left
-	+0.5f,  -0.5f, 1.0f, 1.0f,  // Top-right
-	+0.5f, +0.5f, 1.0f, 0.0f,  // Bottom-right
-	-0.5f, +0.5f, 0.0f, 0.0f // Bottom-left
+static GLfloat vertices[] = {
+	-0.5f,  -0.5f, 0.0f, 1.0f, // bot-left
+	+0.5f,  -0.5f, 1.0f, 1.0f,  // bot-right
+	+0.5f, +0.5f, 1.0f, 0.0f,  // top-right
+	-0.5f, +0.5f, 0.0f, 0.0f // top-left
 };
 
-GLuint elements[] = {
+static GLuint elements[] = {
 	0,1,2,
 	0,2,3
 };
@@ -19,7 +19,9 @@ GLuint elements[] = {
 PlayerUI::PlayerUI() :
 	program(ShaderProgram::loadFromFile("shader/ui/player.vert",
 				"shader/ui/player.frag",
-				"ui"))
+				"ui")),
+	whRatio(1.f),
+	valid(false)
 {
 }
 
@@ -32,6 +34,10 @@ PlayerUI::~PlayerUI()
 
 void PlayerUI::generateVBO()
 {
+	if (valid)
+		return;
+	valid = true;
+
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*5*4, vertices, GL_STATIC_DRAW);
@@ -58,5 +64,30 @@ void PlayerUI::draw()
 
 	//glDrawArrays(GL_POINTS, 0, 4);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void PlayerUI::update()
+{
+	float ts = 0.075f; // width heigth of the tile preview
+	float toffset = 0.05f; // offset from bot and right
+
+	// height values must be adapted
+
+	// botleft, botright, topright, topleft
+	vertices[0*4 + 0] = +1.f - (toffset + ts);
+	vertices[0*4 + 1] = -1.f + (toffset) * whRatio;
+
+	vertices[1*4 + 0] = +1.f - (toffset);
+	vertices[1*4 + 1] = -1.f + (toffset) * whRatio;
+
+	vertices[2*4 + 0] = +1.f - (toffset);
+	vertices[2*4 + 1] = -1.f + (toffset + ts) * whRatio;
+
+	vertices[3*4 + 0] = +1.f - (toffset + ts);
+	vertices[3*4 + 1] = -1.f + (toffset + ts) * whRatio;
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*5*4, vertices, GL_STATIC_DRAW);
+
 }
 

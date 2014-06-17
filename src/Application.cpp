@@ -226,8 +226,9 @@ void Application::run()
 	GalaxyGenerate(globalGalaxy);
 
 	ui = new PlayerUI;
-
 	ui->generateVBO();
+	ui->setWhRatio((float)width/height);
+	ui->update();
 
 	float timeA;
 	char titleBuff[512];
@@ -290,7 +291,7 @@ void Application::loop()
 	testCursor->draw(*camera);
 
 	glDisable(GL_DEPTH_TEST);
-	//ui->draw();
+	ui->draw();
 	glEnable(GL_DEPTH_TEST);
 
 	if(Input::isKeyPressed(GLFW_KEY_N))reloadAllShaders();
