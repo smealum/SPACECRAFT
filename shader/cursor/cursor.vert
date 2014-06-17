@@ -15,9 +15,6 @@ out vec4 fColor;
 void main()
 {
     fColor = vec4(1,0,0,1);
-    // vec4 v = proj * view * model * vec4(position, 1.0);
-    // gl_Position = logDepth(v);
-
 
 	vec3 pos1=position+vec3(model*vec4(offset,1.0));
 	vec3 pos2=v1*pos1.x+v2*pos1.z;
@@ -25,6 +22,4 @@ void main()
 
 	vec4 r = proj * view * planetModel * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = vec4(r.xy,-1.0*r.w,r.w);
-	// gl_Position = logDepth(r);
-	// gl_Position = vec4(r.xy,-0.9*r.w,r.w);
 }

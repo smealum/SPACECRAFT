@@ -74,7 +74,8 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 			// calcul des caractéristiques.
 			const glm::vec3 pos=origin+((v1*float(px+x-offset))+(v2*float(pz+z-offset)))/float(planetInfo->numBlocks);
 			const auto blockReponse=getCharacteristic(threadId, pos);
-			heightMap[x][z] = elevationToBlockHeight(blockReponse.elevation, planetInfo->numBlocks) + 1;
+			// heightMap[x][z] = elevationToBlockHeight(blockReponse.elevation, planetInfo->numBlocks) + 1;
+			heightMap[x][z] = elevationToBlockHeight(blockReponse.elevation, planetInfo->numBlocks); //j'ai viré le +1 parce que ça casse les planetface d'eau...
 			tileMap[x][z]   = blockReponse.tile;
 
 			// ajout des arbres.
@@ -114,9 +115,7 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 					pyPos=zPos;
 					
 					const auto height=heightMap[i+(CHUNK_N)*cx+offset][k+(CHUNK_N)*cz+offset];
-					const auto tile  =tileMap[i+(CHUNK_N)*cx+offset][k+(CHUNK_N)*cz+offset];
-
-
+					const auto tile=tileMap[i+(CHUNK_N)*cx+offset][k+(CHUNK_N)*cz+offset];
 
 					//TEMP (pour tester)
 					const int waterHeight=planetInfo->waterLevelBlock;
