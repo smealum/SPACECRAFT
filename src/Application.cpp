@@ -196,11 +196,10 @@ void Application::createWindowInFullscreen(bool fs)
 }
 
 CaveGenerator caves;
-SolarSystem* testSolarSystem;
 Cursor* testCursor;
 int testTexture;
 int testTextureArray;
-Galaxy* galaxy;
+Galaxy* globalGalaxy;
 bool testBool1=false, testBool2=false;
 
 void Application::run()
@@ -216,16 +215,14 @@ void Application::run()
 	camera->setCameraManager(new CameraKeyboardMouse());
 
 	tt=new testShaders;
-	testSolarSystem=new SolarSystem(dvec3(100.0,0.0,0.0));
-	testSolarSystem->generate(contentHandler);
 	testCursor=new Cursor();
 
 	testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
 	testTextureArray=TextureManager::getInstance().loadTextureArray("data/blocksPackArray.png",16,16);
 	caves.generate();
 	
-	galaxy = new Galaxy();
-	GalaxyGenerate(galaxy);
+	globalGalaxy = new Galaxy();
+	GalaxyGenerate(globalGalaxy);
 
 	float timeA;
 	char titleBuff[512];
@@ -272,8 +269,7 @@ void Application::loop()
 	Input::update(window);
 
 
-	testSolarSystem->update(globalTime);
-	galaxy->step(*camera,contentHandler);
+	globalGalaxy->step(*camera,contentHandler,globalTime);
     
     camera->update();
 
@@ -285,8 +281,7 @@ void Application::loop()
 
 	glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
 
-	galaxy->draw(*camera);
-	testSolarSystem->draw(*camera);
+	globalGalaxy->draw(*camera);
 	testCursor->draw(*camera);
 
 

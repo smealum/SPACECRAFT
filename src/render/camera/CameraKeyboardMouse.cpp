@@ -5,11 +5,12 @@
 #include "render/camera/CameraPlayerGround.h"
 #include "utils/maths.h"
 #include "SolarSystem.h"
+#include "galaxy/Galaxy.h"
 
 using namespace std;
 using namespace glm;
 
-extern SolarSystem* testSolarSystem;
+extern Galaxy* globalGalaxy;
 
 CameraKeyboardMouse::CameraKeyboardMouse()
 {
@@ -31,7 +32,7 @@ void CameraKeyboardMouse::update(Camera& camera)
 
     CameraKeyboard::update(camera);
 
-    Planet* planet=testSolarSystem->getClosestPlanet(camera.getPosition(glm::vec3(0)));
+    Planet* planet=globalGalaxy->getClosestPlanet(camera.getPosition(glm::vec3(0)));
     if(planet)camera.moveReference(glm::dvec3(planet->getPosition()));
     
     if(Input::isKeyPressed(GLFW_KEY_R))

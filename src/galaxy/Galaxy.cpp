@@ -3,6 +3,7 @@
 #include "utils/dbg.h"
 #include "SolarSystem.h"
 #include "render/Shader.h"
+#include "Planet.h"
 
 
 using namespace glm;
@@ -101,8 +102,14 @@ void Galaxy::generateVBO()
 }
 
 
-void Galaxy::step(Camera& camera, ContentHandler& contentHandler)
+void Galaxy::step(Camera& camera, ContentHandler& contentHandler, float globalTime)
 {
+	if (currentSolarSystem)
+	{
+		currentSolarSystem->update(globalTime);
+	}
+	
+
 	// on saute des frames:
 	{
 		static const int nbSkippedFrame = 30;
@@ -113,14 +120,14 @@ void Galaxy::step(Camera& camera, ContentHandler& contentHandler)
 	dvec3 origin(0.0,0.0,0.0);
 	dvec3 position = camera.getPositionDouble(origin);
 	if(selectedPosition)position+=*selectedPosition;
-	GalaxySolarResponse r = getClosestSolarSystem(position,1e9);
+	GalaxySolarResponse r = getClosestSolarSystem(position,1e7);
 
 	// log_info("%f",r.distance);
 	// return;
 
 	// printf("DIST %f\n",glm::length(camera.getPositionDouble(origin)));
 
-	if (r.solarSystem and r.distance<1e4)
+	if (r.solarSystem and r.distance<1e7)
 	{
 		dvec3 p = *(r.solarSystem);
 		// log_info("Plus proche : (%f,%f,%f) = %f", p.x, p.y, p.z, r.distance);
@@ -130,30 +137,42 @@ void Galaxy::step(Camera& camera, ContentHandler& contentHandler)
 		log_info("%f",r.distance);
 		printf("NEW NEW NEW %p\n",selectedPosition);
 
-		if(selectedPosition)camera.movePositionDouble(*selectedPosition);
+		if(selectedPosition)
+			camera.movePositionDouble(*selectedPosition);
 
 		// suppression du précédent système solaire.
 		if (currentSolarSystem)
 		{
 			// TODO suppression du contenu généré
+			currentSolarSystem->deleteSolarSystem();
 			currentSolarSystem = NULL;
 		}
 
 		// ajout du nouveau système solaire.
 		selectedPosition = r.solarSystem;
-		// currentSolarSystem = new SolarSystem(p);
-		// currentSolarSystem->generate(contentHandler);
+		currentSolarSystem = new SolarSystem(p);
+		currentSolarSystem->generate(contentHandler);
 
 		camera.movePositionDouble(-*selectedPosition);
 
-		return;
 	}else{
-		// suppression du précédent système solaire.
+		// suppression de la précédente position (et remise en place de la position)
 		// log_info("Trop loin");
-		if(selectedPosition)camera.movePositionDouble(*selectedPosition);
-		selectedPosition = NULL;
-		currentSolarSystem = NULL;
+		if(selectedPosition)
+		{
+			camera.movePositionDouble(*selectedPosition);
+			selectedPosition = NULL;
+		}
+
+		// suppression du précédent système solaire.
+		if (currentSolarSystem)
+		{
+			// TODO suppression du contenu généré
+			currentSolarSystem->deleteSolarSystem();
+			currentSolarSystem = NULL;
+		}
 	}
+
 }
 
 
@@ -172,8 +191,6 @@ void Galaxy::draw(Camera& camera)
 
     glDrawArrays(GL_POINTS, 0, solarPosition.size());
 	
-	// TODO intégration
-	return;
 	
 	// affichage du système solaire le plus proche
 	if (currentSolarSystem)
@@ -181,6 +198,16 @@ void Galaxy::draw(Camera& camera)
 		currentSolarSystem->draw(camera);
 	}
 }
+
+Planet* Galaxy::getClosestPlanet(const glm::vec3& pos)
+{
+	if (currentSolarSystem)
+	{
+		return currentSolarSystem->getClosestPlanet(pos);
+	}
+	return NULL;
+}
+
 
 ////////////////////////////////////////////////////////
 

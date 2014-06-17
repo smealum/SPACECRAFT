@@ -749,7 +749,9 @@ void Planet::deleteBlock(glm::i32vec3 p)
 
 void Planet::update(float time)
 {
-	if(planetInfo->trajectory)position=planetInfo->trajectory->getPosition(time);
+	if(planetInfo->trajectory)
+		position=planetInfo->trajectory->getPosition(time);
+	log_info("px=%f py=%f pz=%f", position.x, position.y, position.z);
 	angle=time*2*PI/planetInfo->period;
 
 	model=glm::mat3(glm::rotate(glm::mat4(1.0f),angle,planetInfo->axis));

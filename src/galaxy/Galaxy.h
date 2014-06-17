@@ -8,6 +8,7 @@
 class SolarSystem;
 class ShaderProgram;
 class ContentHandler;
+class Planet;
 
 ///////////////////////////////////////////////////////////////
 class  Galaxy;
@@ -34,11 +35,12 @@ class Galaxy
 	public:
 		Galaxy();
 		~Galaxy();
+		Planet* getClosestPlanet(const glm::vec3& pos);
 		GalaxySolarResponse getClosestSolarSystem(const glm::dvec3& pos);
 		GalaxySolarResponse getClosestSolarSystem(const glm::dvec3& pos, double maxDist);
 		void pushSolarSystem(const glm::dvec3& p);
 
-		void step(Camera& camera, ContentHandler& contentHandler);
+		void step(Camera& camera, ContentHandler& contentHandler,float globalTime);
 		void draw(Camera& camera);
 	private:
 		std::vector<glm::dvec3*> allocatedPositions;

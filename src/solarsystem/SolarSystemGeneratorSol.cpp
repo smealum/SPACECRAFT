@@ -1,6 +1,7 @@
 #include "solarsystem/SolarSystemGeneratorSol.h"
 #include "planetGenerator/PlanetGeneratorEarth.h"
 #include "utils/mt19937.h"
+#include "utils/dbg.h"
 
 
 SolarSystemGeneratorSol::SolarSystemGeneratorSol(int seed, ContentHandler& ch):
