@@ -58,7 +58,7 @@ std::string MiniWorld::getName(void)
 	return name;
 }
 
-void MiniWorld::draw(Camera& c)
+void MiniWorld::draw(Camera& c, bool reg)
 {
 	//TODO : passer frustum culling en octree ?
 	//TODO : occlusion culling ?
@@ -71,7 +71,7 @@ void MiniWorld::draw(Camera& c)
 		{
 			for(int k=0;k<MINIWORLD_D;k++)
 			{
-				chunks[i][j][k]->draw(c, model);
+				chunks[i][j][k]->draw(c, model, reg);
 			}
 		}
 	}
@@ -98,7 +98,7 @@ TrackerPointer<MiniWorld>* MiniWorld::getTptr(void)
 	return tptr;
 }
 
-void MiniWorld::updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D], bool modified)
+void MiniWorld::updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D], std::vector<GL_Vertex> valpha[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D], bool modified)
 {
 	this->modified=modified;
 	generated=true;
@@ -108,7 +108,7 @@ void MiniWorld::updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D
 		{
 			for(int k=0;k<MINIWORLD_D;k++)
 			{
-				chunks[i][j][k]->updateData(data[i][j][k], va[i][j][k]);
+				chunks[i][j][k]->updateData(data[i][j][k], va[i][j][k], valpha[i][j][k]);
 			}
 		}
 	}

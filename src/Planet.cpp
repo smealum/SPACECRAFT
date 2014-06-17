@@ -417,6 +417,8 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 	alpha(alpha),
 	shader(water?ShaderProgram::loadFromFile("shader/planetface_water/planetface_water.vert", "shader/planetface_water/planetface_water.frag", "shader/planetface_water/planetface_water.geom", "planetface_water"):
 			ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface"))
+	// shader(water?ShaderProgram::loadFromFile("shader/planetface_water_atmosphere/planetface_water_atmosphere.vert", "shader/planetface_water_atmosphere/planetface_water_atmosphere.frag", "shader/planetface_water_atmosphere/planetface_water_atmosphere.geom", "planetface_water_atmosphere"):
+	// 		ShaderProgram::loadFromFile("shader/planetface_atmosphere/planetface_atmosphere.vert", "shader/planetface_atmosphere/planetface_atmosphere.frag", "shader/planetface_atmosphere/planetface_atmosphere.geom", "planetface_atmosphere"))
 {
 	resizeVBO();
 	shader.use();
@@ -607,6 +609,7 @@ void Planet::draw(Camera& c)
 	for(int i=0;i<6;i++)faces[i]->draw(c, lightdir);
 	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
 	for(int i=0;i<6;i++)faces[i]->draw(c, lightdir, true);
+	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c, false);
 
 	// printf("%d\n",miniWorldList.size());
 	

@@ -33,8 +33,8 @@ class Chunk
 	public:
 		Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, glm::vec3 v2, glm::vec3 n);
 
-		void draw(Camera& camera, glm::mat4 model);
-		void updateData(chunkVal* data, std::vector<GL_Vertex> va);
+		void draw(Camera& camera, glm::mat4 model, bool reg=true);
+		void updateData(chunkVal* data, std::vector<GL_Vertex>& vareg, std::vector<GL_Vertex>& valpha);
 		void destroyChunk(void);
 
 		glm::i32vec3 performRayMarch(glm::dvec3 localBlockPosf, glm::dvec3 localBlockPosf2, glm::dvec3* out, bool* done, int* dir);
@@ -52,10 +52,14 @@ class Chunk
 		bool isConstructionCanceled();
 		
 	private:
+		void initGLObjects();
+		void initGLObjects(std::vector<GL_Vertex>& va, GLuint& vao, GLuint& vbo);
+		void destroyGLObjects();
+		void destroyGLObjects(GLuint& vao, GLuint& vbo);
+		void draw(Camera& cam, glm::mat4 model, std::vector<GL_Vertex>& va, GLuint vao, GLuint vbo);
+
 		bool modified;
 		bool constructionCanceled;
-		void initGLObjects();
-		void destroyGLObjects();
 
 		int px, py, pz;
 		glm::vec3 v1, v2, origin, n;
@@ -65,10 +69,11 @@ class Chunk
 		Planet* planet;
 		class MiniWorld* miniWorld;
 
-		GLuint vbo;
-		GLuint vao;
+		GLuint reg_vbo, reg_vao;
+		GLuint alpha_vbo, alpha_vao;
 
 		std::vector<GL_Vertex> vArray;
+		std::vector<GL_Vertex> alpha_vArray;
 		ShaderProgram &program;
 };
 

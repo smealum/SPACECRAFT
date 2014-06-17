@@ -41,10 +41,11 @@ Chunk::Chunk(Planet* p, class MiniWorld* mw, int x, int y, int z, glm::vec3 v1, 
     initGLObjects();
 }
 
-void Chunk::updateData(chunkVal* data, std::vector<GL_Vertex> va)
+void Chunk::updateData(chunkVal* data, std::vector<GL_Vertex>& vareg, std::vector<GL_Vertex>& valpha)
 {
     memcpy(value,data,sizeof(chunkVal)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2));
-    vArray.swap(va);
+    vArray.swap(vareg);
+    alpha_vArray.swap(valpha);
     destroyGLObjects();
     initGLObjects();
 }
@@ -65,15 +66,20 @@ extern int testTexture;
 extern int testTextureArray;
 extern int testVal;
 
-void Chunk::draw(Camera& cam, glm::mat4 model)
+void Chunk::draw(Camera& cam, glm::mat4 model, bool reg)
 {
-    // if(!vArray.size())return;
-    if(!vArray.size())return;
+    if(reg)draw(cam,model,vArray,reg_vao,reg_vbo);
+    else draw(cam,model,alpha_vArray,alpha_vao,alpha_vbo);
+}
+
+void Chunk::draw(Camera& cam, glm::mat4 model, std::vector<GL_Vertex>& va, GLuint vao, GLuint vbo)
+{
+    if(!va.size())return;
 
     if(!cam.isBoxInFrustum(boundingVolume, 8, model))return;
 
     testVal++; //TEMP
- 
+
     program.use();
 
     glBindVertexArray(vao);
@@ -88,12 +94,12 @@ void Chunk::draw(Camera& cam, glm::mat4 model)
     program.setUniform("model",(model));
 
     //glBindTexture(GL_TEXTURE_2D, testTexture);
-	// On n'a pas besoin de bind un textureArray? (uniquement utilisable dans un shader)
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY,testTextureArray);
-	program.setUniform("Texture",0);
+    // On n'a pas besoin de bind un textureArray? (uniquement utilisable dans un shader)
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY,testTextureArray);
+    program.setUniform("Texture",0);
 
-    glDrawArrays(GL_TRIANGLES, 0, vArray.size());
+    glDrawArrays(GL_TRIANGLES, 0, va.size());
 }
 
 TrackerPointer<Chunk>* Chunk::getTptr(void)
@@ -301,7 +307,7 @@ void Chunk::changeBlock(glm::i32vec3 p, blockTypes::T v)
 
     //TODO (pas sûr qu'on puisse de façon efficace/utile) : mieux optimiser la modification du VBO ?
     //(de toute façon, changeBlock est un évènement *très* ponctuel, donc ça ne devrait pas géner)
-    computeChunkFaces((chunkVal*)value, 1, 1, 1, 0, 0, 0, px, py, pz, origin, v1, v2, planet->getNumBlocks(), vArray);
+    computeChunkFaces((chunkVal*)value, 1, 1, 1, 0, 0, 0, px, py, pz, origin, v1, v2, planet->getNumBlocks(), vArray, alpha_vArray);
 
     destroyGLObjects();
     initGLObjects();
@@ -312,13 +318,19 @@ void Chunk::deleteBlock(glm::i32vec3 p)
     changeBlock(p,blockTypes::air);
 }
 
-void Chunk::initGLObjects()
+void Chunk::initGLObjects(void)
 {
-    if(vArray.size())
+    initGLObjects(vArray, reg_vao, reg_vbo);
+    initGLObjects(alpha_vArray, alpha_vao, alpha_vbo);
+}
+
+void Chunk::initGLObjects(std::vector<GL_Vertex>& va, GLuint& vao, GLuint& vbo)
+{
+    if(va.size())
     {
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(GL_Vertex)*vArray.size(), &(vArray[0]), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(GL_Vertex)*va.size(), &(va[0]), GL_STATIC_DRAW);
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -336,9 +348,15 @@ void Chunk::initGLObjects()
     }
 }
 
-void Chunk::destroyGLObjects()
+void Chunk::destroyGLObjects(void)
 {
-    if (vbo) glDeleteBuffers(1, &vbo);
-    if (vao) glDeleteBuffers(1, &vao);
+    destroyGLObjects(reg_vao, reg_vbo);
+    destroyGLObjects(alpha_vao, alpha_vbo);
+}
+
+void Chunk::destroyGLObjects(GLuint& vao, GLuint& vbo)
+{
+    if(vbo)glDeleteBuffers(1, &vbo);
+    if(vao)glDeleteBuffers(1, &vao);
     vbo=vao=0;
 }

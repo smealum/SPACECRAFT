@@ -63,12 +63,15 @@ const glm::vec3 n[]={glm::vec3(0.0,-1.0,0.0), //bottom
 						glm::normalize(glm::vec3(-1.0,0.0,-1.0)) //diag22
 						};
 
-void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2, int numBlocks, int tile)
+void generateFace(std::vector<GL_Vertex>& vArray, std::vector<GL_Vertex>& alpha_vArray, glm::vec3 pos, int facedir, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2, int numBlocks, int tile, std::uint8_t transp)
 {
 	GL_Vertex v;
 
 	glm::vec3 pos1, pos2;
 	float y;
+
+	std::vector<GL_Vertex>* va=&vArray;
+	if(transp==blockTransparency::transparent)va=&alpha_vArray;
 
 	pos1=pos+o[facedir];
 	pos2=v1*pos1.x+v2*pos1.z;
@@ -81,7 +84,7 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 	v.texcoord=glm::vec2(1,1);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
-	vArray.push_back(v);
+	va->push_back(v);
 
 
 	pos1=pos+o[facedir]+d1[facedir];
@@ -93,7 +96,7 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 	v.texcoord=glm::vec2(0,1);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
-	vArray.push_back(v);
+	va->push_back(v);
 
 
 	pos1=pos+o[facedir]+d2[facedir];
@@ -105,7 +108,7 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 	v.texcoord=glm::vec2(1,0);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
-	vArray.push_back(v);
+	va->push_back(v);
 
 
 
@@ -118,7 +121,7 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 	v.texcoord=glm::vec2(0,0);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
-	vArray.push_back(v);
+	va->push_back(v);
 
 
 	pos1=pos+o[facedir]+d2[facedir];
@@ -130,7 +133,7 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 	v.texcoord=glm::vec2(1,0);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
-	vArray.push_back(v);
+	va->push_back(v);
 
 
 	pos1=pos+o[facedir]+d1[facedir];
@@ -142,7 +145,7 @@ void generateFace(std::vector<GL_Vertex>& vArray, glm::vec3 pos, int facedir, gl
 	v.texcoord=glm::vec2(0,1);
 	v.tile=tile;
 	v.normal=glm::normalize(n[facedir].x*v1+n[facedir].z*v2+n[facedir].y*rn);
-	vArray.push_back(v);
+	va->push_back(v);
 }
 
 //TODO : optimiser pour éviter les multiplications à chaque fois
@@ -153,9 +156,10 @@ void computeChunkFaces(chunkVal* data,
 		int px, int py, int pz, //chunk offset in world (in blocks)
 		glm::vec3 origin, glm::vec3 v1, glm::vec3 v2,
 		int numBlocks,
-		std::vector<GL_Vertex>& vArray) //output
+		std::vector<GL_Vertex>& vArray, std::vector<GL_Vertex>& alpha_vArray) //output
 {
 	vArray.clear();
+	alpha_vArray.clear();
 	//auto &blockType = BlockType::getInstance();
 
 	chunkVal previous,current;
@@ -168,9 +172,9 @@ void computeChunkFaces(chunkVal* data,
 		{
 			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
 			if (blockShouldBeFace(current,previous)) {
-				generateFace(vArray, vec3(px+x,py+y,pz+z), 2, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::side));
+				generateFace(vArray, alpha_vArray, vec3(px+x,py+y,pz+z), 2, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::side), blockTransparencyID[current]);
 			}else if (blockShouldBeFace(previous,current)) {
-				generateFace(vArray, vec3(px+x-1,py+y,pz+z), 3, origin, v1, v2, numBlocks, getBlockID(previous,blockPlane::side));
+				generateFace(vArray, alpha_vArray, vec3(px+x-1,py+y,pz+z), 3, origin, v1, v2, numBlocks, getBlockID(previous,blockPlane::side), blockTransparencyID[previous]);
 			}
 			previous=current;
 		}
@@ -185,9 +189,9 @@ void computeChunkFaces(chunkVal* data,
 		{
 			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
 			if (blockShouldBeFace(current,previous)) {
-				generateFace(vArray, vec3(px+x,py+y,pz+z), 0, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::bottom));
+				generateFace(vArray, alpha_vArray, vec3(px+x,py+y,pz+z), 0, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::bottom), blockTransparencyID[current]);
 			} else if (blockShouldBeFace(previous,current)) {
-				generateFace(vArray, vec3(px+x,py+y-1,pz+z), 1, origin, v1, v2, numBlocks, getBlockID(previous,blockPlane::top));
+				generateFace(vArray, alpha_vArray, vec3(px+x,py+y-1,pz+z), 1, origin, v1, v2, numBlocks, getBlockID(previous,blockPlane::top), blockTransparencyID[previous]);
 			}
 			previous=current;
 		}
@@ -202,9 +206,9 @@ void computeChunkFaces(chunkVal* data,
 		{
 			current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
 			if (blockShouldBeFace(current,previous)) {
-				generateFace(vArray, vec3(px+x,py+y,pz+z), 4, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::side));
+				generateFace(vArray, alpha_vArray, vec3(px+x,py+y,pz+z), 4, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::side), blockTransparencyID[current]);
 			}else if (blockShouldBeFace(previous,current)) {
-				generateFace(vArray, vec3(px+x,py+y,pz+z-1), 5, origin, v1, v2, numBlocks, getBlockID(previous,blockPlane::side));
+				generateFace(vArray, alpha_vArray, vec3(px+x,py+y,pz+z-1), 5, origin, v1, v2, numBlocks, getBlockID(previous,blockPlane::side), blockTransparencyID[previous]);
 			}
 			previous=current;
 		}
@@ -218,10 +222,10 @@ void computeChunkFaces(chunkVal* data,
 		current = accessArray(data,w,h,d,sx,sy,sz,x,y,z);
 		if (blockStyleID[current] == blockStyle::sprite)
 		{
-			generateFace(vArray, vec3(px+x,py+y,pz+z), 6, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::top));
-			generateFace(vArray, vec3(px+x,py+y,pz+z), 7, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::top));
-			generateFace(vArray, vec3(px+x,py+y,pz+z), 8, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::top));
-			generateFace(vArray, vec3(px+x,py+y,pz+z), 9, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::top));
+			generateFace(vArray, alpha_vArray, vec3(px+x,py+y,pz+z), 6, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::top), blockTransparencyID[current]);
+			generateFace(vArray, alpha_vArray, vec3(px+x,py+y,pz+z), 7, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::top), blockTransparencyID[current]);
+			generateFace(vArray, alpha_vArray, vec3(px+x,py+y,pz+z), 8, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::top), blockTransparencyID[current]);
+			generateFace(vArray, alpha_vArray, vec3(px+x,py+y,pz+z), 9, origin, v1, v2, numBlocks, getBlockID(current,blockPlane::top), blockTransparencyID[current]);
 		}
 	}
 }
