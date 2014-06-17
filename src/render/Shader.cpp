@@ -456,8 +456,12 @@ void ShaderProgram::use()
         }
         log_info("Program %s is loaded again.", name.c_str());
         loadUniforms();
-    }
-    glUseProgram(handle);
+	} else {
+		glUseProgram(handle);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	}
 }
 
 void ShaderProgram::setAttribute(const char *name, GLint size, GLboolean normalized, GLsizei stride, GLuint offset, GLenum type)
