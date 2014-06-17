@@ -25,8 +25,8 @@ Cursor::Cursor():
 	shader.setBuffers(vao, vbo, 0);
 
 	shader.use();
-	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
 	shader.setAttribute("offset", 3, GL_FALSE, 3, 0);
+	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
 }
 
 void Cursor::draw(Camera& c)
@@ -78,7 +78,7 @@ void Cursor::draw(Camera& c)
 
 	shader.setUniform("model", model);
 	shader.setUniform("planetModel", planetModel);
-	
+
 	shader.setUniform("origin", origin);
 	shader.setUniform("v1", v1);
 	shader.setUniform("v2", v2);
@@ -96,6 +96,7 @@ void Cursor::setPosition(glm::i32vec3 pos, int dir, glm::vec3 origin, glm::vec3 
 	this->origin=origin;
 	this->v1=v1;
 	this->v2=v2;
+	this->numBlocks=numBlocks;
 	this->planetModel=planetModel;
 }
 

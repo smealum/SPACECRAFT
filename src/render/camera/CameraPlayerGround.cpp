@@ -144,6 +144,7 @@ void CameraPlayerGround::update(Camera& camera)
 					case 5: planet->changeBlock(out+glm::i32vec3(0,0,1),t); break;
 				}
 			}
+			// testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2,glm::translate(glm::mat4(1.0f),planet->getPosition()-camera.getReference())*glm::mat4(planet->getModel()),numBlocks);
 			testCursor->setPosition(out,dir,ret->origin,ret->v1,ret->v2,glm::translate(glm::mat4(1.0f),planet->getPosition()-camera.getReference())*glm::mat4(planet->getModel()),numBlocks);
 		}else{
 			// printf("no block !\n");
