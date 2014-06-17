@@ -26,35 +26,36 @@ using namespace std;
 using namespace glm;
 
 #ifndef NTWBAR
-inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
-{TwEventMouseButtonGLFW(button, action);}
-inline void TwEventMousePosGLFW3(GLFWwindow* /*window*/, double xpos, double ypos)
-{TwMouseMotion(int(xpos), int(ypos));}
-inline void TwEventMouseWheelGLFW3(GLFWwindow* /*window*/, double /*xoffset*/, double yoffset)
-{TwEventMouseWheelGLFW(yoffset);}
-inline void TwEventKeyGLFW3(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
-{TwEventKeyGLFW(key, action);}
-inline void TwEventCharGLFW3(GLFWwindow* /*window*/, int codepoint)
-{TwEventCharGLFW(codepoint, GLFW_PRESS);}
-inline void TwWindowSizeGLFW3(GLFWwindow* /*window*/, int width, int height)
-{TwWindowSize(width, height);}
+	inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
+	{TwEventMouseButtonGLFW(button, action);}
+	inline void TwEventMousePosGLFW3(GLFWwindow* /*window*/, double xpos, double ypos)
+	{TwMouseMotion(int(xpos), int(ypos));}
+	inline void TwEventMouseWheelGLFW3(GLFWwindow* /*window*/, double /*xoffset*/, double yoffset)
+	{TwEventMouseWheelGLFW(yoffset);}
+	inline void TwEventKeyGLFW3(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
+	{TwEventKeyGLFW(key, action);}
+	inline void TwEventCharGLFW3(GLFWwindow* /*window*/, int codepoint)
+	{TwEventCharGLFW(codepoint, GLFW_PRESS);}
+	inline void TwWindowSizeGLFW3(GLFWwindow* /*window*/, int width, int height)
+	{TwWindowSize(width, height);}
 
-void TW_CALL reloadAllShaders(void * /*clientData*/)
-{
-	for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
+	void TW_CALL reloadAllShaders(void * /*clientData*/)
 	{
-		it->second->load();
+		for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
+		{
+			it->second->load();
+		}
 	}
-}
 #else
-void reloadAllShaders(void * /*clientData*/)
-{
-	for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
+	void reloadAllShaders(void * /*clientData*/)
 	{
-		it->second->load();
+		for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
+		{
+			it->second->load();
+		}
 	}
-}
 #endif
+
 void mouseWheelCallback(GLFWwindow *, double x, double y)
 {
 	selectBlockType = (selectBlockType + (int)y);
@@ -106,9 +107,9 @@ Application::Application() :
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // can be GLFW_CURSOR_HIDDEN
 
-#ifndef NTWBAR
-	TwInit(TW_OPENGL_CORE, NULL);
-#endif
+	#ifndef NTWBAR
+		TwInit(TW_OPENGL_CORE, NULL);
+	#endif
 
 	glCheckError("Context creation Errors");
 
@@ -120,33 +121,33 @@ Application::Application() :
 
 	glCheckError("GL State initialisation");
 
-#ifndef NTWBAR
-	bar = TwNewBar("SPACECRAFT");
-	//TwDefine((name+" iconified=true").c_str()); // minimizes
-	TwWindowSize(width, height);
-	TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
-	TwAddVarRW(bar, "Planet LOD Details", TW_TYPE_FLOAT, &PlanetFaceDetailsPower, " label='Planet LOD' min=5.0 max=60.0 step=1");
-	TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
-	TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
-	TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
-	TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
-	TwAddVarRW(bar, "blockType", TW_TYPE_UINT8, &selectBlockType, "label='type of the selected block' min=0 max=255 step=1");
+	#ifndef NTWBAR
+		bar = TwNewBar("SPACECRAFT");
+		//TwDefine((name+" iconified=true").c_str()); // minimizes
+		TwWindowSize(width, height);
+		TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
+		TwAddVarRW(bar, "Planet LOD Details", TW_TYPE_FLOAT, &PlanetFaceDetailsPower, " label='Planet LOD' min=5.0 max=60.0 step=1");
+		TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
+		TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
+		TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
+		TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
+		TwAddVarRW(bar, "blockType", TW_TYPE_UINT8, &selectBlockType, "label='type of the selected block' min=0 max=255 step=1");
 
-	// vsync on
-	glfwSwapInterval(vsync);
+		// vsync on
+		glfwSwapInterval(vsync);
 
-	// Set GLFW event callbacks
-	// - Redirect window size changes to the callback function WindowSizeCB
-	glfwSetWindowSizeCallback(window, (GLFWwindowposfun)TwWindowSizeGLFW3);
+		// Set GLFW event callbacks
+		// - Redirect window size changes to the callback function WindowSizeCB
+		glfwSetWindowSizeCallback(window, (GLFWwindowposfun)TwWindowSizeGLFW3);
 
-	glfwSetMouseButtonCallback(window, (GLFWmousebuttonfun)TwEventMouseButtonGLFW3);
-	glfwSetCursorPosCallback(window, (GLFWcursorposfun)TwEventMousePosGLFW3);
-	glfwSetScrollCallback(window, (GLFWscrollfun)TwEventMouseWheelGLFW3);
-	glfwSetKeyCallback(window, (GLFWkeyfun)TwEventKeyGLFW3);
-	glfwSetCharCallback(window, (GLFWcharfun)TwEventCharGLFW3);
+		glfwSetMouseButtonCallback(window, (GLFWmousebuttonfun)TwEventMouseButtonGLFW3);
+		glfwSetCursorPosCallback(window, (GLFWcursorposfun)TwEventMousePosGLFW3);
+		glfwSetScrollCallback(window, (GLFWscrollfun)TwEventMouseWheelGLFW3);
+		glfwSetKeyCallback(window, (GLFWkeyfun)TwEventKeyGLFW3);
+		glfwSetCharCallback(window, (GLFWcharfun)TwEventCharGLFW3);
 
-	glCheckError("tweak bar");
-#endif
+		glCheckError("tweak bar");
+	#endif
 
 	glfwSetScrollCallback(window, &mouseWheelCallback);
 
@@ -273,8 +274,8 @@ void Application::loop()
 	}
 
 	globalGalaxy->step(*camera,contentHandler,globalTime,deltaTime);
-    Input::update(window);
-    camera->update();
+	Input::update(window);
+	camera->update();
 
 	//---------------------
 	//    drawing
@@ -310,15 +311,15 @@ void Application::loop()
 
 	contentHandler.handleNewContent();
 
-#ifndef NTWBAR
-	// Draw tweak bars (or don't)
-	glUseProgram(0);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-	TwDraw();
-#endif
+	#ifndef NTWBAR
+		// Draw tweak bars (or don't)
+		glUseProgram(0);
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+		TwDraw();
+	#endif
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
@@ -327,8 +328,8 @@ void Application::loop()
 
 Application::~Application()
 {
-#ifndef NTWBAR
-	TwTerminate();
-#endif
+	#ifndef NTWBAR
+		TwTerminate();
+	#endif
 	glfwTerminate();
 }
