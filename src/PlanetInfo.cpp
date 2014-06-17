@@ -1,6 +1,9 @@
 #include "PlanetInfo.h"
 #include "MiniWorld.h"
+#include "data/ContentHandler.h"
 #include "planetGenerator/PlanetGenerator.h"
+#include "planetGenerator/PlanetGeneratorEarth.h"
+#include "planetGenerator/PlanetGeneratorMoon.h"
 #include "utils/positionMath.h"
 #include "utils/dbg.h"
 
@@ -23,8 +26,8 @@ PlanetInfo::~PlanetInfo()
 {
 }
 
-PlanetInfoEarth::PlanetInfoEarth(SpaceObjectTrajectory* t, PlanetGeneratorEarth* p, int seed, int size):
-	PlanetInfo(t,(PlanetGenerator*)p,seed,size),
+PlanetInfoEarth::PlanetInfoEarth(SpaceObjectTrajectory* t, ContentHandler& ch, int seed, int size):
+	PlanetInfo(t,(PlanetGenerator*)(new PlanetGeneratorEarth(ch.getMaxProducers())),seed,size),
 	continentFrequency( 1.f),
 	continentLacunarity(2.089f),
 	mountainLacunarity(2.142f),
@@ -52,8 +55,8 @@ PlanetInfoEarth::~PlanetInfoEarth()
 {
 }
 
-PlanetInfoMoon::PlanetInfoMoon(SpaceObjectTrajectory* t, PlanetGeneratorMoon* p, int seed, int size):
-	PlanetInfo(t,(PlanetGenerator*)p,seed,size)
+PlanetInfoMoon::PlanetInfoMoon(SpaceObjectTrajectory* t, ContentHandler& ch, int seed, int size):
+	PlanetInfo(t,(PlanetGenerator*)(new PlanetGeneratorMoon(ch.getMaxProducers())),seed,size)
 {
 	planetGenerator->setPlanetInfo(this);
 }

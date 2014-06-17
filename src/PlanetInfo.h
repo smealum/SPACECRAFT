@@ -4,6 +4,7 @@
 #include "SpaceObjectTrajectory.h"
 #include "render/Atmosphere.h"
 
+class ContentHandler;
 class PlanetGenerator;
 class PlanetGeneratorEarth;
 class PlanetGeneratorMoon;
@@ -30,7 +31,7 @@ class PlanetInfo
 class PlanetInfoEarth : public PlanetInfo
 {
 	public:
-		PlanetInfoEarth(SpaceObjectTrajectory* t, PlanetGeneratorEarth* planetGen, int seed, int size=1);
+		PlanetInfoEarth(SpaceObjectTrajectory* t, ContentHandler& ch, int seed, int size=1);
 		~PlanetInfoEarth();
 
 		float continentFrequency,
@@ -56,7 +57,7 @@ class PlanetInfoEarth : public PlanetInfo
 class PlanetInfoMoon : public PlanetInfo
 {
 	public:
-		PlanetInfoMoon(SpaceObjectTrajectory* t, PlanetGeneratorMoon* planetGen, int seed, int size=1);
+		PlanetInfoMoon(SpaceObjectTrajectory* t, ContentHandler& ch, int seed, int size=1);
 		~PlanetInfoMoon();	
 };
 
