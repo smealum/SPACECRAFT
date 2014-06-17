@@ -25,4 +25,5 @@ void main()
 
 	vec4 r = proj * view * planetModel * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = logDepth(r);
+	// gl_Position = vec4(r.xy,-0.0*r.w,r.w);
 }
