@@ -98,8 +98,9 @@ PlanetGeneratorResponse PlanetGeneratorMoon::getCharacteristic(int threadId, con
 
 float PlanetGeneratorMoon::getElevation(int threadId, const glm::vec3 &coord)
 {
-	float elev=(glm::simplex(coord*8.0f)+1.0f)/8+0.4f;
-	float v=glm::simplex(coord*128.0f);
+	glm::vec3 offset(planetInfo->seed*3);
+	float elev=(glm::simplex(coord*8.0f+offset)+1.0f)/8+0.4f;
+	float v=glm::simplex(coord*128.0f+offset);
 	if(v<0.0f)elev+=v/16;
 	return blockHeightToElevation((elev)*MINIWORLD_H*CHUNK_N, planetInfo->numBlocks);
 }

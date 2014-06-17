@@ -31,10 +31,17 @@ void SolarSystem::draw(Camera& c)
 
 	sun->draw(c);
 
+	//dessin normal
 	for(int i=0;i<numPlanets;i++)
 	{
 		planets[i]->processLevelOfDetail(c);
 		planets[i]->draw(c);
+	}
+
+	//dessin atmo
+	for(int i=0;i<numPlanets;i++)
+	{
+		planets[i]->draw(c, true);
 	}
 
 	sun->drawGlow(c);

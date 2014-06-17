@@ -406,7 +406,7 @@ void Planet::processLevelOfDetail(Camera& c)
 {
 	if(testBool1)return;
 	if(!c.isBoxInFrustum(position-glm::vec3(1), glm::vec3(2,0,0), glm::vec3(0,2,0), glm::vec3(0,0,2)))return;
-	if(glm::length(c.getPosition(position))>20.0f)return;
+	if(glm::length(c.getPosition(position))>1e2)return;
 	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, NULL, NULL);
 }
 
@@ -607,24 +607,23 @@ void PlanetFace::draw(Camera& c, glm::vec3 lightdir, bool water)
 	}
 }
 
-void Planet::draw(Camera& c)
+void Planet::draw(Camera& c, bool atmo)
 {
 	if(!c.isBoxInFrustum(position-glm::vec3(1), glm::vec3(2,0,0), glm::vec3(0,2,0), glm::vec3(0,0,2)))return;
 
 	lightdir=glm::normalize(sunPosition-position);
 
-	for(int i=0;i<6;i++)faces[i]->draw(c, lightdir);
-	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
-	for(int i=0;i<6;i++)faces[i]->draw(c, lightdir, true);
-	for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c, false);
-
-	// printf("%d\n",miniWorldList.size());
-	
-	// dessin de l'athmosphere
-	if(atmosphere)atmosphere->draw(c, lightdir, position, scale);
-
-	// dessin des nuages
-	// cloud.draw(c);
+	if(atmo)
+	{
+		if(atmosphere)atmosphere->draw(c, lightdir, position, scale);
+	}else{
+		for(int i=0;i<6;i++)faces[i]->draw(c, lightdir);
+		for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c);
+		for(int i=0;i<6;i++)faces[i]->draw(c, lightdir, true);
+		for(auto it(miniWorldList.begin()); it!=miniWorldList.end(); ++it)(*it)->draw(c, false);
+		// dessin des nuages
+		// cloud.draw(c);
+	}
 }
 
 glm::vec3 Planet::getCameraRelativePosition(Camera& c)

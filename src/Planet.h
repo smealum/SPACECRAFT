@@ -150,7 +150,7 @@ class Planet
 		~Planet(); // TODO faire tous les free
 		
 		void processLevelOfDetail(Camera& c);
-		void draw(Camera& c);
+		void draw(Camera& c, bool atmo=false);
 		void update(float time);
 
 		int numMiniWorlds(void);
