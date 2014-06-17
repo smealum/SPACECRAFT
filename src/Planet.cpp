@@ -179,7 +179,7 @@ bool PlanetFace::shouldHaveMiniworld(Camera& c)
 			//on ne prend plus en compte l'élévation, c'est fait exprès
 			p=glm::normalize(p)*max(PLANET_ALTITUDETHRESHOLD,glm::length(p));
 			const float l=glm::length(vertex[4]*PLANET_ALTITUDETHRESHOLD-p);
-			return l*(2<<(depth))<20.0f;
+			return l*(2<<(depth))<20.0f*planet->planetInfo->size;
 		}else{
 			return (childrenDepth >= PLANET_ADDED_DETAIL);
 		}
@@ -194,11 +194,11 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 
 	glm::vec3 p=planet->getCameraRelativePosition(c);
 
-	if(glm::dot(vertex[0]*0.99f-p,vertex[0])>0.0f
-	&& glm::dot(vertex[1]*0.99f-p,vertex[1])>0.0f
-	&& glm::dot(vertex[2]*0.99f-p,vertex[2])>0.0f
-	&& glm::dot(vertex[3]*0.99f-p,vertex[3])>0.0f
-	&& glm::dot(vertex[4]*0.99f-p,vertex[4])>0.0f)return true; //backface culling
+	if(glm::dot(vertex[0]*0.97f-p,vertex[0])>0.0f
+	&& glm::dot(vertex[1]*0.97f-p,vertex[1])>0.0f
+	&& glm::dot(vertex[2]*0.97f-p,vertex[2])>0.0f
+	&& glm::dot(vertex[3]*0.97f-p,vertex[3])>0.0f
+	&& glm::dot(vertex[4]*0.97f-p,vertex[4])>0.0f)return true; //backface culling
 
 	// if(depth<4)return false;
 
@@ -216,7 +216,7 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	//on ne prend plus en compte l'élévation, c'est fait exprès
 	p=glm::normalize(p)*max(PLANET_ALTITUDETHRESHOLD,glm::length(p));
 	const float l=glm::length(vertex[4]*PLANET_ALTITUDETHRESHOLD-p);
-	if(l*(2<<(depth-1))<PlanetFaceDetailsPower) return false;
+	if(l*(2<<(depth-1))<PlanetFaceDetailsPower*planet->planetInfo->size) return false;
 	return true;
 }
 
