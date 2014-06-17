@@ -3,6 +3,14 @@ SPACECRAFT
 
 Génération procédurale d'univers.
 
+![galaxy](http://i.imgur.com/KczAZt2.png)
+
+![space](http://i.imgur.com/i5h5K6r.png)
+
+![sunset](http://i.imgur.com/uY6xw1H.png)
+
+![blocks](http://i.imgur.com/qqypYwj.png)
+
 * [X] Planète avec relief
 * [X] Grottes
 * [ ] Système de climats/Biômes
