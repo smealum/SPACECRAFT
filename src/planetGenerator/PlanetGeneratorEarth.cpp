@@ -72,10 +72,28 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 	{
 		for(int z=0;z<heightMapZ;++z)
 		{
+			// calcul des caractéristiques.
 			const glm::vec3 pos=origin+((v1*float(px+x-offset))+(v2*float(pz+z-offset)))/float(planetInfo->numBlocks);
 			const auto blockReponse=getCharacteristic(threadId, pos);
 			heightMap[x][z] = elevationToBlockHeight(blockReponse.elevation, planetInfo->numBlocks);
 			tileMap[x][z]   = blockReponse.tile;
+
+			// ajout des arbres.
+			int rx = (px + x);
+			int ry = (pz + y);
+			unsigned long long randomSource = rx*3+ry*231331;
+			randomSource ^= (randomSource >> 29) & 0x5555555555555555ULL;
+			randomSource ^= (randomSource << 17) & 0x71D67FFFEDA60000ULL;
+			randomSource ^= ry;
+			randomSource ^= (randomSource << 37) & 0xFFF7EEE000000000ULL;
+			randomSource ^= (randomSource >> 43);
+
+			// ajout des arbres
+			if (
+					randomSource % 200 == 100 and
+					tile == blockTypes::grass
+			)
+			treePositions.push_back(glm::i32vec4(i+(CHUNK_N)*cx,height,k+(CHUNK_N)*cz,randomSource));
 		}
 	}
 
@@ -100,21 +118,6 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 					const auto height=heightMap[i+(CHUNK_N)*cx+offset][k+(CHUNK_N)*cz+offset];
 					const auto tile  =tileMap[i+(CHUNK_N)*cx+offset][k+(CHUNK_N)*cz+offset];
 
-					int rx = (px + i+(CHUNK_N)*cx);
-					int ry = (pz + k+(CHUNK_N)*cz);
-					unsigned long long randomSource = rx*3+ry*231331;
-					randomSource ^= (randomSource >> 29) & 0x5555555555555555ULL;
-					randomSource ^= (randomSource << 17) & 0x71D67FFFEDA60000ULL;
-					randomSource ^= ry;
-					randomSource ^= (randomSource << 37) & 0xFFF7EEE000000000ULL;
-					randomSource ^= (randomSource >> 43);
-
-					// ajout des arbres
-					if (
-							randomSource % 200 == 100 and
-							tile == blockTypes::grass
-					)
-					treePositions.push_back(glm::i32vec4(i+(CHUNK_N)*cx,height,k+(CHUNK_N)*cz,randomSource));
 
 
 					//TEMP (pour tester)
