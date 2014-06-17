@@ -147,7 +147,7 @@ list(REMOVE_ITEM all_obj ${OBJ_FILES}/main.cpp.o)
 #STRING(REPLACE ; " " all_obj "${all_obj}")
 file(GLOB_RECURSE all_tests ${PROJECT_SOURCE_DIR}/tests/*.cpp)
 # XXX this line makes the difference between being able to compile tests ot not on OSX. I just cannot understand why
-message("obj: ${all_obj}")
+#message("obj: ${all_obj}")
 
 foreach(t ${all_tests})
 	GET_FILENAME_COMPONENT(f_base ${t} NAME_WE)
