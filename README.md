@@ -6,7 +6,7 @@ Génération procédurale d'univers.
 * [X] Planète avec relief
 * [X] Grottes
 * [ ] Système de climats/Biômes
-* [ ] Systèmes solaire
+* [X] Systèmes solaire
 * [X] Collision avec le monde
 
 ##Description
