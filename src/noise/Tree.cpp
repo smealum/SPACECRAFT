@@ -23,7 +23,7 @@ void Tree::generate(int seed)
 
 	height = minHeight + (rnd.GetValue(0.1, seed/10000, 0) + 1.f) * halfRandomHeight;
 	size = minSize + (rnd.GetValue(0.2, seed/10000, 0) + 1.f) * halfRandomSize;
-	log_info("seed: %d -> %d, %d", seed, height, size);
+	//log_info("seed: %d -> %d, %d", seed, height, size);
 
 	array = new blockTypes::T[height * size * size];
 

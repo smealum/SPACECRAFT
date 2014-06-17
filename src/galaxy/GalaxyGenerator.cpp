@@ -61,4 +61,7 @@ void GalaxyGenerate(Galaxy* galaxy)
 			
 		}
 	}
+
+	// galaxy originel
+	galaxy->pushSolarSystem(dvec3(0.0,0.0,-1000.0));
 }
