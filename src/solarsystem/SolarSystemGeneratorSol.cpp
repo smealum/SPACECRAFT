@@ -17,7 +17,7 @@ void SolarSystemGeneratorSol::generatePlanetInfos(std::vector<PlanetInfo*>& v)
 	const int numPlanet=genrand64_int64()&7;
 	for(int i=0;i<numPlanet;i++)
 	{
-		double distance=genrand64_real2()*1e3+1e1;
+		double distance=genrand64_real2()*1e3+1e2;
 
 		SpaceObjectTrajectory* trajectory =
 						new EllipticalTrajectory(
@@ -36,18 +36,23 @@ void SolarSystemGeneratorSol::generatePlanetInfos(std::vector<PlanetInfo*>& v)
 		const int numSatellites=genrand64_int64()&3;
 		for(int j=0;j<numSatellites;j++)
 		{
+			double satdistance=genrand64_real2()*2e1+3e0;
+			double satperiod=genrand64_real2()*1e1+7e0;
+			// int satsize=genrand64_int64()&1+2;
+			int satsize=3;
+
 			SpaceObjectTrajectory* satTrajectory =
 							new EllipticalTrajectory(
 								*trajectory,
-								glm::mat3(3.0f),
-								i*1.037f,
-								10.0f);
+								glm::mat3(satdistance),
+								genrand64_real2()*2,
+								satperiod);
 
 			v.push_back(new PlanetInfoMoon(
 							satTrajectory,
 							contentHandler,
 							seed*1000+i*10+j+1,
-							3)
+							satsize)
 						);
 		}
 	}
