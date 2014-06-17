@@ -104,6 +104,10 @@ void Galaxy::generateVBO()
 
 void Galaxy::step(Camera& camera, ContentHandler& contentHandler, float globalTime)
 {
+	if (currentSolarSystem)
+	{
+		currentSolarSystem->update(globalTime);
+	}
 	
 
 	// on saute des frames:
@@ -151,14 +155,13 @@ void Galaxy::step(Camera& camera, ContentHandler& contentHandler, float globalTi
 
 		camera.movePositionDouble(-*selectedPosition);
 
-
-		return;
 	}else{
-		// suppression du précédent système solaire.
+		// suppression de la précédente position (et remise en place de la position)
 		// log_info("Trop loin");
 		if(selectedPosition)
 		{
 			camera.movePositionDouble(*selectedPosition);
+			selectedPosition = NULL;
 		}
 
 		// suppression du précédent système solaire.
@@ -170,10 +173,6 @@ void Galaxy::step(Camera& camera, ContentHandler& contentHandler, float globalTi
 		}
 	}
 
-	if (currentSolarSystem)
-	{
-		currentSolarSystem->update(globalTime);
-	}
 }
 
 
