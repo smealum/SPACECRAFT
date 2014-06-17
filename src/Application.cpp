@@ -41,18 +41,18 @@ inline void TwWindowSizeGLFW3(GLFWwindow* /*window*/, int width, int height)
 
 void TW_CALL reloadAllShaders(void * /*clientData*/)
 {
-    for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
-    {
-        it->second->load();
-    }
+	for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
+	{
+		it->second->load();
+	}
 }
 #else
 void reloadAllShaders(void * /*clientData*/)
 {
-    for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
-    {
-        it->second->load();
-    }
+	for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
+	{
+		it->second->load();
+	}
 }
 #endif
 void mouseWheelCallback(GLFWwindow *, double x, double y)
@@ -70,7 +70,7 @@ void reloadAllShaders()
 
 Application::Application() : 
 	state(appReady),
-    fullscreen(false),
+	fullscreen(false),
 	// fullscreen(true),
 	vsync(false),
 	active(true),
@@ -221,7 +221,7 @@ void Application::run()
 	testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
 	testTextureArray=TextureManager::getInstance().loadTextureArray("data/blocksPackArray.png",16,16);
 	caves.generate();
-	
+
 	globalGalaxy = new Galaxy;
 	GalaxyGenerate(globalGalaxy);
 
@@ -276,8 +276,8 @@ void Application::loop()
 
 
 	globalGalaxy->step(*camera,contentHandler,globalTime);
-    
-    camera->update();
+
+	camera->update();
 
 	//---------------------
 	//    drawing
@@ -296,16 +296,16 @@ void Application::loop()
 
 	if(Input::isKeyPressed(GLFW_KEY_N))reloadAllShaders();
 
-    if(Input::isKeyHold(GLFW_KEY_LEFT_SHIFT))
-    {
-        if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.1f;
-        if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.1f;
-    }else{
-    	if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.001f;
-        if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.001f;
-    }
+	if(Input::isKeyHold(GLFW_KEY_LEFT_SHIFT))
+	{
+		if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.1f;
+		if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.1f;
+	}else{
+		if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.001f;
+		if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.001f;
+	}
 
-    if(Input::isKeyPressed(GLFW_KEY_V))testBool1^=1;
+	if(Input::isKeyPressed(GLFW_KEY_V))testBool1^=1;
 	if(Input::isKeyPressed(GLFW_KEY_B))testBool2^=1;
 
 	// printf("test %d\n",testVal);
@@ -313,15 +313,15 @@ void Application::loop()
 
 	contentHandler.handleNewContent();
 
-    #ifndef NTWBAR
-        // Draw tweak bars (or don't)
-        glUseProgram(0);
-        glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		TwDraw();
-    #endif
+#ifndef NTWBAR
+	// Draw tweak bars (or don't)
+	glUseProgram(0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	TwDraw();
+#endif
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
