@@ -38,7 +38,7 @@ void SolarSystem::draw(Camera& c)
 		planets[i]->draw(c);
 	}
 
-	//dessin atmo
+	//dessin atmosphère
 	for(int i=0;i<numPlanets;i++)
 	{
 		planets[i]->draw(c, true);

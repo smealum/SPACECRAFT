@@ -12,10 +12,13 @@ uniform mat4 view = mat4(1.0);
 
 uniform float logconst, zfar;
 
+uniform float t = 0;
+
 void main ()
 {
     vec4 p = proj*view*model*vec4(position,1.0);
 	// gl_Position = logDepth(p);
 	gl_Position = vec4(p.xy,0.9*p.w,p.w);
+	gl_PointSize = 1.0*(1.0+sin(t+position.x));
 	color=normalize(position);
 }
