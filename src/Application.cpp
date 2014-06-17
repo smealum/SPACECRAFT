@@ -70,7 +70,8 @@ void reloadAllShaders()
 
 Application::Application() : 
 	state(appReady),
-	fullscreen(false),
+    fullscreen(false),
+	// fullscreen(true),
 	vsync(false),
 	active(true),
 	wireframe(false),
