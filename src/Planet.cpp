@@ -415,10 +415,10 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 	vao(0),
 	index(index),
 	alpha(alpha),
-	// shader(water?ShaderProgram::loadFromFile("shader/planetface_water/planetface_water.vert", "shader/planetface_water/planetface_water.frag", "shader/planetface_water/planetface_water.geom", "planetface_water"):
-	// 		ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface"))
-	shader(water?ShaderProgram::loadFromFile("shader/planetface_water_atmosphere/planetface_water_atmosphere.vert", "shader/planetface_water_atmosphere/planetface_water_atmosphere.frag", "shader/planetface_water_atmosphere/planetface_water_atmosphere.geom", "planetface_water_atmosphere"):
-			ShaderProgram::loadFromFile("shader/planetface_atmosphere/planetface_atmosphere.vert", "shader/planetface_atmosphere/planetface_atmosphere.frag", "shader/planetface_atmosphere/planetface_atmosphere.geom", "planetface_atmosphere"))
+	shader(water?ShaderProgram::loadFromFile("shader/planetface_water/planetface_water.vert", "shader/planetface_water/planetface_water.frag", "shader/planetface_water/planetface_water.geom", "planetface_water"):
+			ShaderProgram::loadFromFile("shader/planetface/planetface.vert", "shader/planetface/planetface.frag", "shader/planetface/planetface.geom", "planetface"))
+	// shader(water?ShaderProgram::loadFromFile("shader/planetface_water_atmosphere/planetface_water_atmosphere.vert", "shader/planetface_water_atmosphere/planetface_water_atmosphere.frag", "shader/planetface_water_atmosphere/planetface_water_atmosphere.geom", "planetface_water_atmosphere"):
+	// 		ShaderProgram::loadFromFile("shader/planetface_atmosphere/planetface_atmosphere.vert", "shader/planetface_atmosphere/planetface_atmosphere.frag", "shader/planetface_atmosphere/planetface_atmosphere.geom", "planetface_atmosphere"))
 {
 	resizeVBO();
 	shader.use();

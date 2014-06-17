@@ -63,7 +63,7 @@ const glm::vec3 n[]={glm::vec3(0.0,-1.0,0.0), //bottom
 						glm::normalize(glm::vec3(-1.0,0.0,-1.0)) //diag22
 						};
 
-void generateFace(std::vector<GL_Vertex>& vArray, std::vector<GL_Vertex>& alpha_vArray, glm::vec3 pos, int facedir, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2, int numBlocks, int tile, uint8_t transp)
+void generateFace(std::vector<GL_Vertex>& vArray, std::vector<GL_Vertex>& alpha_vArray, glm::vec3 pos, int facedir, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2, int numBlocks, int tile, std::uint8_t transp)
 {
 	GL_Vertex v;
 

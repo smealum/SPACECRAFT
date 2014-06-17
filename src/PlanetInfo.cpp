@@ -23,8 +23,8 @@ PlanetInfo::~PlanetInfo()
 {
 }
 
-PlanetInfoEarth::PlanetInfoEarth(SpaceObjectTrajectory* t, PlanetGenerator* p, int seed, int size):
-	PlanetInfo(t,p,seed,size),
+PlanetInfoEarth::PlanetInfoEarth(SpaceObjectTrajectory* t, PlanetGeneratorEarth* p, int seed, int size):
+	PlanetInfo(t,(PlanetGenerator*)p,seed,size),
 	continentFrequency( 1.f),
 	continentLacunarity(2.089f),
 	mountainLacunarity(2.142f),
@@ -52,8 +52,8 @@ PlanetInfoEarth::~PlanetInfoEarth()
 {
 }
 
-PlanetInfoMoon::PlanetInfoMoon(SpaceObjectTrajectory* t, PlanetGenerator* p, int seed, int size):
-	PlanetInfo(t,p,seed,size)
+PlanetInfoMoon::PlanetInfoMoon(SpaceObjectTrajectory* t, PlanetGeneratorMoon* p, int seed, int size):
+	PlanetInfo(t,(PlanetGenerator*)p,seed,size)
 {
 	planetGenerator->setPlanetInfo(this);
 }
