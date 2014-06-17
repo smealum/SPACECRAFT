@@ -61,29 +61,29 @@ void Tree::generate(int seed)
 	pos = glm::i32vec3(size/2, height/1.5f, size/2);
 	int maxH = size;
 	glm::i32vec3 cubeSize(size, height/3, size);
-	while (cubeSize.x >= 3)
+	while (cubeSize.x >= 3 && pos.y + cubeSize.y/2 < height)
 	{
 		digCube(pos, cubeSize, blockTypes::tree_foliage_opaque);
-		maxH = pos.y - cubeSize.y / 2;
+		maxH = pos.y + cubeSize.y / 2;
 		// dig the line to make it round
 		glm::i32vec3 a = pos - cubeSize/2,
 					 b = a;
-		b.y += cubeSize.y -1 ;
+		b.y += cubeSize.y-1 ;
 		digLine(a, b, blockTypes::air);
 		
 		a.x += cubeSize.x-1;
 		b = a;
-		b.y += cubeSize.y;
+		b.y += cubeSize.y-1;
 		digLine(a, b, blockTypes::air);
 
 		a.z += cubeSize.z-1;
 		b = a;
-		b.y += cubeSize.y;
+		b.y += cubeSize.y-1;
 		digLine(a, b, blockTypes::air);
 
 		a.x -= (cubeSize.x-1);
 		b = a;
-		b.y += cubeSize.y;
+		b.y += cubeSize.y-1;
 		digLine(a, b, blockTypes::air);
 
 		pos.y += cubeSize.y-1;
