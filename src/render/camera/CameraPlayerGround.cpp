@@ -46,7 +46,7 @@ void CameraPlayerGround::update(Camera& camera)
 	{
 		float delta = Application::getInstance().getFrameDeltaTime();
 
-		if(Input::isKeyPressed(GLFW_KEY_R))camera.setCameraManager(new CameraKeyboardMouse()); //TODO : méga fuite à virer
+		if(Input::isKeyPressed(GLFW_KEY_R))camera.setCameraManager(new CameraKeyboardMouse); //TODO : méga fuite à virer
 
 		const double tS=3.0*delta;
 		const double gS=0.5*delta;
