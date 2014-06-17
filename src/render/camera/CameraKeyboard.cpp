@@ -16,6 +16,10 @@ CameraKeyboard::CameraKeyboard():
 
 float testAngle=0.0f;
 
+//demo stuff
+glm::dvec3 target(0.0);
+glm::dvec3 targets[4]={glm::dvec3(0.0),glm::dvec3(0.0),glm::dvec3(0.0),glm::dvec3(0.0)};
+
 void CameraKeyboard::update(Camera& camera)
 {
     float delta = Application::getInstance().getFrameDeltaTime();
@@ -23,18 +27,40 @@ void CameraKeyboard::update(Camera& camera)
     speedVect=dvec3(0,0,0);
 
     // changement de la vitesse (manière brusque)
-    if (Input::isKeyPressed(GLFW_KEY_Y))    speed*=10.0f;
-    if (Input::isKeyPressed(GLFW_KEY_H))   speed/=10.0f;
+    if (Input::isKeyPressed(GLFW_KEY_Y))speed*=10.0f;
+    if (Input::isKeyPressed(GLFW_KEY_H))speed/=10.0f;
 
     // changement de la vitesse (manière smooth)
-    if (Input::isKeyHold(GLFW_KEY_T))    speed*=exp(delta*0.6);
-    if (Input::isKeyHold(GLFW_KEY_G))   speed*=exp(-delta*0.6);
+    if (Input::isKeyHold(GLFW_KEY_T))speed*=exp(delta*0.6);
+    if (Input::isKeyHold(GLFW_KEY_G))speed*=exp(-delta*0.6);
 
     // vitesse en translation
     float tS = speed * delta;
 
     // vitesse en rotation
     float rS = 1.5 * delta;
+
+    //target (pour demo)
+    if(Input::isKeyHold(GLFW_KEY_Z))
+    {
+        glm::vec3 v1=glm::vec3(glm::normalize(camera.getPositionDouble(glm::dvec3(target))));
+        glm::vec3 v2=glm::transpose(camera.view3)[2];
+        glm::quat q(v1,v2);
+        camera.view3*=glm::mat3_cast(q);
+    }
+
+    if(Input::isKeyHold(GLFW_KEY_LEFT_SHIFT))
+    {
+        if(Input::isKeyPressed(GLFW_KEY_1))targets[0]=camera.getPositionDouble(glm::dvec3(0.0));
+        else if(Input::isKeyPressed(GLFW_KEY_2))targets[1]=camera.getPositionDouble(glm::dvec3(0.0));
+        else if(Input::isKeyPressed(GLFW_KEY_3))targets[2]=camera.getPositionDouble(glm::dvec3(0.0));
+        else if(Input::isKeyPressed(GLFW_KEY_4))targets[3]=camera.getPositionDouble(glm::dvec3(0.0));
+    }else{
+        if(Input::isKeyPressed(GLFW_KEY_1))target=targets[0];
+        else if(Input::isKeyPressed(GLFW_KEY_2))target=targets[1];
+        else if(Input::isKeyPressed(GLFW_KEY_3))target=targets[2];
+        else if(Input::isKeyPressed(GLFW_KEY_4))target=targets[3];
+    }
 
     // mode de précision (instantanée)
     if (Input::isKeyHold(GLFW_KEY_LEFT_SHIFT)){tS/=10.0f;rS=0.0003f;}

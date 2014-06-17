@@ -5,12 +5,14 @@
 
 class CameraKeyboard : public CameraManager
 {
-    public:
-        CameraKeyboard();
-        virtual void update(Camera& camera);
-    private:
-    	float speed;
-    	glm::dvec3 speedVect;
+	public:
+		CameraKeyboard();
+
+		virtual void update(Camera& camera);
+		
+	private:
+		float speed;
+		glm::dvec3 speedVect;
 };
 
 
