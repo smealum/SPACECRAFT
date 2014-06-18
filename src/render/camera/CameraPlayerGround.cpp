@@ -61,6 +61,16 @@ void CameraPlayerGround::update(Camera& camera)
 		if (Input::isKeyHold(GLFW_KEY_J))localView = glm::dmat3(glm::mat3(glm::rotate(glm::mat4(glm::mat3(localView)),rS,glm::vec3(0.0,-1.0,0.0))));
 		if (Input::isKeyHold(GLFW_KEY_L))localView = glm::dmat3(glm::mat3(glm::rotate(glm::mat4(glm::mat3(localView)),rS,glm::vec3(0.0,+1.0,0.0))));
 
+		//mouse
+		if (Input::isMouseFixed())
+		{
+			if (Input::isKeyPressed(GLFW_KEY_T))Input::unfixMouse();
+			// mouse speed
+			const float s = 0.002;
+			localView = glm::dmat3(glm::mat3(glm::rotate(glm::mat4(glm::mat3(localView)),s*Input::getHorAngle(),glm::vec3(0.0,-1.0,0.0))));
+			localView = glm::dmat3(glm::mat3(glm::rotate(glm::mat4(1.0),s*Input::getVerAngle(),glm::vec3(-1.0,0.0,0.0))))*localView;
+		}else if (Input::isKeyPressed(GLFW_KEY_T))Input::fixMouse();
+
 		glm::dvec3 localSpeedVect;
 
 		// translation
@@ -128,8 +138,8 @@ void CameraPlayerGround::update(Camera& camera)
 		if(ret)
 		{
 			// printf("%d block %d %d %d\n",dir,out.x,out.y,out.z);
-			if(Input::isKeyPressed(GLFW_KEY_X))planet->deleteBlock(out);
-			else if(Input::isKeyPressed(GLFW_KEY_C))
+			if(Input::isKeyPressed(GLFW_KEY_X) || Input::isMousePressed(GLFW_MOUSE_BUTTON_2))planet->deleteBlock(out);
+			else if(Input::isKeyPressed(GLFW_KEY_C) || Input::isMousePressed(GLFW_MOUSE_BUTTON_1))
 			{
 				//TODO : check que player n'intersecte pas avec le nouveau bloc...
 				blockTypes::T t=(blockTypes::T)selectBlockType;
