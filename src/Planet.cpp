@@ -305,15 +305,10 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b, Pla
 		// dessin de la face
 		if (elevated)
 		{
+			if(b)b->addFace(this);
+			else{printf("ERROR2 %d\n",depth);}
 			if(w && elevation<planet->planetInfo->waterLevelElevation)
-			{
-				if(b)b->addFace(this,this->elevation-(1.0f/planet->getNumBlocks()),this->tile);
-				else{printf("ERROR2.1 %d\n",depth);}
 				w->addFace(this,planet->planetInfo->waterLevelElevation,blockTypes::water);
-			}else{
-				if(b)b->addFace(this);
-				else{printf("ERROR2 %d\n",depth);}
-			}
 
 
 			// suppresion des éventuels miniWorlds si on a la face qui s'affiche
@@ -491,7 +486,7 @@ void PlanetFaceBufferHandler::resizeVBO(void)
 
 void PlanetFaceBufferHandler::addFace(PlanetFace* pf)
 {
-	addFace(pf,pf->elevation,pf->tile);
+	addFace(pf,pf->elevation-(1.0f/pf->planet->getNumBlocks()),pf->tile);
 }
 
 void PlanetFaceBufferHandler::addFace(PlanetFace* pf, float elevation, blockTypes::T tile)

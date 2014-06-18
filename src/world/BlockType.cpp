@@ -231,6 +231,16 @@ void blockTypeLoadValues()
 	blockTransparencyID[blockTypes::flower_red] = blockTransparency::seeThrough;
 	blockStyleID[blockTypes::flower_red] = blockStyle::sprite;
 
+    // grass
+    blockTransparencyID[blockTypes::grass_blaze] = blockTransparency::seeThrough;
+    blockStyleID[blockTypes::grass_blaze] = blockStyle::sprite;
+
+    // shrooms
+    blockTransparencyID[blockTypes::shroom_red] = blockTransparency::seeThrough;
+    blockStyleID[blockTypes::shroom_red] = blockStyle::sprite;
+    blockTransparencyID[blockTypes::shroom_white] = blockTransparency::seeThrough;
+    blockStyleID[blockTypes::shroom_white] = blockStyle::sprite;
+
 	// water
 	blockTransparencyID[blockTypes::water] = blockTransparency::transparent;
 	blockTransparencyID[blockTypes::water_1] = blockTransparency::transparent;
@@ -238,12 +248,27 @@ void blockTypeLoadValues()
 	blockTransparencyID[blockTypes::water_3] = blockTransparency::transparent;
 	blockTransparencyID[blockTypes::water_4] = blockTransparency::transparent;
 
+    // wheat
+    for (uint32_t i = blockTypes::wheat_1; i <= blockTypes::wheat_8; i++)
+    {
+        blockTransparencyID[(blockTypes::T)i] = blockTransparency::seeThrough;
+        blockStyleID[(blockTypes::T)i] = blockStyle::sprite;
+    }
+
     // trees
     blockTileID[blockTypes::tree][blockPlane::side] = blockTypes::tree;
     blockTileID[blockTypes::tree][blockPlane::bottom] = 
         blockTileID[blockTypes::tree][blockPlane::top] = blockTypes::tree_top;
     
     blockTransparencyID[blockTypes::tree_foliage] = blockTransparency::seeThrough;
+
+    // tnt
+    blockTileID[blockTypes::tnt][blockPlane::side] = blockTypes::tnt;
+    blockTileID[blockTypes::tnt][blockPlane::top] = blockTypes::tnt_top;
+    blockTileID[blockTypes::tnt][blockPlane::bottom] = blockTypes::tnt_bot;
+
+    // glass
+    blockTransparencyID[blockTypes::glass] = blockTransparency::seeThrough;
 
 }
 

@@ -168,7 +168,6 @@ void SolarSystemDataRequest::process(int id)
 
 #include <sstream>
 
-
 // TODO TODO TODO TODO TODO TODO
 // TODO                     TODO
 // TODO   Faire des delete  TODO
