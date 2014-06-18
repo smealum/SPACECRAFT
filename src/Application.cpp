@@ -273,16 +273,12 @@ void Application::loop()
 
 	globalGalaxy->step(*camera,contentHandler,globalTime,deltaTime);
 	Input::update(window);
-<<<<<<< HEAD
 	TileTexture::getInstance().update();
 
 
 	globalGalaxy->step(*camera,contentHandler,globalTime);
     
-    camera->update();
-=======
 	camera->update();
->>>>>>> f1c5e4154112882e7366a009fb2e866830eeca3e
 
 	//---------------------
 	//    drawing
