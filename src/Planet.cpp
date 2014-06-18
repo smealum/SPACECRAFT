@@ -151,8 +151,8 @@ void PlanetFace::finalize(void)
 	uvertex[8]=(uvertex[3]+uvertex[0])*0.5f;
 
 	for(int i=0;i<9;i++)vertex[i]=glm::normalize(uvertex[i]);
-	for(int i=0;i<4;i++)box[i]=vertex[i];
-	for(int i=0;i<4;i++)box[i+4]=vertex[i]*1.4f;
+	for(int i=0;i<4;i++)box[i]=vertex[i]*0.95f;
+	for(int i=0;i<4;i++)box[i+4]=vertex[i]*2.0f;
 
 	planet->handler.requestContent(new PlanetElevationRequest(*planet, *this, vertex[4]));
 }
