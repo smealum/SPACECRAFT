@@ -198,6 +198,7 @@ bool PlanetFace::isDetailedEnough(Camera& c)
 	if(depth>MINIWORLD_DETAIL+PLANET_ADDED_DETAIL+1)return true;
 	if(depth<4)return false;
 
+
 	glm::vec3 p=planet->getCameraRelativePosition(c);
 
 	if(glm::dot(vertex[0]*0.97f-p,vertex[0])>0.0f
@@ -345,12 +346,15 @@ void PlanetFace::processLevelOfDetail(Camera& c, PlanetFaceBufferHandler* b, Pla
 
 			// ajout des éventuels enfants
 			bool done=true;
-			for(int i=0;i<4;i++)
+			if (elevated)
 			{
-				if(!sons[i])sons[i]=new PlanetFace(planet,this,i);
-				else sons[i]->processLevelOfDetail(c, b, w);
+				for(int i=0;i<4;i++)
+				{
+					if(!sons[i])sons[i]=new PlanetFace(planet,this,i);
+					else sons[i]->processLevelOfDetail(c, b, w);
 
-				done &= ( sons[i]->isDisplayOk );
+					done &= ( sons[i]->isDisplayOk );
+				}
 			}
 
 			// on peux ne plus afficher la face si les enfants affichent quelque chose.

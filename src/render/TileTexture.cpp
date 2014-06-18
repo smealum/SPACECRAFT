@@ -1,5 +1,4 @@
 #include "TileTexture.h"
-#include "utils/dbg.h"
 #include "Application.h"
 
 void TileTexture::update()
@@ -14,7 +13,6 @@ void TileTexture::update()
 
 GLuint TileTexture::get()
 {
-	log_info("current = %d",current);
 	return current;
 }
 
