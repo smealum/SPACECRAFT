@@ -28,25 +28,49 @@ void PlanetGeneratorMoon::generateWorldData(int threadId,
 		py h
 		pz d
 	*/
-	int pxPos,pzPos,xPos,zPos,pyPos,yPos;
-	pxPos=0;
 
 	// génération de la map des hauteurs
-	const int offset=2;
+	const int offset = 6;
 	const int heightMapX = MINIWORLD_W*CHUNK_N+2*offset;
 	const int heightMapZ = MINIWORLD_D*CHUNK_N+2*offset;
-	int heightMap[heightMapX][heightMapZ];
-	blockTypes::T tileMap[heightMapX][heightMapZ];
+	int          heightMap[heightMapX+1][heightMapZ+1];
+	blockTypes::T  tileMap[heightMapX+1][heightMapZ+1];
 
-	for(int x=0;x<heightMapX;++x)
+	
+	for(int x=0;x<heightMapX+1;x+=2)
 	{
-		for(int z=0;z<heightMapZ;++z)
+		for(int z=0;z<heightMapZ+1;z+=2)
 		{
 			// calcul des caractéristiques.
 			const glm::vec3 pos=origin+((v1*float(px+x-offset))+(v2*float(pz+z-offset)))/float(planetInfo->numBlocks);
 			const auto blockReponse=getCharacteristic(threadId, pos);
 			heightMap[x][z] = elevationToBlockHeight(blockReponse.elevation, planetInfo->numBlocks) ;
-			tileMap[x][z] = blockReponse.tile;
+			tileMap[x][z]   = blockReponse.tile;
+		}
+	}
+
+	int pxPos,pzPos,xPos,zPos,pyPos,yPos;
+	pxPos=0;
+
+	// interpolation des caractéristiques
+	for(int x=0;x<heightMapX;x++)
+	{
+		for(int z=0;z<heightMapZ;z++)
+		{
+			int cx = int(x/2)*2;
+			int cz = int(z/2)*2;
+			int cxx = int((x+2)/2)*2;
+			int czz = int((z+2)/2)*2;
+
+			double xx = double(x-cx)*0.5;
+			double zz = double(z-cz)*0.5;
+			
+			heightMap[x][z] = 
+				heightMap[cx][cz] * (1.0-xx)*(1.0-zz) +
+				heightMap[cx+2][cz] * (xx)*(1.0-zz) +
+				heightMap[cx][cz+2] * (1.0-xx)*(zz) +
+				heightMap[cx+2][cz+2]* (xx)*(zz);
+			tileMap[x][z] = tileMap[cxx][czz];
 		}
 	}
 
