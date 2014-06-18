@@ -51,7 +51,7 @@ void PlanetElevationRequest::update(void)
 	face->getPointer()->updateElevation(elevation,tile);
 }
 
-bool PlanetElevationRequest::isRelevant(int id)
+bool PlanetElevationRequest::isRelevant(int)
 {
 	return true;
 }
@@ -61,13 +61,13 @@ MiniWorldDataRequest::MiniWorldDataRequest(Planet& p, MiniWorld& mw, glm::vec3 o
 	px(x),
 	py(y),
 	pz(z),
-	numBlocks(numBlocks),
 	origin(o),
 	v1(v1),
 	v2(v2),
-	planet(p),
-	name(mw.getName()),
+	numBlocks(numBlocks),
 	modified(false),
+	name(mw.getName()),
+	planet(p),
 	contentHandler(ch)
 {
 	miniworld=mw.getTptr();
@@ -79,7 +79,7 @@ MiniWorldDataRequest::~MiniWorldDataRequest()
 	miniworld->release();
 }
 
-bool MiniWorldDataRequest::isRelevant(int id)
+bool MiniWorldDataRequest::isRelevant(int)
 {
 	return !miniworld->getPointer()->isConstructionCanceled();
 }
@@ -120,12 +120,12 @@ MiniWorldDeletionRequest::~MiniWorldDeletionRequest()
 	miniworld->release();
 }
 
-bool MiniWorldDeletionRequest::isRelevant(int id)
+bool MiniWorldDeletionRequest::isRelevant(int)
 {
 	return true;
 }
 
-void MiniWorldDeletionRequest::process(int id)
+void MiniWorldDeletionRequest::process(int)
 {
 	if(miniworld->getNumRef()>1)return;
 	contentHandler.cache.save(miniworld->getPointer());
@@ -150,7 +150,7 @@ SolarSystemDataRequest::~SolarSystemDataRequest()
 	solarSystem->release();
 }
 
-bool SolarSystemDataRequest::isRelevant(int id)
+bool SolarSystemDataRequest::isRelevant(int)
 {
 	return true;
 }
@@ -158,7 +158,7 @@ bool SolarSystemDataRequest::isRelevant(int id)
 #include "solarsystem/SolarSystemGeneratorSol.h"
 
 //idée ici c'est de générer les planetInfo côté producer (ie process) puis de faire l'initialisation des objets côté consumer (ie update)
-void SolarSystemDataRequest::process(int id)
+void SolarSystemDataRequest::process(int)
 {
 	SolarSystemGeneratorSol ssgs(seed, contentHandler);
 	ssgs.generatePlanetInfos(planetInfos);

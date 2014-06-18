@@ -18,10 +18,10 @@ const double SOLARSYSTEM_MIN_DISTANCE = 0.001;
 /////////////////////////////////////////////////////////
 
 Galaxy::Galaxy():
-	galaxyTree(NULL),
-	vbo(0),
-	vao(0),
 	time(0),
+	galaxyTree(NULL),
+	vao(0),
+	vbo(0),
 	program(ShaderProgram::loadFromFile(
 		"shader/galaxy/galaxy.vert",
 		"shader/galaxy/galaxy.frag",
@@ -79,7 +79,7 @@ GalaxySolarResponse Galaxy::getClosestSolarSystem(const dvec3& pos , double maxD
 			return galaxyTree->getClosestSolarSystem(pos,maxDist);
 		}
 	}
-	return {NULL,2.0*maxDist};
+	return {NULL, 2.0*maxDist, -1};
 }
 
 void Galaxy::generateVBO()
@@ -189,9 +189,6 @@ void Galaxy::draw(Camera& camera)
 {
 	if (not isVBOGenerated) generateVBO();
     program.use();
-
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     camera.updateCamera(program);
 
