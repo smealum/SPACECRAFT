@@ -118,12 +118,13 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 
 					//TEMP (pour tester)
 					const int waterHeight=planetInfo->waterLevelBlock;
-					int caveHeightMin;
 					int caveHeightMax;
+					int caveHeightMin;
+					caveHeightMax = height;
+					caveHeightMax -= glm::clamp(waterHeight-height+3,0,4);
+					
 					if(height<waterHeight)
 					{
-						caveHeightMax = height-25;
-						caveHeightMin = caveHeightMax-100;
 						//UNDER THE SEAAAAAA
 						for(int cy=0;cy<h;cy++)
 						{
@@ -139,8 +140,6 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 							pyPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*w;
 						}
 					}else{
-						caveHeightMax = height+50;
-						caveHeightMin = caveHeightMax-100;
 						for(int cy=0;cy<h;cy++)
 						{
 							yPos=pyPos;
@@ -158,13 +157,16 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 						}
 					}
 					// cave
+					caveHeightMin = caveHeightMax - 100;
 					auto holes = caves.getHolesList(px+i+cx*(CHUNK_N),pz+k+cz*(CHUNK_N));
 					for(auto it = holes.begin(); it!=holes.end();++it)
 					{
-						if (it->first  < caveHeightMin) continue;
-						if (it->second > caveHeightMax) break;
+						int a = std::max(caveHeightMin,it->first);
+						int b = std::min(caveHeightMax,it->second);
 
-						for(int i=it->first;i<=it->second;++i)
+						if (it->first  > caveHeightMax) break;
+
+						for(int i=a;i<=b;++i)
 						{
 							int y = (i % CHUNK_N)+1;
 							int cy = i / CHUNK_N;
