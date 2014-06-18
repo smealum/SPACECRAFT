@@ -276,9 +276,8 @@ void Application::loop()
 	TileTexture::getInstance().update();
 
 
-	globalGalaxy->step(*camera,contentHandler,globalTime);
     
-	camera->update();
+    camera->update();
 
 	//---------------------
 	//    drawing
