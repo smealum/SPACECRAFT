@@ -6,6 +6,8 @@ SPACECRAFT
 SPACECRAFT is a game prototype which was made by @smealum, @ArthurSonzogni and @posva. Our goal with this was to make a minecraft clone which wouldn't ground the player to a single infinite -- and flat -- world. Instead, we want players to be able to explore an (almost) infinite universe, made of galaxies, solar systems and planets, all the while keeping their ability to place and remove blocks.
 Please be aware that this is a prototype which was developed as a school project over the span about three weeks. As such, it is extremely unpolished and incomplete. That being said, we believe it is a solid foundation which could be used to make our vision a reality.
 
+The github repo for this can be found at https://github.com/smealum/SPACECRAFT
+
 ##Dependencies
 
 All included libraries save for the windows version were compiled for the x86_64 architecture.
@@ -144,3 +146,9 @@ That being said, some bits and pieces were borrowed or heavily inspired by the w
 - The block textures, which were taken from the Eldpack Minecraft texturepack, by eldrone.
 - GLM. 
 - Probably other stuff I'm forgetting; please let us know if you believe we're not doing your work justice.
+
+##Contact
+
+@smealum : http://smealum.net, sme@lum.sexy
+@ArthurSonzogni : http://panigame.fr, ArthurSonzogni@panigame.fr
+@posva : http://posva.net, 
