@@ -11,6 +11,7 @@ class Producer
 	public:
 		Producer(int id, ContentInputQueue& inputQueue, ContentOutputQueue& outputQueue);
 		void producerMain();
+		inline void endThread() { shouldEnd = true; } // ask the producer to end the thread
 		~Producer();
 	private:
 		Producer();
@@ -20,6 +21,7 @@ class Producer
 		//FIFO synallagmatique
 		ContentInputQueue& inputQueue;
 		ContentOutputQueue& outputQueue;
+		bool shouldEnd; // stop the thread
 };
 
 #endif
