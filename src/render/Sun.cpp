@@ -6,7 +6,7 @@
 using namespace std;
 using namespace glm;
 
-Sun::Sun(vec3 position, float size):
+Sun::Sun(vec3 position, float size, float color):
 	shader(ShaderProgram::loadFromFile(
 				"shader/sun/sun.vert",
 				"shader/sun/sun.frag",
@@ -17,9 +17,11 @@ Sun::Sun(vec3 position, float size):
 				"sunGlow")),
 	position(position),
 	size(size),
-	time(0.0)
+	time(0.0),
+	spectrum(color)
 {
-
+	primaryColor=glm::rgbColor(glm::vec3(10.0,1.0,1.0)*(1-spectrum)+glm::vec3(50.0,0.0,1.0)*(spectrum));
+	secondaryColor=glm::rgbColor(glm::vec3(30.0,1.0,1.0)*(1-spectrum)+glm::vec3(70.0,0.5,1.0)*(spectrum));
 }
 
 void Sun::draw(Camera& c)
@@ -34,10 +36,11 @@ void Sun::draw(Camera& c)
     float delta = Application::getInstance().getFrameDeltaTime();
 	time+=delta;
 
-
 	// rotation et animation
 	shader.use();
 	shader.setUniform("time",time);
+	shader.setUniform("primaryColor",primaryColor);
+	shader.setUniform("secondaryColor",secondaryColor);
 	shader.setUniform("model",
 			translate(
 				mat4(1.0f),

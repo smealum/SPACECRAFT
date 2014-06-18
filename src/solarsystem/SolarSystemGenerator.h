@@ -11,6 +11,7 @@ class SolarSystemGenerator
 		SolarSystemGenerator(int seed, ContentHandler& ch);
 
 		virtual void generatePlanetInfos(std::vector<PlanetInfo*>& v)=0;
+		virtual void generateSunInfo(float& size, float& color)=0;
 
 	protected:
 		int seed;

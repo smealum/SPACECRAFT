@@ -1,12 +1,18 @@
 #include "SolarSystem.h"
+#include "utils/Tools.h"
 #include "data/ContentHandler.h"
+#include <sstream>
 
-SolarSystem::SolarSystem(const glm::dvec3& pos):
+SolarSystem::SolarSystem(const glm::dvec3& pos, int seed):
 	generated(false),
 	tptr(new TrackerPointer<SolarSystem>(this, true)),
 	numPlanets(0),
-	position(pos)
+	position(pos),
+	seed(seed)
 {
+	std::ostringstream oss;
+	oss << seed;
+	createDir((SAVE_DIR+std::string("/")+oss.str()).c_str());
 }
 
 void SolarSystem::generate(ContentHandler& ch)

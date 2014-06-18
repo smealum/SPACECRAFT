@@ -14,20 +14,22 @@
 class Sun
 {
 	public:
-		Sun(glm::vec3 position, float size);
+		Sun(glm::vec3 position, float size, float color);
 
 		void draw(Camera& c);
 		void drawGlow(Camera& c);
 		void setPosition(glm::vec3 position);
+
 		glm::vec3 getPosition(void);
 
 	private:
 		ShaderProgram &shader;
 		ShaderProgram &shaderGlow;
 		
+		glm::vec3 position, primaryColor, secondaryColor;
+		float spectrum;
 		float time;
 		float size;
-		glm::vec3 position;
 		int lod;
 
 };

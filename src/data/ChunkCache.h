@@ -3,7 +3,7 @@
 
 #define CACHE_MAXSIZE (64)
 
-#define CACHE_DIR "worlddata"
+#define SAVE_DIR "worlddata"
 
 #include <SFML/System/Mutex.hpp>
 #include <map>
