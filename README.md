@@ -6,6 +6,8 @@ SPACECRAFT
 SPACECRAFT is a game prototype which was made by @smealum, @ArthurSonzogni and @posva. Our goal with this was to make a minecraft clone which wouldn't ground the player to a single infinite -- and flat -- world. Instead, we want players to be able to explore an (almost) infinite universe, made of galaxies, solar systems and planets, all the while keeping their ability to place and remove blocks.
 Please be aware that this is a prototype which was developed as a school project over the span about three weeks. As such, it is extremely unpolished and incomplete. That being said, we believe it is a solid foundation which could be used to make our vision a reality.
 
+The github repo for this can be found at https://github.com/smealum/SPACECRAFT
+
 ##Dependencies
 
 All included libraries save for the windows version were compiled for the x86_64 architecture.
@@ -76,6 +78,46 @@ Once compiled, you may also run it using :
 
 Under Mac OS X, you might have no choice but to use that first option as we do not use a .app directory.
 
+##Controls
+
+As this is an engine prototype rather than an actual game, the controls are very awkward and complicated to use.
+There are two modes of control : no-clip flying camera, and player mode. The former can be used in any situation, while the latter should only be used to navigate planets' surfaces.
+
+No-clip flying camera controls :
+```
+W/S : move forward/backwards
+A/D : move left/right
+Q/E : move up/down
+
+I/K : control pitch
+J/L : control yaw
+U/O : control roll
+
+SPACE : toggle mouse-look mode
+```
+
+Player mode controls :
+```
+W/S : move forward/backwards
+A/D : move left/right
+
+I/K : control pitch
+J/L : control yaw
+
+SPACE : jump
+T : toggle mouse-look mode
+
+LEFT CLICK / C : place block
+RIGHT CLICK / X : remove block
+```
+
+Common controls :
+
+```
+P/M : control time
+SHIFT + P/M : control time faster
+```
+
 ##Unit tests
 
 In order to run the few unit tests we wrote, you should use the following command :
@@ -104,3 +146,9 @@ That being said, some bits and pieces were borrowed or heavily inspired by the w
 - The block textures, which were taken from the Eldpack Minecraft texturepack, by eldrone.
 - GLM. 
 - Probably other stuff I'm forgetting; please let us know if you believe we're not doing your work justice.
+
+##Contact
+
+@smealum : http://smealum.net, sme@lum.sexy
+@ArthurSonzogni : http://panigame.fr, ArthurSonzogni@panigame.fr
+@posva : http://posva.net, 

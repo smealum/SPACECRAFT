@@ -99,9 +99,13 @@ void Galaxy::generateVBO()
 
 	program.setBuffers(vao, vbo, 0);
 	program.use();
-
 }
 
+glm::dvec3 Galaxy::getGlobalPosition(glm::dvec3 p)
+{
+	if(!selectedPosition)return p;
+	return p+*selectedPosition;
+}
 
 void Galaxy::step(Camera& camera, ContentHandler& contentHandler, float globalTime, float deltaTime)
 {
@@ -110,7 +114,7 @@ void Galaxy::step(Camera& camera, ContentHandler& contentHandler, float globalTi
 		currentSolarSystem->update(globalTime);
 	}
 	
-	time+=deltaTime;
+	time+=deltaTime*0.1f;
 
 	// on saute des frames:
 	{

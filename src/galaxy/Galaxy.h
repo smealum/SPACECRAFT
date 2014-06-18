@@ -46,6 +46,8 @@ class Galaxy
 		void step(Camera& camera, ContentHandler& contentHandler, float globalTime, float deltaTime);
 		void draw(Camera& camera);
 
+		glm::dvec3 getGlobalPosition(glm::dvec3 p);
+
 	private:
 		std::vector<glm::dvec3*> allocatedPositions;
 
