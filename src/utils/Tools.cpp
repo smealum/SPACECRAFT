@@ -18,8 +18,8 @@ bool createDir(const char *dir)
 		success = mkdir(dir, 0755) == 0;
 	#endif
 
-	if (!success)
-		printf("Pas possible de créer le dossier %s\n", dir);
+	if (!success && !dirExists(dir))
+		printf("Couldn't create the directory: %s\n", dir);
 
 	return success;
 }
