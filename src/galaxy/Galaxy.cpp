@@ -101,6 +101,11 @@ void Galaxy::generateVBO()
 	program.use();
 }
 
+glm::dvec3 Galaxy::getGlobalPosition(glm::dvec3 p)
+{
+	if(!selectedPosition)return p;
+	return p+*selectedPosition;
+}
 
 void Galaxy::step(Camera& camera, ContentHandler& contentHandler, float globalTime, float deltaTime)
 {

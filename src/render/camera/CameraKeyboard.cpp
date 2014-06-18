@@ -1,4 +1,5 @@
 #include "../Camera.h"
+#include "galaxy/Galaxy.h"
 #include "utils/Input.h"
 #include "CameraKeyboard.h"
 #include <GLFW/glfw3.h>
@@ -18,7 +19,14 @@ float testAngle=0.0f;
 
 //demo stuff
 glm::dvec3 target(0.0);
-glm::dvec3 targets[4]={glm::dvec3(0.0),glm::dvec3(0.0),glm::dvec3(0.0),glm::dvec3(0.0)};
+glm::dvec3 targets[4]={
+    glm::dvec3(1091.146322, -0.065097, -1000.001511),
+    glm::dvec3(0.000000, 0.000000, 0.000000),
+    glm::dvec3(0.000000, 0.000000, 0.000000),
+    glm::dvec3(0.000000, 0.000000, 0.000000)
+};
+bool targetMode=false;
+extern Galaxy* globalGalaxy;
 
 void CameraKeyboard::update(Camera& camera)
 {
@@ -41,25 +49,38 @@ void CameraKeyboard::update(Camera& camera)
     float rS = 1.5 * delta;
 
     //target (pour demo)
-    if(Input::isKeyHold(GLFW_KEY_Z))
+    if(Input::isKeyPressed(GLFW_KEY_Z))targetMode^=1;
+
+    if(targetMode)
     {
-        glm::vec3 v1=glm::vec3(glm::normalize(camera.getPositionDouble(glm::dvec3(target))));
+        glm::dvec3 v=globalGalaxy->getGlobalPosition(camera.getPositionDouble(target));
+        glm::vec3 v1=glm::vec3(glm::normalize(v));
         glm::vec3 v2=glm::transpose(camera.view3)[2];
         glm::quat q(v1,v2);
         camera.view3*=glm::mat3_cast(q);
+        double s=glm::length(v);
+        if(tS>s)tS=s/100.0;
     }
 
     if(Input::isKeyHold(GLFW_KEY_LEFT_SHIFT))
     {
-        if(Input::isKeyPressed(GLFW_KEY_1))targets[0]=camera.getPositionDouble(glm::dvec3(0.0));
-        else if(Input::isKeyPressed(GLFW_KEY_2))targets[1]=camera.getPositionDouble(glm::dvec3(0.0));
-        else if(Input::isKeyPressed(GLFW_KEY_3))targets[2]=camera.getPositionDouble(glm::dvec3(0.0));
-        else if(Input::isKeyPressed(GLFW_KEY_4))targets[3]=camera.getPositionDouble(glm::dvec3(0.0));
+        if(Input::isKeyPressed(GLFW_KEY_1))targets[0]=globalGalaxy->getGlobalPosition(camera.getPositionDouble(glm::dvec3(0.0)));
+        else if(Input::isKeyPressed(GLFW_KEY_2))targets[1]=globalGalaxy->getGlobalPosition(camera.getPositionDouble(glm::dvec3(0.0)));
+        else if(Input::isKeyPressed(GLFW_KEY_3))targets[2]=globalGalaxy->getGlobalPosition(camera.getPositionDouble(glm::dvec3(0.0)));
+        else if(Input::isKeyPressed(GLFW_KEY_4))targets[3]=globalGalaxy->getGlobalPosition(camera.getPositionDouble(glm::dvec3(0.0)));
     }else{
         if(Input::isKeyPressed(GLFW_KEY_1))target=targets[0];
         else if(Input::isKeyPressed(GLFW_KEY_2))target=targets[1];
         else if(Input::isKeyPressed(GLFW_KEY_3))target=targets[2];
         else if(Input::isKeyPressed(GLFW_KEY_4))target=targets[3];
+    }
+
+    if(Input::isKeyPressed(GLFW_KEY_9))
+    {
+        for(int i=0;i<4;i++)
+        {
+            printf("glm::dvec3(%f, %f, %f),\n",targets[i].x,targets[i].y,targets[i].z);
+        }
     }
 
     // mode de précision (instantanée)
