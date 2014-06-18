@@ -2,6 +2,7 @@
 #include "utils/Tools.h"
 #include "data/ChunkCache.h"
 #include "Compression.h"
+#include "utils/dbg.h"
 
 ChunkCacheEntry::ChunkCacheEntry(MiniWorld* mw)
 {
@@ -20,7 +21,7 @@ ChunkCacheEntry::ChunkCacheEntry(MiniWorld* mw)
 	}
 }
 
-ChunkCacheEntry::ChunkCacheEntry(std::string name, FILE* f):
+ChunkCacheEntry::ChunkCacheEntry(const std::string &name, FILE* f):
 	name(name)
 {
 	toSave=false;
@@ -57,24 +58,30 @@ void ChunkCache::save(MiniWorld* mw)
 	printf("CACHING %s\n",name.c_str());
 
 	mutex.lock();
-		auto it=map.find(name);
-		if(it!=map.end())printf("TRYING TO CACHE ALREADY CACHED CHUNK\n");
-		removeChunk(name);
-		while(map.size()>CACHE_MAXSIZE)removeChunk(map.begin()->first); //TODO : système de prio (maintenir une queue de prio en parallèle ?)
-		map.insert(std::pair<std::string,TrackerPointer<ChunkCacheEntry>*>(name, new TrackerPointer<ChunkCacheEntry>(new ChunkCacheEntry(mw), true)));
+		auto it=m_map.find(name);
+		if(it!=m_map.end())
+		{
+			printf("TRYING TO CACHE ALREADY CACHED CHUNK\n");
+            auto current = it++;
+			removeChunk(current);
+		}
+		while(m_map.size()>CACHE_MAXSIZE)
+			removeChunk(m_map.begin()); //TODO : système de prio (maintenir une queue de prio en parallèle ?)
+		m_map[name] = new TrackerPointer<ChunkCacheEntry>(new ChunkCacheEntry(mw), true);
 	mutex.unlock();
 }
 
-TrackerPointer<ChunkCacheEntry>* ChunkCache::get(std::string name)
+TrackerPointer<ChunkCacheEntry>* ChunkCache::get(const std::string &name)
 {
 	mutex.lock();
-	auto it=map.find(name);
-	if(it!=map.end())
+	auto it=m_map.find(name);
+	if(it!=m_map.end())
 	{
-		map.erase(it);
+		TrackerPointer<ChunkCacheEntry>* tmp = it->second;
+		m_map.erase(it);
 		mutex.unlock();
 		// it->second->grab();
-		return it->second;
+		return tmp;
 	}else{
 		mutex.unlock();
 		{
@@ -102,21 +109,22 @@ TrackerPointer<ChunkCacheEntry>* ChunkCache::get(std::string name)
 void ChunkCache::flush(void)
 {
 	mutex.lock();
-		for(auto it=map.begin(); it!=map.end(); ++it)removeChunk(it->first);
+	auto it = m_map.begin();
+	while(it != m_map.end())
+    {
+        auto current = it++;
+        removeChunk(current);
+    }
 	mutex.unlock();
 }
 
-void ChunkCache::removeChunk(std::string name)
+void ChunkCache::removeChunk(std::map<std::string,TrackerPointer<ChunkCacheEntry>* >::iterator it)
 {
 	//suppose qu'on a déjà lock
-	auto it=map.find(name);
-	if(it!=map.end())
-	{
-		printf("FLUSHING %s\n",it->first.c_str());
-		it->second->getPointer()->dump();
-		it->second->release();
-		map.erase(name);
-	}
+	printf("FLUSHING %s\n",it->first.c_str());
+	it->second->getPointer()->dump();
+	it->second->release();
+	m_map.erase(it);
 }
 
 void ChunkCacheEntry::dump(void)

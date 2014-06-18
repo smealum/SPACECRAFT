@@ -88,7 +88,7 @@ void Galaxy::generateVBO()
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vec3)*solarPosition.size(), &solarPosition[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vec4)*solarPosition.size(), &solarPosition[0], GL_STATIC_DRAW);
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);

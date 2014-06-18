@@ -18,7 +18,7 @@ class ChunkCacheEntry
 	friend class ChunkCache;
 	public:
 		ChunkCacheEntry(MiniWorld* mw);
-		ChunkCacheEntry(std::string name, FILE* f);
+		ChunkCacheEntry(const std::string &name, FILE* f);
 
 		void dump(void);
 
@@ -38,14 +38,15 @@ class ChunkCache
 		ChunkCache();
 
 		void save(MiniWorld* mw);
-		TrackerPointer<ChunkCacheEntry>* get(std::string name);
+		TrackerPointer<ChunkCacheEntry>* get(const std::string &name);
 		void flush(void);
 
 	private:
-		void removeChunk(std::string name);
+		// return true if the element was removed
+		void removeChunk(std::map<std::string,TrackerPointer<ChunkCacheEntry>* >::iterator it);
 
 		sf::Mutex mutex;
-		std::map<std::string,TrackerPointer<ChunkCacheEntry>*> map;
+		std::map<std::string,TrackerPointer<ChunkCacheEntry>* > m_map;
 
 };
 
