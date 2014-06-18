@@ -30,8 +30,6 @@ void CameraKeyboardMouse::update(Camera& camera)
 
     }else if (Input::isKeyPressed(GLFW_KEY_SPACE))Input::fixMouse();
 
-    CameraKeyboard::update(camera);
-
     Planet* planet=globalGalaxy->getClosestPlanet(camera.getPosition(glm::vec3(0)));
     if(planet)camera.moveReference(glm::dvec3(planet->getPosition()));
     
@@ -44,4 +42,6 @@ void CameraKeyboardMouse::update(Camera& camera)
    			camera.setCameraManager(new CameraPlayerGround(planet, camera, pf));
    		}
    	}
+
+    CameraKeyboard::update(camera);
 }

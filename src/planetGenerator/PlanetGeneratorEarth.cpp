@@ -114,9 +114,7 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 					pyPos=zPos;
 					
 					const auto height=heightMap[i+(CHUNK_N)*cx+offset][k+(CHUNK_N)*cz+offset];
-					const auto tile  =tileMap[i+(CHUNK_N)*cx+offset][k+(CHUNK_N)*cz+offset];
-
-
+					const auto tile=tileMap[i+(CHUNK_N)*cx+offset][k+(CHUNK_N)*cz+offset];
 
 					//TEMP (pour tester)
 					const int waterHeight=planetInfo->waterLevelBlock;

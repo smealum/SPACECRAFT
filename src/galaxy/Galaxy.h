@@ -2,6 +2,7 @@
 #define GALAXY_9PFASIY
 
 #include "utils/glm.h"
+#include "utils/mt19937.h"
 #include "render/Camera.h"
 #include <vector>
 
@@ -40,16 +41,19 @@ class Galaxy
 		GalaxySolarResponse getClosestSolarSystem(const glm::dvec3& pos, double maxDist);
 		void pushSolarSystem(const glm::dvec3& p);
 
-		void step(Camera& camera, ContentHandler& contentHandler,float globalTime);
+		void step(Camera& camera, ContentHandler& contentHandler, float globalTime, float deltaTime);
 		void draw(Camera& camera);
+
 	private:
 		std::vector<glm::dvec3*> allocatedPositions;
+
+		float time;
 
 		// OctoTree part
 		GalaxyTree* galaxyTree;
 
 		// graphic part
-		std::vector<glm::vec3> solarPosition;
+		std::vector<glm::vec4> solarPosition;
 		GLuint vao, vbo;
 		ShaderProgram& program;
 		bool isVBOGenerated;

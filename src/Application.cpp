@@ -20,44 +20,45 @@
 
 float PlanetFaceDetailsPower = 28.0;
 
-blockTypes::T selectBlockType(blockTypes::dirt);
+uint8_t selectBlockType(blockTypes::dirt);
 
 using namespace std;
 using namespace glm;
 
 #ifndef NTWBAR
-inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
-{TwEventMouseButtonGLFW(button, action);}
-inline void TwEventMousePosGLFW3(GLFWwindow* /*window*/, double xpos, double ypos)
-{TwMouseMotion(int(xpos), int(ypos));}
-inline void TwEventMouseWheelGLFW3(GLFWwindow* /*window*/, double /*xoffset*/, double yoffset)
-{TwEventMouseWheelGLFW(yoffset);}
-inline void TwEventKeyGLFW3(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
-{TwEventKeyGLFW(key, action);}
-inline void TwEventCharGLFW3(GLFWwindow* /*window*/, int codepoint)
-{TwEventCharGLFW(codepoint, GLFW_PRESS);}
-inline void TwWindowSizeGLFW3(GLFWwindow* /*window*/, int width, int height)
-{TwWindowSize(width, height);}
+	inline void TwEventMouseButtonGLFW3(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
+	{TwEventMouseButtonGLFW(button, action);}
+	inline void TwEventMousePosGLFW3(GLFWwindow* /*window*/, double xpos, double ypos)
+	{TwMouseMotion(int(xpos), int(ypos));}
+	inline void TwEventMouseWheelGLFW3(GLFWwindow* /*window*/, double /*xoffset*/, double yoffset)
+	{TwEventMouseWheelGLFW(yoffset);}
+	inline void TwEventKeyGLFW3(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
+	{TwEventKeyGLFW(key, action);}
+	inline void TwEventCharGLFW3(GLFWwindow* /*window*/, int codepoint)
+	{TwEventCharGLFW(codepoint, GLFW_PRESS);}
+	inline void TwWindowSizeGLFW3(GLFWwindow* /*window*/, int width, int height)
+	{TwWindowSize(width, height);}
 
-void TW_CALL reloadAllShaders(void * /*clientData*/)
-{
-    for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
-    {
-        it->second->load();
-    }
-}
+	void TW_CALL reloadAllShaders(void * /*clientData*/)
+	{
+		for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
+		{
+			it->second->load();
+		}
+	}
 #else
-void reloadAllShaders(void * /*clientData*/)
-{
-    for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
-    {
-        it->second->load();
-    }
-}
+	void reloadAllShaders(void * /*clientData*/)
+	{
+		for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
+		{
+			it->second->load();
+		}
+	}
 #endif
+
 void mouseWheelCallback(GLFWwindow *, double x, double y)
 {
-	selectBlockType = (blockTypes::T)(selectBlockType + (int)y);
+	selectBlockType = (selectBlockType + (int)y);
 }
 
 void reloadAllShaders()
@@ -71,6 +72,7 @@ void reloadAllShaders()
 Application::Application() : 
 	state(appReady),
 	fullscreen(false),
+	// fullscreen(true),
 	vsync(false),
 	active(true),
 	wireframe(false),
@@ -105,9 +107,9 @@ Application::Application() :
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // can be GLFW_CURSOR_HIDDEN
 
-#ifndef NTWBAR
-	TwInit(TW_OPENGL_CORE, NULL);
-#endif
+	#ifndef NTWBAR
+		TwInit(TW_OPENGL_CORE, NULL);
+	#endif
 
 	glCheckError("Context creation Errors");
 
@@ -119,33 +121,33 @@ Application::Application() :
 
 	glCheckError("GL State initialisation");
 
-#ifndef NTWBAR
-	bar = TwNewBar("SPACECRAFT");
-	//TwDefine((name+" iconified=true").c_str()); // minimizes
-	TwWindowSize(width, height);
-	TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
-	TwAddVarRW(bar, "Planet LOD Details", TW_TYPE_FLOAT, &PlanetFaceDetailsPower, " label='Planet LOD' min=5.0 max=60.0 step=1");
-	TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
-	TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
-	TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
-	TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
-	TwAddVarRW(bar, "blockType", TW_TYPE_UINT8, (char*)&selectBlockType, "label='type of the selected block' min=0 max=255 step=1");
+	#ifndef NTWBAR
+		bar = TwNewBar("SPACECRAFT");
+		//TwDefine((name+" iconified=true").c_str()); // minimizes
+		TwWindowSize(width, height);
+		TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
+		TwAddVarRW(bar, "Planet LOD Details", TW_TYPE_FLOAT, &PlanetFaceDetailsPower, " label='Planet LOD' min=5.0 max=60.0 step=1");
+		TwAddVarRW(bar, "bgColor", TW_TYPE_COLOR3F, &bgColor, " label='Background color' ");
+		TwAddVarRW(bar, "Wireframe", TW_TYPE_BOOL8, &wireframe, " label='Wireframe mode' help='Toggle wireframe display mode.' ");
+		TwAddButton(bar, "Reload shader", &reloadAllShaders, NULL, " label='reload shaders and compile them' ");
+		TwAddVarRO(bar, "FPS", TW_TYPE_FLOAT, &fps, " label='FPS' ");
+		TwAddVarRW(bar, "blockType", TW_TYPE_UINT8, &selectBlockType, "label='type of the selected block' min=0 max=255 step=1");
 
-	// vsync on
-	glfwSwapInterval(vsync);
+		// vsync on
+		glfwSwapInterval(vsync);
 
-	// Set GLFW event callbacks
-	// - Redirect window size changes to the callback function WindowSizeCB
-	glfwSetWindowSizeCallback(window, (GLFWwindowposfun)TwWindowSizeGLFW3);
+		// Set GLFW event callbacks
+		// - Redirect window size changes to the callback function WindowSizeCB
+		glfwSetWindowSizeCallback(window, (GLFWwindowposfun)TwWindowSizeGLFW3);
 
-	glfwSetMouseButtonCallback(window, (GLFWmousebuttonfun)TwEventMouseButtonGLFW3);
-	glfwSetCursorPosCallback(window, (GLFWcursorposfun)TwEventMousePosGLFW3);
-	glfwSetScrollCallback(window, (GLFWscrollfun)TwEventMouseWheelGLFW3);
-	glfwSetKeyCallback(window, (GLFWkeyfun)TwEventKeyGLFW3);
-	glfwSetCharCallback(window, (GLFWcharfun)TwEventCharGLFW3);
+		glfwSetMouseButtonCallback(window, (GLFWmousebuttonfun)TwEventMouseButtonGLFW3);
+		glfwSetCursorPosCallback(window, (GLFWcursorposfun)TwEventMousePosGLFW3);
+		glfwSetScrollCallback(window, (GLFWscrollfun)TwEventMouseWheelGLFW3);
+		glfwSetKeyCallback(window, (GLFWkeyfun)TwEventKeyGLFW3);
+		glfwSetCharCallback(window, (GLFWcharfun)TwEventCharGLFW3);
 
-	glCheckError("tweak bar");
-#endif
+		glCheckError("tweak bar");
+	#endif
 
 	glfwSetScrollCallback(window, &mouseWheelCallback);
 
@@ -210,17 +212,22 @@ void Application::run()
 			glm::vec3(0.f),
 			glm::vec3(0, 1.f, 0.f)
 			);
-	camera->setCameraManager(new CameraKeyboardMouse());
+	camera->setCameraManager(new CameraKeyboardMouse);
 
 	tt=new testShaders;
-	testCursor=new Cursor();
+	testCursor=new Cursor;
 
 	caves.generate();
-	
-	globalGalaxy = new Galaxy();
+
+	globalGalaxy = new Galaxy;
 	GalaxyGenerate(globalGalaxy);
 
 	TileTexture::getInstance().init();
+
+	ui = new PlayerUI;
+	ui->generateVBO();
+	ui->setWhRatio((float)width/height);
+	ui->update();
 
 	float timeA;
 	char titleBuff[512];
@@ -264,13 +271,18 @@ void Application::loop()
 		state = appExiting;
 	}
 
+	globalGalaxy->step(*camera,contentHandler,globalTime,deltaTime);
 	Input::update(window);
+<<<<<<< HEAD
 	TileTexture::getInstance().update();
 
 
 	globalGalaxy->step(*camera,contentHandler,globalTime);
     
     camera->update();
+=======
+	camera->update();
+>>>>>>> f1c5e4154112882e7366a009fb2e866830eeca3e
 
 	//---------------------
 	//    drawing
@@ -283,19 +295,22 @@ void Application::loop()
 	globalGalaxy->draw(*camera);
 	testCursor->draw(*camera);
 
+	glDisable(GL_DEPTH_TEST);
+	ui->draw();
+	glEnable(GL_DEPTH_TEST);
 
 	if(Input::isKeyPressed(GLFW_KEY_N))reloadAllShaders();
 
-    if(Input::isKeyHold(GLFW_KEY_LEFT_SHIFT))
-    {
-        if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.1f;
-        if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.1f;
-    }else{
-    	if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.001f;
-        if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.001f;
-    }
+	if(Input::isKeyHold(GLFW_KEY_LEFT_SHIFT))
+	{
+		if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.1f;
+		if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.1f;
+	}else{
+		if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.001f;
+		if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.001f;
+	}
 
-    if(Input::isKeyPressed(GLFW_KEY_V))testBool1^=1;
+	if(Input::isKeyPressed(GLFW_KEY_V))testBool1^=1;
 	if(Input::isKeyPressed(GLFW_KEY_B))testBool2^=1;
 
 	// printf("test %d\n",testVal);
@@ -303,15 +318,15 @@ void Application::loop()
 
 	contentHandler.handleNewContent();
 
-    #ifndef NTWBAR
-        // Draw tweak bars (or don't)
-        glUseProgram(0);
-        glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+	#ifndef NTWBAR
+		// Draw tweak bars (or don't)
+		glUseProgram(0);
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		TwDraw();
-    #endif
+	#endif
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
@@ -320,8 +335,8 @@ void Application::loop()
 
 Application::~Application()
 {
-#ifndef NTWBAR
-	TwTerminate();
-#endif
+	#ifndef NTWBAR
+		TwTerminate();
+	#endif
 	glfwTerminate();
 }
