@@ -78,11 +78,11 @@ void PlanetGeneratorMoon::generateWorldData(int threadId,
 	for(int cx=0;cx<w;cx++)
 	{
 		pzPos=pxPos;
-		const int vx=cx*(CHUNK_N+2);
+		//const int vx=cx*(CHUNK_N+2);
 		for(int cz=0;cz<d;cz++)
 		{
 			xPos=pzPos;
-			const int vz=cz*(CHUNK_N+2);
+			//const int vz=cz*(CHUNK_N+2);
 			for(int i=0;i<(CHUNK_N+2);i++)
 			{
 				zPos=xPos;
@@ -120,7 +120,7 @@ PlanetGeneratorResponse PlanetGeneratorMoon::getCharacteristic(int threadId, con
 	return {getElevation(threadId, glm::normalize(pos)), blockTypes::moondust};
 }
 
-float PlanetGeneratorMoon::getElevation(int threadId, const glm::vec3 &coord)
+float PlanetGeneratorMoon::getElevation(int , const glm::vec3 &coord)
 {
 	glm::vec3 offset(planetInfo->seed*3);
 	float elev=(glm::simplex(coord*8.0f+offset)+1.0f)/8+0.4f;

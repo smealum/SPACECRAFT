@@ -124,11 +124,11 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 	for(int cx=0;cx<w;cx++)
 	{
 		pzPos=pxPos;
-		const int vx=cx*(CHUNK_N+2);
+		//const int vx=cx*(CHUNK_N+2);
 		for(int cz=0;cz<d;cz++)
 		{
 			xPos=pzPos;
-			const int vz=cz*(CHUNK_N+2);
+			//const int vz=cz*(CHUNK_N+2);
 			for(int i=0;i<(CHUNK_N+2);i++)
 			{
 				zPos=xPos;
@@ -214,7 +214,7 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 		pxPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*1;
 	}
 
-	double t2 = glfwGetTime();
+	//double t2 = glfwGetTime();
 
 	// ajout des arbres 
 	for(int x=0;x<heightMapX;++x)
