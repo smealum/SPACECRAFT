@@ -25,7 +25,7 @@ class Shader
 {
     public:
         // Chargement du shader depuis un fichier
-        static Shader& loadFromFile(const char *filename, ShaderType::T type);
+        static Shader& loadFromFile(const std::string &filename, ShaderType::T type);
 
 
         // Fournit l'identifiant du shader
@@ -78,21 +78,21 @@ class ShaderProgram
         inline std::string getName() const { return name; }
 
         // Fournit localisation d'un uniform.
-        GLint uniform(const char* name);
-        GLint attribLocation(const char* name);
-        inline GLint operator[](const char* name) {return uniform(name);}
+        GLint uniform(const std::string& name);
+        GLint attribLocation(const std::string& name);
+        inline GLint operator[](const std::string& name) {return uniform(name);}
 
         // parametrer le ShaderProgram
-        void setUniform(const char *name, float x,float y,float z);
-        void setUniform(const char *name, const glm::vec3 & v);
-        void setUniform(const char *name, const glm::dvec3 & v);
-        void setUniform(const char *name, const glm::vec4 & v);
-        void setUniform(const char *name, const glm::dvec4 & v);
-        void setUniform(const char *name, const glm::dmat4 & m);
-        void setUniform(const char *name, const glm::mat4 & m);
-        void setUniform(const char *name, const glm::mat3 & m);
-        void setUniform(const char *name, float val );
-        void setUniform(const char *name, int val );
+        void setUniform(const std::string& name, float x,float y,float z);
+        void setUniform(const std::string& name, const glm::vec3 & v);
+        void setUniform(const std::string& name, const glm::dvec3 & v);
+        void setUniform(const std::string& name, const glm::vec4 & v);
+        void setUniform(const std::string& name, const glm::dvec4 & v);
+        void setUniform(const std::string& name, const glm::dmat4 & m);
+        void setUniform(const std::string& name, const glm::mat4 & m);
+        void setUniform(const std::string& name, const glm::mat3 & m);
+        void setUniform(const std::string& name, float val );
+        void setUniform(const std::string& name, int val );
 
         // invalid program, need some shaders
         ShaderProgram();
@@ -105,9 +105,9 @@ class ShaderProgram
         void detachShader(Shader &s);
         // parametrer les attributs
 		// stride est multiplié par sizeof(float) en interne, de meme pour offset
-        void setAttribute(const char *name, GLint size, GLboolean normalized, GLsizei stride, GLuint offset, GLenum type = GL_FLOAT);
-        //void bindAttribLocation( GLuint location,const char * name);
-        //void bindFragDataLocation( GLuint location,const char * name );
+        void setAttribute(const std::string& name, GLint size, GLboolean normalized, GLsizei stride, GLuint offset, GLenum type = GL_FLOAT);
+        //void bindAttribLocation( GLuint location,const std::string& name);
+        //void bindFragDataLocation( GLuint location,const std::string& name );
     private:
         struct uniform_t;
         struct attribute_t;

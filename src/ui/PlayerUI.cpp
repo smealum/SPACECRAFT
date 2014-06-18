@@ -27,9 +27,12 @@ PlayerUI::PlayerUI() :
 
 PlayerUI::~PlayerUI()
 {
-	glDeleteVertexArrays(1, &vao);
-	glDeleteBuffers(1, &vbo);
-	glDeleteBuffers(1, &ebo);
+	if (valid)
+	{
+		glDeleteVertexArrays(1, &vao);
+		glDeleteBuffers(1, &vbo);
+		glDeleteBuffers(1, &ebo);
+	}
 }
 
 void PlayerUI::generateVBO()
@@ -62,7 +65,6 @@ void PlayerUI::draw()
 	program.use();
 	program.setUniform("tile", selectBlockType-1);
 
-	//glDrawArrays(GL_POINTS, 0, 4);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
@@ -86,8 +88,11 @@ void PlayerUI::update()
 	vertices[3*4 + 0] = +1.f - (toffset + ts);
 	vertices[3*4 + 1] = -1.f + (toffset + ts) * whRatio;
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*5*4, vertices, GL_STATIC_DRAW);
+	if (valid)
+	{
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*5*4, vertices, GL_STATIC_DRAW);
+	}
 
 }
 

@@ -37,4 +37,6 @@ void ContentHandler::handleNewContent(void)
 
 ContentHandler::~ContentHandler()
 {
+    for(auto it = producers.begin(); it != producers.end(); ++it)
+        delete *it;
 }
