@@ -47,7 +47,7 @@ std::string ChunkCacheEntry::getName(void)
 
 ChunkCache::ChunkCache()
 {
-	createDir(CACHE_DIR);
+	createDir(SAVE_DIR);
 }
 
 void ChunkCache::save(MiniWorld* mw)
@@ -85,14 +85,8 @@ TrackerPointer<ChunkCacheEntry>* ChunkCache::get(const std::string &name)
 	}else{
 		mutex.unlock();
 		{
-			//TEMP
-			//char cwd[256];
-			//getcwd(cwd,256);
-
-			//chdir("./worlddata");
-			std::string file(CACHE_DIR+std::string("/")+name);
+			std::string file(SAVE_DIR+std::string("/")+name);
 			FILE* f=fopen(file.c_str(), "rb");
-			//chdir(cwd);
 
 			if(f)
 			{
@@ -131,20 +125,13 @@ void ChunkCacheEntry::dump(void)
 {
 	if(!toSave)return;
 
-	//TEMP
-	//char cwd[256];
-	//getcwd(cwd,256);
-
-	//chdir("./worlddata");
-	std::string file(CACHE_DIR+std::string("/")+name);
+	std::string file(SAVE_DIR+std::string("/")+name);
 	FILE* f=fopen(file.c_str(), "wb");
-	//chdir(cwd);
 
 	printf("SAVING %s (%p)\n",name.c_str(),f);
 	if(!f)return;
 
 	chunkCompression((chunkVal*)data,f);
-	//fwrite(data,1,sizeof(chunkVal)*(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*MINIWORLD_H*MINIWORLD_W*MINIWORLD_D,f);
 
 	fclose(f);
 }

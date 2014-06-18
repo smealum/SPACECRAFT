@@ -14,3 +14,4 @@
 #include <glm/gtc/noise.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/color_space.hpp>

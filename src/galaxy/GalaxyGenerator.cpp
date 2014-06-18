@@ -37,6 +37,9 @@ const dvec3 p3(0.0,0.0,1.0);
 
 void GalaxyGenerate(Galaxy* galaxy)
 {
+	// galaxy originel (seed0)
+	galaxy->pushSolarSystem(dvec3(0.0,0.0,-1000.0));
+
 	for(double theta=0; theta<thetaMax; theta+=thetaInc)
 	{
 		double rInc = rhoInc * (1.0+0.9*sin(arms*theta));
@@ -61,7 +64,4 @@ void GalaxyGenerate(Galaxy* galaxy)
 			
 		}
 	}
-
-	// galaxy originel
-	galaxy->pushSolarSystem(dvec3(0.0,0.0,-1000.0));
 }

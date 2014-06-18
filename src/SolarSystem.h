@@ -10,7 +10,7 @@ class SolarSystem
 {
 	friend class SolarSystemDataRequest;
 	public:
-		SolarSystem(const glm::dvec3& position);
+		SolarSystem(const glm::dvec3& position, int seed);
 		~SolarSystem();
 
 		void generate(ContentHandler& contentHandler);
@@ -30,6 +30,7 @@ class SolarSystem
 	private:
 
 		glm::dvec3 position;
+		int seed;
 
 		bool generated;
 

@@ -26,6 +26,8 @@ struct GalaxySolarResponse
 	// distance depuis la position demandée.
 	double distance;
 
+	int index;
+
 	bool operator<(const GalaxySolarResponse& other) const;
 };
 
@@ -73,9 +75,10 @@ class Galaxy
 class GalaxyTree
 {
 	public:
-		GalaxyTree(glm::dvec3* p, const glm::dvec3& center, double width);
+		GalaxyTree(glm::dvec3* p, int index, const glm::dvec3& center, double width);
+
 		GalaxySolarResponse getClosestSolarSystem(const glm::dvec3& pos, double maxDist);
-		void pushSolarSystem(glm::dvec3* s);
+		void pushSolarSystem(glm::dvec3* s, int index);
 
 	private:
 		bool isSubdivised;
@@ -89,6 +92,8 @@ class GalaxyTree
 			glm::dvec3* solarSystem;
 		};
 
+		int index;
+		
 		// dimension du noeud
 		glm::dvec3 center;
 		double width;
