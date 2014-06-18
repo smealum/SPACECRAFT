@@ -181,7 +181,7 @@ void SolarSystemDataRequest::update(void)
 	for(auto it=planetInfos.begin(); it!=planetInfos.end(); ++it)
 	{
 		std::ostringstream oss;
-		oss << i;
+		oss << seed << "/" << i;
 		planets[i]=new Planet(*it, contentHandler, oss.str());
 		i++;
 	}
