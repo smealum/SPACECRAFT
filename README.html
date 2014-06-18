@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <title>README.md - Grip</title><link rel="stylesheet" href="README_fichiers/github2-229908efb675f645b84ec7f08045d1b0c47612f6.css">
+  <link rel="stylesheet" href="README_fichiers/github-8850878a3b8c9016a33ac13293f916b8fb6abbc4.css">
+  <style>
+    .previewPage {
+      margin: 64px auto;
+      width: 920px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="previewPage">
+    <div id="readme" class="announce md">
+      <article class="markdown-body entry-content">
+        <h1>
+<a name="user-content-spacecraft" class="anchor" href="#spacecraft" aria-hidden="true"><span class="octicon octicon-link"></span></a>SPACECRAFT</h1>
+
+<h2>
+<a name="user-content-description" class="anchor" href="#description" aria-hidden="true"><span class="octicon octicon-link"></span></a>Description</h2>
+
+<p>SPACECRAFT is a game prototype which was made by @smealum, 
+@ArthurSonzogni and @posva. Our goal with this was to make a minecraft 
+clone which wouldn't ground the player to a single infinite -- and flat 
+-- world. Instead, we want players to be able to explore an (almost) 
+infinite universe, made of galaxies, solar systems and planets, all the 
+while keeping their ability to place and remove blocks.
+Please be aware that this is a prototype which was developed as a school
+ project over the span about three weeks. As such, it is extremely 
+unpolished and incomplete. That being said, we believe it is a solid 
+foundation which could be used to make our vision a reality.</p>
+
+<p>The github repo for this can be found at <a href="https://github.com/smealum/SPACECRAFT">https://github.com/smealum/SPACECRAFT</a></p>
+
+<h2>
+<a name="user-content-dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies</h2>
+
+<p>All included libraries save for the windows version were compiled for the x86_64 architecture.</p>
+
+<p>If you'd rather install the libraries yourself, you'll need :</p>
+
+<ul>
+<li>glfw3 (used for window management/opengl context stuff)</li>
+<li>AntTweakBar (for easy testing tools)</li>
+<li>libnoise (for planet generation)</li>
+<li>SFML 2.1 (for threads)</li>
+</ul><p>Please note that this code was intended to be written in C++11; 
+however, as our school's computers aren't super up to date, we had to 
+limit ourselves to only a subset of that standard.</p>
+
+<h2>
+<a name="user-content-screenshots" class="anchor" href="#screenshots" aria-hidden="true"><span class="octicon octicon-link"></span></a>Screenshots</h2>
+
+<p><a href="https://camo.githubusercontent.com/2d513b0b50f1e925426b81fffe11ca7c061b768e/687474703a2f2f692e696d6775722e636f6d2f4b637a415a74322e706e67" target="_blank"><img src="README_fichiers/687474703a2f2f692e696d6775722e636f6d2f4b637a415a74322e706e67.png" alt="galaxy" data-canonical-src="http://i.imgur.com/KczAZt2.png" style="max-width:100%;"></a></p>
+
+<p><a href="https://camo.githubusercontent.com/8168386eeef91113b638fa0e5397b9b73f456b55/687474703a2f2f692e696d6775722e636f6d2f693568354b36722e706e67" target="_blank"><img src="README_fichiers/687474703a2f2f692e696d6775722e636f6d2f693568354b36722e706e67.png" alt="space" data-canonical-src="http://i.imgur.com/i5h5K6r.png" style="max-width:100%;"></a></p>
+
+<p><a href="https://camo.githubusercontent.com/2e299b8136d1cf5ae66534c0dc88dd1c2f607e01/687474703a2f2f692e696d6775722e636f6d2f755936787731482e706e67" target="_blank"><img src="README_fichiers/687474703a2f2f692e696d6775722e636f6d2f755936787731482e706e67.png" alt="sunset" data-canonical-src="http://i.imgur.com/uY6xw1H.png" style="max-width:100%;"></a></p>
+
+<p><a href="https://camo.githubusercontent.com/03445e8ec20ccab961de4c0c187f67c068abf0c5/687474703a2f2f692e696d6775722e636f6d2f7171797059776a2e706e67" target="_blank"><img src="README_fichiers/687474703a2f2f692e696d6775722e636f6d2f7171797059776a2e706e67.png" alt="blocks" data-canonical-src="http://i.imgur.com/qqypYwj.png" style="max-width:100%;"></a></p>
+
+<h2>
+<a name="user-content-compiling" class="anchor" href="#compiling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Compiling</h2>
+
+<p>By default, compilation is done in release mode. Build mode can still be specified manually however.</p>
+
+<p>Compiling in debug mode :</p>
+
+<pre><code>mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=DEBUG ..
+</code></pre>
+
+<p>Compiling in release mode :</p>
+
+<pre><code>mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=RELEASE ..
+</code></pre>
+
+<ul>
+<li>
+<strong>Windows</strong>:
+If the provided pre-compiled libraries do not work as expected, you 
+should compile them yourself and place them in your MinGW floder. You'll
+ then have to add your MinGW path to the CMakeLists.txt file, line 27 
+and 28 :</li>
+</ul><pre><code>set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} C:/CodeBlocks/MinGW/lib ${PROJECT_SOURCE_DIR}/extlibs/libs-win32)
+set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} C:/CodeBlocks/MinGW/include )
+</code></pre>
+
+<pre><code>cmake -G "MinGW Makefiles" ..
+mingw32-make
+</code></pre>
+
+<h2>
+<a name="user-content-running" class="anchor" href="#running" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running</h2>
+
+<p>The easiest way to run SPACECRAFT is to use the following command :</p>
+
+<pre><code>make run
+</code></pre>
+
+<p>Once compiled, you may also run it using :</p>
+
+<pre><code>./bin/spacecraft
+</code></pre>
+
+<p>Under Mac OS X, you might have no choice but to use that first option as we do not use a .app directory.</p>
+
+<h2>
+<a name="user-content-controls" class="anchor" href="#controls" aria-hidden="true"><span class="octicon octicon-link"></span></a>Controls</h2>
+
+<p>As this is an engine prototype rather than an actual game, the 
+controls are very awkward and complicated to use.
+There are two modes of control : no-clip flying camera, and player mode.
+ The former can be used in any situation, while the latter should only 
+be used to navigate planets' surfaces.</p>
+
+<p>No-clip flying camera controls :</p>
+
+<pre><code>W/S : move forward/backwards
+A/D : move left/right
+Q/E : move up/down
+
+I/K : control pitch
+J/L : control yaw
+U/O : control roll
+
+SPACE : toggle mouse-look mode
+</code></pre>
+
+<p>Player mode controls :</p>
+
+<pre><code>W/S : move forward/backwards
+A/D : move left/right
+
+I/K : control pitch
+J/L : control yaw
+
+SPACE : jump
+T : toggle mouse-look mode
+
+LEFT CLICK / C : place block
+RIGHT CLICK / X : remove block
+</code></pre>
+
+<p>Common controls :</p>
+
+<pre><code>P/M : control time
+SHIFT + P/M : control time faster
+</code></pre>
+
+<h2>
+<a name="user-content-unit-tests" class="anchor" href="#unit-tests" aria-hidden="true"><span class="octicon octicon-link"></span></a>Unit tests</h2>
+
+<p>In order to run the few unit tests we wrote, you should use the following command :</p>
+
+<pre><code>make &amp;&amp; make test
+</code></pre>
+
+<p>If you run into an error, try the following :</p>
+
+<pre><code>cmake .. # on considère qu'on est dans build/
+make
+make test
+</code></pre>
+
+<p>On Mac OS X, you should run <code>make osxfix</code> before running the unit tests.</p>
+
+<h2>
+<a name="user-content-credits" class="anchor" href="#credits" aria-hidden="true"><span class="octicon octicon-link"></span></a>Credits</h2>
+
+<p>The vast majority of the code present in SPACECRAFT is original and 
+was written by @smealum, @ArthurSonzogni and @posva. In the same way, 
+the application's design and architecture is completely original.
+That being said, some bits and pieces were borrowed or heavily inspired 
+by the work of others. These bits include :</p>
+
+<ul>
+<li>The atmospheric scattering code, which was originally written by 
+Sean P O'Neil. We essentially took his CPU-based code, made it into a 
+fragment shader and changed a couple things (including adding a new 
+LUT).</li>
+<li>The planet heightmap generation code, which is largely inspired/stolen from a libnoise example.</li>
+<li>The block textures, which were taken from the Eldpack Minecraft texturepack, by eldrone.</li>
+<li>GLM. </li>
+<li>Probably other stuff I'm forgetting; please let us know if you believe we're not doing your work justice.</li>
+</ul><h2>
+<a name="user-content-contact" class="anchor" href="#contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contact</h2>
+
+<p>@smealum : <a href="http://smealum.net/">http://smealum.net</a>, <a href="mailto:sme@lum.sexy">sme@lum.sexy</a>
+@ArthurSonzogni : <a href="http://panigame.fr/">http://panigame.fr</a>, <a href="mailto:ArthurSonzogni@panigame.fr">ArthurSonzogni@panigame.fr</a>
+@posva : <a href="http://posva.net/">http://posva.net</a>, </p>
+      </article>
+    </div>
+  </div>
+
+  <div>&nbsp;</div>
+  </div><script>
+    function scrollToHash() {
+      if (location.hash && !document.querySelector(":target")) {
+        var elements = document.getElementsByName('user-content-' + location.hash.slice(1));
+        if (elements.length > 0) {
+          elements[elements.length - 1].scrollIntoView();
+        }
+      }
+    }
+    window.onhashchange = function() {
+      scrollToHash();
+    }
+    window.onload = function() {
+      scrollToHash();
+    }
+  </script>
+
+</body></html>
