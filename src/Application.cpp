@@ -214,7 +214,6 @@ void Application::run()
 			);
 	camera->setCameraManager(new CameraKeyboardMouse);
 
-	tt=new testShaders;
 	testCursor=new Cursor;
 
 	caves.generate();

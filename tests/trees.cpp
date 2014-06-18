@@ -22,6 +22,7 @@ int main(void)
                     if (ty != blockTypes::tree &&
                             ty != blockTypes::tree_top &&
                             ty != blockTypes::tree_foliage &&
+                            ty != blockTypes::tree_foliage_opaque &&
                             ty != blockTypes::air)
                     {
                         log_err("unexpected blockType at (%d, %d, %d): %u", x, y, z, ty);
