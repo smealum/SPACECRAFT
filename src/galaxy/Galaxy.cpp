@@ -99,7 +99,6 @@ void Galaxy::generateVBO()
 
 	program.setBuffers(vao, vbo, 0);
 	program.use();
-
 }
 
 
@@ -110,7 +109,7 @@ void Galaxy::step(Camera& camera, ContentHandler& contentHandler, float globalTi
 		currentSolarSystem->update(globalTime);
 	}
 	
-	time+=deltaTime;
+	time+=deltaTime*0.1f;
 
 	// on saute des frames:
 	{

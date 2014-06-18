@@ -274,9 +274,6 @@ void Application::loop()
 	globalGalaxy->step(*camera,contentHandler,globalTime,deltaTime);
 	Input::update(window);
 	TileTexture::getInstance().update();
-
-
-    
     camera->update();
 
 	//---------------------
@@ -298,15 +295,16 @@ void Application::loop()
 
 	if(Input::isKeyHold(GLFW_KEY_LEFT_SHIFT))
 	{
-		if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.1f;
-		if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.1f;
+		if(Input::isKeyHold(GLFW_KEY_P))globalTime+=1.0f*deltaTime;
+		if(Input::isKeyHold(GLFW_KEY_M))globalTime-=1.0f*deltaTime;
 	}else{
-		if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.001f;
-		if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.001f;
+		if(Input::isKeyHold(GLFW_KEY_P))globalTime+=0.1f*deltaTime;
+		if(Input::isKeyHold(GLFW_KEY_M))globalTime-=0.1f*deltaTime;
 	}
 
 	if(Input::isKeyPressed(GLFW_KEY_V))testBool1^=1;
 	if(Input::isKeyPressed(GLFW_KEY_B))testBool2^=1;
+	if(Input::isKeyPressed(GLFW_KEY_0))globalTime=0.0f;
 
 	// printf("test %d\n",testVal);
 	testVal=0;
@@ -325,7 +323,6 @@ void Application::loop()
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
-
 }
 
 Application::~Application()

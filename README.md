@@ -76,6 +76,46 @@ Once compiled, you may also run it using :
 
 Under Mac OS X, you might have no choice but to use that first option as we do not use a .app directory.
 
+##Controls
+
+As this is an engine prototype rather than an actual game, the controls are very awkward and complicated to use.
+There are two modes of control : no-clip flying camera, and player mode. The former can be used in any situation, while the latter should only be used to navigate planets' surfaces.
+
+No-clip flying camera controls :
+```
+W/S : move forward/backwards
+A/D : move left/right
+Q/E : move up/down
+
+I/K : control pitch
+J/L : control yaw
+U/O : control roll
+
+SPACE : toggle mouse-look mode
+```
+
+Player mode controls :
+```
+W/S : move forward/backwards
+A/D : move left/right
+
+I/K : control pitch
+J/L : control yaw
+
+SPACE : jump
+T : toggle mouse-look mode
+
+LEFT CLICK / C : place block
+RIGHT CLICK / X : remove block
+```
+
+Common controls :
+
+```
+P/M : control time
+SHIFT + P/M : control time faster
+```
+
 ##Unit tests
 
 In order to run the few unit tests we wrote, you should use the following command :
