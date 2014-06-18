@@ -62,7 +62,8 @@ void ChunkCache::save(MiniWorld* mw)
 		if(it!=m_map.end())
 		{
 			printf("TRYING TO CACHE ALREADY CACHED CHUNK\n");
-			it = removeChunk(it);
+            auto current = it++;
+			removeChunk(current);
 		}
 		while(m_map.size()>CACHE_MAXSIZE)
 			removeChunk(m_map.begin()); //TODO : système de prio (maintenir une queue de prio en parallèle ?)
@@ -110,17 +111,20 @@ void ChunkCache::flush(void)
 	mutex.lock();
 	auto it = m_map.begin();
 	while(it != m_map.end())
-		it = removeChunk(it);
+    {
+        auto current = it++;
+        removeChunk(current);
+    }
 	mutex.unlock();
 }
 
-std::map<std::string,TrackerPointer<ChunkCacheEntry>* >::iterator ChunkCache::removeChunk(std::map<std::string,TrackerPointer<ChunkCacheEntry>* >::iterator it)
+void ChunkCache::removeChunk(std::map<std::string,TrackerPointer<ChunkCacheEntry>* >::iterator it)
 {
 	//suppose qu'on a déjà lock
 	printf("FLUSHING %s\n",it->first.c_str());
 	it->second->getPointer()->dump();
 	it->second->release();
-	return m_map.erase(it);
+	m_map.erase(it);
 }
 
 void ChunkCacheEntry::dump(void)

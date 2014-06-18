@@ -43,7 +43,7 @@ class ChunkCache
 
 	private:
 		// return true if the element was removed
-		std::map<std::string,TrackerPointer<ChunkCacheEntry>* >::iterator removeChunk(std::map<std::string,TrackerPointer<ChunkCacheEntry>* >::iterator it);
+		void removeChunk(std::map<std::string,TrackerPointer<ChunkCacheEntry>* >::iterator it);
 
 		sf::Mutex mutex;
 		std::map<std::string,TrackerPointer<ChunkCacheEntry>* > m_map;
