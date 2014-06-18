@@ -9,7 +9,6 @@
 #endif
 #include "render/Camera.h"
 #include "render/camera/CameraKeyboardMouse.h"
-#include "tests/testShaders.h"
 #include "data/ContentHandler.h"
 #include "ui/PlayerUI.h"
 
@@ -35,7 +34,6 @@ class Application : public Singleton<Application> {
         GLFWwindow* window;
         Camera *camera;
         float bgColor[3];
-        testShaders *tt;
         ContentHandler contentHandler;
         float deltaTime, time, fps;
         int fpsCounter;

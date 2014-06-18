@@ -15,22 +15,25 @@ Producer::Producer(int id, ContentInputQueue& iq, ContentOutputQueue& oq):
 	thread(new sf::Thread(fakeProducerMain, this)),
 	inputQueue(iq),
 	outputQueue(oq),
-	id(id)
+	id(id),
+	shouldEnd(false)
 {
-    thread->launch();
+	thread->launch();
 	debug("Thread started");
 }
 
 Producer::~Producer()
 {
-    delete thread;
+	//thread->terminate();
+	endThread();
+	delete thread;
 }
 
 void Producer::producerMain()
 {
 	//TODO : attente passive avec signaux
 	//TODO : mieux qu'avec un sleep.
-	while(1)
+	while(!shouldEnd)
 	{
 		
 		ContentRequest* cr=inputQueue.pop();
