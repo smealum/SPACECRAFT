@@ -4,6 +4,7 @@
 in vec3 vPos;
 
 uniform float time;
+uniform vec3 primaryColor, secondaryColor;
 
 out vec4 outColor;
 
@@ -128,6 +129,7 @@ void main()
 	float c1 = min(abs(noise1),0.5)+0.42;
 	float c2 = min(abs(noise2),0.5)+0.5;
 
-	outColor = vec4(c1+c2*2.0,c1+c2*0.5,c1,1.0);
+  // outColor = vec4(c1+c2*2.0,c1+c2*0.5,c1,1.0);
+	outColor = vec4(primaryColor*c1+secondaryColor*c2,1.0);
 }
 

@@ -9,6 +9,7 @@ class SolarSystemGeneratorSol : public SolarSystemGenerator
 		SolarSystemGeneratorSol(int seed, ContentHandler& ch);
 
 		virtual void generatePlanetInfos(std::vector<PlanetInfo*>& v);
+		virtual void generateSunInfo(float& size, float& color);
 
 	private:
 };

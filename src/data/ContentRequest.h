@@ -97,6 +97,10 @@ class SolarSystemDataRequest : public ContentRequest
 
 		std::vector<PlanetInfo*> planetInfos;
 
+		float sunColor, sunSize;
+
+		int seed;
+
 		Sun* sun;
 		Planet** planets;
 };

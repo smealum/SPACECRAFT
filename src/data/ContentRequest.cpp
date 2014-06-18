@@ -138,7 +138,8 @@ void MiniWorldDeletionRequest::update(void)
 
 //SolarSystemDataRequest stuff
 SolarSystemDataRequest::SolarSystemDataRequest(SolarSystem& ss, ContentHandler& ch):
-	contentHandler(ch)
+	contentHandler(ch),
+	seed(ss.seed)
 {
 	solarSystem=ss.getTptr();
 	solarSystem->grab();
@@ -159,8 +160,9 @@ bool SolarSystemDataRequest::isRelevant(int id)
 //idée ici c'est de générer les planetInfo côté producer (ie process) puis de faire l'initialisation des objets côté consumer (ie update)
 void SolarSystemDataRequest::process(int id)
 {
-	SolarSystemGeneratorSol ssgs(0, contentHandler);
+	SolarSystemGeneratorSol ssgs(seed, contentHandler);
 	ssgs.generatePlanetInfos(planetInfos);
+	ssgs.generateSunInfo(sunSize, sunColor);
 	planets=new Planet*[planetInfos.size()];
 }
 
@@ -183,8 +185,7 @@ void SolarSystemDataRequest::update(void)
 		planets[i]=new Planet(*it, contentHandler, oss.str());
 		i++;
 	}
-	sun=new Sun(glm::vec3(0.0f), 108.0f);
-	// sun=new Sun(glm::vec3(0.0f), 40.0f);
+	sun=new Sun(glm::vec3(0.0f), sunSize, sunColor);
 
 	solarSystem->getPointer()->numPlanets=planetInfos.size();
 	solarSystem->getPointer()->planets=planets;

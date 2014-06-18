@@ -10,8 +10,17 @@ SolarSystemGeneratorSol::SolarSystemGeneratorSol(int seed, ContentHandler& ch):
 
 }
 
+void SolarSystemGeneratorSol::generateSunInfo(float& size, float& color)
+{
+	init_genrand64(seed*2);
+
+	color=genrand64_real2();
+	size=genrand64_real2()*80.0f+40.0f;
+}
+
 void SolarSystemGeneratorSol::generatePlanetInfos(std::vector<PlanetInfo*>& v)
 {
+	printf("SEED2 %d\n",seed);
 	init_genrand64(seed);
 		
 	const int numPlanet=genrand64_int64()&7;

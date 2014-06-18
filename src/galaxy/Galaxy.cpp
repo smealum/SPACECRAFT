@@ -49,15 +49,14 @@ void Galaxy::pushSolarSystem(const dvec3& s)
 	solarPosition.push_back(vec4(vec3(s),genrand64_real2()*3.14));
 
 	dvec3* solarSystem = new dvec3(s);
+	int index=allocatedPositions.size();
 	allocatedPositions.push_back(solarSystem);
 
 	if (galaxyTree)
 	{
-		galaxyTree->pushSolarSystem(solarSystem);
-	}
-	else
-	{
-		galaxyTree = new GalaxyTree(solarSystem,GALAXY_CENTER, GALAXY_WIDTH);
+		galaxyTree->pushSolarSystem(solarSystem, index);
+	}else{
+		galaxyTree = new GalaxyTree(solarSystem, index, GALAXY_CENTER, GALAXY_WIDTH);
 	}
 }
 
@@ -153,7 +152,10 @@ void Galaxy::step(Camera& camera, ContentHandler& contentHandler, float globalTi
 
 		// ajout du nouveau système solaire.
 		selectedPosition = r.solarSystem;
-		currentSolarSystem = new SolarSystem(p);
+
+		int seed=r.index;
+		printf("SEED %d\n",seed);
+		currentSolarSystem = new SolarSystem(p, seed);
 		currentSolarSystem->generate(contentHandler);
 
 		camera.movePositionDouble(-*selectedPosition);
@@ -216,9 +218,10 @@ Planet* Galaxy::getClosestPlanet(const glm::vec3& pos)
 
 ////////////////////////////////////////////////////////
 
-GalaxyTree::GalaxyTree(dvec3* s, const glm::dvec3& c, double w):
+GalaxyTree::GalaxyTree(dvec3* s, int index, const glm::dvec3& c, double w):
 	isSubdivised(false),
 	solarSystem(s),
+	index(index),
 	center(c),
 	width(w)
 {
@@ -249,13 +252,15 @@ dvec3 cubeDecalage[2][2][2]=
 	},
 };
 
-void GalaxyTree::pushSolarSystem(dvec3* s)
+void GalaxyTree::pushSolarSystem(dvec3* s, int ind)
 {
 	// sauvegarde du solarSystem si il est présent
 	dvec3* previousSolarSystem = NULL;
+	int previousIndex=0;
 	if (not isSubdivised)
 	{
 		previousSolarSystem = solarSystem;
+		previousIndex = index;
 
 		// suppression des systèmes solaires trop proches
 		if (glm::distance(*solarSystem,*s) < SOLARSYSTEM_MIN_DISTANCE)
@@ -283,14 +288,13 @@ void GalaxyTree::pushSolarSystem(dvec3* s)
 	// insertion
 	if (children[xx][yy][zz])
 	{
-		children[xx][yy][zz]->pushSolarSystem(s);
-	}
-	else
-	{
+		children[xx][yy][zz]->pushSolarSystem(s,ind);
+	}else{
 		dvec3 c = center + cubeDecalage[xx][yy][zz]*width*0.5;
 		children[xx][yy][zz] =
 			new GalaxyTree(
 					s,
+					ind,
 					c,
 					width*0.5
 			);
@@ -299,7 +303,7 @@ void GalaxyTree::pushSolarSystem(dvec3* s)
 	
 	// réinsertion du précédent solar system si il est là
 	if (previousSolarSystem)
-		pushSolarSystem(previousSolarSystem);
+		pushSolarSystem(previousSolarSystem,previousIndex);
 }
 
 GalaxySolarResponse GalaxyTree::getClosestSolarSystem(const glm::dvec3& pos, double maxDist)
@@ -332,12 +336,12 @@ GalaxySolarResponse GalaxyTree::getClosestSolarSystem(const glm::dvec3& pos, dou
 		}
 		else
 		{
-			return {NULL,2*maxDist};
+			return {NULL,2*maxDist,-1};
 		}
 	}
 	else
 	{
-		return {solarSystem,glm::distance(*solarSystem,pos)};
+		return {solarSystem,glm::distance(*solarSystem,pos),index};
 	}
 }
 
