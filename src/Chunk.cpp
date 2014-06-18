@@ -4,6 +4,7 @@
 #include "world/blockProcessing.h"
 #include "utils/positionMath.h"
 #include "utils/dbg.h"
+#include "render/TileTexture.h"
 
 using namespace std;
 using namespace glm;
@@ -62,8 +63,6 @@ bool Chunk::isConstructionCanceled()
 }
 
 //TEMP
-extern int testTexture;
-extern int testTextureArray;
 extern int testVal;
 
 void Chunk::draw(Camera& cam, glm::mat4 model, bool reg)
@@ -96,7 +95,7 @@ void Chunk::draw(Camera& cam, glm::mat4 model, std::vector<GL_Vertex>& va, GLuin
     //glBindTexture(GL_TEXTURE_2D, testTexture);
     // On n'a pas besoin de bind un textureArray? (uniquement utilisable dans un shader)
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY,testTextureArray);
+    glBindTexture(GL_TEXTURE_2D_ARRAY,TileTexture::getInstance().get());
     program.setUniform("Texture",0);
 
     glDrawArrays(GL_TRIANGLES, 0, va.size());

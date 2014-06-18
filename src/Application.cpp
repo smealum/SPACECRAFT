@@ -9,7 +9,7 @@
 #include "MiniWorld.h"
 #include "render/Atmosphere.h"
 #include "render/Cursor.h"
-#include "utils/TextureManager.h"
+#include "render/TileTexture.h"
 #include "world/BlockType.h"
 #include "utils/glm.h"
 #include "noise/CaveGenerator.h"
@@ -197,8 +197,6 @@ void Application::createWindowInFullscreen(bool fs)
 
 CaveGenerator caves;
 Cursor* testCursor;
-int testTexture;
-int testTextureArray;
 Galaxy* globalGalaxy;
 bool testBool1=false, testBool2=false;
 
@@ -217,12 +215,12 @@ void Application::run()
 	tt=new testShaders;
 	testCursor=new Cursor();
 
-	testTexture=TextureManager::getInstance().loadTexture("data/blocksPack.png");
-	testTextureArray=TextureManager::getInstance().loadTextureArray("data/blocksPackArray.png",16,16);
 	caves.generate();
 	
 	globalGalaxy = new Galaxy();
 	GalaxyGenerate(globalGalaxy);
+
+	TileTexture::getInstance().init();
 
 	float timeA;
 	char titleBuff[512];
@@ -267,6 +265,7 @@ void Application::loop()
 	}
 
 	Input::update(window);
+	TileTexture::getInstance().update();
 
 
 	globalGalaxy->step(*camera,contentHandler,globalTime);

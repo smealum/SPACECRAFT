@@ -8,6 +8,7 @@
 #include "utils/positionMath.h"
 #include "world/BlockType.h"
 #include "render/Atmosphere.h"
+#include "render/TileTexture.h"
 
 
 using namespace std;
@@ -562,8 +563,6 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf)
 	pf->isDisplayOk = false;
 }
 
-// XXX TMP
-extern int testTextureArray;
 
 void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 {
@@ -588,7 +587,7 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir)
 
 	// bind la texture
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, testTextureArray);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, TileTexture::getInstance().get());
 	shader.setUniform("Texture",0);
 
 	glDrawArrays(GL_POINTS, 0, curSize);

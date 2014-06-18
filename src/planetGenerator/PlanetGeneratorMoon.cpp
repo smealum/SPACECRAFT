@@ -45,7 +45,7 @@ void PlanetGeneratorMoon::generateWorldData(int threadId,
 			// calcul des caractéristiques.
 			const glm::vec3 pos=origin+((v1*float(px+x-offset))+(v2*float(pz+z-offset)))/float(planetInfo->numBlocks);
 			const auto blockReponse=getCharacteristic(threadId, pos);
-			heightMap[x][z] = elevationToBlockHeight(blockReponse.elevation, planetInfo->numBlocks) + 1;
+			heightMap[x][z] = elevationToBlockHeight(blockReponse.elevation, planetInfo->numBlocks) ;
 			tileMap[x][z] = blockReponse.tile;
 		}
 	}
