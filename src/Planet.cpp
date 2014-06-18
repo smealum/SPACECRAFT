@@ -712,7 +712,7 @@ Chunk* Planet::selectBlock(glm::dvec3 p, glm::dvec3 v, glm::i32vec3& out, int& d
 		for(auto it(miniWorldList.begin());it!=miniWorldList.end();++it)
 		{
 			glm::dvec3 out2=p;
-			bool done;
+			bool done = false;
 			Chunk* ret=(*it)->selectBlock(p,v,out,out2,done,dir);
 			if(ret)return ret;
 			else if(done)return NULL;

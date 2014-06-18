@@ -6,6 +6,7 @@
 #include "noise/CaveGenerator.h" // XXX debug
 #include "noise/Tree.h"
 #include <list>
+#include "Application.h" // TODO remove include
 
 // XXX temp
 extern CaveGenerator caves;
@@ -58,44 +59,66 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 
 	// liste des positions d'arbres
 	list<i32vec4> treePositions;
+
+	//double t0 = glfwGetTime();
 	
 	// génération de la map des hauteurs
-	const int offset = 5;
+	const int offset = 6;
 	const int heightMapX = MINIWORLD_W*CHUNK_N+2*offset;
 	const int heightMapZ = MINIWORLD_D*CHUNK_N+2*offset;
-	int          heightMap[heightMapX][heightMapZ];
-	blockTypes::T  tileMap[heightMapX][heightMapZ];
+	int          heightMap[heightMapX+1][heightMapZ+1];
+	blockTypes::T  tileMap[heightMapX+1][heightMapZ+1];
 
-
-	for(int x=0;x<heightMapX;++x)
+	
+	for(int x=0;x<heightMapX+1;x+=2)
 	{
-		for(int z=0;z<heightMapZ;++z)
+		for(int z=0;z<heightMapZ+1;z+=2)
 		{
 			// calcul des caractéristiques.
 			const glm::vec3 pos=origin+((v1*float(px+x-offset))+(v2*float(pz+z-offset)))/float(planetInfo->numBlocks);
 			const auto blockReponse=getCharacteristic(threadId, pos);
 			heightMap[x][z] = elevationToBlockHeight(blockReponse.elevation, planetInfo->numBlocks) ;
 			tileMap[x][z]   = blockReponse.tile;
-
-			// ajout des arbres.
-			int rx = (px + x - offset);
-			int rz = (pz + z - offset);
-			unsigned long long randomSource = rx*3+rz*231331;
-			randomSource ^= (randomSource >> 29) & 0x5555555555555555ULL;
-			randomSource ^= (randomSource << 17) & 0x71D67FFFEDA60000ULL;
-			randomSource ^= rz;
-			randomSource ^= (randomSource << 37) & 0xFFF7EEE000000000ULL;
-			randomSource ^= (randomSource >> 43);
-
-			// ajout des arbres
-			if (
-					(randomSource % 200 == 100) and
-					blockReponse.tile == blockTypes::grass
-			)
-			treePositions.push_back(glm::i32vec4(x-offset, heightMap[x][z], z-offset, randomSource));
 		}
 	}
 
+	// interpolation des caractéristiques
+	for(int x=0;x<heightMapX;x++)
+	{
+		for(int z=0;z<heightMapZ;z++)
+		{
+			int cx = int(x/2)*2;
+			int cz = int(z/2)*2;
+			int cxx = int((x+2)/2)*2;
+			int czz = int((z+2)/2)*2;
+
+			double xx = double(x-cx)*0.5;
+			double zz = double(z-cz)*0.5;
+			
+			heightMap[x][z] = 
+				heightMap[cx][cz] * (1.0-xx)*(1.0-zz) +
+				heightMap[cx+2][cz] * (xx)*(1.0-zz) +
+				heightMap[cx][cz+2] * (1.0-xx)*(zz) +
+				heightMap[cx+2][cz+2]* (xx)*(zz);
+			tileMap[x][z] = tileMap[cxx][czz];
+		}
+	}
+	
+
+	//for(int x=0;x<heightMapX;++x)
+	//{
+		//for(int z=0;z<heightMapZ;++z)
+		//{
+			//// calcul des caractéristiques.
+			//const glm::vec3 pos=origin+((v1*float(px+x-offset))+(v2*float(pz+z-offset)))/float(planetInfo->numBlocks);
+			//const auto blockReponse=getCharacteristic(threadId, pos);
+			//heightMap[x][z] = elevationToBlockHeight(blockReponse.elevation, planetInfo->numBlocks) ;
+			//tileMap[x][z]   = blockReponse.tile;
+		//}
+	//}
+
+
+	//double t1 = glfwGetTime();
 
 	// génération des blocs
 	for(int cx=0;cx<w;cx++)
@@ -191,6 +214,35 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 		pxPos+=(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)*1;
 	}
 
+	double t2 = glfwGetTime();
+
+	// ajout des arbres 
+	for(int x=0;x<heightMapX;++x)
+	{
+		for(int z=0;z<heightMapZ;++z)
+		{
+			// ajout des arbres.
+			int rx = (px + x - offset);
+			int rz = (pz + z - offset);
+			unsigned long long randomSource = rx*61311+rz*231331;
+			//(randomSource) ^= (randomSource) >> 23;               
+			//(randomSource) *= 0x2127599bf4325c37ULL;   
+			//(randomSource) ^= (randomSource) >> 47;
+			randomSource ^= (randomSource >> 29) & 0x5555555555555555ULL;
+			randomSource ^= (randomSource << 17) & 0x71D67FFFEDA60000ULL;
+			randomSource ^= rz;
+			randomSource ^= (randomSource << 37) & 0xFFF7EEE000000000ULL;
+			randomSource ^= (randomSource >> 43);
+
+			// ajout des arbres
+			if (
+					(randomSource % 200 == 100) and
+					tileMap[x][z] == blockTypes::grass
+			)
+			treePositions.push_back(glm::i32vec4(x-offset,heightMap[x][z], z-offset ,randomSource));
+		}
+	}
+
 	// list positions ou poser des arbres
 	for(auto tPos = treePositions.begin(); tPos != treePositions.end(); ++tPos)
 	{
@@ -208,6 +260,9 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 					it->second);
 		}
 	}
+	//double t3 = glfwGetTime();
+
+	//log_info("%f %f %f",t1-t0,t2-t1,t3-t2);
 	
 	//for(int x=0;x<16;++x)
 	//for(int y=0;y<16;++y)

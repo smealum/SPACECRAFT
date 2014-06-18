@@ -143,12 +143,12 @@ void Shader::load()
 }
 
 // chargement d'un shader depuis un fichier
-Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
+Shader& Shader::loadFromFile(const std::string &filename, ShaderType::T type)
 {
     //debug("Chargement du shader : %s",filename);
 
     // test si le shader est déja chargé en mémoire.
-    auto it = shaderMap.find(string(filename));
+    auto it = shaderMap.find(filename);
     if (it!=shaderMap.end())
         return *(it->second);
 
@@ -160,7 +160,7 @@ Shader& Shader::loadFromFile(const char* filename, ShaderType::T type)
     s->load();
 
     // ajout du shader dans la map
-    shaderMap[string(filename)]=s;
+    shaderMap[filename]=s;
 
     return *s;
 }
@@ -290,15 +290,15 @@ ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragm
     return *p;
 }
 
-GLint ShaderProgram::uniform(const char* name)
+GLint ShaderProgram::uniform(const std::string &name)
 {
     auto it = uniformsMap.find(name);
     if (it == uniformsMap.end())
     {
         // uniforme non référencé
-        GLint r = glGetUniformLocation(handle, name); 
+        GLint r = glGetUniformLocation(handle, name.c_str()); 
         if ( r == GL_INVALID_OPERATION || r < 0 )
-            log_warn("Uniform %s doesn't exist (value is %d) in program %s.", name, r, this->name.c_str());
+            log_warn("Uniform %s doesn't exist (value is %d) in program %s.", name.c_str(), r, this->name.c_str());
         // add it anyways
         uniformsMap[name] = r;
 
@@ -308,11 +308,11 @@ GLint ShaderProgram::uniform(const char* name)
         return it->second; 
 }
 
-GLint ShaderProgram::attribLocation(const char *name)
+GLint ShaderProgram::attribLocation(const std::string& name)
 {
-    GLint attrib = glGetAttribLocation(handle, name);
+    GLint attrib = glGetAttribLocation(handle, name.c_str());
     if (attrib == GL_INVALID_OPERATION || attrib < 0 )
-        log_warn("Attribute %s doesn't exist in program %s.", name, this->name.c_str());
+        log_warn("Attribute %s doesn't exist in program %s.", name.c_str(), this->name.c_str());
 
     return attrib;
 }
@@ -323,43 +323,43 @@ ShaderProgram::ShaderProgram(const ShaderProgram& other)
     uniformsMap = other.uniformsMap;
 }
 
-void ShaderProgram::setUniform(const char *name,float x,float y,float z)
+void ShaderProgram::setUniform(const std::string& name,float x,float y,float z)
 {
     glUniform3f(uniform(name), x, y, z);
 }
-void ShaderProgram::setUniform(const char *name, const vec3 & v)
+void ShaderProgram::setUniform(const std::string& name, const vec3 & v)
 {
     glUniform3fv(uniform(name), 1, value_ptr(v));
 }
-void ShaderProgram::setUniform(const char *name, const dvec3 & v)
+void ShaderProgram::setUniform(const std::string& name, const dvec3 & v)
 {
     glUniform3dv(uniform(name), 1, value_ptr(v));
 }
-void ShaderProgram::setUniform(const char *name, const vec4 & v)
+void ShaderProgram::setUniform(const std::string& name, const vec4 & v)
 {
     glUniform4fv(uniform(name), 1, value_ptr(v));
 }
-void ShaderProgram::setUniform(const char *name, const dvec4 & v)
+void ShaderProgram::setUniform(const std::string& name, const dvec4 & v)
 {
     glUniform4dv(uniform(name), 1, value_ptr(v));
 }
-void ShaderProgram::setUniform(const char *name, const dmat4 & m)
+void ShaderProgram::setUniform(const std::string& name, const dmat4 & m)
 {
     glUniformMatrix4dv(uniform(name), 1, GL_FALSE, value_ptr(m));
 }
-void ShaderProgram::setUniform(const char *name, const mat4 & m)
+void ShaderProgram::setUniform(const std::string& name, const mat4 & m)
 {
     glUniformMatrix4fv(uniform(name), 1, GL_FALSE, value_ptr(m));
 }
-void ShaderProgram::setUniform(const char *name, const mat3 & m)
+void ShaderProgram::setUniform(const std::string& name, const mat3 & m)
 {
     glUniformMatrix3fv(uniform(name), 1, GL_FALSE, value_ptr(m));
 }
-void ShaderProgram::setUniform(const char *name, float val )
+void ShaderProgram::setUniform(const std::string& name, float val )
 {
     glUniform1f(uniform(name), val);
 }
-void ShaderProgram::setUniform(const char *name, int val )
+void ShaderProgram::setUniform(const std::string& name, int val )
 {
     glUniform1i(uniform(name), val);
 }
@@ -441,7 +441,7 @@ void ShaderProgram::use()
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         for (auto it(attributes.begin()); it != attributes.end(); ++it)
         {
-            GLint loc = attribLocation(it->first.c_str());
+            GLint loc = attribLocation(it->first);
             glEnableVertexAttribArray(loc);
             glVertexAttribPointer(
                     loc,
@@ -464,7 +464,7 @@ void ShaderProgram::use()
 	}
 }
 
-void ShaderProgram::setAttribute(const char *name, GLint size, GLboolean normalized, GLsizei stride, GLuint offset, GLenum type)
+void ShaderProgram::setAttribute(const std::string& name, GLint size, GLboolean normalized, GLsizei stride, GLuint offset, GLenum type)
 {
     GLint loc = attribLocation(name);
     glEnableVertexAttribArray(loc);
@@ -567,18 +567,18 @@ void ShaderProgram::loadUniforms()
         auto &val(it->second.val);
         switch (it->second.type) {
             case GL_FLOAT_VEC4:
-                //glUniform4fv(uniform(it->first.c_str()), 1, value_ptr(it->second.val.v4));
-                glUniform4fv(uniform(it->first.c_str()),
+                //glUniform4fv(uniform(it->first), 1, value_ptr(it->second.val.v4));
+                glUniform4fv(uniform(it->first),
                         val.size,
                         val.v);
                 break;
             case GL_FLOAT:
-                glUniform1fv(uniform(it->first.c_str()),
+                glUniform1fv(uniform(it->first),
                         val.size,
                         val.v);
                 break;
             case GL_FLOAT_MAT4:
-                glUniformMatrix4fv(uniform(it->first.c_str()),
+                glUniformMatrix4fv(uniform(it->first),
                         val.size,
                         GL_FALSE,
                         val.v);

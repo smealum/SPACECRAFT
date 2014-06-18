@@ -37,4 +37,8 @@ void ContentHandler::handleNewContent(void)
 
 ContentHandler::~ContentHandler()
 {
+    // we dont need that because the threads are infinite loops and
+    // this destructor is called at the end of the program, therefore
+    // the OS will free all the memory
+    //for(auto it = producers.begin(); it != producers.end(); ++it) delete *it;
 }
