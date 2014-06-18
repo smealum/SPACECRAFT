@@ -190,9 +190,6 @@ void Galaxy::draw(Camera& camera)
 	if (not isVBOGenerated) generateVBO();
     program.use();
 
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
     camera.updateCamera(program);
 
     if(selectedPosition)program.setUniform("model",glm::translate(glm::mat4(1.0f),glm::vec3(-*selectedPosition)-camera.getReference()));
