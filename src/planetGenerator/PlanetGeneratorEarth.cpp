@@ -92,7 +92,7 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 					(randomSource % 200 == 100) and
 					blockReponse.tile == blockTypes::grass
 			)
-			treePositions.push_back(glm::i32vec4(x-offset,heightMap[x][z], z-offset ,randomSource));
+			treePositions.push_back(glm::i32vec4(x-offset, heightMap[x][z], z-offset, randomSource));
 		}
 	}
 

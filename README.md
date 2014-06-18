@@ -1,7 +1,25 @@
 SPACECRAFT
 ===
 
-Génération procédurale d'univers.
+##Description
+
+SPACECRAFT is a game prototype which was made by @smealum, @ArthurSonzogni and @posva. Our goal with this was to make a minecraft clone which wouldn't ground the player to a single infinite -- and flat -- world. Instead, we want players to be able to explore an (almost) infinite universe, made of galaxies, solar systems and planets, all the while keeping their ability to place and remove blocks.
+Please be aware that this is a prototype which was developed as a school project over the span about three weeks. As such, it is extremely unpolished and incomplete. That being said, we believe it is a solid foundation which could be used to make our vision a reality.
+
+##Dependencies
+
+All included libraries save for the windows version were compiled for the x86_64 architecture.
+
+If you'd rather install the libraries yourself, you'll need :
+
+- glfw3 (used for window management/opengl context stuff)
+- AntTweakBar (for easy testing tools)
+- libnoise (for planet generation)
+- SFML 2.1 (for threads)
+
+Please note that this code was intended to be written in C++11; however, as our school's computers aren't super up to date, we had to limit ourselves to only a subset of that standard.
+
+##Screenshots
 
 ![galaxy](http://i.imgur.com/KczAZt2.png)
 
@@ -11,31 +29,11 @@ Génération procédurale d'univers.
 
 ![blocks](http://i.imgur.com/qqypYwj.png)
 
-* [X] Planète avec relief
-* [X] Grottes
-* [ ] Système de climats/Biômes
-* [X] Systèmes solaire
-* [X] Collision avec le monde
+##Compiling
 
-##Description
+By default, compilation is done in release mode. Build mode can still be specified manually however.
 
-SPACECRAFT a pour but de générer des galaxies qui soient visitables à l'échelle humaine. En utilisant du bruit de Perlin on génére des planètes uniques qvec des biômes et des grottes qui varient. Les modifications faites sur une planète sont conservées. 
-
-##Dépendances
-
-Les libs fournies dans extlibs sont x64 sauf pour celles de windows qui sont x86. Il est cependant conseillé de les installer soit même.
-
-Les libraries à installer sont:
-
-- glfw3
-- AntTweakBar
-- libnoise
-- SFML 2.1
-
-##Compilation
-
-On conseille de créer un dossier build ou faire ` cmake ..`. Ainsi si CMake pose problème on peut toujours faire `rm -rf build` pour regénérer le projet.
-On peut compiler en debug ou en release selon les besoins. Par exemple pour tester avec valgrind on va plutôt utiliser la version debug:
+Compiling in debug mode :
 
 ```
 mkdir build
@@ -43,7 +41,7 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=DEBUG ..
 ```
 
-Par défaut on compile en release, c'est équivalent à:
+Compiling in release mode :
 
 ```
 mkdir build
@@ -51,52 +49,42 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=RELEASE ..
 ```
 
-Si on compile avec l'option `-j` on risque d'avoir des erreurs à l'édition des liens. Dans ce cas lancer à nouveau `make` sans l'option `-j`.
-
-- **UNIX**
-```
-make
-```
-
 - **Windows**:
-Les libraries fournies peuvent poser des soucis à l'édition des liens. Pour que tout fonctionne correctement on conseille de les installer en les compilant soi même et des les mettre dans le dossier de MinGW. Il faut également ajouter le dossier de `include` et `bin` à la ligne 27 et 28:
+If the provided pre-compiled libraries do not work as expected, you should compile them yourself and place them in your MinGW floder. You'll then have to add your MinGW path to the CMakeLists.txt file, line 27 and 28 :
 
 ```
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} C:/CodeBlocks/MinGW/lib ${PROJECT_SOURCE_DIR}/extlibs/libs-win32)
 set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} C:/CodeBlocks/MinGW/include )
 ```
 
-
 ```
 cmake -G "MinGW Makefiles" ..
 mingw32-make
 ```
 
-Finalement il faut copier les dlls correspondantes dans le dossier bin. Cela est nécessaire si les dlls fournies ne marchent pas sur votre système.
+##Running 
 
-##Exécution
-
-Il est possible que sous OS X un fix soit nécessaire (car on n'utilise pas de `.app`). Si l'exécution donne une erreur concernant des dylibs introuvables, faire: `make osxfix` pour corriger cela. Par défaut `make run` fait le fix.
-
+The easiest way to run SPACECRAFT is to use the following command :
 ```
 make run
 ```
-
-ou
+Once compiled, you may also run it using :
 
 ```
 ./bin/spacecraft
 ```
 
-##Tests
+Under Mac OS X, you might have no choice but to use that first option as we do not use a .app directory.
 
-Les tests unitaires sont lancés avec `make test` il faut cepedant avoir fait `make all` avant car CTest ne compile pas les tests. L'édition des liens peut donner des erreurs, dans ce cas il faut refaire `cmake ..` et relancer `make`. En résumé:
+##Unit tests
+
+In order to run the few unit tests we wrote, you should use the following command :
 
 ```
 make && make test
 ```
 
-S'il y a une erreur:
+If you run into an error, try the following :
 
 ```
 cmake .. # on considère qu'on est dans build/
@@ -104,10 +92,15 @@ make
 make test
 ```
 
-Sur OS X faire `make osxfix` avant de lancer les tests.
+On Mac OS X, you should run `make osxfix` before running the unit tests.
 
-Ces tests permettent de vérifier les focntionalités des différentes classes/modules et ainsi aassurent le développement par incréments.
+##Credits
 
-##Licence
+The vast majority of the code present in SPACECRAFT is original and was written by @smealum, @ArthurSonzogni and @posva. In the same way, the application's design and architecture is completely original.
+That being said, some bits and pieces were borrowed or heavily inspired by the work of others. These bits include :
 
-TODO
+- The atmospheric scattering code, which was originally written by Sean P O'Neil. We essentially took his CPU-based code, made it into a fragment shader and changed a couple things (including adding a new LUT).
+- The planet heightmap generation code, which is largely inspired/stolen from a libnoise example.
+- The block textures, which were taken from the Eldpack Minecraft texturepack, by eldrone.
+- GLM. 
+- Probably other stuff I'm forgetting; please let us know if you believe we're not doing your work justice.
