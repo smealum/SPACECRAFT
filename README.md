@@ -136,6 +136,8 @@ make test
 
 On Mac OS X, you should run `make osxfix` before running the unit tests.
 
+As these tests were written with UNIX in mind, there's no guarantee they'll work properly on Windows systems.
+
 ##Credits
 
 The vast majority of the code present in SPACECRAFT is original and was written by @smealum, @ArthurSonzogni and @posva. In the same way, the application's design and architecture is completely original.
@@ -151,4 +153,4 @@ That being said, some bits and pieces were borrowed or heavily inspired by the w
 
 @smealum : http://smealum.net, sme@lum.sexy
 @ArthurSonzogni : http://panigame.fr, ArthurSonzogni@panigame.fr
-@posva : http://posva.net, 
+@posva : http://posva.net, posva13@gmail.com

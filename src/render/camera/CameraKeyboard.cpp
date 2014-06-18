@@ -19,11 +19,15 @@ float testAngle=0.0f;
 
 //demo stuff
 glm::dvec3 target(0.0);
-glm::dvec3 targets[4]={
+glm::dvec3 targets[8]={
     glm::dvec3(1091.146322, -0.065097, -1000.001511),
+    glm::dvec3(1091.148543, 0.050548, -1000.087311),
+    glm::dvec3(514.392157, 0.000000, -130.238961),
+    glm::dvec3(-484.821664, 0.000000, -117.179801),
+    glm::dvec3(4093957957.280227, 574915980.858341, 9849105513.134794),
+    glm::dvec3(4093958623.051689, 574915558.085391, 9849105241.231743),
+    glm::dvec3(16681286785.911911, -2319275960.656412, -8470569221.782546),
     glm::dvec3(0.000000, 0.000000, 0.000000),
-    glm::dvec3(0.000000, 0.000000, 0.000000),
-    glm::dvec3(0.000000, 0.000000, 0.000000)
 };
 bool targetMode=false;
 extern Galaxy* globalGalaxy;
@@ -68,16 +72,24 @@ void CameraKeyboard::update(Camera& camera)
         else if(Input::isKeyPressed(GLFW_KEY_2))targets[1]=globalGalaxy->getGlobalPosition(camera.getPositionDouble(glm::dvec3(0.0)));
         else if(Input::isKeyPressed(GLFW_KEY_3))targets[2]=globalGalaxy->getGlobalPosition(camera.getPositionDouble(glm::dvec3(0.0)));
         else if(Input::isKeyPressed(GLFW_KEY_4))targets[3]=globalGalaxy->getGlobalPosition(camera.getPositionDouble(glm::dvec3(0.0)));
+        else if(Input::isKeyPressed(GLFW_KEY_5))targets[4]=globalGalaxy->getGlobalPosition(camera.getPositionDouble(glm::dvec3(0.0)));
+        else if(Input::isKeyPressed(GLFW_KEY_6))targets[5]=globalGalaxy->getGlobalPosition(camera.getPositionDouble(glm::dvec3(0.0)));
+        else if(Input::isKeyPressed(GLFW_KEY_7))targets[6]=globalGalaxy->getGlobalPosition(camera.getPositionDouble(glm::dvec3(0.0)));
+        else if(Input::isKeyPressed(GLFW_KEY_8))targets[7]=globalGalaxy->getGlobalPosition(camera.getPositionDouble(glm::dvec3(0.0)));
     }else{
         if(Input::isKeyPressed(GLFW_KEY_1))target=targets[0];
         else if(Input::isKeyPressed(GLFW_KEY_2))target=targets[1];
         else if(Input::isKeyPressed(GLFW_KEY_3))target=targets[2];
         else if(Input::isKeyPressed(GLFW_KEY_4))target=targets[3];
+        else if(Input::isKeyPressed(GLFW_KEY_5))target=targets[4];
+        else if(Input::isKeyPressed(GLFW_KEY_6))target=targets[5];
+        else if(Input::isKeyPressed(GLFW_KEY_7))target=targets[6];
+        else if(Input::isKeyPressed(GLFW_KEY_8))target=targets[7];
     }
 
     if(Input::isKeyPressed(GLFW_KEY_9))
     {
-        for(int i=0;i<4;i++)
+        for(int i=0;i<8;i++)
         {
             printf("glm::dvec3(%f, %f, %f),\n",targets[i].x,targets[i].y,targets[i].z);
         }
