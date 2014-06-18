@@ -46,7 +46,7 @@ Galaxy::~Galaxy()
 
 void Galaxy::pushSolarSystem(const dvec3& s)
 {
-	solarPosition.push_back(vec4(vec3(s),genrand64_real2()*3.14));
+	solarPosition.push_back(vec4(vec3(s),genrand64_real2()*6.2830));
 
 	dvec3* solarSystem = new dvec3(s);
 	int index=allocatedPositions.size();

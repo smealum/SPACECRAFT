@@ -10,16 +10,15 @@ uniform vec3 position;
 uniform vec3 origin, v1, v2;
 uniform float numBlocks;
 
-out vec4 fColor;
+out vec3 fpos;
 
 void main()
 {
-    fColor = vec4(1,0,0,1);
-
 	vec3 pos1=position+vec3(model*vec4(offset,1.0));
 	vec3 pos2=v1*pos1.x+v2*pos1.z;
 	float y=1.0+pos1.y/numBlocks;
 
+	fpos = offset;
 	vec4 r = proj * view * planetModel * vec4((normalize(origin+(pos2)/numBlocks)*y),1.0);
 	gl_Position = vec4(r.xy,-1.0*r.w,r.w);
 }

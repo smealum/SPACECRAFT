@@ -1,5 +1,6 @@
 #include "render/Cursor.h"
 #include "MiniWorld.h"
+#include "Application.h"
 
 static GLfloat vertices[] =
 {
@@ -12,7 +13,8 @@ static GLfloat vertices[] =
 Cursor::Cursor():
 	affected(false),
 	planetModel(glm::mat4(1.0f)),
-	shader(ShaderProgram::loadFromFile("shader/cursor/cursor.vert", "shader/cursor/cursor.frag", "cursor"))
+	shader(ShaderProgram::loadFromFile("shader/cursor/cursor.vert", "shader/cursor/cursor.frag", "cursor")),
+	time(0.f)
 {
 	//generate VBO
 	glGenBuffers(1, &vbo);
@@ -31,6 +33,8 @@ Cursor::Cursor():
 
 void Cursor::draw(Camera& c)
 {
+	time+=Application::getInstance().getFrameDeltaTime();
+
 	if(!affected)return;
 
 	shader.use();
@@ -84,6 +88,7 @@ void Cursor::draw(Camera& c)
 	shader.setUniform("v2", v2);
 	shader.setUniform("position", glm::vec3(pos));
     shader.setUniform("numBlocks",float(numBlocks));
+    shader.setUniform("t",time);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 12);
 }

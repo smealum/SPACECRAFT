@@ -31,6 +31,8 @@ class Cursor
 
 		ShaderProgram& shader;
 		GLuint vao, vbo;
+
+		float time;
 };
 
 #endif

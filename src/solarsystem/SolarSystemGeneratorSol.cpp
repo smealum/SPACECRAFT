@@ -12,7 +12,7 @@ SolarSystemGeneratorSol::SolarSystemGeneratorSol(int seed, ContentHandler& ch):
 
 void SolarSystemGeneratorSol::generateSunInfo(float& size, float& color)
 {
-	init_genrand64(seed*2);
+	init_genrand64(seed*2+444);
 
 	color=genrand64_real2();
 	size=genrand64_real2()*80.0f+40.0f;

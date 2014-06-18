@@ -7,16 +7,11 @@
 
 // caractéristiques ( a choisir )
 const double width = 2e10; // rayon de la galaxie
-const double density = 5000.0; // quantité d'étoiles (évolution linéaire)
+const double density = 10000.0; // quantité d'étoiles (évolution linéaire)
 const double arms = 6; // nombre de bras de la galaxie
 const double spin = 3.0; // tendance à tourner des bras
 const double noiseQt = 0.1; // chaos dans la galaxie
 
-//const double width = 100; // rayon de la galaxie
-//const double density = 40.0; // quantité d'étoiles (évolution linéaire)
-//const double arms = 6; // nombre de bras de la galaxie
-//const double spin = 3.0; // tendance à tourner des bras
-//const double noiseQt = 0.1; // chaos dans la galaxie
 
 // caractéristique déduites
 const double rhoMax = width;
