@@ -411,7 +411,7 @@ void Planet::processLevelOfDetail(Camera& c)
 {
 	if(testBool1)return;
 	if(!c.isBoxInFrustum(position-glm::vec3(1), glm::vec3(2,0,0), glm::vec3(0,2,0), glm::vec3(0,0,2)))return;
-	if(glm::length(c.getPosition(position))>1e2)return;
+	if(glm::length(c.getPosition(position))>2e2)return;
 	for(int i=0;i<6;i++)faces[i]->processLevelOfDetail(c, NULL, NULL);
 }
 
