@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include "Atmosphere.h"
+#include "utils/mt19937.h"
 #include "utils/SphereManager.h"
 
 AtmosphereInfo::AtmosphereInfo():
@@ -20,6 +21,36 @@ AtmosphereInfo::AtmosphereInfo():
 	m_fWavelength4[0]=(powf(m_fWavelength[0], 4.0f));
 	m_fWavelength4[1]=(powf(m_fWavelength[1], 4.0f));
 	m_fWavelength4[2]=(powf(m_fWavelength[2], 4.0f));
+}
+
+AtmosphereInfo::AtmosphereInfo(int seed):
+	m_fInnerRadius(1.0f),
+	m_nSamples(NUMSAMPLES),
+	m_Kr(KR),
+	m_Kr4PI(m_Kr*4.0f*PI),
+	m_Km(KM),
+	m_Km4PI(m_Km*4.0f*PI),
+	m_fRayleighScaleDepth(RAYLEIGHDEPTH),
+	m_fMieScaleDepth(MIEDEPTH)
+{
+	init_genrand64(seed);
+
+	m_fOuterRadius=1.05f+(genrand64_real1()-0.3f)*0.04f;
+	// m_fWavelength[0]=WAVELENGTH0+(genrand64_real1()-0.5f)*0.200f;
+	// m_fWavelength[1]=WAVELENGTH1+(genrand64_real1()-0.5f)*0.200f;
+	// m_fWavelength[2]=WAVELENGTH2+(genrand64_real1()-0.5f)*0.200f;
+	m_fWavelength[0]=WAVELENGTH0+(genrand64_real1()-0.5f)*0.010f;
+	m_fWavelength[1]=WAVELENGTH1+(genrand64_real1()-0.5f)*0.010f;
+	m_fWavelength[2]=WAVELENGTH2+(genrand64_real1()-0.5f)*0.010f;
+
+	m_ESun=(ESUN)+(genrand64_real1())*20.0f;
+	m_g=(G)+(genrand64_real1()-0.5f)*0.15f;
+
+	m_fWavelength4[0]=(powf(m_fWavelength[0], 4.0f));
+	m_fWavelength4[1]=(powf(m_fWavelength[1], 4.0f));
+	m_fWavelength4[2]=(powf(m_fWavelength[2], 4.0f));
+
+	m_fScale=(1.0f/(m_fOuterRadius - m_fInnerRadius));
 }
 
 Atmosphere::Atmosphere(AtmosphereInfo* ai):

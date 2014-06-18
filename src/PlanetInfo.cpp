@@ -49,7 +49,7 @@ PlanetInfoEarth::PlanetInfoEarth(SpaceObjectTrajectory* t, ContentHandler& ch, i
 	continentHeightScale((1.f - seaLevel) / 4.f),
 	riverDepth(0.0223f)
 {
-	atmosphereInfo=new AtmosphereInfo;
+	atmosphereInfo=new AtmosphereInfo(seed);
 	planetGenerator->setPlanetInfo(this);
 }
 

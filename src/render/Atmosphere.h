@@ -24,6 +24,7 @@ class AtmosphereInfo
 {
 	public:
 		AtmosphereInfo();
+		AtmosphereInfo(int seed);
 
 		int m_nSamples;
 		float m_Kr, m_Kr4PI;
