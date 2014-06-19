@@ -21,6 +21,10 @@ If you'd rather install the libraries yourself, you'll need :
 
 Please note that this code was intended to be written in C++11; however, as our school's computers aren't super up to date, we had to limit ourselves to only a subset of that standard.
 
+##Video
+
+Here's a video showing what the engine looks like as of June 19th 2014 : https://www.youtube.com/watch?v=HsskVpPskSc
+
 ##Screenshots
 
 ![galaxy](http://i.imgur.com/KczAZt2.png)
