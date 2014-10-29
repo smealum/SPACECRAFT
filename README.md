@@ -97,6 +97,8 @@ I/K : control pitch
 J/L : control yaw
 U/O : control roll
 
+Y/H: control movespeed
+
 SPACE : toggle mouse-look mode
 ```
 
