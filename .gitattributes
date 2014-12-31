@@ -1,0 +1,8 @@
+extlibs/**/* linguist-vendored
+src/utils/stb_image.* linguist-vendored
+src/glew/* linguist-vendored
+shader/**/*.frag linguist-language=GLSL
+shader/**/*.vert linguist-language=GLSL
+shader/**/*.geom linguist-language=GLSL
+src/**/*.h linguist-language=C++
+src/**/*.cpp linguist-language=C++
