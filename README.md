@@ -8,6 +8,10 @@ Please be aware that this is a prototype which was developed as a school project
 
 The github repo for this can be found at https://github.com/smealum/SPACECRAFT
 
+##Windows Demo
+
+You can download a precompiled demo for windows at https://dl.dropboxusercontent.com/u/13279485/spacecraft.zip
+
 ##Dependencies
 
 All included libraries save for the windows version were compiled for the x86_64 architecture.
