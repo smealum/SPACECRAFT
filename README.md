@@ -1,18 +1,18 @@
 SPACECRAFT
 ===
 
-##Description
+## Description
 
 SPACECRAFT is a game prototype which was made by @smealum, @ArthurSonzogni and @posva. Our goal with this was to make a minecraft clone which wouldn't ground the player to a single infinite -- and flat -- world. Instead, we want players to be able to explore an (almost) infinite universe, made of galaxies, solar systems and planets, all the while keeping their ability to place and remove blocks.
 Please be aware that this is a prototype which was developed as a school project over the span about three weeks. As such, it is extremely unpolished and incomplete. That being said, we believe it is a solid foundation which could be used to make our vision a reality.
 
 The github repo for this can be found at https://github.com/smealum/SPACECRAFT
 
-##Windows Demo
+## Windows Demo
 
 You can download a precompiled demo for windows at https://dl.dropboxusercontent.com/u/13279485/spacecraft.zip
 
-##Dependencies
+## Dependencies
 
 All included libraries save for the windows version were compiled for the x86_64 architecture.
 
@@ -25,11 +25,11 @@ If you'd rather install the libraries yourself, you'll need :
 
 Please note that this code was intended to be written in C++11; however, as our school's computers aren't super up to date, we had to limit ourselves to only a subset of that standard.
 
-##Video
+## Video
 
 Here's a video showing what the engine looks like as of June 19th 2014 : https://www.youtube.com/watch?v=HsskVpPskSc
 
-##Screenshots
+## Screenshots
 
 ![galaxy](http://i.imgur.com/KczAZt2.png)
 
@@ -39,7 +39,7 @@ Here's a video showing what the engine looks like as of June 19th 2014 : https:/
 
 ![blocks](http://i.imgur.com/qqypYwj.png)
 
-##Compiling
+## Compiling
 
 By default, compilation is done in release mode. Build mode can still be specified manually however.
 
@@ -72,7 +72,7 @@ cmake -G "MinGW Makefiles" ..
 mingw32-make
 ```
 
-##Running 
+## Running 
 
 The easiest way to run SPACECRAFT is to use the following command :
 ```
@@ -86,7 +86,7 @@ Once compiled, you may also run it using :
 
 Under Mac OS X, you might have no choice but to use that first option as we do not use a .app directory.
 
-##Controls
+## Controls
 
 As this is an engine prototype rather than an actual game, the controls are very awkward and complicated to use.
 There are two modes of control : no-clip flying camera, and player mode. The former can be used in any situation, while the latter should only be used to navigate planets' surfaces.
@@ -128,7 +128,7 @@ P/M : control time
 SHIFT + P/M : control time faster
 ```
 
-##Unit tests
+## Unit tests
 
 In order to run the few unit tests we wrote, you should use the following command :
 
@@ -148,7 +148,7 @@ On Mac OS X, you should run `make osxfix` before running the unit tests.
 
 As these tests were written with UNIX in mind, there's no guarantee they'll work properly on Windows systems.
 
-##Credits
+## Credits
 
 The vast majority of the code present in SPACECRAFT is original and was written by @smealum, @ArthurSonzogni and @posva. In the same way, the application's design and architecture is completely original.
 That being said, some bits and pieces were borrowed or heavily inspired by the work of others. These bits include :
@@ -159,7 +159,7 @@ That being said, some bits and pieces were borrowed or heavily inspired by the w
 - GLM. 
 - Probably other stuff I'm forgetting; please let us know if you believe we're not doing your work justice.
 
-##Contact
+## Contact
 
 @smealum : http://smealum.net, sme@lum.sexy
 @ArthurSonzogni : http://panigame.fr, ArthurSonzogni@panigame.fr
