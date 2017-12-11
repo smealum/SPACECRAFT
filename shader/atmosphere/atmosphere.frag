@@ -1,4 +1,3 @@
-#version 330
 // atmospheric scattering fragment shader
 // original code by sean p o'neill (http://sponeil.net/)
 // fragment shader adaptation by smea (http://smealum.net)
@@ -10,7 +9,7 @@ out vec4 outColor;
 const float PI=3.14159265;
 
 uniform sampler2D depthTex;
-uniform sampler1D phaseTex;
+uniform sampler2D phaseTex;
 
 uniform float m_fOuterRadius;
 uniform float m_fScale;
@@ -58,30 +57,30 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 	vec4 fCameraDepth=vec4(0.0);
 	vec4 fLightDepth;
 	vec4 fSampleDepth;
-	if(fNear <= 0)
+	if(fNear <= 0.f)
 	{
 		// If the near point is behind the camera, it means the camera is inside the atmosphere
-		fNear = 0;
+		fNear = 0.f;
 		float fCameraHeight = length(vCamera);
 		float fCameraAltitude = (fCameraHeight - m_fInnerRadius) * m_fScale;
 		bCameraAbove = fCameraHeight >= length(v);
 		float fCameraAngle = dot((bCameraAbove ? (-vRay) : (vRay)), vCamera) / fCameraHeight;
 		// fCameraDepth=Interpolate((vec2(fCameraAltitude, 0.5 - fCameraAngle * 0.5)));
 		fCameraDepth=texture(depthTex, (vec2(fCameraAltitude, 0.5 - fCameraAngle * 0.5)));
-	}else{
+	} else {
 		// Otherwise, move the camera up to the near intersection point
 		vCamera = (vCamera+(vRay*fNear));
 		fFar -= fNear;
-		fNear = 0;
+		fNear = 0.f;
 	}
 
 	// If the distance between the points on the ray is negligible, don't bother to calculate anything
-	if(fFar <= DELTA)return vec3(0);
+	if(fFar <= DELTA)return vec3(0.0);
 
 	// Initialize a few variables to use inside the loop
 	vec3 fRayleighSum=vec3(0, 0, 0);
 	vec3 fMieSum=vec3(0, 0, 0);
-	float fSampleLength = fFar / m_nSamples;
+	float fSampleLength = fFar / float(m_nSamples);
 	float fScaledLength = fSampleLength * m_fScale;
 	vec3 vSampleRay = (vRay*fSampleLength);
 
@@ -140,12 +139,11 @@ vec3 SetColor(vec3 v, vec3 c, vec3 lightDir)
 
 	// Calculate the angle and phase values
 	float fAngle = -dot(vRay, lightDir);
-	vec2 fPhase = vec2(texture(phaseTex,(fAngle+1.0)/2.0));
+	vec2 fPhase = vec2(texture(phaseTex, vec2((fAngle+1.0)/2.0), 0.0));
 
 	// Calculate the in-scattering color and clamp it to the max color value
-	vec3 fColor=fRayleighSum*fPhase.x/m_fWavelength4+fMieSum*fPhase.y;
-	fColor=min(fColor, 1.0);
-	return fColor;
+  vec3 fColor=fRayleighSum*fPhase.x/m_fWavelength4+fMieSum*fPhase.y;
+  return min(fColor, 1.0);
 }
 
 void main()
@@ -160,7 +158,7 @@ void main()
 
 	vec3 t=SetColor(vt, cameraPosition, lightDirection);
 
-	if(sky)color=vec4(t,length(t)*5);//t[1]);//length(vec3(t[0],t[1],t[2])));
+	if(sky)color=vec4(t,length(t)*5.f);//t[1]);//length(vec3(t[0],t[1],t[2])));
 	else color=vec4(t,1.0);
 
 	//color=texelFetch(tex, ivec2((int(gl_FragCoord[0])%texSize),(int(gl_FragCoord[1])%texSize)), 0);

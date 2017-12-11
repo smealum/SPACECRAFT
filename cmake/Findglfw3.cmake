@@ -12,9 +12,8 @@
 # Usage example to compile an "executable" target to the glfw library:
 #
 # FIND_PACKAGE (glfw REQUIRED)
-# INCLUDE_DIRECTORIES (${GLFW_INCLUDE_DIR})
-# ADD_EXECUTABLE (executable ${EXECUTABLE_SRCS})
-# TARGET_LINK_LIBRARIES (executable ${GLFW_LIBRARY})
+# INCLUDE_DIRECTORIES (${GLFW_INCLUDE_DIRS})
+# TARGET_LINK_LIBRARIES (executable ${GLFW_LIBRARIES})
 #
 # TODO:
 # Allow the user to select to link to a shared library or to a static library.
@@ -54,7 +53,7 @@ IF( APPLE )
     find_library(COCOA NAMES Cocoa)
     find_library(pthread NAMES pthread)
     SET(GLFW_LIBRARIES ${GLFW_LIBRARIES} ${IOKIT} ${COREVIDEO} ${COCOA} ${pthread})
-elseif(OS_LINUX)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   find_library(x11 NAMES X11)
   find_library(xrandr NAMES Xrandr)
   find_library(xi NAMES Xi)

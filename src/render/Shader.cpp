@@ -10,184 +10,200 @@
 using namespace std;
 using namespace glm;
 
+const std::string shader_header = 
+#ifdef __EMSCRIPTEN__
+"#version 300 es\n"
+"precision mediump float;\n"
+"precision mediump sampler2DArray;\n";
+#else
+"#version 330\n";
+#endif
+
 // collection des shader déja créés.
 map<string,Shader*> shaderMap;
 // collection des programmes déjà créés.
 map<string, ShaderProgram*> shaderProgramMap;
 
 struct uniform_u { // XXX should be an union
-    GLfloat *v;
-    GLint i; // for int types;
-    GLint size;
-    uniform_u () : v(NULL) {}
-    //uniform_u(const uniform_u &u) : m4(u.m4) {}
+  GLfloat *v;
+  GLint i; // for int types;
+  GLint size;
+  uniform_u () : v(NULL) {}
+  //uniform_u(const uniform_u &u) : m4(u.m4) {}
 };
 
 struct ShaderProgram::uniform_t {
-    GLenum type;
-    uniform_u val;
-    uniform_t() {}
-    //uniform_t(const uniform_t& u) :  type(u.type), val(u.val){}
+  GLenum type;
+  uniform_u val;
+  uniform_t() {}
+  //uniform_t(const uniform_t& u) :  type(u.type), val(u.val){}
 };
 
 
 struct ShaderProgram::attribute_t {
-    GLint size;
-    GLboolean normalized;
-    GLsizei stride;
-    GLuint offset;
-    GLenum type;
+  GLint size;
+  GLboolean normalized;
+  GLsizei stride;
+  GLuint offset;
+  GLenum type;
 };
 
 Shader* getShader(const std::string& file)
 {
-    auto it(shaderMap.find(file));
-    return it != shaderMap.end() ? it->second : NULL;
+  auto it(shaderMap.find(file));
+  return it != shaderMap.end() ? it->second : NULL;
 }
 
 // Lecture d'un fichier
 bool getFileContents(const char *filename, vector<char>& buffer)
 {
-    //debug("chargement du fichier : %s",filename);
-    ifstream file(filename, ios_base::binary);
-    if (file)
+  //debug("chargement du fichier : %s",filename);
+  ifstream file(filename, ios_base::binary);
+  if (file)
+  {
+    // chargement de headers du shader.
+    for(const auto& c : shader_header)
+      buffer.push_back(c);
+
+    file.seekg(0, ios_base::end);
+    streamsize size = file.tellg();
+    if (size > 0)
     {
-        file.seekg(0, ios_base::end);
-        streamsize size = file.tellg();
-        if (size > 0)
-        {
-            file.seekg(0, ios_base::beg);
-            buffer.resize(static_cast<size_t>(size));
-            file.read(&buffer[0], size);
-        }
-        buffer.push_back('\0');
-        return true;
+      file.seekg(0, ios_base::beg);
+      buffer.resize(static_cast<size_t>(size+shader_header.size()));
+      file.read(&buffer[shader_header.size()], size);
     }
-    else
-    {
-        return false;
-    }
+    buffer.push_back('\0');
+    return true;
+  }
+  else
+  {
+    std::cerr << "Cannot load " << filename << std::endl;
+    return false;
+  }
 }
 
 void Shader::addProgram(ShaderProgram *p)
 {
-    programs.insert(p);
+  programs.insert(p);
 }
 
 void Shader::removeProgram(ShaderProgram *p)
 {
-    programs.erase(p);
+  programs.erase(p);
 }
 
 void Shader::notifyPrograms()
 {
-    for (auto it(programs.begin()); it != programs.end(); ++it)
-    {
-        (*it)->setInvalid();
-    }
+  for (auto it(programs.begin()); it != programs.end(); ++it)
+  {
+    (*it)->setInvalid();
+  }
 }
 
 void Shader::load()
 {
-	glCheckError("Flush previous Errors");	
+  glCheckError("Flush previous Errors");	
 
-    // chargement du fichier
-    vector<char> fileContent;
-    if (!getFileContents(file.c_str(),fileContent))
-    {
-        log_err("[Erreur] Fichier %s  introuvable.", file.c_str());
-        //exit(EXIT_FAILURE);
-    }
+  vector<char> fileContent;
 
-    // creation
-    if (handle == 0)
-        handle = glCreateShader(type);
-    if(handle == 0)
-    {
-        debug("Impossible de créer un shader vierge");
-    }
+  std::cout << "Compilation : " << file.c_str() << std::endl;
+  // chargement du fichier
+  if (!getFileContents(file.c_str(),fileContent))
+  {
+    log_err("[Erreur] Fichier %s  introuvable.", file.c_str());
+    //exit(EXIT_FAILURE);
+  }
 
-    // assignation du code source
-    const char* shaderText(&fileContent[0]);
-    glShaderSource(handle, 1, (const GLchar**)&shaderText, NULL);
+  // creation
+  if (handle == 0)
+    handle = glCreateShader(type);
+  if(handle == 0) {
+    std::cerr << "type = " << type << std::endl;
+    debug("Impossible de créer un shader vierge");
+  }
 
-    // compilation
-    glCompileShader(handle);
+  // assignation du code source
+  const char* shaderText(&fileContent[0]);
+  glShaderSource(handle, 1, (const GLchar**)&shaderText, NULL);
 
-    // vérification de la compilation
-    GLint compile_status;
-    glGetShaderiv(handle, GL_COMPILE_STATUS, &compile_status);
-    if(compile_status != GL_TRUE)
-    {
-        /* error text retreiving*/
-        GLsizei logsize = 0;
-        glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &logsize);
-         
-        char* log = new char[logsize+1];
-        glGetShaderInfoLog(handle, logsize, &logsize, log);
-        //log[logsize]='\0';
-         
-        log_err("Impossible de compiler le shader : %s",file.c_str());
-        log_err("\n[Erreur log]\n%s\n_________", log);
-        
-        exit(EXIT_FAILURE);
-    }
-    else
-    {
-        log_info("Shader %s compiled successfully.", file.c_str());
-    }
+  // compilation
+  glCompileShader(handle);
 
-    notifyPrograms();
+  // vérification de la compilation
+  GLint compile_status;
+  glGetShaderiv(handle, GL_COMPILE_STATUS, &compile_status);
+  if(compile_status != GL_TRUE)
+  {
+    /* error text retreiving*/
+    GLsizei logsize = 0;
+    glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &logsize);
 
-	glCheckError("Shader load");
+    char* log = new char[logsize+1];
+    glGetShaderInfoLog(handle, logsize, &logsize, log);
+    log[logsize]='\0';
+
+    log_err("Impossible de compiler le shader : %s",file.c_str());
+    log_err("\n[Erreur log]\n%s\n_________", log);
+    exit(EXIT_FAILURE);
+  }
+  else
+  {
+    log_info("Shader %s compiled successfully.", file.c_str());
+  }
+
+  notifyPrograms();
+
+  glCheckError("Shader load");
 }
 
 // chargement d'un shader depuis un fichier
 Shader& Shader::loadFromFile(const std::string &filename, ShaderType::T type)
 {
-    //debug("Chargement du shader : %s",filename);
+  //debug("Chargement du shader : %s",filename);
 
-    // test si le shader est déja chargé en mémoire.
-    auto it = shaderMap.find(filename);
-    if (it!=shaderMap.end())
-        return *(it->second);
+  // test si le shader est déja chargé en mémoire.
+  auto it = shaderMap.find(filename);
+  if (it!=shaderMap.end())
+    return *(it->second);
 
-    // Sinon, on le charge
-    Shader* s = new Shader;
-    s->file = filename;
-    s->type = type;
+  // Sinon, on le charge
+  Shader* s = new Shader;
+  s->file = filename;
+  s->type = type;
 
-    s->load();
+  s->load();
 
-    // ajout du shader dans la map
-    shaderMap[filename]=s;
+  // ajout du shader dans la map
+  shaderMap[filename]=s;
 
-    return *s;
+  return *s;
 }
 
 Shader::Shader() :
-handle(0)
+  handle(0)
 {
 }
 
 Shader::Shader(const Shader& shader) :
-handle(shader.handle)
+  handle(shader.handle)
 {
 }
 
 
 ShaderProgram& ShaderProgram::loadFromFile(const char* vertexShader, const char* fragmentShader, const std::string &name)
 {
-    // debug("Chargement d'un programme : %s , %s ",vertexShader,fragmentShader);
-    return ShaderProgram::loadFromShader(
-                Shader::loadFromFile(vertexShader,ShaderType::Vertex),
-                Shader::loadFromFile(fragmentShader,ShaderType::Fragment),
-                name
-            );
+  // debug("Chargement d'un programme : %s , %s ",vertexShader,fragmentShader);
+  return ShaderProgram::loadFromShader(
+      Shader::loadFromFile(vertexShader,ShaderType::Vertex),
+      Shader::loadFromFile(fragmentShader,ShaderType::Fragment),
+      name
+      );
 }
 
 ShaderProgram& ShaderProgram::loadFromFile(const char* vertexShader, const char* fragmentShader, const char* geometryShader, const std::string &name)
 {
+  #ifndef __EMSCRIPTEN__
     // debug("Chargement d'un programme : %s , %s, %s ",vertexShader,fragmentShader,geometryShader);
     return ShaderProgram::loadFromShader(
                 Shader::loadFromFile(vertexShader,ShaderType::Vertex),
@@ -195,6 +211,9 @@ ShaderProgram& ShaderProgram::loadFromFile(const char* vertexShader, const char*
                 Shader::loadFromFile(geometryShader,ShaderType::Geometry),
                 name
             );
+  #else
+    return loadFromFile(vertexShader, fragmentShader, name);
+  #endif
 }
 
 ShaderProgram& ShaderProgram::loadFromShader(Shader& vertexShader, Shader& fragmentShader, const std::string &name)
@@ -333,7 +352,9 @@ void ShaderProgram::setUniform(const std::string& name, const vec3 & v)
 }
 void ShaderProgram::setUniform(const std::string& name, const dvec3 & v)
 {
+  #ifndef __EMSCRIPTEN__
     glUniform3dv(uniform(name), 1, value_ptr(v));
+  #endif
 }
 void ShaderProgram::setUniform(const std::string& name, const vec4 & v)
 {
@@ -341,11 +362,15 @@ void ShaderProgram::setUniform(const std::string& name, const vec4 & v)
 }
 void ShaderProgram::setUniform(const std::string& name, const dvec4 & v)
 {
+  #ifndef __EMSCRIPTEN__
     glUniform4dv(uniform(name), 1, value_ptr(v));
+  #endif
 }
 void ShaderProgram::setUniform(const std::string& name, const dmat4 & m)
 {
+  #ifndef __EMSCRIPTEN__
     glUniformMatrix4dv(uniform(name), 1, GL_FALSE, value_ptr(m));
+  #endif
 }
 void ShaderProgram::setUniform(const std::string& name, const mat4 & m)
 {
@@ -494,9 +519,9 @@ void ShaderProgram::saveUniforms()
 {
     GLint numUniforms = 0;
     glGetProgramiv(handle, GL_ACTIVE_UNIFORMS, &numUniforms);
-    log_info("There is %d uniforms in shader %s", numUniforms, name.c_str());
     //glGetProgramInterfaceiv(handle, GL_UNIFORM, GL_ACTIVE_RESOURCES, &numUniforms);
     //const GLenum properties[4] = {GL_BLOCK_INDEX, GL_TYPE, GL_NAME_LENGTH, GL_LOCATION};
+    log_info("There is %d uniforms in shader %s", numUniforms, name.c_str());
 
     for(int unif = 0; unif < numUniforms; ++unif)
     {

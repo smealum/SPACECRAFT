@@ -33,12 +33,13 @@ IF (WIN32)
 		)
 	ENDIF(NV_SYSTEM_PROCESSOR STREQUAL "AMD64")
 ELSE (WIN32)
-	FIND_PATH( GLEW_INCLUDE_PATH GL/glew.h
-		/usr/include
-		/usr/local/include
-		/sw/include
-		/opt/local/include
-		${GLEW_ROOT_DIR}/include
+	FIND_PATH(GLEW_INCLUDE_PATH GL/glew.h
+    PATHS /usr/include
+		      /usr/local/include
+		      /sw/include
+		      /opt/local/include
+		      ${GLEW_ROOT_DIR}/include
+          ${CMAKE_SOURCE_DIR}/extlibs/headers
 		DOC "The directory where GL/glew.h resides")
 
 	FIND_LIBRARY( GLEW_LIBRARY

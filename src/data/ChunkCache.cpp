@@ -57,7 +57,9 @@ void ChunkCache::save(MiniWorld* mw)
 	std::string name=mw->getName();
 	printf("CACHING %s\n",name.c_str());
 
-	mutex.lock();
+#ifndef __EMSCRIPTEN__
+  mutex.lock();
+#endif
 		auto it=m_map.find(name);
 		if(it!=m_map.end())
 		{
@@ -68,22 +70,30 @@ void ChunkCache::save(MiniWorld* mw)
 		while(m_map.size()>CACHE_MAXSIZE)
 			removeChunk(m_map.begin()); //TODO : système de prio (maintenir une queue de prio en parallèle ?)
 		m_map[name] = new TrackerPointer<ChunkCacheEntry>(new ChunkCacheEntry(mw), true);
-	mutex.unlock();
+#ifndef __EMSCRIPTEN__
+  mutex.unlock();
+#endif
 }
 
 TrackerPointer<ChunkCacheEntry>* ChunkCache::get(const std::string &name)
 {
-	mutex.lock();
+#ifndef __EMSCRIPTEN__
+  mutex.lock();
+#endif
 	auto it=m_map.find(name);
 	if(it!=m_map.end())
 	{
 		TrackerPointer<ChunkCacheEntry>* tmp = it->second;
 		m_map.erase(it);
-		mutex.unlock();
-		// it->second->grab();
+#ifndef __EMSCRIPTEN__
+    mutex.unlock();
+     it->second->grab();
+#endif
 		return tmp;
 	}else{
-		mutex.unlock();
+#ifndef __EMSCRIPTEN__
+    mutex.unlock();
+#endif
 		{
 			std::string file(SAVE_DIR+std::string("/")+name);
 			FILE* f=fopen(file.c_str(), "rb");
@@ -102,14 +112,18 @@ TrackerPointer<ChunkCacheEntry>* ChunkCache::get(const std::string &name)
 
 void ChunkCache::flush(void)
 {
-	mutex.lock();
+#ifndef __EMSCRIPTEN__
+  mutex.lock();
+#endif
 	auto it = m_map.begin();
 	while(it != m_map.end())
     {
         auto current = it++;
         removeChunk(current);
     }
-	mutex.unlock();
+#ifndef __EMSCRIPTEN__
+  mutex.unlock();
+#endif
 }
 
 void ChunkCache::removeChunk(std::map<std::string,TrackerPointer<ChunkCacheEntry>* >::iterator it)

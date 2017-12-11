@@ -1,11 +1,15 @@
 #ifndef __CAVEGENERATOR_H__
 #define __CAVEGENERATOR_H__
 
-#include "utils/glm.h"
-#include <noise/noise.h>
-#include "noise/noiseutils.h"
-#include <vector>
+#ifndef __EMSCRIPTEN__
+  #include <noise/noise.h>
+#endif
+
 #include <list>
+#include <vector>
+
+#include "noise/noiseutils.h"
+#include "utils/glm.h"
 
 // fill a 3D grid with aire and blocks (bool) and eventually with blockTypes
 
@@ -25,8 +29,11 @@ typedef bool caveBlock; // easier to change in the future
 class CaveGenerator {
 	private:
 		int seed;
-		noise::module::Perlin posNoise, // density to generate starting points
-							  rotNoise[3]; // one for each axis
+#ifndef __EMSCRIPTEN__
+		noise::module::Perlin
+      posNoise, // density to generate starting points
+      rotNoise[3]; // one for each axis
+#endif
 		int segmentCount,
 			segmentLength; // in units (meters?)
 		float twistiness; // how much caves twist their way

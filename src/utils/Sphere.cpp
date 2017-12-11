@@ -96,7 +96,9 @@ void Sphere::generateVBO(void)
 
 	shader.setBuffers(vao, vbo, ebo);
 
+#ifndef __EMSCRIPTEN__
 	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
+#endif
 	shader.setAttribute("position", 3, GL_FALSE, 3, 0);
 }
 

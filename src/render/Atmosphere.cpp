@@ -2,6 +2,7 @@
 #include "Atmosphere.h"
 #include "utils/mt19937.h"
 #include "utils/SphereManager.h"
+#include "utils/gldbg.h"
 
 AtmosphereInfo::AtmosphereInfo():
 	m_fInnerRadius(1.0f),
@@ -170,7 +171,7 @@ void Atmosphere::makeOpticalDepthBuffer(void)
 //TODO : idem
 void Atmosphere::makePhaseBuffer(void)
 {
-	const int nSize = 8192; //on est en 1D, on peut se le permettre
+	const int nSize = 1024;
 	float* phaseBuffer=(float*)malloc(sizeof(float)*nSize*4);
 	int k=0;
 	for(int i=0;i<nSize;i++)
@@ -190,19 +191,19 @@ void Atmosphere::makePhaseBuffer(void)
 	}
 
 	glGenTextures(1, &phaseTexture);
-	glBindTexture(GL_TEXTURE_1D, phaseTexture);
-	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA32F, nSize, 0, GL_RGBA, GL_FLOAT, phaseBuffer);
+	glBindTexture(GL_TEXTURE_2D, phaseTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, nSize, 1, 0, GL_RGBA, GL_FLOAT, phaseBuffer);
 
-	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAX_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 
 	//important
-	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	
 	//important
-	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
 	free(phaseBuffer);
 }
@@ -237,7 +238,7 @@ void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, f
 	sprogram.setUniform("phaseTex",2);
 
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_1D, phaseTexture);
+	glBindTexture(GL_TEXTURE_2D, phaseTexture);
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, depthTexture);

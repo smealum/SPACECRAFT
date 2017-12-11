@@ -22,13 +22,13 @@ void Cloud::draw(Camera& c)
 	time+=delta;
 
 	// rotation et animation
-	shader.use();
-	shader.setUniform("time",time);
-	shader.setUniform("model", rotate(mat4(1.0),time*0.01f,vec3(0.0,1.0,0.0)));
+	//shader.use();
+	////shader.setUniform("time",time);
+	//shader.setUniform("model", rotate(mat4(1.0),time*0.01f,vec3(0.0,1.0,0.0)));
 
 	// draw
-	glDisable(GL_CULL_FACE);
-    //glEnable(GL_CULL_FACE);
-	SphereManager::getInstance().draw(c,shader,4);
-	glEnable(GL_CULL_FACE);
+	//glDisable(GL_CULL_FACE);
+    ////glEnable(GL_CULL_FACE);
+	//SphereManager::getInstance().draw(c,shader,4);
+	//glEnable(GL_CULL_FACE);
 }

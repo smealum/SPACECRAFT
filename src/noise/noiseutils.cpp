@@ -1,3 +1,4 @@
+#ifndef __EMSCRIPTEN__
 // noiseutils.cpp
 //
 // Copyright (C) 2003-2005 Jason Bevins
@@ -1297,3 +1298,5 @@ void RendererNormalMap::Render ()
     }
   }
 }
+
+#endif

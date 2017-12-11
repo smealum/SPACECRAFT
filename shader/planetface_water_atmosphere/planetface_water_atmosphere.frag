@@ -1,4 +1,3 @@
-#version 330
 // atmospheric scattering fragment shader
 // original code by sean p o'neill (http://sponeil.net/)
 // fragment shader adaptation by smea (http://smealum.net)

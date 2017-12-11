@@ -1,7 +1,11 @@
 #ifndef GLDBG_3IW9KCUN
 #define GLDBG_3IW9KCUN
 
-#include <GL/glew.h>
+#ifdef __EMSCRIPTEN__
+  #include <GLES3/gl3.h>
+#else
+  #include <GL/glew.h>
+#endif
 #include "dbg.h"
 
 #define glCheckError(message) ___glCheckError(message,BASE_FILE,__LINE__)

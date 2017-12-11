@@ -1,5 +1,3 @@
-#version 330
-
 #define logDepthZ(v) ((log2(max(1e-6,1.0+v.w))*logconst-1.0)*v.w)
 #define logDepth(v) vec4(v.xy,logDepthZ(v),v.w)
 

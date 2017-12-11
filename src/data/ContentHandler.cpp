@@ -1,9 +1,11 @@
+#include <iostream>
 #include "ContentHandler.h"
 #include <queue>
 
 ContentHandler::ContentHandler(int numProducers)
 {
-	for(int i=0;i<numProducers;i++)producers.push_back(new Producer(i, inputQueue, outputQueue));
+  for (int i = 0; i < numProducers; i++)
+    producers.push_back(new Producer(i, inputQueue, outputQueue));
 }
 
 void ContentHandler::requestContent(ContentRequest* req, bool release)
@@ -26,17 +28,22 @@ void ContentHandler::handleNewContent(void)
 
 	while(q.size()>0)
 	{
-		ContentRequest* r=q.front();
-		if(!r->isCanceled)r->update();
+		ContentRequest* request=q.front();
+		if(!request->isCanceled)
+      request->update();
 		q.pop();
-		delete r;
+		delete request;
 	}
 
 	if(Input::isKeyHold(GLFW_KEY_F))cache.flush();
 }
 
-ContentHandler::~ContentHandler()
-{
-	// the producers MUST somehow terminate the thread
-	for(auto it = producers.begin(); it != producers.end(); ++it) delete *it;
+bool ContentHandler::ExecuteOneTask() {
+  return producers[0]->ExecuteOneTask();
+}
+
+ContentHandler::~ContentHandler() {
+  // the producers MUST somehow terminate the thread
+  for (auto it = producers.begin(); it != producers.end(); ++it)
+    delete *it;
 }

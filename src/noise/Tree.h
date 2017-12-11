@@ -1,11 +1,14 @@
 #ifndef __TREE_H__
 #define __TREE_H__
 
-#include "utils/glm.h"
-#include <noise/noise.h>
-#include "noise/noiseutils.h"
-#include "world/BlockType.h"
+#ifndef __EMSCRITEN__
+  #include <noise/noise.h>
+#endif
 #include <vector>
+
+#include "noise/noiseutils.h"
+#include "utils/glm.h"
+#include "world/BlockType.h"
 
 class Tree {
 	private:
@@ -23,7 +26,9 @@ class Tree {
 		std::list<std::pair<glm::i32vec3, blockTypes::T> > blockList;
 
 		blockTypes::T *array; // 3D flattened array
+#ifndef __EMSCRIPTEN__
 		noise::module::Perlin rnd;
+#endif
 
 		void digLine(const glm::i32vec3 &a, const glm::i32vec3 &b, blockTypes::T type);
 		// creuse sur le plan xz

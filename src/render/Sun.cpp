@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Sun.h"
 #include "Application.h"
 #include "utils/SphereManager.h"

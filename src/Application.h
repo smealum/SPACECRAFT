@@ -1,18 +1,32 @@
 #ifndef __APPLICATION_H__
 #define __APPLICATION_H__
 
-#include "utils/Singleton.h"
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#ifndef NTWBAR
-    #include <AntTweakBar.h>
+#ifdef __EMSCRIPTEN__
+  #include <emscripten/emscripten.h>
+  #define GLFW_INCLUDE_ES3
+  #include <GLFW/glfw3.h>
+  #include <GLES3/gl3.h>
+#else
+  #include <GL/glew.h>
+  #include <GLFW/glfw3.h>
 #endif
+
 #include "render/Camera.h"
 #include "render/camera/CameraKeyboardMouse.h"
 #include "data/ContentHandler.h"
 #include "ui/PlayerUI.h"
+#include "utils/Singleton.h"
 
+#ifndef NTWBAR
+    #include <AntTweakBar.h>
+#endif
+
+
+#ifndef __EMSCRIPTEN__
 #define NUMPRODUCERS (3)
+#else
+#define NUMPRODUCERS (1)
+#endif
 
 enum appState {
     appReady,
@@ -35,6 +49,7 @@ class Application : public Singleton<Application> {
         Camera *camera;
         float bgColor[3];
         ContentHandler contentHandler;
+        float frame_time_start;
         float deltaTime, time, fps;
         int fpsCounter;
 
@@ -49,6 +64,7 @@ class Application : public Singleton<Application> {
         void run();
         void loop();
         void createWindowInFullscreen(bool fs);
+        void CreateWebWindow();
         //void resetVSync();
         inline void exit() { state = appExiting; }
         inline float getWindowRatio() const { return static_cast<float>(width)/static_cast<float>(height); }

@@ -2,9 +2,9 @@
 #define PLANETGENERATOREARTH_TDQAA38S
 
 #include "PlanetGenerator.h"
+#include "noise/PlanetNoiseGenerator.h"
 #include "noise/Tree.h"
 #include <vector>
-
 
 class PlanetGeneratorEarth : public PlanetGenerator
 {
@@ -23,7 +23,9 @@ class PlanetGeneratorEarth : public PlanetGenerator
 		virtual float getElevation(int threadId, const glm::vec3 &coord);
 	
 	private:
-		std::vector<PlanetNoiseGenerator*> generators;
+    #ifndef __EMSCRIPTEN__
+		  std::vector<PlanetNoiseGenerator*> generators;
+    #endif
 		std::vector<Tree> treePool;
 
 		void initGenerators();

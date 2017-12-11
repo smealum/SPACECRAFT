@@ -4,8 +4,6 @@
 #include "Chunk.h"
 #include <cstdint>
 
-
-
 void chunkCompression(
 		chunkVal* data,
 		FILE* file

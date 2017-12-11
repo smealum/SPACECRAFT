@@ -1,5 +1,3 @@
-#version 150 core
-
 in vec3 position;
 in vec4 color;
 in vec2 texcoord;

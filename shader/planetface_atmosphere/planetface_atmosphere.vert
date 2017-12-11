@@ -1,5 +1,3 @@
-#version 150 core
-
 in vec3 position;
 in float elevation;
 in float minElevation;

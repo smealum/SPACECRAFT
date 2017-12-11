@@ -30,7 +30,9 @@ BlockType::BlockType() :
 	TextureManager::getInstance().bind("data/blocksPack.png");
 	unsigned char *img = new unsigned char[texWidth*texHeight*4];
 
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
+#ifndef __EMSCRIPTEN__
+  glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
+#endif
 
 	// fill texcoord map
 	int blockSize = texWidth / texCols,

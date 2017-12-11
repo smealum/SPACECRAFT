@@ -1,31 +1,32 @@
 #ifndef CONTENTHANDLER_H
 #define CONTENTHANDLER_H
 
-#include "data/Producer.h"
 #include "data/ChunkCache.h"
+#include "data/Producer.h"
 #include <vector>
 
-class ContentHandler
-{
-	friend class MiniWorldDataRequest;
-	friend class MiniWorldDeletionRequest;
-	public:
-		ContentHandler(int numProducers);
-        ~ContentHandler();
+class ContentHandler {
+  friend class MiniWorldDataRequest;
+  friend class MiniWorldDeletionRequest;
 
-		void requestContent(ContentRequest* req, bool release=true);
-		void manualReleaseInput(void);
+public:
+  ContentHandler(int numProducers);
+  ~ContentHandler();
 
-		void handleNewContent();
+  void requestContent(ContentRequest *req, bool release = true);
+  void manualReleaseInput(void);
 
-		inline int getMaxProducers() const { return int(producers.size()); }
-	private:
+  void handleNewContent();
+  bool ExecuteOneTask();
 
-		std::vector<Producer*> producers;
-        ContentInputQueue inputQueue;
-        ContentOutputQueue outputQueue;
+  inline int getMaxProducers() const { return int(producers.size()); }
 
-        ChunkCache cache;
+private:
+  std::vector<Producer *> producers;
+  ContentInputQueue inputQueue;
+  ContentOutputQueue outputQueue;
+
+  ChunkCache cache;
 };
 
 #endif

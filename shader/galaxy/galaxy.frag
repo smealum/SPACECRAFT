@@ -1,5 +1,3 @@
-#version 330
-
 in float foffset;
 
 uniform float t;

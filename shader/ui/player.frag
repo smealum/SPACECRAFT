@@ -1,5 +1,3 @@
-#version 330 core
-
 uniform sampler2DArray Texture;
 
 flat in int ftile;

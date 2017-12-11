@@ -2,8 +2,8 @@
 
 # This module defines the following variables:
 # NOISE_LIBRARY, the name of the library;
-# NOISE_INCLUDE_DIR, where to find glfw include files.
-# NOISE_FOUND, true if both the NOISE_LIBRARY and NOISE_INCLUDE_DIR have been found.
+# NOISE_INCLUDE_DIRS, where to find glfw include files.
+# NOISE_FOUND, true if both the NOISE_LIBRARY and NOISE_INCLUDE_DIRS have been found.
 
 #Search for the include file...
 FIND_PATH(NOISE_INCLUDE_DIRS AntTweakBar.h DOC "Path to libnoise include directory."
@@ -37,4 +37,3 @@ ELSE()
   message(STATUS "libnoise NOT found!")
     return()
 ENDIF(NOISE_LIBRARY AND NOISE_INCLUDE_DIRS)
-

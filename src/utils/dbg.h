@@ -7,7 +7,7 @@
 
 
 // colored printing for unixes
-#ifdef __WIN32__
+#if defined(__WIN32__) || defined(__EMSCRIPTEN__)
 	#define ERROR_TEXT "[ERROR]"
 	#define WARN_TEXT "[WARN]"
 	#define INFO_TEXT "[INFO]"
@@ -62,9 +62,6 @@ static inline const char* file_basename (const char * filename)
 
 // check condition A. If A is not true, print an error and go to error label
 #define check(A, M, ...) if(!(A)) { log_err(M, ##__VA_ARGS__); errno=0; goto error; }
-
-// Used in switches with cases that should never happen, prints an error and then go to error label
-#define sentinel(M, ...)  { log_err(M, ##__VA_ARGS__); errno=0; goto error; }
 
 // checks for mem allocation, if it fails, goes to error label
 #define check_mem(A) check((A), "Out of memory.")

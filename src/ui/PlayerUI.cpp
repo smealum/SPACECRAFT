@@ -52,7 +52,9 @@ void PlayerUI::generateVBO()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*6, elements, GL_STATIC_DRAW);
 
+#ifndef __EMSCRIPTEN__
 	glBindFragDataLocation(program.getHandle(), 0, "outColor");
+#endif
 	program.setAttribute("position", 2, GL_FALSE, 4, 0);
 	program.setAttribute("texcoord", 2, GL_FALSE, 4, 2);
 

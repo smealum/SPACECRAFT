@@ -1,22 +1,26 @@
+#include <iostream>
 #include "Application.h"
-#include "utils/dbg.h"
-#include "utils/gldbg.h"
+
 #include <cstdlib>
-#include "utils/Input.h"
-#include "Planet.h"
-#include "SolarSystem.h"
-#include "render/Sun.h"
+#include <functional>
+#include <iostream>
+
 #include "MiniWorld.h"
-#include "render/Atmosphere.h"
-#include "render/Cursor.h"
-#include "render/TileTexture.h"
-#include "world/BlockType.h"
-#include "utils/glm.h"
-#include "noise/CaveGenerator.h"
+#include "Planet.h"
 #include "galaxy/Galaxy.h"
 #include "galaxy/GalaxyGenerator.h"
+#include "noise/CaveGenerator.h"
+#include "render/Atmosphere.h"
+#include "render/Cursor.h"
+#include "render/Sun.h"
+#include "render/TileTexture.h"
+#include "utils/Input.h"
+#include "utils/dbg.h"
+#include "utils/gldbg.h"
+#include "utils/glm.h"
+#include "world/BlockType.h"
 
-#define WIN_TITLE "SPACECRAFT"
+const std::string WIN_TITLE = "SPACECRAFT";
 
 float PlanetFaceDetailsPower = 28.0;
 
@@ -92,8 +96,6 @@ Application::Application() :
 	fps(0.f),
 	fpsCounter(0)
 {
-	// glCheckError("Flush Previous Errors");
-
 	if (!glfwInit())
 	{
 		log_err("Cannot initialize glfw3...");
@@ -102,9 +104,15 @@ Application::Application() :
 
 	glfwWindowHints();
 
-	createWindowInFullscreen(fullscreen);
+  #ifdef __EMSCRIPTEN__
+    CreateWebWindow();
+  #else
+    createWindowInFullscreen(fullscreen);
+  #endif
 
 	glfwMakeContextCurrent(window);
+  printf("OpenGL version = %s\n", glGetString(GL_VERSION));
+        
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // can be GLFW_CURSOR_HIDDEN
 
 	#ifndef NTWBAR
@@ -151,27 +159,34 @@ Application::Application() :
 
 	glfwSetScrollCallback(window, &mouseWheelCallback);
 
-	glewExperimental = GL_TRUE;
-	if (glewInit() != GLEW_NO_ERROR)
-	{
-		log_err("Cannot initialize GLEW...");
-		glfwTerminate();
-		std::exit(1);
-	}
-
-	glCheckError("GLEWInit Errors");
+  #ifndef __EMSCRIPTEN__
+  	glewExperimental = GL_TRUE;
+  	if (glewInit() != GLEW_NO_ERROR)
+  	{
+  		log_err("Cannot initialize GLEW...");
+  		glfwTerminate();
+  		std::exit(1);
+  	}
+  	glCheckError("GLEWInit Errors");
+  #endif
 
 	blockTypeLoadValues();
 }
 
 void Application::glfwWindowHints()
 {
+#ifdef __EMSCRIPTEN__
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#else
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
+#endif
 }
 
 void Application::createWindowInFullscreen(bool fs)
@@ -187,7 +202,11 @@ void Application::createWindowInFullscreen(bool fs)
 		viewHeight = height;
 		if (!fs)
 			width *= 2.f/3.f, height *= 2.f/3.f;
-		window = glfwCreateWindow(width, height, WIN_TITLE, fs?glfwGetPrimaryMonitor():NULL, NULL); // Windowed
+		window = glfwCreateWindow(
+        width,
+        height,
+        WIN_TITLE.c_str(),
+        fs?glfwGetPrimaryMonitor():NULL, NULL); // Windowed
 		if (!window) {
 			log_err("Cannot create window...");
 			glfwTerminate();
@@ -197,14 +216,48 @@ void Application::createWindowInFullscreen(bool fs)
 	}
 }
 
+void Application::CreateWebWindow() {
+	if (window) {
+		log_err("CreateWebWindow called but windows is already created.");
+    return;
+	}
+
+  width = 1024;
+  height = 640;
+  viewWidth = width;
+  viewHeight = height;
+
+  window = glfwCreateWindow(
+             width,
+             height, 
+             WIN_TITLE.c_str(), 
+             nullptr,
+             nullptr); // Windowed
+
+  if (!window) {
+    log_err("Cannot create window...");
+    glfwTerminate();
+    std::exit(2);
+  }
+  glfwSetCursorPos(window, width/2, height/2);
+}
+
 CaveGenerator caves;
 Cursor* testCursor;
 Galaxy* globalGalaxy;
 bool testBool1=false, testBool2=false;
 
+
+//Application* application_tha
+
+std::function<void()> registered_loop;
+void loop_iteration() {
+	registered_loop();
+}
+
 void Application::run()
 {
-	BlockType::getInstance(); // TODO can be deleted when used
+	//BlockType::getInstance(); // TODO can be deleted when used
 	state = appInLoop;
 	camera = new Camera(0.0000001f, 1e5);
 	camera->view = glm::lookAt(
@@ -214,7 +267,7 @@ void Application::run()
 			);
 	camera->setCameraManager(new CameraKeyboardMouse);
 
-	testCursor=new Cursor;
+  testCursor=new Cursor;
 
 	caves.generate();
 
@@ -228,34 +281,44 @@ void Application::run()
 	ui->setWhRatio((float)width/height);
 	ui->update();
 
-	float timeA;
-	char titleBuff[512];
-	while (state != appExiting)
-	{
-		while(!glfwWindowShouldClose(window))
+	frame_time_start = (float)glfwGetTime();
+
+	//int limit = 900;
+	registered_loop =  [&]() {
+
+		loop();
+		fpsCounter++;
+
+    float frame_time_end = (float)glfwGetTime();
+		deltaTime = frame_time_end - frame_time_start;
+		time += deltaTime;
+
+		if (time > 1.f) {
+			fps = (float)fpsCounter/time;
+			fpsCounter = 0;
+			time = 0.f;
+			glfwSetWindowTitle(
+          window,
+          (WIN_TITLE + " fps = " + std::to_string(fps)).c_str());
+		}
+		// test des ereurs openGL non reportées:
 		{
-			timeA = (float)glfwGetTime();
-			loop();
-			fpsCounter++;
-			deltaTime = (float)glfwGetTime() - timeA;
-			time += deltaTime;
-			if (time > 1.f)
-			{
-				fps = (float)fpsCounter/time;
-				fpsCounter = 0;
-				time = 0.f;
-				// updating title to have FPS
-				sprintf(titleBuff, "%s FPS: %.1f", WIN_TITLE, fps);
-				glfwSetWindowTitle(window, titleBuff);
-			}
-			// test des ereurs openGL non reportées:
-			{
-				static int i=0;
-				if (i++%300==0)
-					glCheckError("Unreported Error");
-			}
+			static int i=0;
+			if (i++%300==0)
+				glCheckError("Unreported Error");
+		}
+    frame_time_start = frame_time_end;
+	};
+
+#ifdef __EMSCRIPTEN__
+  emscripten_set_main_loop(loop_iteration, 60, 0);
+#else
+	while (state != appExiting) {
+		while(!glfwWindowShouldClose(window)) {
+			loop_iteration();
 		}
 	}
+#endif
 
 }
 
@@ -281,7 +344,9 @@ void Application::loop()
 	glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
+  #ifndef __EMSCRIPTEN__
+      glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
+  #endif
 
 	globalGalaxy->draw(*camera);
 	testCursor->draw(*camera);
@@ -316,12 +381,28 @@ void Application::loop()
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+#ifndef __EMSCRIPTEN__
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+#endif
 		TwDraw();
 	#endif
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
+
+#ifdef __EMSCRIPTEN__
+  while(true) {
+    bool executed = contentHandler.ExecuteOneTask();
+
+    if (!executed)
+      break;
+
+    float frame_time_end = (float)glfwGetTime();
+    deltaTime = frame_time_end - frame_time_start;
+    if (deltaTime > 1.0 / 60.0)
+      break;
+  }
+#endif
 }
 
 Application::~Application()

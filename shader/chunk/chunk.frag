@@ -1,5 +1,3 @@
-#version 150 core
-
 uniform sampler2DArray Texture;
 
 in vec2 texcoord;

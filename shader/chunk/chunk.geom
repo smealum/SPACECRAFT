@@ -1,5 +1,3 @@
-#version 330
-
 #define logDepth(v) vec4(v.xy,(log2(max(1e-6,1.0+v.w))*logconst-1.0)*v.w,v.w)
 
 layout(points) in;

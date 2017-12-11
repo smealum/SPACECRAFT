@@ -333,6 +333,7 @@ void Chunk::initGLObjects(void)
 
 void Chunk::initGLObjects(std::vector<GL_Vertex>& va, GLuint& vao, GLuint& vbo)
 {
+#ifndef __EMSCRIPTEN__
     if(va.size())
     {
         glGenBuffers(1, &vbo);
@@ -353,6 +354,7 @@ void Chunk::initGLObjects(std::vector<GL_Vertex>& va, GLuint& vao, GLuint& vbo)
     }else{
         vbo=vao=0;
     }
+#endif
 }
 
 void Chunk::destroyGLObjects(void)

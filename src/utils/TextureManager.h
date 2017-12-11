@@ -1,11 +1,15 @@
 #ifndef __TEXTUREMANAGER_H__
 #define __TEXTUREMANAGER_H__
 
-#include <GL/glew.h>
-#ifdef __APPLE__
-#include <OpenGL/gl.h>
+#ifdef __EMSCRIPTEN__
+  #include <GLES3/gl3.h>
 #else
-#include <GL/gl.h>
+  #include <GL/glew.h>
+  #ifdef __APPLE__
+    #include <OpenGL/gl.h>
+  #else
+    #include <GL/gl.h>
+  #endif
 #endif
 
 #include <map>

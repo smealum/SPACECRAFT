@@ -1,8 +1,15 @@
 #ifndef SHADER_F8X43H2W
 #define SHADER_F8X43H2W
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#ifdef __EMSCRIPTEN__
+  #include <GLES3/gl3.h>
+  #include <emscripten/emscripten.h>
+  #define GLFW_INCLUDE_ES3
+  #include <GLFW/glfw3.h>
+#else
+  #include <GL/glew.h>
+  #include <GLFW/glfw3.h>
+#endif
 #include "utils/glm.h"
 #include <string>
 #include <map>
@@ -17,7 +24,9 @@ namespace ShaderType
     enum T {
         Vertex = GL_VERTEX_SHADER,
         Fragment = GL_FRAGMENT_SHADER,
+        #ifndef __EMSCRIPTEN__
         Geometry = GL_GEOMETRY_SHADER
+        #endif
     };
 };
 

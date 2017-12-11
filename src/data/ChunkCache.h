@@ -5,7 +5,9 @@
 
 #define SAVE_DIR "worlddata"
 
-#include <SFML/System/Mutex.hpp>
+#ifndef __EMSCRIPTEN__
+  #include <SFML/System/Mutex.hpp>
+#endif
 #include <map>
 #include <string>
 #include <cstdio>
@@ -45,7 +47,9 @@ class ChunkCache
 		// return true if the element was removed
 		void removeChunk(std::map<std::string,TrackerPointer<ChunkCacheEntry>* >::iterator it);
 
-		sf::Mutex mutex;
+#ifndef __EMSCRIPTEN__
+    sf::Mutex mutex;
+#endif
 		std::map<std::string,TrackerPointer<ChunkCacheEntry>* > m_map;
 
 };

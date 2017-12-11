@@ -1,5 +1,3 @@
-#version 330
-
 smooth in vec4 fcolor;
 smooth in vec3 fnormal;
 smooth in vec3 flightDir;

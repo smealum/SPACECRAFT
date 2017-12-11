@@ -10,25 +10,26 @@ static GLfloat vertices[] =
 	0.0f, 1.0f, 1.0f,
 };
 
-Cursor::Cursor():
-	affected(false),
-	planetModel(glm::mat4(1.0f)),
-	shader(ShaderProgram::loadFromFile("shader/cursor/cursor.vert", "shader/cursor/cursor.frag", "cursor")),
-	time(0.f)
-{
-	//generate VBO
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+Cursor::Cursor()
+    : affected(false), planetModel(glm::mat4(1.0f)),
+      shader(ShaderProgram::loadFromFile(
+          "shader/cursor/cursor.vert", "shader/cursor/cursor.frag", "cursor")),
+      time(0.f) {
+  // generate VBO
+  glGenBuffers(1, &vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
 
-	shader.setBuffers(vao, vbo, 0);
+  shader.setBuffers(vao, vbo, 0);
 
-	shader.use();
-	shader.setAttribute("offset", 3, GL_FALSE, 3, 0);
+#ifndef __EMSCRIPTEN__
+  shader.use();
+  shader.setAttribute("offset", 3, GL_FALSE, 3, 0);
 	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
+#endif
 }
 
 void Cursor::draw(Camera& c)
@@ -37,11 +38,12 @@ void Cursor::draw(Camera& c)
 
 	if(!affected)return;
 
-	shader.use();
+#ifndef __EMSCRIPTEN__
+  shader.use();
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-	c.updateCamera(shader);
+  c.updateCamera(shader);
 
 	glm::mat4 model(1.0f);
 
@@ -91,6 +93,7 @@ void Cursor::draw(Camera& c)
     shader.setUniform("t",time);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 12);
+#endif
 }
 
 void Cursor::setPosition(glm::i32vec3 pos, int dir, glm::vec3 origin, glm::vec3 v1, glm::vec3 v2, glm::mat4 planetModel, int numBlocks)

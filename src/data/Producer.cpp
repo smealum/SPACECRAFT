@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <iostream>
 // waiting function
-#include <SFML/System/Sleep.hpp>
-#include <SFML/System/Time.hpp>
+#ifndef __EMSCRIPTEN__
+  #include <SFML/System/Sleep.hpp>
+  #include <SFML/System/Time.hpp>
+#endif
 #include "utils/dbg.h"
 
 void fakeProducerMain(Producer* p)
@@ -12,38 +14,48 @@ void fakeProducerMain(Producer* p)
 }
 
 Producer::Producer(int id, ContentInputQueue& iq, ContentOutputQueue& oq):
-	thread(new sf::Thread(fakeProducerMain, this)),
+#ifndef __EMSCRIPTEN__
+  thread(new sf::Thread(fakeProducerMain, this)),
+#endif
 	inputQueue(iq),
 	outputQueue(oq),
 	id(id),
 	shouldEnd(false)
 {
-	thread->launch();
+#ifndef __EMSCRIPTEN__
+  thread->launch();
+#endif
 	debug("Thread started");
 }
 
 Producer::~Producer()
 {
-	//thread->terminate();
-	endThread();
-	delete thread;
+#ifndef __EMSCRIPTEN__
+  thread->terminate();
+  endThread();
+  delete thread;
+#endif
 }
 
-void Producer::producerMain()
-{
-	//TODO : attente passive avec signaux
-	//TODO : mieux qu'avec un sleep.
-	while(!shouldEnd)
-	{
-		
-		ContentRequest* cr=inputQueue.pop();
-		if(cr)
-		{
-			if(cr->isRelevant(id))cr->process(id);
-			else cr->isCanceled = true;
-			outputQueue.push(cr);
-		}else{
-			sf::sleep(sf::milliseconds(10));
-		}
-	}
+bool Producer::ExecuteOneTask() {
+  ContentRequest *request = inputQueue.pop();
+  if (!request)
+    return false;
+  if (request->isRelevant(id))
+    request->process(id);
+  else
+    request->isCanceled = true;
+  outputQueue.push(request);
+  return true;
+}
+
+void Producer::producerMain() {
+#ifndef __EMSCRIPTEN__
+  // TODO : attente passive avec signaux
+  // TODO : mieux qu'avec un sleep.
+  while (!shouldEnd) {
+    if (!ExecuteOneTask())
+      sf::sleep(sf::milliseconds(10));
+  }
+#endif
 }

@@ -1,3 +1,4 @@
+#ifndef __EMSCRIPTEN__
 #include "noise/PlanetNoiseGenerator.h"
 
 PlanetNoiseGenerator::PlanetNoiseGenerator(const PlanetInfoEarth & pinfo):
@@ -567,3 +568,4 @@ PlanetNoiseGenerator::~PlanetNoiseGenerator()
 {
 
 }
+#endif

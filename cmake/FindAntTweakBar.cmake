@@ -37,4 +37,3 @@ ELSE()
     message(STATUS "AntTweakBar NOT found!")
     return()
 ENDIF(ANTTWEAKBAR_LIBRARY AND ANTTWEAKBAR_INCLUDE_DIRS)
-

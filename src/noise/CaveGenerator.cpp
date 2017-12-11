@@ -16,18 +16,19 @@ CaveGenerator::CaveGenerator() :
 	holes(CAVE_CHUNK_SIZE_X*CAVE_CHUNK_SIZE_Z),
 	isGenerated(false)
 {
-	posNoise.SetSeed(seed);
-	// TODO noise for positions
+#ifndef __EMSCRIPTEN__
+  posNoise.SetSeed(seed);
+  // TODO noise for positions
 
-	for (int i = 0; i < 3; i++)
-	{
-		rotNoise[i].SetSeed(seed+i);
-		rotNoise[i].SetFrequency(1.0);
-		rotNoise[i].SetLacunarity(2.375);
-		rotNoise[i].SetOctaveCount(3);
-		rotNoise[i].SetPersistence(0.5);
-		rotNoise[i].SetNoiseQuality(noise::QUALITY_STD);
-	}
+  for (int i = 0; i < 3; i++) {
+    rotNoise[i].SetSeed(seed + i);
+    rotNoise[i].SetFrequency(1.0);
+    rotNoise[i].SetLacunarity(2.375);
+    rotNoise[i].SetOctaveCount(3);
+    rotNoise[i].SetPersistence(0.5);
+    rotNoise[i].SetNoiseQuality(noise::QUALITY_STD);
+  }
+#endif
 }
 
 // helper to transform angle from [-1, 1] to [-2π, 2π]
@@ -44,6 +45,7 @@ void CaveGenerator::generate()
 	if (isGenerated) return;
 	isGenerated=true;
 
+#ifndef __EMSCRIPTEN__
 	log_info("Cave Generation");
 
 	// first generate the points where the worms start
@@ -57,7 +59,7 @@ void CaveGenerator::generate()
 		conPoints.push_back(vector<vec3>(1,vec3(x,y,z)));
 	}
 
-	float scale = 0.06;
+  float scale = 0.06;
 	float yy = 0.f,
 		  zz = 0.f; // used to get the noise
 
@@ -125,6 +127,8 @@ void CaveGenerator::generate()
 			}
 		}
 	}
+
+#endif
 	computeList();
 	log_info("Cave Generation (fin)");
 }

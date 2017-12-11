@@ -1,10 +1,10 @@
+#include <iostream>
 #include "Galaxy.h"
 #include <list>
 #include "utils/dbg.h"
 #include "SolarSystem.h"
 #include "render/Shader.h"
 #include "Planet.h"
-
 
 using namespace glm;
 using namespace std;
@@ -93,7 +93,9 @@ void Galaxy::generateVBO()
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
+#ifndef __EMSCRIPTEN__
 	glBindFragDataLocation(program.getHandle(), 0, "outColor");
+#endif
 	program.setAttribute("position", 3, GL_FALSE, 4, 0);
 	program.setAttribute("offset", 1, GL_FALSE, 4, 3);
 
@@ -109,8 +111,7 @@ glm::dvec3 Galaxy::getGlobalPosition(glm::dvec3 p)
 
 void Galaxy::step(Camera& camera, ContentHandler& contentHandler, float globalTime, float deltaTime)
 {
-	if (currentSolarSystem)
-	{
+	if (currentSolarSystem) {
 		currentSolarSystem->update(globalTime);
 	}
 	
@@ -147,8 +148,7 @@ void Galaxy::step(Camera& camera, ContentHandler& contentHandler, float globalTi
 			camera.movePositionDouble(*selectedPosition);
 
 		// suppression du précédent système solaire.
-		if (currentSolarSystem)
-		{
+		if (currentSolarSystem) {
 			// TODO suppression du contenu généré
 			currentSolarSystem->deleteSolarSystem();
 			currentSolarSystem = NULL;

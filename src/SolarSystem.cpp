@@ -33,22 +33,22 @@ void SolarSystem::deleteSolarSystem(void)
 
 void SolarSystem::draw(Camera& c)
 {
-	if(!generated)return;
+  if(!generated)return;
 
 	sun->draw(c);
 
-	//dessin normal
-	for(int i=0;i<numPlanets;i++)
-	{
-		planets[i]->processLevelOfDetail(c);
-		planets[i]->draw(c);
-	}
+  //dessin normal
+  for(int i=0;i<numPlanets;i++)
+  {
+    planets[i]->processLevelOfDetail(c);
+    planets[i]->draw(c);
+  }
 
-	//dessin atmosphère
-	for(int i=0;i<numPlanets;i++)
-	{
-		planets[i]->draw(c, true);
-	}
+  //dessin atmosphère
+  for(int i=0;i<numPlanets;i++)
+  {
+    planets[i]->draw(c, true);
+  }
 
 	sun->drawGlow(c);
 }

@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "utils/stb_image.h"
 #include <cstdlib>
 #include "utils/TextureManager.h"
@@ -16,13 +18,16 @@ unsigned char * imageLoad(
 	unsigned char *data;
 
 	FILE *file = fopen(filename.c_str(), "rb");
-	if (!file)
+	if (!file) {
+    std::cerr << "File not found" << std::endl;
 		return 0;
+  }
 
 	data = stbi_load_from_file(file, &width, &height, &comp, 0);
 
-	cout<<"imageLoad[\""<<filename<<"\","<<(void*)data<<","<<width<<","<<height<<","<<comp<<"]"<<endl;
-	fclose(file);
+  cout << "imageLoad[\"" << filename << "\"," << (void *)data << ","
+       << width << "," << height << "," << comp << "]" << endl;
+  fclose(file);
 
 	return data;
 }
@@ -60,7 +65,10 @@ GLuint TextureManager::loadTexture(const std::string& filename)
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+#ifndef __EMSCRIPTEN__
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, (comp==4)?GL_RGBA:GL_RGB, GL_UNSIGNED_BYTE, data);
+#endif
 
 	free(data);
 
@@ -178,4 +186,3 @@ void TextureManager::getTextureSize(const std::string& filename, int *width, int
 	*width = it->second.width;
 	*height = it->second.height;
 }
-

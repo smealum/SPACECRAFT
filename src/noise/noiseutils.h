@@ -23,6 +23,8 @@
 #ifndef NOISEUTILS_H
 #define NOISEUTILS_H
 
+#ifndef __EMSCRIPTEN__
+
 #include <stdlib.h>
 #include <string.h>
 #include <string>
@@ -2536,5 +2538,7 @@ namespace noise
   }
 
 }
+
+#endif
 
 #endif

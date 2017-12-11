@@ -433,7 +433,9 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf, int ms, glm::ve
 {
 	resizeVBO();
 	shader.use();
+#ifndef __EMSCRIPTEN__
 	glBindFragDataLocation(shader.getHandle(), 0, "outColor");
+#endif
 
 	shader.setUniform("model", glm::mat4(1.0f));
 }

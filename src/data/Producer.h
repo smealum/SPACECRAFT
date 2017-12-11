@@ -1,7 +1,9 @@
 #ifndef PRODUCER_H
 #define PRODUCER_H
 
-#include <SFML/System/Thread.hpp>
+#ifndef __EMSCRIPTEN__
+  #include <SFML/System/Thread.hpp>
+#endif
 #include "data/ContentRequest.h"
 
 typedef SynchronizationQueue<ContentRequest*> ContentOutputQueue;
@@ -12,12 +14,15 @@ class Producer
 		Producer(int id, ContentInputQueue& inputQueue, ContentOutputQueue& outputQueue);
 		void producerMain();
 		inline void endThread() { shouldEnd = true; } // ask the producer to end the thread
+    bool ExecuteOneTask();
 		~Producer();
 	private:
 		Producer();
 		
 		int id;
-		sf::Thread *thread;
+#ifndef __EMSCRIPTEN__
+    sf::Thread *thread;
+#endif
 		//FIFO synallagmatique
 		ContentInputQueue& inputQueue;
 		ContentOutputQueue& outputQueue;
