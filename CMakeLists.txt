@@ -18,11 +18,11 @@ if (CMAKE_BUILD_TYPE MATCHES "RELEASE")
   #add_definitions(-DNTWBAR)
 endif()
 
-# C++ 11
+# C++ 14
 if (Web)
-  string(APPEND CMAKE_CXX_FLAGS " --std=c++11")
+  string(APPEND CMAKE_CXX_FLAGS " --std=c++14")
 else()
-  set (CMAKE_CXX_STANDARD 11)
+  set (CMAKE_CXX_STANDARD 14)
 endif()
 
 # modules

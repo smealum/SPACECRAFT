@@ -4,16 +4,12 @@ uniform float alpha;
 in float fluminosity;
 flat in int ftile;
 in vec2 ftexCoords;
-in float frepeat;
+flat in float frepeat;
 
 out vec4 outColor;
 
-void main()
-{
-    outColor = texture(Texture,vec3(ftexCoords.xy*frepeat,ftile));
-	// XXX
-	// outColor.xyz-=2.0*(1.0-outColor.a);
-	outColor.xyz*=fluminosity;
-	// outColor.a=alpha;
-	outColor.a=1.0;
+void main() {
+  outColor = texture(Texture,vec3(ftexCoords.xy*frepeat,ftile));
+	outColor.xyz *= fluminosity;
+	outColor.a = 1.0;
 }

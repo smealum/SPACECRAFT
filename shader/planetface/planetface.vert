@@ -16,7 +16,7 @@ out float gminElevation;
 out float gsize;
 flat out int gtopTile;
 flat out int gsideTile;
-out float grepeat;
+flat out float grepeat;
 
 void main()
 {

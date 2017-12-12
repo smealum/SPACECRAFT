@@ -19,12 +19,12 @@ in vec3 gv2[];
 in float gelevation[];
 in float gminElevation[];
 in float gsize[];
-in float grepeat[];
+flat in float grepeat[];
 
 out float fluminosity;
 flat out int ftile;
 out vec2 ftexCoords;
-out float frepeat;
+flat out float frepeat;
 
 void main()
 {
