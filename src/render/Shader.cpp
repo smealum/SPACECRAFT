@@ -14,6 +14,7 @@ const std::string shader_header =
 #ifdef __EMSCRIPTEN__
 "#version 300 es\n"
 "precision mediump float;\n"
+"precision mediump int;\n"
 "precision mediump sampler2DArray;\n";
 #else
 "#version 330\n";
@@ -489,23 +490,21 @@ void ShaderProgram::use()
 	}
 }
 
-void ShaderProgram::setAttribute(const std::string& name, GLint size, GLboolean normalized, GLsizei stride, GLuint offset, GLenum type)
-{
-    GLint loc = attribLocation(name);
-    glEnableVertexAttribArray(loc);
-    glVertexAttribPointer(
-            loc,
-            size,
-            type,
-            normalized,
-            stride*sizeof(GLfloat),
-            (void*)(offset*sizeof(GLfloat))
-	);
-    attributes[name].size = size;
-    attributes[name].normalized = normalized;
-    attributes[name].stride = stride;
-    attributes[name].offset = offset;
-    attributes[name].type = type;
+void ShaderProgram::setAttribute(const std::string& name,
+                                 GLint size,
+                                 GLboolean normalized,
+                                 GLsizei stride,
+                                 GLuint offset,
+                                 GLenum type) {
+  GLint loc = attribLocation(name);
+  glEnableVertexAttribArray(loc);
+  glVertexAttribPointer(loc, size, type, normalized, stride * sizeof(GLfloat),
+                        (void*)(offset * sizeof(GLfloat)));
+  attributes[name].size = size;
+  attributes[name].normalized = normalized;
+  attributes[name].stride = stride;
+  attributes[name].offset = offset;
+  attributes[name].type = type;
 }
 
 void ShaderProgram::setBuffers(GLint vao, GLint vbo, GLint ebo)
@@ -615,4 +614,3 @@ void ShaderProgram::loadUniforms()
     }
 
 }
-

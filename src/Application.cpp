@@ -299,7 +299,7 @@ void Application::run()
 			time = 0.f;
 			glfwSetWindowTitle(
           window,
-          (WIN_TITLE + " fps = " + std::to_string(fps)).c_str());
+          (" fps = " + std::to_string(fps) + WIN_TITLE).c_str());
 		}
 		// test des ereurs openGL non reportées:
 		{
@@ -392,6 +392,7 @@ void Application::loop()
 
 #ifdef __EMSCRIPTEN__
   while(true) {
+    for(int i = 0; i<10; ++i);
     bool executed = contentHandler.ExecuteOneTask();
 
     if (!executed)
@@ -399,7 +400,7 @@ void Application::loop()
 
     float frame_time_end = (float)glfwGetTime();
     deltaTime = frame_time_end - frame_time_start;
-    if (deltaTime > 1.0 / 60.0)
+    if (deltaTime > 1.0 / 30.0)
       break;
   }
 #endif

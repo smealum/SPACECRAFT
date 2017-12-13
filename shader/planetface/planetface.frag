@@ -1,15 +1,14 @@
 uniform sampler2DArray Texture;
 uniform float alpha;
 
-in float fluminosity;
-flat in int ftile;
-in vec2 ftexCoords;
-flat in float frepeat;
+in vec2 f_texture_coordinate;
+in float luminancy;
+flat in int f_tile;
 
 out vec4 outColor;
 
 void main() {
-  outColor = texture(Texture,vec3(ftexCoords.xy*frepeat,ftile));
-	outColor.xyz *= fluminosity;
+  outColor = texture(Texture,vec3(f_texture_coordinate.xy,f_tile));
+  outColor.rgb *= luminancy;
 	outColor.a = 1.0;
 }

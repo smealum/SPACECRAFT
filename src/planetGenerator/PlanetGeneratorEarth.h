@@ -23,9 +23,7 @@ class PlanetGeneratorEarth : public PlanetGenerator
 		virtual float getElevation(int threadId, const glm::vec3 &coord);
 	
 	private:
-    #ifndef __EMSCRIPTEN__
-		  std::vector<PlanetNoiseGenerator*> generators;
-    #endif
+    std::vector<PlanetNoiseGenerator*> generators;
 		std::vector<Tree> treePool;
 
 		void initGenerators();

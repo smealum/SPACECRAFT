@@ -24,17 +24,14 @@ PlanetGeneratorEarth::PlanetGeneratorEarth(int nbThread):
 	}
 }
 
-void PlanetGeneratorEarth::initGenerators()
-{
-#ifndef __EMSCRIPTEN__
-	for(int i=0;i<nbThread;++i)
-		generators.push_back(new PlanetNoiseGenerator(*((PlanetInfoEarth*)planetInfo)));
-#endif
+void PlanetGeneratorEarth::initGenerators() {
+  for (int i = 0; i < nbThread; ++i) {
+    generators.push_back(
+        new PlanetNoiseGenerator(*((PlanetInfoEarth*)planetInfo)));
+  }
 }
 
-PlanetGeneratorEarth::~PlanetGeneratorEarth()
-{
-}
+PlanetGeneratorEarth::~PlanetGeneratorEarth() {}
 
 void PlanetGeneratorEarth::setPlanetInfo(PlanetInfo* p)
 {
@@ -335,12 +332,10 @@ PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, co
 
 float PlanetGeneratorEarth::getElevation(int threadId, const glm::vec3 &coord)
 {
-#ifndef __EMSCRIPTEN__
-	float elevation = (generators[threadId]->getElevation(glm::normalize(coord))+1.0)/2.0f;
-#else
-  float elevation = 0.5f;
-#endif
-	return blockHeightToElevation(elevation*float(CHUNK_N*MINIWORLD_H), planetInfo->numBlocks);
+  float elevation =
+      (generators[threadId]->getElevation(glm::normalize(coord)) + 1.0) / 2.0f;
+  return blockHeightToElevation(elevation * float(CHUNK_N * MINIWORLD_H),
+                                planetInfo->numBlocks);
 }
 
 float PlanetGeneratorEarth::getTemperature(const glm::vec3& pos)

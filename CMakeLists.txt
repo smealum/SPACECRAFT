@@ -63,6 +63,10 @@ if (Web)
   string(APPEND CMAKE_CXX_FLAGS " -s ASSERTIONS=1")
   string(APPEND CMAKE_CXX_FLAGS " -s USE_WEBGL2=1")
   string(APPEND CMAKE_CXX_FLAGS " -s FULL_ES3=1")
+  string(APPEND CMAKE_CXX_FLAGS " -s WASM=1")
+  string(APPEND CMAKE_CXX_FLAGS " --no-heap-copy")
+  string(APPEND CMAKE_CXX_FLAGS " --closure 1")
+  string(APPEND CMAKE_CXX_FLAGS " --llvm-lto 1")
 
   # Allow the directories /shader and /data to be fetched by the web browser.
   file(GLOB shader_files "${CMAKE_SOURCE_DIR}/shader/**/*")

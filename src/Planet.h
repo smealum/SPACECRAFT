@@ -1,10 +1,11 @@
 #ifndef PLANET_H
 #define PLANET_H
 
+#include <array>
+#include <list>
 #include <memory>
 #include <string>
 #include <vector>
-#include <list>
 
 #include "PlanetInfo.h"
 #include "noise/PlanetNoiseGenerator.h"
@@ -25,17 +26,8 @@
 class Planet;
 class PlanetFace;
 
-struct FaceBufferEntry {
-  float pos[3];
-  float elevation;
-  float minElevation;
-  float size;
-  int topTile;
-  int sideTile;
-  float repeat;
-};
-
 class PlanetFaceBufferHandler {
+
  public:
   PlanetFaceBufferHandler(PlanetFace& pf,
                           int ms,
@@ -59,7 +51,18 @@ class PlanetFaceBufferHandler {
   ShaderProgram& shader;
   PlanetFace& planetFace;
   std::vector<PlanetFace*> faces;
-  std::vector<FaceBufferEntry> buffer;
+
+  struct Vertex {
+    glm::vec3 position;
+    glm::vec3 normal;
+    glm::vec2 texture_coordinate;
+    float tile;
+  };
+  using Cube = std::array<Vertex, 6*5>;
+  static constexpr size_t CubeSize =
+      std::tuple_size<Cube>::value * sizeof(Vertex);
+  std::vector<Cube> buffer;
+
   int max_size;
   int current_size;
   int current_capacity;

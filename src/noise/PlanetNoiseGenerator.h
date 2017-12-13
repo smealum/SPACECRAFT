@@ -1,12 +1,13 @@
 #ifndef  __PLANETGENERATOR_H__ 
 #define __PLANETGENERATOR_H__
 
+#include <utils/glm.h>
+#include "PlanetInfo.h"
+
 #ifndef __EMSCRIPTEN__
 
 #include <noise/noise.h>
 #include "noise/noiseutils.h"
-#include <utils/glm.h>
-#include "PlanetInfo.h"
 
 // TODO tester d'enlever les cache ou de de les supprimer car ils ne conservent que la dernière valeur demandée
 
@@ -625,6 +626,26 @@ public:
     return continentsWithRivers.GetValue(v.x, v.y, v.z);
   }
 
+};
+
+#else
+
+class PlanetNoiseGenerator {
+ public:
+  PlanetNoiseGenerator(const PlanetInfoEarth& pi) : pi(pi) {}
+  ~PlanetNoiseGenerator() {}
+
+  inline float getElevation(const glm::vec3& v) {
+    float result = 0.0;
+    for (float k = 1.0; k >= 0.01; k *= 0.2) {
+      float inv = 1000.0 / k;
+      result += k * (sin(v.x * inv) * sin(v.y * inv) * sin(v.z * inv));
+    }
+    return result + pi.seaLevel;
+  }
+
+ private:
+  const PlanetInfoEarth& pi;
 };
 
 #endif

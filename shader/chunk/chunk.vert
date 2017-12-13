@@ -18,7 +18,6 @@ void main()
 {
 	const float ambient=0.2;
 	float col=max(dot(mat3(model)*normal,lightdir),0.0)+ambient;
-    col*=(elevation-1.00)*600.0;
 	vec4 r=proj*view*model*vec4(position,1.0);
 	gl_Position=logDepth(r);
 	texcoord=intexcoord;
