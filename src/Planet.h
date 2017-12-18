@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "CubeVertex.h"
 #include "PlanetInfo.h"
 #include "noise/PlanetNoiseGenerator.h"
 #include "render/Atmosphere.h"
@@ -52,16 +53,7 @@ class PlanetFaceBufferHandler {
   PlanetFace& planetFace;
   std::vector<PlanetFace*> faces;
 
-  struct Vertex {
-    glm::vec3 position;
-    glm::vec3 normal;
-    glm::vec2 texture_coordinate;
-    float tile;
-  };
-  using Cube = std::array<Vertex, 6*5>;
-  static constexpr size_t CubeSize =
-      std::tuple_size<Cube>::value * sizeof(Vertex);
-  std::vector<Cube> buffer;
+  std::vector<CubeVertex> buffer;
 
   int max_size;
   int current_size;
@@ -69,6 +61,9 @@ class PlanetFaceBufferHandler {
   GLuint vbo, vao;
   glm::vec3 v1, v2;
   float alpha;
+
+  int vertex_per_cube;
+  bool water;
 };
 
 // Vertex position

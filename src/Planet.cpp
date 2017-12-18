@@ -430,14 +430,11 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf,
       vao(0),
       index(index),
       alpha(alpha),
-      shader(water ? ShaderProgram::loadFromFile(
-                         "shader/planetface/planetface.vert",
-                         "shader/planetface/planetface.frag",
-                         "planetface")
-                   : ShaderProgram::loadFromFile(
-                         "shader/planetface/planetface.vert",
-                         "shader/planetface/planetface.frag",
-                         "planetface")) {
+      shader(ShaderProgram::loadFromFile("shader/CubeVertex/CubeVertex.vert",
+                                         "shader/CubeVertex/CubeVertex.frag",
+                                         "CubeVertex")),
+      vertex_per_cube(water ? 6 : 30),
+      water(water) {
   resizeVBO();
   shader.use();
 #ifndef __EMSCRIPTEN__
@@ -468,10 +465,12 @@ int PlanetFaceBufferHandler::getSize(void) {
 void PlanetFaceBufferHandler::resizeVBO(void) {
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, current_capacity * CubeSize, NULL,
+  glBufferData(GL_ARRAY_BUFFER,
+               current_capacity * vertex_per_cube * sizeof(CubeVertex), NULL,
                GL_STATIC_DRAW);
   if (current_size != 0) {
-    glBufferSubData(GL_ARRAY_BUFFER, 0, current_size * CubeSize,
+    glBufferSubData(GL_ARRAY_BUFFER, 0,
+                    current_size * vertex_per_cube * sizeof(CubeVertex),
                     (void*)&buffer[0]);
   }
 
@@ -481,10 +480,7 @@ void PlanetFaceBufferHandler::resizeVBO(void) {
   shader.setBuffers(vao, vbo, 0);
   shader.use();
 
-  shader.setAttribute("position", 3, GL_FALSE, 9, 0);
-  shader.setAttribute("normal", 3, GL_TRUE, 9, 3);
-  shader.setAttribute("texture_coordinate", 2, GL_FALSE, 9, 6);
-  shader.setAttribute("tile", 1, GL_FALSE, 9, 8);
+  CubeVertex::SetAttributes(&shader);
 }
 
 // TODO : grouper les glBufferSubData de façon intelligente à chaque frame
@@ -492,7 +488,8 @@ void PlanetFaceBufferHandler::resizeVBO(void) {
 // queue ?)
 
 void PlanetFaceBufferHandler::addFace(PlanetFace* pf) {
-  addFace(pf, pf->elevation - (1.0f / pf->planet->getNumBlocks()), pf->tile);
+  float numblocks = pf->planet->getNumBlocks();
+  addFace(pf, int(pf->elevation * numblocks - 1.0) / numblocks, pf->tile);
 }
 
 void PlanetFaceBufferHandler::addFace(PlanetFace* pf,
@@ -512,34 +509,6 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf,
   float topTile = getBlockID(tile, blockPlane::top) + 0.5;
   float sideTile = getBlockID(tile, blockPlane::side) + 0.5;
 
-  // float repeat;
-
-  // if (pf->depth < MINIWORLD_DETAIL)
-  //{
-  // repeat = 1<<(MINIWORLD_DETAIL-(pf->depth));
-  //}
-  // else
-  //{
-  // // version 1
-  // repeat = 1;
-
-  // // version 2
-  // int depth = pf->depth;
-  // while(depth<MINIWORLD_DETAIL)
-  //{
-  // repeat*=0.5;
-  // depth++;
-  //}
-  //}
-  // repeat *= MINIWORLD_W * CHUNK_N;
-
-  // peut-être que c'est mieux ainsi ?
-  // j'attend des feedback (si quelqu'un passe par là)
-  //-------------------------------------------------
-  //
-
-  // repeat = 2.0;
-
   faces.push_back(pf);
 
   // 0 -- 1
@@ -550,8 +519,8 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf,
   // |    |
   // 7 -- 6
 
-  float size = (1 << pf->size);
-  float inv_size = 1.f / size;
+  const float size = (1 << pf->size);
+  const float inv_size = 1.f / size;
   glm::vec3 position[8] = {
       elevation * glm::normalize(n + inv_size * (-v1 + v2)),
       elevation * glm::normalize(n + inv_size * (v1 + v2)),
@@ -563,68 +532,65 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf,
       pf->minElevation * glm::normalize(n + inv_size * (-v1 - v2)),
   };
 
-  glm::vec3 normal_left(1.0, 0.0, 0.0);
-  glm::vec3 normal_right(-1.0, 0.0, 0.0);
-  glm::vec3 normal_up(0.0, -1.0, 0.0);
-  glm::vec3 normal_down(0.0, 1.0, 0.0);
+  // Always drawn
+  {
+    // Top
+    buffer.push_back({position[0], position[0], {0.f, 0.f}, topTile});
+    buffer.push_back({position[1], position[1], {1.f, 0.f}, topTile});
+    buffer.push_back({position[2], position[2], {1.f, 1.f}, topTile});
+    buffer.push_back({position[0], position[0], {0.f, 0.f}, topTile});
+    buffer.push_back({position[2], position[2], {1.f, 1.f}, topTile});
+    buffer.push_back({position[3], position[3], {0.f, 1.f}, topTile});
+  }
 
-  buffer.push_back({// Top
-                    Vertex({position[0], position[0], {0.0, 0.0}, topTile}),
-                    Vertex({position[1], position[1], {1.0, 0.0}, topTile}),
-                    Vertex({position[2], position[2], {1.0, 1.0}, topTile}),
+  if (!water) {
+    // normales
+    glm::vec3 n_left =
+        glm::cross(position[3] - position[4], position[7] - position[0]);
+    glm::vec3 n_down =
+        glm::cross(position[5] - position[7], position[6] - position[4]);
+    glm::vec3 n_right = -n_left;
+    glm::vec3 n_up = -n_down;
 
-                    Vertex({position[0], position[0], {0.0, 0.0}, topTile}),
-                    Vertex({position[2], position[2], {1.0, 1.0}, topTile}),
-                    Vertex({position[3], position[3], {0.0, 1.0}, topTile}),
+    // Left
+    buffer.push_back({position[4], n_left, {0.f, 1.f}, sideTile});
+    buffer.push_back({position[0], n_left, {0.f, 0.f}, sideTile});
+    buffer.push_back({position[3], n_left, {1.f, 0.f}, sideTile});
+    buffer.push_back({position[4], n_left, {0.f, 1.f}, sideTile});
+    buffer.push_back({position[3], n_left, {1.f, 0.f}, sideTile});
+    buffer.push_back({position[7], n_left, {1.f, 1.f}, sideTile});
 
-                    // Left
-                    Vertex({position[4], normal_left, {0.0, 1.0}, sideTile}),
-                    Vertex({position[0], normal_left, {0.0, 0.0}, sideTile}),
-                    Vertex({position[3], normal_left, {1.0, 0.0}, sideTile}),
+    // Right
+    buffer.push_back({position[6], n_right, {0.f, 1.f}, sideTile});
+    buffer.push_back({position[2], n_right, {0.f, 0.f}, sideTile});
+    buffer.push_back({position[1], n_right, {1.f, 0.f}, sideTile});
+    buffer.push_back({position[6], n_right, {0.f, 1.f}, sideTile});
+    buffer.push_back({position[1], n_right, {1.f, 0.f}, sideTile});
+    buffer.push_back({position[5], n_right, {1.f, 1.f}, sideTile});
 
-                    Vertex({position[4], normal_left, {0.0, 1.0}, sideTile}),
-                    Vertex({position[3], normal_left, {1.0, 0.0}, sideTile}),
-                    Vertex({position[7], normal_left, {1.0, 1.0}, sideTile}),
+    // Up
+    buffer.push_back({position[5], n_up, {0.f, 1.f}, sideTile});
+    buffer.push_back({position[1], n_up, {0.f, 0.f}, sideTile});
+    buffer.push_back({position[0], n_up, {1.f, 0.f}, sideTile});
+    buffer.push_back({position[5], n_up, {0.f, 1.f}, sideTile});
+    buffer.push_back({position[0], n_up, {1.f, 0.f}, sideTile});
+    buffer.push_back({position[4], n_up, {1.f, 1.f}, sideTile});
 
-                    // Right
-                    Vertex({position[6], normal_right, {0.0, 1.0}, sideTile}),
-                    Vertex({position[2], normal_right, {0.0, 0.0}, sideTile}),
-                    Vertex({position[1], normal_right, {1.0, 0.0}, sideTile}),
-
-                    Vertex({position[6], normal_right, {0.0, 1.0}, sideTile}),
-                    Vertex({position[1], normal_right, {1.0, 0.0}, sideTile}),
-                    Vertex({position[5], normal_right, {1.0, 1.0}, sideTile}),
-
-                    // Up
-                    Vertex({position[5], normal_up, {0.0, 1.0}, sideTile}),
-                    Vertex({position[1], normal_up, {0.0, 0.0}, sideTile}),
-                    Vertex({position[0], normal_up, {1.0, 0.0}, sideTile}),
-
-                    Vertex({position[5], normal_up, {0.0, 1.0}, sideTile}),
-                    Vertex({position[0], normal_up, {1.0, 0.0}, sideTile}),
-                    Vertex({position[4], normal_up, {1.0, 1.0}, sideTile}),
-
-                    // Down
-                    Vertex({position[7], normal_down, {0.0, 1.0}, sideTile}),
-                    Vertex({position[3], normal_down, {0.0, 0.0}, sideTile}),
-                    Vertex({position[2], normal_down, {1.0, 0.0}, sideTile}),
-
-                    Vertex({position[7], normal_down, {0.0, 1.0}, sideTile}),
-                    Vertex({position[2], normal_down, {1.0, 0.0}, sideTile}),
-                    Vertex({position[6], normal_down, {1.0, 1.0}, sideTile})});
-
-  // buffer.push_back(Vertex{{n.x, n.y, n.z},
-  // elevation,
-  // pf->minElevation,
-  // 1.0f / (1 << pf->size),
-  // topTile,
-  // sideTile,
-  // repeat});
+    // Down
+    buffer.push_back({position[7], n_down, {0.f, 1.f}, sideTile});
+    buffer.push_back({position[3], n_down, {0.f, 0.f}, sideTile});
+    buffer.push_back({position[2], n_down, {1.f, 0.f}, sideTile});
+    buffer.push_back({position[7], n_down, {0.f, 1.f}, sideTile});
+    buffer.push_back({position[2], n_down, {1.f, 0.f}, sideTile});
+    buffer.push_back({position[6], n_down, {1.f, 1.f}, sideTile});
+  }
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferSubData(GL_ARRAY_BUFFER, current_size * CubeSize, CubeSize,
-                  (void*)&buffer[current_size]);
 
+  glBufferSubData(GL_ARRAY_BUFFER,
+                  current_size * sizeof(CubeVertex) * vertex_per_cube,
+                  sizeof(CubeVertex) * vertex_per_cube,
+                  (void*)&buffer[vertex_per_cube * current_size]);
   pf->bufferID[index] = current_size;
   current_size++;
 
@@ -637,17 +603,27 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf) {
     return;
 
   if (faces.size() > 1) {
+    // Move the last element into 'i'.
     faces[i] = faces[current_size - 1];
-    buffer[i] = buffer[current_size - 1];
     faces[i]->bufferID[index] = i;
+    for (int j = 0; j < vertex_per_cube; ++j) {
+      buffer[vertex_per_cube * i + j] =
+          buffer[vertex_per_cube * (current_size - 1) + j];
+    }
 
+    // Update the OpenGL buffer.
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, i * CubeSize, CubeSize, (void*)&buffer[i]);
+    glBufferSubData(GL_ARRAY_BUFFER, vertex_per_cube * sizeof(CubeVertex) * i,
+                    vertex_per_cube * sizeof(CubeVertex),
+                    (void*)&buffer[vertex_per_cube * i]);
   }
 
+  // Remove the last element.
   pf->bufferID[index] = -1;
-  buffer.pop_back();
   faces.pop_back();
+  for (int j = 0; j < vertex_per_cube; ++j) {
+    buffer.pop_back();
+  }
   current_size--;
   pf->isDisplayOk = false;
 }
@@ -682,8 +658,8 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir) {
   glBindTexture(GL_TEXTURE_2D_ARRAY, TileTexture::getInstance().get());
   shader.setUniform("Texture", 0);
 
-  glDrawArrays(GL_TRIANGLES, 0, current_size * std::tuple_size<Cube>::value);
-  // printf("%d, %d\n",current_size,faces.size());
+  glDrawArrays(GL_TRIANGLES, 0,
+               current_size * vertex_per_cube);
 }
 
 void PlanetFace::draw(Camera& c, glm::vec3 lightdir, bool water) {

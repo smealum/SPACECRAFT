@@ -1,12 +1,14 @@
 #ifndef __BLOCKTYPE_H__
 #define __BLOCKTYPE_H__
 
-#include "utils/glm.h"
-#include "utils/TextureManager.h"
-#include "utils/Singleton.h"
-#include <vector>
-#include <list>
 #include <cassert>
+#include <list>
+#include <vector>
+
+#include "utils/Singleton.h"
+#include "utils/TextureManager.h"
+#include "utils/glm.h"
+
 #define TEXCOLS 16
 
 // x, y in [0..1]

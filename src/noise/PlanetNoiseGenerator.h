@@ -630,21 +630,21 @@ public:
 
 #else
 
+#include "utils/SimplexNoise.h"
+
 class PlanetNoiseGenerator {
  public:
-  PlanetNoiseGenerator(const PlanetInfoEarth& pi) : pi(pi) {}
+  PlanetNoiseGenerator(const PlanetInfoEarth& pi)
+      : pi(pi), noise(1.0, 1.0, 4.0, 0.5) {}
   ~PlanetNoiseGenerator() {}
 
   inline float getElevation(const glm::vec3& v) {
-    float result = 0.0;
-    for (float k = 1.0; k >= 0.01; k *= 0.2) {
-      float inv = 1000.0 / k;
-      result += k * (sin(v.x * inv) * sin(v.y * inv) * sin(v.z * inv));
-    }
-    return result + pi.seaLevel;
+    return noise.fractal(10, v.x, v.y) +
+           noise.fractal(10, v.y, v.z) + pi.seaLevel;
   }
 
  private:
+  SimplexNoise noise;
   const PlanetInfoEarth& pi;
 };
 

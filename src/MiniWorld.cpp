@@ -58,23 +58,21 @@ std::string MiniWorld::getName(void)
 	return name;
 }
 
-void MiniWorld::draw(Camera& c, bool reg)
-{
-	//TODO : passer frustum culling en octree ?
-	//TODO : occlusion culling ?
+void MiniWorld::draw(Camera& c, bool reg) {
+  // TODO : passer frustum culling en octree ?
+  // TODO : occlusion culling ?
 
-	model=glm::translate(glm::mat4(1.0f),planet->getPosition()-c.getReference())*glm::mat4(planet->getModel());
+  model = glm::translate(glm::mat4(1.0f),
+                         planet->getPosition() - c.getReference()) *
+          glm::mat4(planet->getModel());
 
-	for(int i=0;i<MINIWORLD_W;i++)
-	{
-		for(int j=0;j<MINIWORLD_H;j++)
-		{
-			for(int k=0;k<MINIWORLD_D;k++)
-			{
-				chunks[i][j][k]->draw(c, model, reg);
-			}
-		}
-	}
+  for (int i = 0; i < MINIWORLD_W; i++) {
+    for (int j = 0; j < MINIWORLD_H; j++) {
+      for (int k = 0; k < MINIWORLD_D; k++) {
+        chunks[i][j][k]->draw(c, model, reg);
+      }
+    }
+  }
 }
 
 bool MiniWorld::isConstructionCanceled()
@@ -98,7 +96,7 @@ TrackerPointer<MiniWorld>* MiniWorld::getTptr(void)
 	return tptr;
 }
 
-void MiniWorld::updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)], std::vector<GL_Vertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D], std::vector<GL_Vertex> valpha[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D], bool modified)
+void MiniWorld::updateChunks(chunkVal data[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D][(CHUNK_N+2)*(CHUNK_N+2)*(CHUNK_N+2)], std::vector<CubeVertex> va[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D], std::vector<CubeVertex> valpha[MINIWORLD_W][MINIWORLD_H][MINIWORLD_D], bool modified)
 {
 	this->modified=modified;
 	generated=true;

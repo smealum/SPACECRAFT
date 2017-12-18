@@ -45,6 +45,7 @@ void SolarSystemGeneratorSol::generatePlanetInfos(std::vector<PlanetInfo*>& v)
 						1)
 					);
 
+#ifdef _qdsfmlqksdfjm_EMSCRIPTEN__
 		for(int j=0;j<numSatellites;j++)
 		{
 			int nseed=seed*1000+i*10+j+1;
@@ -68,5 +69,6 @@ void SolarSystemGeneratorSol::generatePlanetInfos(std::vector<PlanetInfo*>& v)
 							satsize)
 						);
 		}
+#endif
 	}
 }
