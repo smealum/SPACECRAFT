@@ -29,6 +29,8 @@ class Input
 
         static float getHorAngle();
         static float getVerAngle();
+
+        static bool isIdle();
 };
 
 #endif /* end of include guard: INPUT_QHZPGW1N */

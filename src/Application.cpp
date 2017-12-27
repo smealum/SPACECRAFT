@@ -60,6 +60,58 @@ using namespace glm;
 	}
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+
+std::map<int, std::string> keys = {
+    // Rotation
+    {GLFW_KEY_Q, "KEY_Q"},
+    {GLFW_KEY_W, "KEY_W"},
+    {GLFW_KEY_E, "KEY_E"},
+    {GLFW_KEY_A, "KEY_A"},
+    {GLFW_KEY_S, "KEY_S"},
+    {GLFW_KEY_D, "KEY_D"},
+    // Translation
+    {GLFW_KEY_U, "KEY_U"},
+    {GLFW_KEY_I, "KEY_I"},
+    {GLFW_KEY_O, "KEY_O"},
+    {GLFW_KEY_J, "KEY_J"},
+    {GLFW_KEY_K, "KEY_K"},
+    {GLFW_KEY_L, "KEY_L"},
+    // Speed
+    {GLFW_KEY_Y, "KEY_Y"},
+    {GLFW_KEY_H, "KEY_H"},
+    // Mode
+    {GLFW_KEY_R, "KEY_R"},
+};
+
+void UpdateKeyboardInterface() {
+  static std::string previous_command = "";
+  std::string command;
+  for (const auto& key : keys) {
+    if (Input::isKeyHold(key.first)) {
+      command += "document.getElementById('" + key.second +
+                 "').style.backgroundColor = 'gray';";
+    } else {
+      command += "document.getElementById('" + key.second +
+                 "').style.backgroundColor = '#AAD';";
+    }
+  }
+  if (command != previous_command) {
+    emscripten_run_script(command.c_str());
+    previous_command = command;
+  }
+}
+
+#else
+
+void UpdateKeyboardInterface() {
+  // Nothing
+}
+
+#endif
+
+
 void mouseWheelCallback(GLFWwindow *, double x, double y)
 {
 	selectBlockType = (selectBlockType + (int)y);
@@ -67,10 +119,8 @@ void mouseWheelCallback(GLFWwindow *, double x, double y)
 
 void reloadAllShaders()
 {
-	for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
-	{
-		it->second->load();
-	}
+  for (auto it(shaderMap.begin()); it != shaderMap.end(); ++it)
+    it->second->load();
 }
 
 Application::Application() : 
@@ -131,7 +181,6 @@ Application::Application() :
 
 	#ifndef NTWBAR
 		bar = TwNewBar("SPACECRAFT");
-		//TwDefine((name+" iconified=true").c_str()); // minimizes
 		TwWindowSize(width, height);
 		TwDefine(" GLOBAL help='SPACECRAFT > Minecraft' ");
 		TwAddVarRW(bar, "Planet LOD Details", TW_TYPE_FLOAT, &PlanetFaceDetailsPower, " label='Planet LOD' min=5.0 max=60.0 step=1");
@@ -178,8 +227,6 @@ void Application::glfwWindowHints()
 #ifdef __EMSCRIPTEN__
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #else
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -221,6 +268,8 @@ void Application::CreateWebWindow() {
 		log_err("CreateWebWindow called but windows is already created.");
     return;
 	}
+	
+  glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
   width = 1024;
   height = 640;
@@ -233,6 +282,12 @@ void Application::CreateWebWindow() {
              WIN_TITLE.c_str(), 
              nullptr,
              nullptr); // Windowed
+
+  (void)glfwSetFramebufferSizeCallback(
+      window, [](GLFWwindow * window, int width, int height) {
+        std::cerr << "width = " << width << " height = " << height << std::endl;
+        std::cout << "width = " << width << " height = " << height << std::endl;
+      });
 
   if (!window) {
     log_err("Cannot create window...");
@@ -335,6 +390,9 @@ void Application::loop()
 
 	globalGalaxy->step(*camera,contentHandler,globalTime,deltaTime);
 	Input::update(window);
+
+  UpdateKeyboardInterface();
+
 	TileTexture::getInstance().update();
     camera->update();
 
@@ -345,7 +403,7 @@ void Application::loop()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   #ifndef __EMSCRIPTEN__
-      glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, wireframe?GL_LINE:GL_FILL);
   #endif
 
 	globalGalaxy->draw(*camera);
@@ -392,9 +450,7 @@ void Application::loop()
 
 #ifdef __EMSCRIPTEN__
   while(true) {
-    for(int i = 0; i<10; ++i);
     bool executed = contentHandler.ExecuteOneTask();
-
     if (!executed)
       break;
 

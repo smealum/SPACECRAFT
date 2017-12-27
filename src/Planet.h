@@ -60,7 +60,6 @@ class PlanetFaceBufferHandler {
   int current_capacity;
   GLuint vbo, vao;
   glm::vec3 v1, v2;
-  float alpha;
 
   int vertex_per_cube;
   bool water;

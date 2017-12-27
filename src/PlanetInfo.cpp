@@ -29,7 +29,7 @@ PlanetInfo::~PlanetInfo()
 }
 
 PlanetInfoEarth::PlanetInfoEarth(SpaceObjectTrajectory* t, ContentHandler& ch, int seed, int size):
-	PlanetInfo(t,(PlanetGenerator*)(new PlanetGeneratorEarth(ch.getMaxProducers())),seed,size,float(CHUNK_N*MINIWORLD_H)*0.5),
+	PlanetInfo(t,(PlanetGenerator*)(new PlanetGeneratorEarth(ch.getMaxProducers())),seed,size,float(CHUNK_N*MINIWORLD_H)*0.5-50),
 	continentFrequency( 1.f),
 	continentLacunarity(2.089f),
 	mountainLacunarity(2.142f),

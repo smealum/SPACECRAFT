@@ -222,10 +222,10 @@ void Atmosphere::bind(Camera& c, glm::vec3 lightDirection, glm::vec3 position, f
 	sprogram.setUniform("cameraPosition", c.getPosition(position)/scale);
 	sprogram.setUniform("lightDirection", lightDirection);
 	sprogram.setUniform("m_fWavelength4", info->m_fWavelength4);
-	sprogram.setUniform("m_g", info->m_g);
-	sprogram.setUniform("m_ESun", info->m_ESun);
-	sprogram.setUniform("m_Kr", info->m_Kr);
-	sprogram.setUniform("m_Km", info->m_Km);
+	//sprogram.setUniform("m_g", info->m_g);
+	//sprogram.setUniform("m_ESun", info->m_ESun);
+	//sprogram.setUniform("m_Kr", info->m_Kr);
+	//sprogram.setUniform("m_Km", info->m_Km);
 	sprogram.setUniform("m_Kr4PI", info->m_Kr4PI);
 	sprogram.setUniform("m_Km4PI", info->m_Km4PI);
 	sprogram.setUniform("m_fInnerRadius", info->m_fInnerRadius);

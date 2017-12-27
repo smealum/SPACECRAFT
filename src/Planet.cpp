@@ -429,19 +429,12 @@ PlanetFaceBufferHandler::PlanetFaceBufferHandler(PlanetFace& pf,
       vbo(0),
       vao(0),
       index(index),
-      alpha(alpha),
       shader(ShaderProgram::loadFromFile("shader/CubeVertex/CubeVertex.vert",
                                          "shader/CubeVertex/CubeVertex.frag",
                                          "CubeVertex")),
       vertex_per_cube(water ? 6 : 30),
       water(water) {
   resizeVBO();
-  shader.use();
-#ifndef __EMSCRIPTEN__
-  glBindFragDataLocation(shader.getHandle(), 0, "outColor");
-#endif
-
-  shader.setUniform("model", glm::mat4(1.0f));
 }
 
 PlanetFaceBufferHandler::~PlanetFaceBufferHandler() {
@@ -511,13 +504,15 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf,
 
   faces.push_back(pf);
 
-  // 0 -- 1
-  // |    |
-  // 3 -- 2
-  //
-  // 4 -- 5
-  // |    |
-  // 7 -- 6
+  /*
+          0────1
+         /│   /│
+        3────2 │
+        │ │  │ │
+        │ 4──│─5
+        │/   │/
+        7────6
+  */
 
   const float size = (1 << pf->size);
   const float inv_size = 1.f / size;
@@ -632,16 +627,12 @@ void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir) {
   shader.use();
   c.updateCamera(shader);
 
-  shader.setUniform("v1", v1);
-  shader.setUniform("v2", v2);
   shader.setUniform("lightdir", lightdir);
-  shader.setUniform("planetPos",
-                    planetFace.planet->position - c.getReference());
-  shader.setUniform("cameraPos", c.getPosition(planetFace.planet->position));
-  shader.setUniform("model", glm::mat4(planetFace.planet->model));
-  shader.setUniform("planetSize", planetFace.planet->scale);
-  shader.setUniform("alpha", alpha);
-  shader.setUniform("size", float(planetFace.planet->planetInfo->size));
+
+  glm::vec3 planet_position = planetFace.planet->position - c.getReference();
+  glm::mat4 model = glm::translate(glm::mat4(1.0), planet_position) *
+                    glm::mat4(planetFace.planet->model);
+  shader.setUniform("model", model);
 
   // planetface_atmosphere test
   if (planetFace.planet->atmosphere) {
@@ -677,25 +668,25 @@ void PlanetFace::draw(Camera& c, glm::vec3 lightdir, bool water) {
   }
 }
 
-void Planet::draw(Camera& c, bool atmo) {
-  if (!c.isBoxInFrustum(position - glm::vec3(1), glm::vec3(2, 0, 0),
-                        glm::vec3(0, 2, 0), glm::vec3(0, 0, 2)))
+void Planet::draw(Camera& camera, bool atmo) {
+  if (!camera.isBoxInFrustum(position - glm::vec3(1), glm::vec3(2, 0, 0),
+                             glm::vec3(0, 2, 0), glm::vec3(0, 0, 2)))
     return;
 
   lightdir = glm::normalize(sunPosition - position);
 
   if (atmo) {
     if (atmosphere)
-      atmosphere->draw(c, lightdir, position, scale);
+      atmosphere->draw(camera, lightdir, position, scale);
   } else {
     for (int i = 0; i < 6; i++)
-      faces[i]->draw(c, lightdir);
+      faces[i]->draw(camera, lightdir);
     for (auto it(miniWorldList.begin()); it != miniWorldList.end(); ++it)
-      (*it)->draw(c);
+      (*it)->draw(camera);
     for (int i = 0; i < 6; i++)
-      faces[i]->draw(c, lightdir, true);
+      faces[i]->draw(camera, lightdir, true);
     for (auto it(miniWorldList.begin()); it != miniWorldList.end(); ++it)
-      (*it)->draw(c, false);
+      (*it)->draw(camera, false);
     // dessin des nuages
     // cloud.draw(c);
   }

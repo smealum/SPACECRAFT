@@ -37,8 +37,6 @@ h3 {
 
 
 canvas {
-  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-
   transition: all 0.2s ease-in-out;
   border-radius:2px;
   display:block;
@@ -47,7 +45,7 @@ canvas {
 }
 
 canvas:hover {
-  box-shadow: 0 14px 20px rgba(0,0,0,0.19), 0 6px 10px rgba(0,0,0,0.23);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
 
@@ -66,4 +64,70 @@ textarea {
 
 textarea:hover {
   opacity:1.0;
+}
+
+/********  keyboard  ****************/
+
+#keyboard_translation {
+  position:absolute;
+  width:96px;
+  left:10px;
+  top:64px;
+}
+
+#keyboard_mode {
+  position:absolute;
+  width:96px;
+  left:116px;
+  top:64px;
+}
+
+#keyboard_rotation {
+  position:absolute;
+  width:96px;
+  right:10px;
+  top:64px;
+}
+
+#keyboard_speed {
+  position:absolute;
+  width:50px;
+  right:116px;
+  top:64px;
+}
+
+#keyboard_rotation, #keyboard_translation, #keyboard_speed, #keyboard_mode {
+  display:flex;
+  flex-wrap:wrap;
+  margin:0px;
+  padding:0px;
+  border:1px solid;
+}
+
+.KEY {
+  vertical-align: middle;
+  line-height:30px;
+  transition: background-color 0.1s ease-in-out;
+  min-width:30px;
+  height:30px;
+  border:1px solid;
+  text-align:center;
+  display:inline-block;
+  background-color:#AAD;
+  margin:0px;
+  padding:0px;
+  flex:1;
+}
+
+.keyboard_title {
+  width:100%;
+  margin:0px;
+  min-height:32px;
+  padding:0px;
+  text-align:center;
+  background-color:white;
+  border: 1px solid;
+  vertical-align: middle;
+  text-align:center;
+  line-height:30px;
 }
