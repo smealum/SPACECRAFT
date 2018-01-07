@@ -20,6 +20,11 @@
 #include "utils/glm.h"
 #include "world/BlockType.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h> 
+#endif
+
+
 const std::string WIN_TITLE = "SPACECRAFT";
 
 float PlanetFaceDetailsPower = 28.0;
@@ -61,7 +66,6 @@ using namespace glm;
 #endif
 
 #ifdef __EMSCRIPTEN__
-#include <emscripten.h>
 
 std::map<int, std::string> keys = {
     // Rotation
@@ -110,7 +114,6 @@ void UpdateKeyboardInterface() {
 }
 
 #endif
-
 
 void mouseWheelCallback(GLFWwindow *, double x, double y)
 {
@@ -162,8 +165,6 @@ Application::Application() :
 
 	glfwMakeContextCurrent(window);
   printf("OpenGL version = %s\n", glGetString(GL_VERSION));
-        
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // can be GLFW_CURSOR_HIDDEN
 
 	#ifndef NTWBAR
 		TwInit(TW_OPENGL_CORE, NULL);
@@ -294,7 +295,7 @@ void Application::CreateWebWindow() {
     glfwTerminate();
     std::exit(2);
   }
-  glfwSetCursorPos(window, width/2, height/2);
+  //glfwSetCursorPos(window, width/2, height/2);
 }
 
 CaveGenerator caves;
@@ -366,7 +367,10 @@ void Application::run()
 	};
 
 #ifdef __EMSCRIPTEN__
-  emscripten_set_main_loop(loop_iteration, 60, 0);
+  //emscripten_set_main_loop(loop_iteration, 60, 0);
+  emscripten_set_main_loop(loop_iteration, 0, 1);
+  glfwTerminate();
+
 #else
 	while (state != appExiting) {
 		while(!glfwWindowShouldClose(window)) {

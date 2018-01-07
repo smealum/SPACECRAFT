@@ -6,31 +6,29 @@
 
 struct GLFWwindow;
 
-class Input
-{
-    public:
-        // update state
-        static void update(GLFWwindow* window);
-        // keyboard
-        static bool isKeyPressed(int key);
-        static bool isKeyReleased(int key);
-        static bool isKeyHold(int key);
-        // mouse
-        static bool isMousePressed(int key);
-        static bool isMouseReleased(int key);
-        static bool isMouseHold(int key);
-        static double mouseX();
-        static double mouseY();
-        static void setMousePos(double x, double y); // relative
+class Input {
+ public:
+  // update state
+  static void update(GLFWwindow* window);
+  // keyboard
+  static bool isKeyPressed(int key);
+  static bool isKeyReleased(int key);
+  static bool isKeyHold(int key);
+  // mouse
+  static bool isMousePressed(int key);
+  static bool isMouseReleased(int key);
+  static bool isMouseHold(int key);
+  static double mouseX();
+  static double mouseY();
 
-        static void fixMouse();
-        static void unfixMouse();
-        static bool isMouseFixed();
+  static void fixMouse();
+  static void unfixMouse();
+  static bool isMouseFixed();
 
-        static float getHorAngle();
-        static float getVerAngle();
+  static float getHorAngle();
+  static float getVerAngle();
 
-        static bool isIdle();
+  static bool isIdle();
 };
 
 #endif /* end of include guard: INPUT_QHZPGW1N */
