@@ -624,6 +624,8 @@ void PlanetFaceBufferHandler::deleteFace(PlanetFace* pf) {
 }
 
 void PlanetFaceBufferHandler::draw(Camera& c, glm::vec3 lightdir) {
+  if (current_size <= 0)
+    return;
   shader.use();
   c.updateCamera(shader);
 
