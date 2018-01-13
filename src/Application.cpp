@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Application.h"
 
+
 #include <cstdlib>
 #include <functional>
 #include <iostream>
@@ -22,6 +23,7 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h> 
+#include <cmath>
 #endif
 
 
@@ -103,7 +105,23 @@ void UpdateKeyboardInterface() {
   }
   if (command != previous_command) {
     emscripten_run_script(command.c_str());
-    previous_command = command;
+    previous_command.swap(command);
+  }
+}
+
+void UpdateTaskLoad(size_t tasks) {
+  static std::string previous_command = "";
+  static int i = 0;
+  if (i++ % 10 == 0) {
+    std::string command =
+        "var task_counter = document.getElementById('task_counter');" 
+        "task_counter.innerHTML = " + std::to_string(tasks) + ";" +
+        "task_counter.style.width='" + std::to_string(std::sqrt(1.0 + tasks)) +
+        "px';";
+    if (command != previous_command) {
+      emscripten_run_script(command.c_str());
+      previous_command.swap(command);
+    }
   }
 }
 
@@ -463,6 +481,7 @@ void Application::loop()
     if (deltaTime > 1.0 / 30.0)
       break;
   }
+  UpdateTaskLoad(contentHandler.TaskListSize());
 #endif
 }
 

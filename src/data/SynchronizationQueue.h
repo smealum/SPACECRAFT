@@ -15,6 +15,7 @@ class SynchronizationQueue
 		void popAll(std::queue<T>& ret);
 		void push(T t, bool release=true);
 		void manualRelease(void);
+    size_t size();
 		T pop(void);
 	private:
 #ifndef __EMSCRIPTEN__
@@ -49,6 +50,13 @@ void SynchronizationQueue<T>::manualRelease(void)
   mutex.unlock();
 #endif
 }
+
+template<class T>
+size_t SynchronizationQueue<T>::size()
+{
+  return queue.size();
+}
+
 
 template<class T>
 T SynchronizationQueue<T>::pop(void)

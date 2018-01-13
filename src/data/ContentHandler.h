@@ -18,6 +18,7 @@ public:
 
   void handleNewContent();
   bool ExecuteOneTask();
+  size_t TaskListSize();
 
   inline int getMaxProducers() const { return int(producers.size()); }
 

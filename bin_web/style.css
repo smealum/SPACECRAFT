@@ -131,3 +131,12 @@ textarea:hover {
   text-align:center;
   line-height:30px;
 }
+
+#task_counter {
+  transition:0.1s width ease-in-out;
+  margin:10px;
+  margin-left:auto;
+  margin-right:auto;
+  margin-top:0;
+  padding:10px;
+}

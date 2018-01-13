@@ -38,13 +38,22 @@ Producer::~Producer()
 }
 
 bool Producer::ExecuteOneTask() {
-  ContentRequest *request = inputQueue.pop();
-  if (!request)
-    return false;
-  if (request->isRelevant(id))
-    request->process(id);
-  else
-    request->isCanceled = true;
+  ContentRequest* request;
+  for (;;) {
+    request = inputQueue.pop();
+
+    if (!request)
+      return false;
+
+    if (!request->isRelevant(id)) {
+      request->isCanceled = true;
+      outputQueue.push(request);
+      continue;
+    }
+    
+    break;
+  }
+  request->process(id);
   outputQueue.push(request);
   return true;
 }

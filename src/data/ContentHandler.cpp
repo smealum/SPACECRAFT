@@ -42,6 +42,10 @@ bool ContentHandler::ExecuteOneTask() {
   return producers[0]->ExecuteOneTask();
 }
 
+size_t ContentHandler::TaskListSize() {
+  return inputQueue.size();
+}
+
 ContentHandler::~ContentHandler() {
   // the producers MUST somehow terminate the thread
   for (auto it = producers.begin(); it != producers.end(); ++it)
