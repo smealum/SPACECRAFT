@@ -540,12 +540,14 @@ void PlanetFaceBufferHandler::addFace(PlanetFace* pf,
 
   if (!water) {
     // normales
-    glm::vec3 n_left =
-        glm::cross(position[3] - position[4], position[7] - position[0]);
-    glm::vec3 n_down =
-        glm::cross(position[5] - position[7], position[6] - position[4]);
-    glm::vec3 n_right = -n_left;
-    glm::vec3 n_up = -n_down;
+
+    const glm::vec3 n_left = glm::cross(position[3] - position[4],
+                                        position[7] - position[0]);
+    const glm::vec3 n_down = glm::cross(position[2] - position[7],
+                                        position[7] - position[3]);
+
+    const glm::vec3 n_right = -n_left;
+    const glm::vec3 n_up = -n_down;
 
     // Left
     buffer.push_back({position[4], n_left, {0.f, 1.f}, sideTile});
