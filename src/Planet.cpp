@@ -207,7 +207,7 @@ bool PlanetFace::isDetailedEnough(Camera& c) {
 
   // if(depth<4)return false;
 
-  // if(!c.isBoxInFrustum(box, 8, glm::mat4(1)))return true; //frustum culling
+  //if(!c.isBoxInFrustum(box, 8, glm::mat4(1)))return true; //frustum culling
 
   // if (!sons[0])
   // if(!c.isPointInFrustum(vertex[4]))
@@ -222,7 +222,7 @@ bool PlanetFace::isDetailedEnough(Camera& c) {
   // on ne prend plus en compte l'élévation, c'est fait exprès
   p = glm::normalize(p) * std::max(PLANET_ALTITUDETHRESHOLD, glm::length(p));
   const float l = glm::length(vertex[4] * PLANET_ALTITUDETHRESHOLD - p);
-  if (l * (2 << (depth - 1)) <
+  if (l * (1 << depth) <
       PlanetFaceDetailsPower * planet->planetInfo->size)
     return false;
   return true;

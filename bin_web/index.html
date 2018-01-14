@@ -6,6 +6,11 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
+
+    <div id="task_counter_container">
+      <div id="task_counter"></div>
+    </div>
+
     <h3>by @smealum @ArthurSonzogni and @posva!</h3>
 
     <div id="keyboard_translation">
@@ -41,8 +46,10 @@
 
     <div id="content">
       <h1>SpaceCraft.js </h1>
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-      <div id="task_counter" style="background-color:red; width:200px;">task_counter</div>
+
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()">
+        Chargement... 
+      </canvas>
     </div>
 
     <div id="footer">

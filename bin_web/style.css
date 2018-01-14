@@ -1,5 +1,5 @@
 body {
-  margin: 10px;
+  margin: 0;
   background: #0A539C;
   height:100%;
   overflow:hidden;
@@ -38,7 +38,7 @@ h3 {
 
 canvas {
   transition: all 0.2s ease-in-out;
-  border-radius:2px;
+  border-radius:20px;
   display:block;
   margin-left:auto;
   margin-right:auto;
@@ -132,11 +132,20 @@ textarea:hover {
   line-height:30px;
 }
 
+#task_counter_container {
+  display:block;
+  background-color:black;
+  border: 1px solid black;
+  width:100%;
+  display:block;
+  margin:0;
+  padding:0;
+}
+
 #task_counter {
-  transition:0.1s width ease-in-out;
-  margin:10px;
-  margin-left:auto;
-  margin-right:auto;
-  margin-top:0;
-  padding:10px;
+  background-color: red;
+  margin:0;
+  padding:0;
+  transition:1.0s width linear;
+  font-size:8px;
 }

@@ -57,23 +57,20 @@ if (Web)
   list(APPEND CMAKE_LIBRARY_PATH "${CMAKE_SOURCE_DIR}/extlibs/libs-linux")
 
   # Emscripten options
-  string(APPEND CMAKE_CXX_FLAGS " -O3")
+  string(APPEND CMAKE_CXX_FLAGS " --closure 1")
+  string(APPEND CMAKE_CXX_FLAGS " --js-opts 3")
   string(APPEND CMAKE_CXX_FLAGS " --llvm-lto 3")
   string(APPEND CMAKE_CXX_FLAGS " --llvm-opts 3")
-  string(APPEND CMAKE_CXX_FLAGS " --js-opts 3")
-  string(APPEND CMAKE_CXX_FLAGS " --emit-symbol-map")
+  string(APPEND CMAKE_CXX_FLAGS " -O3")
   string(APPEND CMAKE_CXX_FLAGS " -s USE_GLFW=3 ")
   string(APPEND CMAKE_CXX_FLAGS " -s NO_FILESYSTEM=0 ")
   string(APPEND CMAKE_CXX_FLAGS " -s DEMANGLE_SUPPORT=0")
   string(APPEND CMAKE_CXX_FLAGS " -s ALLOW_MEMORY_GROWTH=1")
   string(APPEND CMAKE_CXX_FLAGS " -s ASSERTIONS=0")
   string(APPEND CMAKE_CXX_FLAGS " -s USE_WEBGL2=1")
-  #string(APPEND CMAKE_CXX_FLAGS " -s FULL_ES3=1")
   string(APPEND CMAKE_CXX_FLAGS " -s WASM=1")
   string(APPEND CMAKE_CXX_FLAGS " -s \"BINARYEN_TRAP_MODE='clamp'\"")
   string(APPEND CMAKE_CXX_FLAGS " --no-heap-copy")
-  string(APPEND CMAKE_CXX_FLAGS " --closure 1")
-  string(APPEND CMAKE_CXX_FLAGS " --llvm-lto 1")
 
 
   # Allow the directories /shader and /data to be fetched by the web browser.

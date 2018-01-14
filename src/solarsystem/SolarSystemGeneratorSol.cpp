@@ -36,7 +36,7 @@ void SolarSystemGeneratorSol::generatePlanetInfos(std::vector<PlanetInfo*>& v) {
       init_genrand64(nseed);
       satdistance += genrand64_real2() * 1e2 + 3e1;
       double satperiod = genrand64_real2() * 1e1 + 7e0;
-      int satsize=genrand64_int64()&1+2;
+      int satsize=(genrand64_int64()&1)+2;
 
       SpaceObjectTrajectory* satTrajectory =
           new EllipticalTrajectory(*trajectory, glm::mat3(satdistance),

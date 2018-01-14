@@ -11,7 +11,7 @@
 PlanetInfo::PlanetInfo(SpaceObjectTrajectory* t, PlanetGenerator* p, int seed, int size, float waterLevelBlock):
 	seed(seed),
 	trajectory(t),
-	axis(glm::normalize(glm::vec3(1.0,1.0,1.0))),
+	axis(glm::normalize(glm::vec3(0.1,1.0,0.2))),
 	period(1.0f),
 	planetGenerator(p),
 	size(size),

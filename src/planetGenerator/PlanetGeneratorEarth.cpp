@@ -138,7 +138,7 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 					const auto height=heightMap[i+(CHUNK_N)*cx+offset][k+(CHUNK_N)*cz+offset];
 					const auto tile=tileMap[i+(CHUNK_N)*cx+offset][k+(CHUNK_N)*cz+offset];
 
-					//TEMP (pour tester)
+					//TEMP (pour tester)artthurhursonzogni.com
 					const int waterHeight=planetInfo->waterLevelBlock;
 					int caveHeightMax;
 					int caveHeightMin;
@@ -235,7 +235,7 @@ void PlanetGeneratorEarth::generateWorldData(int threadId,
 
 			// ajout des arbres
 			if (
-					(randomSource % 200 == 100) and
+					(randomSource % 1000 == 42) and
 					tileMap[x][z] == blockTypes::grass
 			)
 			treePositions.push_back(glm::i32vec4(x-offset,heightMap[x][z], z-offset ,randomSource));
@@ -296,9 +296,9 @@ PlanetGeneratorResponse PlanetGeneratorEarth::getCharacteristic(int threadId, co
 		float e = (elevation - 1.001) * 1000.f ;
 
 		float sandCoef  = 3.0*temperature + 0.4*e - humidity;
-		float snowCoef  = -2.0*temperature+ 1.4*e + 0.3*humidity;
+		float snowCoef  = -2.0*temperature+ 1.4*e + 0.3*humidity - 0.2;
 		float stoneCoef = snowCoef+0.01;
-		float grassCoef = 0.5 + 0.5*abs(humidity);
+		float grassCoef = 1.0 + 0.5*abs(humidity);
 
 		// inihibition
 		// (pas de sable près de l'eau)

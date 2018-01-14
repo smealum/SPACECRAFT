@@ -29,7 +29,7 @@
 
 const std::string WIN_TITLE = "SPACECRAFT";
 
-float PlanetFaceDetailsPower = 28.0;
+float PlanetFaceDetailsPower = 40.0;
 
 uint8_t selectBlockType(blockTypes::dirt);
 
@@ -114,10 +114,12 @@ void UpdateTaskLoad(size_t tasks) {
   static int i = 0;
   if (i++ % 10 == 0) {
     std::string command =
-        "var task_counter = document.getElementById('task_counter');" 
-        "task_counter.innerHTML = " + std::to_string(tasks) + ";" +
-        "task_counter.style.width='" + std::to_string(std::sqrt(1.0 + tasks)) +
-        "px';";
+        "var task_counter = document.getElementById('task_counter');"
+        "task_counter.innerHTML = " +
+        std::to_string(tasks) +
+        ";"
+        "task_counter.style.width='" +
+        std::to_string(std::powf(tasks / 20000.f, 0.8) * 100.f) + "%';";
     if (command != previous_command) {
       emscripten_run_script(command.c_str());
       previous_command.swap(command);
@@ -303,9 +305,8 @@ void Application::CreateWebWindow() {
              nullptr); // Windowed
 
   (void)glfwSetFramebufferSizeCallback(
-      window, [](GLFWwindow * window, int width, int height) {
+      window, [](GLFWwindow* window, int width, int height) {
         std::cerr << "width = " << width << " height = " << height << std::endl;
-        std::cout << "width = " << width << " height = " << height << std::endl;
       });
 
   if (!window) {
@@ -478,8 +479,9 @@ void Application::loop()
 
     float frame_time_end = (float)glfwGetTime();
     deltaTime = frame_time_end - frame_time_start;
-    if (deltaTime > 1.0 / 30.0)
+    if (deltaTime > 1.0 / 30.0) {
       break;
+    }
   }
   UpdateTaskLoad(contentHandler.TaskListSize());
 #endif
