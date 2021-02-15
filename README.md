@@ -10,7 +10,7 @@ The github repo for this can be found at https://github.com/smealum/SPACECRAFT
 
 ## Windows Demo
 
-You can download a precompiled demo for windows at https://dl.dropboxusercontent.com/u/13279485/spacecraft.zip
+You can download a precompiled demo for windows at https://www.dropbox.com/s/owxhu38ujpquikb/spacecraft.zip?dl=1
 
 ## Dependencies
 
